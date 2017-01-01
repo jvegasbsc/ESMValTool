@@ -812,7 +812,8 @@ function cdo_remapdis(var[1]:string,
 ;;    index        = index of current model in data_pointer
 ;;    data_pointer = see interface_scripts/data_handling.ncl
 ;;    dst_grid     = path to file containing destination grid information
-;;    opt          = unused
+;;    opt          = filename to save regridded field in
+;;                   start with diag_script name to be unambigious
 ;;
 ;; Return value:
 ;;    The field regridded to the destination grid specified in dst_grid
@@ -825,22 +826,42 @@ function cdo_remapdis(var[1]:string,
 ;;    Climate Data Operators (CDO) package must be installed on the system
 ;;
 ;; Modification history:
+;;    20170317-A_gier_be: added filestorage support
 ;;    20170120-A_senf_da: written.
 ;;
 local regfile_in_tmp, regfile_out_tmp, lat, lon, gAtt, field_out, quote
 begin
 
+    funcname = "cdo_remapdis"
+    scriptname = "diag_scripts/lib/ncl/latlon.ncl"
+    verbosity = stringtointeger(getenv("ESMValTool_verbosity"))
+    enter_msg(scriptname, funcname, 10)
+
     ;; Necessary files
     if (.not.isfilepresent(wrk_dir + "/CDO/")) then
         system("mkdir -p " + wrk_dir + "/CDO/")
     end if
-    regfile_in_tmp  = wrk_dir + "/CDO/regrid_in.nc"   ; temporary -
-    regfile_out_tmp = wrk_dir + "/CDO/regrid_out.nc"  ; regrid-files
-    if (isfilepresent(regfile_in_tmp)) then
-        system("rm " + regfile_in_tmp)
-    end if
-    if (isfilepresent(regfile_out_tmp)) then
-        system("rm " + regfile_out_tmp)
+    if opt.eq."" then
+        regfile_in_tmp  = wrk_dir + "/CDO/regrid_in.nc"   ; temporary -
+        regfile_out_tmp = wrk_dir + "/CDO/regrid_out.nc"  ; regrid-files
+        if (isfilepresent(regfile_in_tmp)) then
+            system("rm " + regfile_in_tmp)
+        end if
+        if (isfilepresent(regfile_out_tmp)) then
+            system("rm " + regfile_out_tmp)
+        end if
+    else
+        regfile_in_tmp = wrk_dir + "/CDO/regrid_in.nc"    ; in can stay same
+        regfile_out_tmp = wrk_dir + "/CDO/" + opt + ".nc"
+        if (isfilepresent(regfile_in_tmp)) then
+            system("rm " + regfile_in_tmp)
+        end if
+        if (isfilepresent(regfile_out_tmp)) then
+            error_msg("f", "latlon.ncl", funcname, \
+                      "File " + regfile_out_tmp + " already exists," + \
+                      " delete it or improve diag_script")
+           ;; system("rm " + regfile_out_tmp)
+        end if
     end if
     
     ;; Attach coordinate information to array and file
