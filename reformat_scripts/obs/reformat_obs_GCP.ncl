@@ -7,9 +7,10 @@
 ;;
 ;; Source
 ;;    http://www.globalcarbonproject.org/carbonbudget/
+;;    http://cdiac.ornl.gov/GCP/
 ;;
 ;; Last access
-;;    20140115
+;;    20170328
 ;;
 ;; Download and processing instructions
 ;;    Select the following filters:
@@ -19,16 +20,13 @@
 ;;                        atmospheric growth	
 ;;                        ocean sink	
 ;;                        land sink	
-;;                        sum land+ocean sinkCarbon Dioxide.
 ;;        Type: Reanalysis.
 ;;        Frequency: Annual.
-;;    Convert the data to unix format using dos2unix.
-;;    This list must be manually formatted in a comma-separated table, given as
-;;    FILE_STAT below.
 ;;    Check the period covered by the data and give it below as YEAR1 and
 ;;    YEAR2.
 ;;
 ;; Modification history
+;;    20170329-A_gier_be: updated to new data, now gives both nbp and fgco2
 ;;    20151001-A_wenz_sa: written.
 ;;
 ;;#############################################################################
@@ -44,35 +42,42 @@ begin
     ;; Input dir (raw data)
     INDIR = getenv("ESMValTool_RAWOBSPATH") + "/Tier" + \
         TIER + "/" + OBSNAME + "/"
+    ;INDIR = "obs/GCP/"
 
     ;; Output dir (CMOR-ized data)
     OUTDIR = getenv("ESMValTool_OBSPATH") + "/Tier" + \
         TIER + "/" + OBSNAME + "/"
+    ;OUTDIR = "obs/GCP/"
 
     ;; Period
     YEAR1 = 1959
-    YEAR2 = 2011
+    YEAR2 = 2015
 
     ;; Selected variable (standard name)
-    VAR = "co2flux"
+    VARS = (/"fgco2", "nbp"/)
 
     ;; Field
-    FIELD = "T0M"
+    FLDARR = (/"T0M", "T0M"/)
+
+    ;; Initialize global variable
+    FIELD = ""
 
 end
 
+;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "./interface_scripts/messaging.ncl"
+load "./interface_scripts/constants.ncl"
 load "./reformat_scripts/constants.ncl"
 load "./reformat_scripts/obs/reformat_obs_func.ncl"
 
 begin
 
     verbosity = stringtointeger(getenv("ESMValTool_verbosity"))
-    diag_script = "reformat_obs_ESACCI-GCP.ncl"
+    diag_script = "reformat_obs_GCP.ncl"
     enter_msg(diag_script, "", 1)
 
     ;; Create output dir
-    if (.not.isfilepresent(OUTDIR)) then
+    if (.not.isfilepresent_esmval(OUTDIR)) then
         system("mkdir -p " + OUTDIR)
     end if
 
@@ -80,23 +85,33 @@ begin
     timec = create_timec(YEAR1, YEAR2)
     datec = ut_calendar(timec, 1)
 
-    ;; Read station info
-    info_output("Reading station information", verbosity, 1)
+    ;; Reading data info
+    info_output("Reading data information", verbosity, 1)
 
-    infile = INDIR + OBSNAME + "_2012_v1.3.txt"
+    infile = INDIR + OBSNAME + "_2016_v1.0.csv"
+    ;;head = readAsciiHead(infile, "#Year")
+    data = readAsciiTable(infile, 6, "float", "#Year")
+    ;;delete(head)
 
-    if (isfilepresent_esmval(infile)) then
+    ;; Loop over variables
+    do vID = 0, dimsizes(VARS) - 1
 
-        head = readAsciiHead(infile, "#Year")
-        data = readAsciiTable(infile, 7, "float", dimsizes(head))
-        delete(head)
+        ;; Set field
+        FIELD = FLDARR(vID)
 
-        info_output("Processing " + infile, verbosity, 1)
+        info_output("", verbosity, 1)
+        info_output("Processing " + VARS(vID) + " (" + FIELD + ") ", \
+                    verbosity, 1)
+
         ;; Read time and extract full years only
         year = data(:, 0)
-        date = toint(year)
-        var = data(:, 6)
-        delete(data)
+
+        if VARS(vID).eq."fgco2" then
+            var = data(:,4)
+        end if
+        if VARS(vID).eq."nbp" then
+            var = data(:,5) - data(:,2)
+        end if
 
         ;; Check time range
         if (min(toint(year)).lt.YEAR1 .or. max(toint(year)).gt.YEAR2) then
@@ -106,10 +121,11 @@ begin
                        min(toint(year)) + "-" + max(toint(year)) + ")")
         end if
         delete(year)
-        
-        ;; Create time coordinate
-        timec = create_timec(YEAR1, YEAR2)
-        datec = cd_calendar(timec, 1)
+
+        ;; Convert units
+        ;; [PgC y-1] --> [kg m-2 s-1]
+        var = var / (3600. * 24. * 365 / 1e12)
+        conversion = True
         
         ;; Create output variable
         output = new(dimsizes(timec), float)
@@ -121,12 +137,9 @@ begin
             output(6+ii*12) = (/var(ii)/)
         end do
         delete(var)
-        delete(date)
-
-        output = where(output.lt.0., output@_FillValue, output)
 
         ;; Set variable attributes (CMOR)
-        tmp = var_attrib(output, VAR)
+        tmp = var_attrib(output, VARS(vID))
         delete(output)
         output = tmp
         delete(tmp)
@@ -146,18 +159,19 @@ begin
         gAtt@field = FIELD
         gAtt@tier = TIER
         gAtt@source = "http://www.globalcarbonproject.org/carbonbudget/"
-        gAtt@title = OBSNAME + " data reformatted for the ESMValTool"
+        gAtt@title = OBSNAME + \
+        " data reformatted for the ESMValTool"
         gAtt@conventions = "CF/CMOR"
         
         ;; Outfile
-        fout = OUTDIR + "OBS_" + OBSNAME + "_reanaly_1" \
-                      + "_" + FIELD + "_" + VAR + ".nc"
+        fout = OUTDIR + "OBS_" + OBSNAME + "_reanaly_1_" + FIELD + \
+            "_" + VARS(vID) + "_" + YEAR1 + "01-" + YEAR2 + "12.nc"
         
         ;; Write variable
-        write_nc(fout, VAR, output, gAtt)
+        write_nc(fout, VARS(vID), output, gAtt)
         delete(gAtt)
         
-    end if
+    end do
 
     leave_msg(diag_script, "", 1)
     

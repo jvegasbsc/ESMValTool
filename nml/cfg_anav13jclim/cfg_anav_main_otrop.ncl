@@ -1,7 +1,7 @@
 diag_script_info = True
 
 ;; Define region for the spatial average
-diag_script_info@region = "NH extratropics"
+diag_script_info@region = (/-18., 18./)
 
 ;; Plot legend in a separate file
 diag_script_info@legend_outside = False
@@ -12,18 +12,14 @@ diag_script_info@styleset = "CMIP5"
 ;; Sort model alphabetically
 diag_script_info@sort = True
 
+;; For regridding; default: 2deg - others not supported yet
+diag_script_info@grid = "2deg"
+
 ;; Draw seasonal cycle plot, including diff y-axis setting
 diag_script_info@seasonal_cycle_plot = True
-if (any(variables(0).eq.(/"GPP", "NBP"/))) then
-    diag_script_info@anav_month = True
-end if
 
 ;; Draw errorbar plot
 diag_script_info@errorbar_plot = True
 
 ;; Draw Mean (x-axis), IAV (y-axis) plot
 diag_script_info@mean_IAV_plot = False
-
-;; For regridding; default: 2deg - others not supported yet
-diag_script_info@grid = "2deg"
-
