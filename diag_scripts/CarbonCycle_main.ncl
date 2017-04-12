@@ -383,7 +383,7 @@ begin
         models@name = models@name_new
         all_yearly = all_yearly_new
         delete([/models@project_new, models@name_new, all_yearly_new/])
-        dim_MOD = dim_MOD + 1  ; update number of models
+        dim_MOD = dimsizes(models@name)  ; update number of models
     end if
 
     ;; Convert units if appropriate [kg m-2 s-1] --> [PgC y-1]
@@ -589,7 +589,7 @@ begin
         
         data_arr@ref_name = diag_script_info@evolution_plot_ref_model
         data_arr@units = all_yearly@units
-        data_arr@dim_Mod = dim_MOD -1
+        data_arr@dim_Mod = dimsizes(models@name) - 1
 
         ;; Subtract mean 1901-1930 (coded as till 1930) if anomaly plot
         ind_1930 = ind(all_yearly&year.eq.1930)
