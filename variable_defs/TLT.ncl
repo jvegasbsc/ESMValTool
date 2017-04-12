@@ -55,6 +55,13 @@ begin
     tmp_ta = extract_data_extended(index, "ta", tmp1, -1, 0, 0)
     tmp_tas = extract_data_extended(index, "tas", tmp2, -1, 0, 0)
 
+    ;; Only works if tas, ta on same grid, do not wanna regrid here
+    if .not.((dimsizes(tmp_ta&lat).eq.dimsizes(tmp_tas&lat)) .or. \
+        (dimsizes(tmp_ta&lon).eq.dimsizes(tmp_tas&lon))) then
+        error_msg("f", scriptname, "", "ta and tas are not using" \
+        + " the same grid, please regrid manually")
+    end if
+
     ;; Loading weight functions
     ;; Pressure levels in column 4, weights col 6
     land_weights = readAsciiTable( \
@@ -117,14 +124,18 @@ begin
     tas_oce = tmp_tas * conform(tmp_tas, sftof, (/1,2/))
 
     ;; Apply weights and calc TLT for land, oce seperately
-    tmp_land&plev = tmp_land&plev*l_weights
-    tmp_oce&plev = tmp_oce&plev*o_weights
-    land_tlt = dim_sum_n_Wrap(tmp_land, 1) + tas_land*tas_lw
-    oce_tlt = dim_sum_n_Wrap(tmp_oce, 1) + tas_oce*tas_ow
+    tmp_land = tmp_land * conform(tmp_land, l_weights, 1)
+    tmp_oce = tmp_oce * conform(tmp_oce, o_weights, 1)
+    copy_VarMeta(tmp_ta, tmp_land)
+    copy_VarMeta(tmp_ta, tmp_oce)
+    land_tlt = dim_sum_n_Wrap(tmp_land, 1)
+    land_tlt = land_tlt + tas_land*tas_lw
+    oce_tlt = dim_sum_n_Wrap(tmp_oce, 1)
+    oce_tlt = oce_tlt + tas_oce*tas_ow
 
     ;; Add TLT
     dum = land_tlt + oce_tlt
-
+    copy_VarMeta(land_tlt, dum)
 
     data_new = True
     dum@long_name = variable_info@long_name

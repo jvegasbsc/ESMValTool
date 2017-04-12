@@ -331,14 +331,41 @@ This namelist is part of the ESMValTool
 <!-- *********************************************************************** -->
 
     <diag>
-        <description>  </description>
+        <description> TLT vs prw trend                 </description>
 	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
-	<variable MIP="Amon"> TLT                      </variable>
+	<variable>            TLT                      </variable>
+        <variable>            prw                      </variable>
 	<field_type>          T2Ms                     </field_type>
 	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
 
-    <model> CMIP5_ETHZ   ACCESS1-0        MIP_VAR_DEF   historical   r1i1p1   1988 2012   @{MODELPATH}/ETHZ_CMIP5 </model>
-    <diag_script cfg="cfg_ipcc-fig-9-6.ncl">      ipcc-fig-9-9.ncl       </diag_script>
+    <model> CMIP5_ETHZ     bcc-csm1-1      Amon   historical   r1i1p1   1988 2012 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     CanESM2         Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     CCSM4           Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     CNRM-CM5        Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     CSIRO-Mk3-6-0   Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     FGOALS-s2       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     GFDL-CM3        Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     GFDL-ESM2G      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     GFDL-ESM2M      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     GISS-E2-R       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     inmcm4          Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     IPSL-CM5A-LR    Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     IPSL-CM5A-MR    Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     IPSL-CM5B-LR    Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     MIROC5          Amon   historical   r1i1p1   1988 2012 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     MIROC-ESM       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     MIROC-ESM-CHEM  Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     MPI-ESM-LR      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     MPI-ESM-MR      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     MRI-CGCM3       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     NorESM1-M       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ     NorESM1-ME      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+
+   <!-- <model> OBS     JRA-25       reanaly  1  1988 2012 new_data/ </model>-->
+    <model> OBS     ERA-Interim       reanaly 1   1988 2012 @{OBSPATH}/Tier3/ERA-Interim </model>
+
+
+    <diag_script cfg="cfg_ipcc-fig-9-9.ncl">      ipcc-fig-9-9.ncl       </diag_script>
     </diag>
 
 </DIAGNOSTICS>
