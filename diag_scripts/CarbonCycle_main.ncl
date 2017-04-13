@@ -589,7 +589,7 @@ begin
         
         data_arr@ref_name = diag_script_info@evolution_plot_ref_model
         data_arr@units = all_yearly@units
-        data_arr@dim_Mod = dimsizes(models@name) - 1
+        data_arr@dim_Mod = dimsizes(mod_ind)
 
         ;; Subtract mean 1901-1930 (coded as till 1930) if anomaly plot
         ind_1930 = ind(all_yearly&year.eq.1930)
