@@ -49,8 +49,8 @@ begin
 
     dim_MOD = dimsizes(models@name)
     dim_VAR = dimsizes(variables)
-    var0 = variables(0)
-    var1 = variables(1)
+    var0 = variables(1)
+    var1 = variables(0)
     field_type0 = field_types(0)
     field_type1 = field_types(1)
 end
@@ -144,18 +144,18 @@ begin
                                   toint(models@end_year(imod)), "average", \
                                    "yearly", True)
             delete(varA)
-            rc = regCoef_n(1.0*all_years(mod_start:mod_end), tmpA, 0, 0)
-            copy_VarCoords(tmpA(0, :, :), rc)
 
             ;; Computing area-weighted sum
-            avg_A = area_operations(rc, region(0), region(1), region(2), \
+            avg_A = area_operations(tmpA, region(0), region(1), region(2), \
                                     region(3), "average", True)
             delete(tmpA)
-            delete(rc)
+            rc = regline((1.0*all_years(mod_start:mod_end)), avg_A)
+
 
             ;; Assign to global array
-            all_data_A(imod) = avg_A
+            all_data_A(imod) = rc
             delete(avg_A)
+            delete(rc)
 
         end if
 
@@ -193,11 +193,9 @@ begin
             anomaly_B = (avg_B - avg(avg_B))/avg(avg_B)*100
             delete(tmpB)
             rc = regline(1.0*all_years(mod_start:mod_end), anomaly_B)
+            ;; Assign to global array
             all_data_B(imod) = rc
             delete(rc)
-
-            ;; Assign to global array
-            ;all_data_B(imod) = avg_B
             delete(avg_B)
             delete(anomaly_B)
 
@@ -219,15 +217,15 @@ begin
 ; a compute-intensive script.
 ;----------------------------------------------------------------------
 
-;;  models = (/"NorESM1-ME","NorESM1-M","MRI-CGCM3","MPI-ESM-MR","MPI-ESM-LR", \
-;;             "MIROC-ESM-CHEM", "MIROC-ESM","MIROC5","IPSL-CM5B-LR", \
-;;             "IPSL-CM5A-MR","IPSL-CM5A-LR","INM-CM4", "HadGEM2-ES", \
-;;             "HadGEM2-CC","GISS-E2-R","GISS-E2-H","GFDL-ESM2M","GFDL-ESM2G", \
-;;             "GFDL-CM3","FIO-ESM","FGOALS-g2","EC-EARTH","CSIRO-Mk3.6.0", \
-;;             "CNRM-CM5","CMCC-CMS", "CMCC-CESM","CESM1(CAM5)","CESM1(BGC)", \
-;;             "CCSM4","CanESM2","BCC-CSM1.1(m)", "BCC-CSM1.1","ACCESS1.3", \
-;;             "ACCESS1.0","RSS V3.3-SSM/I","UAH V5.4-SSM/I","MERRA", \ 
-;;             "JRA-25","ERA-Interim"/)
+;; models = (/"NorESM1-ME","NorESM1-M","MRI-CGCM3","MPI-ESM-MR","MPI-ESM-LR", \
+;;            "MIROC-ESM-CHEM", "MIROC-ESM","MIROC5","IPSL-CM5B-LR", \
+;;            "IPSL-CM5A-MR","IPSL-CM5A-LR","INM-CM4", "HadGEM2-ES", \
+;;            "HadGEM2-CC","GISS-E2-R","GISS-E2-H","GFDL-ESM2M","GFDL-ESM2G", \
+;;            "GFDL-CM3","FIO-ESM","FGOALS-g2","EC-EARTH","CSIRO-Mk3.6.0", \
+;;            "CNRM-CM5","CMCC-CMS", "CMCC-CESM","CESM1(CAM5)","CESM1(BGC)", \
+;;            "CCSM4","CanESM2","BCC-CSM1.1(m)", "BCC-CSM1.1","ACCESS1.3", \
+;;            "ACCESS1.0","RSS V3.3-SSM/I","UAH V5.4-SSM/I","MERRA", \ 
+;;            "JRA-25","ERA-Interim"/)
 ;;  data = asciiread("figure_9_9.rev2_HL_ncl.txt",(/39,2/),"float")
 ;;  tr_tlt = data(38:0,0)
 ;;  tr_pr = data(38:0,1)
@@ -250,7 +248,8 @@ begin
 ; Open a PS file and define the color table
 ;----------------------------------------------------------------------
   
-  outfile = plot_output_dir + diag_script_base + "_" + diag_script_info@region + "." + file_type
+  outfile = plot_output_dir + diag_script_base + "_" + diag_script_info@region + \
+            "." + file_type
   ;wks = gsn_open_wks ("pdf","Fig9_09")
   wks = gsn_open_wks(file_type, outfile)
   ;gsn_define_colormap(wks,"IPCC5")
@@ -286,10 +285,10 @@ begin
   res@xyMarkerSizeF      = 0.013
   res@xyMarkerThicknessF = 4.
   res@xyMonoMarkerColor  = False          ; Allow different colors for markers
-  ;res@xyMarkerColors     = (/22,22,20,19,19,18,18,18,17,17,17,16,15,15,14,14, \
-  ;                         13,13,13,12,11,10,9,8,7,7,6,6,6,5,3,3,2,2,1,1,1,1,1/)
-  ;res@xyMarkers          = (/6,4,4,6,4,7,6,4,7,6,4,4,6,4,6,4,7,6,4,4,4,4,4,4, \
-  ;                         6,4,7,6,4,4,6,4,6,4,12,5,7,6,4/)
+;res@xyMarkerColors     = (/22,22,20,19,19,18,18,18,17,17,17,16,15,15,14,14, \
+;                         13,13,13,12,11,10,9,8,7,7,6,6,6,5,3,3,2,2,1,1,1,1,1/)
+;res@xyMarkers          = (/6,4,4,6,4,7,6,4,7,6,4,4,6,4,6,4,7,6,4,4,4,4,4,4, \
+;                         6,4,7,6,4,4,6,4,6,4,12,5,7,6,4/)
   res@xyMarkerColors    = colors
   res@xyMarkers         = markers
 
@@ -329,7 +328,7 @@ begin
 ;----------------------------------------------------------------------
  ;; Regression line needs at least 3 models
  rc  = regline(tr_tlt,tr_pr)
- ;print(rc)
+ print(rc)
  x = (-0.5-rc@yintercept)/rc
  y = rc*0.6+rc@yintercept
 
@@ -383,7 +382,8 @@ begin
 
   txres@txFontHeightF = 0.016
   ;gsn_text_ndc (wks,"Slope = 5.7% / ~S~o~N~C",0.45,0.45,txres)
-  gsn_text_ndc (wks,"Slope = " + sprintf("%2.1f", rc) + "% / ~S~o~N~C",0.45,0.45,txres)
+  gsn_text_ndc (wks,"Slope = " + sprintf("%2.1f", rc) + "% / ~S~o~N~C", \
+                0.45,0.45,txres)
 
   frame(wks)    ; Now advance the frame.
 

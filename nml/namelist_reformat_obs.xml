@@ -88,6 +88,11 @@ This namelist is part of the ESMValTool
 <!--   <reformat_script id="WHOI-OAFlux">             ./reformat_scripts/obs/reformat_obs_WHOI-OAFlux.ncl             </reformat_script> -->
 <!--   <reformat_script id="WOA09">                   ./reformat_scripts/obs/reformat_obs_WOA09.ncl                   </reformat_script> -->
 <!--   <reformat_script id="woa2005">                 ./reformat_scripts/obs/reformat_obs_woa2005.csh                 </reformat_script> -->
+   <reformat_script id="RSS">                     ./reformat_scripts/obs/reformat_obs_RSS.ncl                     </reformat_script> 
+<!--   <reformat_script id="UAH">                     ./reformat_scripts/obs/reformat_obs_UAH.ncl                     </reformat_script>-->
+   <reformat_script id="RSS_prw">                     ./reformat_scripts/obs/reformat_obs_RSS_prw.ncl                     </reformat_script>
+
+
 </REFORMAT>
 
 

@@ -41,7 +41,8 @@ function calculate(index [1] : integer,
 ;;
 local tmp1, tmp2, dum, verbosity, land_weights, land_w, oce_weights, oce_w, \
       f, a, sftlf, l_weights, o_weights, p_ini, p_fin, tas_lw, tas_ow, \
-      tmp_ta, tmp_tas, tmp_land, tmp_ocean, land_tlt, oce_tlt
+      tmp_ta, tmp_tas, tmp_land, tmp_ocean, land_tlt, oce_tlt, xregrid, \
+      yregrid, var_hreg
 begin
 
     funcname = "calculate"
@@ -55,11 +56,45 @@ begin
     tmp_ta = extract_data_extended(index, "ta", tmp1, -1, 0, 0)
     tmp_tas = extract_data_extended(index, "tas", tmp2, -1, 0, 0)
 
-    ;; Only works if tas, ta on same grid, do not wanna regrid here
-    if .not.((dimsizes(tmp_ta&lat).eq.dimsizes(tmp_tas&lat)) .or. \
-        (dimsizes(tmp_ta&lon).eq.dimsizes(tmp_tas&lon))) then
-        error_msg("f", scriptname, "", "ta and tas are not using" \
-        + " the same grid, please regrid manually")
+    ;; Only works if tas, ta on same grid, regrid tas if not
+    if ((dimsizes(tmp_ta&lat).ne.dimsizes(tmp_tas&lat)) .or. \
+        (dimsizes(tmp_ta&lon).ne.dimsizes(tmp_tas&lon))) then
+        info_output("Regridding tas", verbosity, 1)
+        ; Need to regrid, determine dimensions to regrid
+        xregrid = True ;lon
+        yregrid = True ;lat
+        if (dimsizes(tmp_tas&lon).eq.dimsizes(tmp_ta&lon)) then
+            if (max(abs(tmp_tas&lon - tmp_ta&lon)).lt.1.0d-5) then
+                xregrid = False
+            end if
+        end if
+        if (dimsizes(tmp_tas&lat).eq.dimsizes(tmp_ta&lat)) then
+            if (max(abs(tmp_tas&lat - tmp_ta&lat)).lt.1.0d-5) then
+                yregrid = False
+            end if
+        end if
+
+        dnames = getVarDimNames(tmp_tas)
+        if (xregrid.and.yregrid) then
+            var_hreg = linint2_Wrap(tmp_tas&lon, tmp_tas&lat, tmp_tas, True, \
+                                      tmp_ta&lon, tmp_ta&lat, 0)
+        else if (xregrid.and..not.yregrid) then
+            dx = ind(dnames.eq."lon")
+            var_hreg = linint1_n_Wrap(tmp_tas&lon, tmp_tas, True, \
+                                                  tmp_ta&lon, 0, dx)
+        else if (.not.xregrid.and.yregrid) then
+            dx = ind(dnames.eq."lat")
+            var_hreg = linint1_n_Wrap(tmp_tas&lat, tmp_tas, False, \
+                                                   tmp_ta&lat, 0, dx)
+        end if
+        end if
+        end if
+
+        delete(tmp_tas)
+        tmp_tas = var_hreg
+        delete(var_hreg)
+        delete(xregrid)
+        delete(yregrid)
     end if
 
     ;; Loading weight functions
