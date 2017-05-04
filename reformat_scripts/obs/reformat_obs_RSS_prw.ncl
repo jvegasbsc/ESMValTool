@@ -1,5 +1,5 @@
 ;;#############################################################################
-;; REFORMAT SCRIPT FOR ERA-Interim REANALYISIS DATA
+;; REFORMAT SCRIPT FOR RSS prw REANALYISIS DATA
 ;;#############################################################################
 ;;
 ;; Tier
@@ -31,14 +31,12 @@ begin
     TIER = 2
 
     ;; Input dir (raw data)
-    ;INDIR = getenv("ESMValTool_RAWOBSPATH") + "/Tier" + \
-    ;    TIER + "/" + OBSNAME + "/"
-    INDIR = "new_data/"
-
+    INDIR = getenv("ESMValTool_RAWOBSPATH") + "/Tier" + \
+        TIER + "/" + OBSNAME + "/"
+    
     ;; Output dir (CMOR-ized data)
-    ;OUTDIR = getenv("ESMValTool_OBSPATH") + "/Tier" + \
-    ;    TIER + "/" + OBSNAME + "/"
-    OUTDIR = "new_data/"
+    OUTDIR = getenv("ESMValTool_OBSPATH") + "/Tier" + \
+        TIER + "/" + OBSNAME + "/"
 
     ;; Period
     YEAR1 = 1988
