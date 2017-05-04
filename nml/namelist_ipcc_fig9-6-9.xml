@@ -331,13 +331,24 @@ This namelist is part of the ESMValTool
 <!-- *********************************************************************** -->
 
     <diag>
+    <description> Preprocessing for prw from RSS </description>
+    <variable_def_dir>    ./variable_defs/      </variable_def_dir>
+    <variable> prw                              </variable>
+    <field_type>          T2Ms                  </field_type>
+    <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/   </diag_script_cfg_dir>
+    <diag_script cfg="cfg_dummy.py"> dummy_python.py </diag_script>
+    <launcher_arguments>    [('execute_as_shell', False)]  </launcher_arguments>
+    <model> OBS     RSS       reanaly 1  1988 2012 @{OBSPATH}/Tier2/RSS </model>
+    </diag>
+
+    <diag>
         <description> TLT vs prw trend                 </description>
 	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
         <variable>            prw                      </variable>
 	<variable>            TLT                      </variable>
 	<field_type>          T2Ms                     </field_type>
 	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
-
+<!--
     <model> CMIP5_ETHZ     ACCESS1-0       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ     bcc-csm1-1      Amon   historical   r1i1p1   1988 2012 @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ     CanESM2         Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
@@ -362,13 +373,13 @@ This namelist is part of the ESMValTool
     <model> CMIP5_ETHZ     MPI-ESM-MR      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ     MRI-CGCM3       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ     NorESM1-M       Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
+-->
     <model> CMIP5_ETHZ     NorESM1-ME      Amon   historical   r1i1p1   1988 2005 @{MODELPATH}/ETHZ_CMIP5 </model>
 
-    <!--<model> OBS     RSS       reanaly 1  1988 2012 new_data/ </model>-->
-    <model> ana4mips     JRA-25       Amon reanalysis  1988 2012 new_data/ </model>
+    <model> OBS     RSS       reanaly 1  1988 2012 @{OBSPATH}/Tier2/RSS </model>
+    <model> ana4mips     JRA-25       Amon reanalysis  1988 2012 @{OBSPATH}/Tier1 </model>
     <model> OBS     ERA-Interim       reanaly 1   1988 2012 @{OBSPATH}/Tier3/ERA-Interim </model>
-    <model> ana4mips     MERRA Amon reanalysis   1988 2012 new_data/ </model>
-
+    <model> ana4mips     MERRA Amon reanalysis   1988 2012 @{OBSPATH}/Tier1 </model>
 
     <diag_script cfg="cfg_ipcc-fig-9-9.ncl">      ipcc-fig-9-9.ncl       </diag_script>
     </diag>
