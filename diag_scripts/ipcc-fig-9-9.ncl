@@ -49,8 +49,8 @@ begin
 
     dim_MOD = dimsizes(models@name)
     dim_VAR = dimsizes(variables)
-    var0 = variables(1)
-    var1 = variables(0)
+    var0 = variables(0)
+    var1 = variables(1)
     field_type0 = field_types(0)
     field_type1 = field_types(1)
 end
@@ -192,6 +192,7 @@ begin
             ;; Computing anomaly in percent
             anomaly_B = (avg_B - avg(avg_B))/avg(avg_B)*100
             delete(tmpB)
+            ;print(anomaly_B)
             rc = regline(1.0*all_years(mod_start:mod_end), anomaly_B)
             ;; Assign to global array
             all_data_B(imod) = rc
@@ -202,6 +203,13 @@ begin
         end if
 
     end do
+
+    ;; UAH uses the same prw as RSS, thus is excluded in prw read-in
+    if any(models@name.eq."UAH") then
+        idx_UAH = ind(var_attr_exclude(1).eq.model_attr_id)
+        idx_RSS = ind(models@name.eq."RSS")
+        all_data_B(idx_UAH) = all_data_B(idx_RSS)
+    end if
 
 
 ;; Plotting routine from Hongmei, only changed where necessary
@@ -233,6 +241,9 @@ begin
   tr_tlt = all_data_A*10
   tr_pr = all_data_B*10
   nmodel = dimsizes(model_names)
+
+  print(tr_tlt)
+  print(tr_pr)
 
   markertab = project_style(diag_script_info, "markers")
   colortab  = project_style(diag_script_info, "colors")
@@ -276,7 +287,8 @@ begin
 
 ;---Resources for X/Y axes.
   res@trYMinF            =  0.               ; min value on y-axis
-  res@trYMaxF            =  3.5               ; max value on y-axis
+  res@trYMaxF    = 4.5
+ ; res@trYMaxF            =  3.5               ; max value on y-axis
   res@trXMinF            =  0.                  ; min value on x-axis
   res@trXMaxF            =  0.6                  ; max value on x-axis
 
@@ -308,14 +320,14 @@ begin
   res@tmXBLabelFontHeightF  = 0.015
   res@tiXAxisFontHeightF    = 0.015
   res@tiYAxisFontHeightF    = 0.015
- res@tmXBMajorOutwardLengthF = 0.
- res@tmYLMajorOutwardLengthF = 0.
- res@tmXBMinorOutwardLengthF = 0.
- res@tmYLMinorOutwardLengthF = 0.
- res@tmXBMajorLengthF = 0.006
- res@tmYLMajorLengthF = 0.006
- res@tmXBMinorLengthF = 0.003
- res@tmYLMinorLengthF = 0.003
+  res@tmXBMajorOutwardLengthF = 0.
+  res@tmYLMajorOutwardLengthF = 0.
+  res@tmXBMinorOutwardLengthF = 0.
+  res@tmYLMinorOutwardLengthF = 0.
+  res@tmXBMajorLengthF = 0.006
+  res@tmYLMajorLengthF = 0.006
+  res@tmXBMinorLengthF = 0.003
+  res@tmYLMinorLengthF = 0.003
 
 ;----------------------------------------------------------------------
 ; Create the scatter plot, but don't draw it yet.
@@ -330,7 +342,7 @@ begin
  rc  = regline(tr_tlt,tr_pr)
  print(rc)
  x = (-0.5-rc@yintercept)/rc
- y = rc*0.6+rc@yintercept
+ y = rc*0.6 + rc@yintercept
 
  xx = (/x,0.6/)
  yy = (/-0.5,y/)
