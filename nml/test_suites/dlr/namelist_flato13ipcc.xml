@@ -7,7 +7,7 @@ namelist_flato13ipcc.xml
 Description
 Reproducing selected figures from IPCC AR5, chap. 9 (Flato et al., 2013):
 Figs. 9.2a/b/c, 9.3, 9.4, 9.5, 9,7, 9.8, 9.10, 9.24a, 9.28, 9.29, 9.30, 9.31,
-9.32, 9.35, 9.36, 9.45b
+9.32, 9.35, 9.36, 9.42b, 9.45b
 
 Authors
 Axel Lauer (DLR, Germany - axel.lauer@dlr.de)
@@ -17,6 +17,7 @@ Contributors
 Lisa Bock, DLR (Fig. 9.8)
 Irene Cionni, ENEA, namelist_eyring13jgr.xml (Fig. 9.10)
 Ricard Levine, UK Met Office, namelist_SAMonsoon.xml (Fig. 9.32)
+Ricarda Rettinger, DLR (Fig. 9.42b, namelist_ECS.xml)
 Mattia Righi, DLR, namelist_perfmetrics_CMIP5.xml (Fig. 9.7),
     namelist_aerosol_CMIP5.xml (Figs. 9.28, 9.29)
 Daniel Senftleben, DLR, namelist_SeaIce.xml (Fig. 9.24)
@@ -493,6 +494,50 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ NorESM1-M      Amon historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> OBS CMAP mergedanaly 1 1980 1982 @{OBSPATH}/Tier2/CMAP </model>
         <diag_script cfg="cfg_ipcc-fig-9-36.ncl"> ipcc-fig-9-36.ncl </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.42b                                               * -->
+<!-- * =================================================================== * -->
+<!-- * Equilibrium climate sensitivity (ECS) vs. transient climate         * -->
+<!-- * response (TCR)                                                      * -->
+<!-- * Contribution by Ricarda Rettinger, DLR, namelist_ECS.xml            * -->
+<!-- *                                                                     * -->
+<!-- * Notes:                                                              * -->
+<!-- * (1) IT IS IMPORTANT TO KEEP THE MODELS IN ALPHABETICAL ORDER!       * -->
+<!-- * (2) PLEASE INDICATE THE APPROPRIATE YEARS (150 PER EXPERIMENT)      * -->
+<!-- * (3) THE TIME STEPS OF THE EXPERIMENTS CAN VARY                      * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description> ECS (needed as input for ECS vs TCR) </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>   
+        <variable>            rtmt                </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ECS/      </diag_script_cfg_dir>
+        <tags>                R_atmos             </tags>
+        <model> CMIP5_ETHZ CanESM2      Amon abrupt4xCO2 r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ CanESM2      Amon piControl   r1i1p1 2015 2164 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR Amon abrupt4xCO2 r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR Amon piControl   r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR   Amon abrupt4xCO2 r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR   Amon piControl   r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <diag_script cfg="cfg_ECS_anomaly.ncl"> ECS.ncl </diag_script>
+    </diag>
+
+    <diag>
+        <description> ECS vs TCR (fig 9.42b)      </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_TCR/      </diag_script_cfg_dir>
+        <tags>                R_atmos             </tags>
+        <model> CMIP5_ETHZ CanESM2      Amon 1pctCO2 r1i1p1 1850 1929 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR Amon 1pctCO2 r1i1p1 1850 1929 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR   Amon 1pctCO2 r1i1p1 1850 1929 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <diag_script cfg="cfg_TCR.ncl"> TCR.ncl        </diag_script>
     </diag>
 
 <!-- *********************************************************************** -->

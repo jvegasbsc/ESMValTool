@@ -93,7 +93,7 @@ begin
     delete(str)
 
     system("python diag_scripts/lib/python/running_MD_for_ncl_with_file.py '" + ascii_file + "'")
-;    system("rm '" + ascii_file + "'")
+    system("rm '" + ascii_file + "'")
 
     leave_msg(scriptname, funcname, 6)
 
