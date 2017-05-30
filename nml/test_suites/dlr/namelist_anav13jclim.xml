@@ -45,10 +45,10 @@ This namelist is part of the ESMValTool
 <MODELS>
 <!-- ### CMIP5 MODELS. MODELS WHICH DO NOT PROVIDE ALL VARIABLES ARE DEFINED WITHIN EACH DIAG BLOCK BELOW ########################
  -->
-    <model> CMIP5_ETHZ   CanESM2          MIP_VAR_DEF   historical   r1i1p1   1998 2002   @{MODELPATH}/ETHZ_CMIP5 </model>
-    <model> CMIP5_ETHZ   MIROC-ESM-CHEM   MIP_VAR_DEF   historical   r1i1p1   1998 2002   @{MODELPATH}/ETHZ_CMIP5 </model>
-    <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1998 2002   @{MODELPATH}/ETHZ_CMIP5 </model>
-    <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1998 2002   @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ   CanESM2          MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ   MIROC-ESM-CHEM   MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
 </MODELS>
 
 <DIAGNOSTICS>
@@ -60,7 +60,7 @@ This namelist is part of the ESMValTool
     <field_type>           T2Ms                        </field_type>
     <diag_script_cfg_dir>  ./nml/cfg_anav13jclim/      </diag_script_cfg_dir>
 
-    <model> OBS          CRU                            reanaly      1        1998 2002   @{OBSPATH}/Tier3/CRU    </model>
+    <model> OBS          CRU                            reanaly      1        1986 2005   @{OBSPATH}/Tier3/CRU    </model>
   
     <diag_script cfg="cfg_anav_MVI_trop.ncl">  CarbonCycle_MVI.ncl </diag_script>
   </diag>  
@@ -72,7 +72,7 @@ This namelist is part of the ESMValTool
     <field_type>           T2Ms                         </field_type>
     <diag_script_cfg_dir>  ./nml/cfg_anav13jclim/       </diag_script_cfg_dir>
 
-    <model> OBS          JMA-TRANSCOM                   reanaly      1        1998 2002   @{OBSPATH}/Tier3/JMA-TRANSCOM  </model>
+    <model> OBS          JMA-TRANSCOM                   reanaly      1        1986 2005   @{OBSPATH}/Tier3/JMA-TRANSCOM  </model>
 
     <diag_script cfg="cfg_anav_main_glob.ncl"> CarbonCycle_main.ncl </diag_script>
   </diag>
