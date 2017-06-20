@@ -23,10 +23,9 @@
 ###############################################################################
 """
 
-#inpath = "/Work/Reference/OBS_ESACCI_FIRE_all/"
-inpath = "/media/bmueller/Work/ESMVAL_res/work/Reference/OBS_CCI_FIRE_all/"
-#outpath = "/Work/Reference/OBS_ESACCI_FIRE_all/output/"
-outpath = "/media/bmueller/Work/ESMVAL_res/work/Reference/OBS_CCI_FIRE_all/output/"
+inpath = "/Work/Reference/OBS_ESACCI_FIRE_all/"
+outpath = "/Work/Reference/OBS_ESACCI_FIRE_all/output/"
+
 
 field = "T2Ms"
 

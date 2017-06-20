@@ -62,4 +62,4 @@ coverage.xml
 /tests/data/**
 /test_bash.sh
 /python_test_out.txt
-/config_private_BM_local.xml~
+doc/sphinx/build

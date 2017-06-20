@@ -10,11 +10,6 @@ import os
 import unittest
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + os.sep + '..' + os.sep + '..')
-try:
-    sys.path.append("/media/bmueller/Work/GIT/DUMMYDATA/dummydata-master")
-except:
-    pass
-
 from esmvaltool_testlib import ESMValToolTest, ESMValTestDiagnostic
 
 
@@ -24,7 +19,7 @@ class DiagnosticTest(ESMValToolTest):
     """
     def __init__(self, **kwargs):
         xml_single = 'namelist_LMU_for_tests.xml'
-        xmlfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + xml_single  # the realpath ensures that the file is also foudn wehn nosetests runs from an upper directory
+        xmlfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + xml_single  # the realpath ensures that the file is also found when nosetests runs from an upper directory
         super(DiagnosticTest, self).__init__(nml=xmlfile, **kwargs)
 
     def get_field_definitions(self):
@@ -33,8 +28,7 @@ class DiagnosticTest(ESMValToolTest):
         """
         r = {}
         rpath = self._default_input_dir
-        r.update({'pr' : {'method' : 'uniform', 'filename' : rpath + os.sep + '@{VAR_FILE}', 'ndim' : 2}})
-        r.update({'mrsos' : {'method' : 'uniform', 'filename' : rpath + os.sep + '@{VAR_FILE}', 'ndim' : 2}})
+        r.update({'ts' : {'method' : 'uniform', 'filename' : rpath + os.sep + '@{VAR_FILE}', 'ndim' : 2}})
         return r
 
 
@@ -49,7 +43,7 @@ class TestDiagnostic(ESMValTestDiagnostic):
     def test_general_output(self):
         # specify list with expected output files as tuples with directory and filename
         # reffiles=[('plot','ro_coefficient-rel-pr_biases.png'),('plot','ro-et_coefficient_biases.png')]
-        # ALTERNATIVE 1: example if output files based on model names need to be processed
+        # example if output files based on model names need to be processed
         # models = ['MPIESM', 'MPIESM-LR'] # models as specified in testing namelist
         # for m in models:
             # reffiles.append(('plot',m + '_bias_ET_catchments.txt'))
@@ -61,10 +55,15 @@ class TestDiagnostic(ESMValTestDiagnostic):
             # reffiles.append(('plot',m + '_sep-bias-plot-ET.png'))
             # reffiles.append(('plot',m + '_sep-bias-plot-precip.png'))
             # reffiles.append(('plot',m + '_sep-bias-plot-runoff.png'))
-        # ALTERNATIVE 2: read reference files directly from a separate ASCII file
-        reffiles = self.read_reffiles('myreffiles.txt')
+	# example if output file list is produced with 'ls [-a] > filenames.txt'
+ 	#reffiles=[]
+	#with open('filenames.txt', 'rU') as f:
+  	#    for line in f: 
+        #      reffiles.append(('plot',line.split()[0]))
 
-        T = DiagnosticTest(files=reffiles, subdirectory = 'sm_ESACCI')  
+        reffiles=self.read_reffiles('filenames.txt', tdir='plot')
+
+        T = DiagnosticTest(files=reffiles)  
         T.run_nml()
         T.run_tests(execute=False, graphics=None, checksum_files=None, files='all', check_size_gt_zero=True)
         self.assertTrue(T.sucess)
