@@ -94,7 +94,7 @@ begin
                      "A_sedl_ja", \  ; contributors
                      "D_collins13ipcc",    \  ; diag_references
                      "",          \  ; obs_references
-                     "P_cresce")   ; proj_references
+                     "P_crescendo")   ; proj_references
 end
 
 ; Load variable_info

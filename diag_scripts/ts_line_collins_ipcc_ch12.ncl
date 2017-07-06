@@ -96,7 +96,7 @@ begin
                      "A_sedl_ja", \  ; contributors
                      "D_collins13ipcc",    \  ; diag_references
                      "",          \  ; obs_references
-                     "P_cresce")   ; proj_references
+                     "P_crescendo")   ; proj_references
 
     do idx_mod = 0, dim_MOD - 1
         data = read_data(idx_mod, var0, field_type0)
