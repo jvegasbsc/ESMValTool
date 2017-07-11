@@ -52,4 +52,4 @@ coverage.xml
 doc/sphinx/build
 
 # Interface data
-interface_data/ncl.interface
+interface_data/*
