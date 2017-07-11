@@ -50,3 +50,6 @@ coverage.xml
 .ipynb_checkpoints
 
 doc/sphinx/build
+
+# Interface data
+interface_data/ncl.interface
