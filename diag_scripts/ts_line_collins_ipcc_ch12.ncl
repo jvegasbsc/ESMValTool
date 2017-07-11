@@ -44,6 +44,8 @@
 ;;    are included
 ;;    Variable number of scenarios? So far hardcoded 4 scenarios (rcp2.6,
 ;;    rcp4.5, rcp6.0, rcp8.5)
+;;    every model (ensemble) in RCP needs corresponding historical run as
+;;    reference
 ;;
 ;; Modification history
 ;;    20170523-A_lore_ru: separated plotting from calcuation
