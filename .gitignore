@@ -53,3 +53,6 @@ doc/sphinx/build
 
 # Interface data
 interface_data/*
+
+# work directory
+work/
