@@ -1496,7 +1496,7 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ NorESM1-M      Amon piControl r1i1p1  700 1200 @{MODELPATH} </model>
         <model> CMIP5_ETHZ NorESM1-ME     Amon piControl r1i1p1  901 1152 @{MODELPATH} </model>
 
-        <diag_script cfg="cfg_IAV_for_stippandhatch_ipcc12.ncl"> IAV_for_stippandhatch_ipcc12.ncl </diag_script>
+<!--        <diag_script cfg="cfg_IAV_for_stippandhatch_ipcc12.ncl"> IAV_for_stippandhatch_ipcc12.ncl </diag_script>-->
         <diag_script cfg="cfg_IAV_for_stippandhatch_ipcc12.ncl"> IAV_mmm_for_stippandhatch_ipcc12.ncl </diag_script>
     </diag>
 
