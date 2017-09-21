@@ -895,15 +895,10 @@ begin
     copy_VarCoords_2(data_in, data_out)
 
     ;; Regrid over time data
-    if (ntime .eq. 1) then
-        data_out(0, :, :) = ESMF_regrid_with_weights(data_in(0, :, :), \
-                                                     wgtFile, Opt)
-    else
-	do t = 0, ntime - 1
-	    var = data_in(t, :, :)
-	    data_out(t, :, :) = ESMF_regrid_with_weights(var, wgtFile, Opt)
-	end do
-    end if
+    do t = 0, ntime - 1
+	var = data_in(t, :, :)
+	data_out(t, :, :) = ESMF_regrid_with_weights(var, wgtFile, Opt)
+    end do
 
     system("rm -f " + \
            srcGridName + " " + \

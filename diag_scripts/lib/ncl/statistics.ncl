@@ -1295,13 +1295,24 @@ begin
 
     ;; Seasonal climatology
     if (opt.eq."seasonalclim") then
-        ;; first remove seasonal cycle
-        field_noseascyc = rmMonAnnCycTLL(field)
         ;; calculate seasonal mean for each year
-        field_avg_djf = month_to_season_extended(field_noseascyc, "DJF")
-        field_avg_mam = month_to_season_extended(field_noseascyc, "MAM")
-        field_avg_jja = month_to_season_extended(field_noseascyc, "JJA")
-        field_avg_son = month_to_season_extended(field_noseascyc, "SON")
+        field_djf = time_operations(field_noseascyc, y1, y2, "extract", \ 
+                                    "DJF", True)
+        field_mam = time_operations(field_noseascyc, y1, y2, "extract", \
+                                    "MAM", True)
+        field_jja = time_operations(field_noseascyc, y1, y2, "extract", \
+                                    "JJA", True)
+        field_son = time_operations(field_noseascyc, y1, y2, "extract", \
+                                    "SON", True)
+
+        field_avg_djf = time_operations(field_djf, y1, y2, "average", \
+                                        "yearly", True)
+        field_avg_mam = time_operations(field_mam, y1, y2, "average", \
+                                        "yearly", True)
+        field_avg_jja = time_operations(field_jja, y1, y2, "average", \
+                                        "yearly", True)
+        field_avg_son = time_operations(field_son, y1, y2, "average", \
+                                        "yearly", True)
         if (dtr.eq."None") then
             field_avg_djf_dtr = field_avg_djf
             field_avg_mam_dtr = field_avg_mam
@@ -1342,31 +1353,31 @@ begin
         end if
         if (rank.eq.1) then
             out = field(0:3)  ; save metadata
-            out(0) = dim_stddev(field_avg_djf_dtr)
-            out(1) = dim_stddev(field_avg_mam_dtr)
-            out(2) = dim_stddev(field_avg_jja_dtr)
-            out(3) = dim_stddev(field_avg_son_dtr)
+            out(0) = dim_stddev_Wrap(field_avg_djf_dtr)
+            out(1) = dim_stddev_Wrap(field_avg_mam_dtr)
+            out(2) = dim_stddev_Wrap(field_avg_jja_dtr)
+            out(3) = dim_stddev_Wrap(field_avg_son_dtr)
         end if
         if (rank.eq.2) then
             out = field(0:3, :)  ; save metadata
-            out(0, :) = dim_stddev_n(field_avg_djf_dtr, 0)
-            out(1, :) = dim_stddev_n(field_avg_mam_dtr, 0)
-            out(2, :) = dim_stddev_n(field_avg_jja_dtr, 0)
-            out(3, :) = dim_stddev_n(field_avg_son_dtr, 0)
+            out(0, :) = dim_stddev_n_Wrap(field_avg_djf_dtr, 0)
+            out(1, :) = dim_stddev_n_Wrap(field_avg_mam_dtr, 0)
+            out(2, :) = dim_stddev_n_Wrap(field_avg_jja_dtr, 0)
+            out(3, :) = dim_stddev_n_Wrap(field_avg_son_dtr, 0)
         end if
         if (rank.eq.3) then
             out = field(0:3, :, :)  ; save metadata
-            out(0, :, :) = dim_stddev_n(field_avg_djf_dtr, 0)
-            out(1, :, :) = dim_stddev_n(field_avg_mam_dtr, 0)
-            out(2, :, :) = dim_stddev_n(field_avg_jja_dtr, 0)
-            out(3, :, :) = dim_stddev_n(field_avg_son_dtr, 0)
+            out(0, :, :) = dim_stddev_n_Wrap(field_avg_djf_dtr, 0)
+            out(1, :, :) = dim_stddev_n_Wrap(field_avg_mam_dtr, 0)
+            out(2, :, :) = dim_stddev_n_Wrap(field_avg_jja_dtr, 0)
+            out(3, :, :) = dim_stddev_n_Wrap(field_avg_son_dtr, 0)
         end if
         if (rank.eq.4) then
             out = field(0:3, :, :, :)  ; save metadata
-            out(0, :, :, :) = dim_stddev_n(field_avg_djf_dtr, 0)
-            out(1, :, :, :) = dim_stddev_n(field_avg_mam_dtr, 0)
-            out(2, :, :, :) = dim_stddev_n(field_avg_jja_dtr, 0)
-            out(3, :, :, :) = dim_stddev_n(field_avg_son_dtr, 0)
+            out(0, :, :, :) = dim_stddev_n_Wrap(field_avg_djf_dtr, 0)
+            out(1, :, :, :) = dim_stddev_n_Wrap(field_avg_mam_dtr, 0)
+            out(2, :, :, :) = dim_stddev_n_Wrap(field_avg_jja_dtr, 0)
+            out(3, :, :, :) = dim_stddev_n_Wrap(field_avg_son_dtr, 0)
         end if
         leave_msg(scriptname, funcname, 6)
         return(out)
