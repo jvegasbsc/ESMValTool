@@ -1295,9 +1295,6 @@ begin
 
     ;; Seasonal climatology
     if (opt.eq."seasonalclim") then
-        ;; first remove seasonal cycle
-        field_noseascyc = rmMonAnnCycTLL(field)
-
         ;; calculate seasonal mean for each year
         field_djf = time_operations(field_noseascyc, y1, y2, "extract", \ 
                                     "DJF", True)
