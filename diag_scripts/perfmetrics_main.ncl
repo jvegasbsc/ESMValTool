@@ -808,7 +808,7 @@ begin
             var_avg = time_operations(var_zon, start_year, end_year, \
                                       "average", time_avg, True)
             var_std = interannual_variability(var_zon, start_year, end_year, \
-                                              time_avg)
+                                              time_avg, None)
             delete(var_zon)
 
             ;; Assign to global array
@@ -828,7 +828,7 @@ begin
             var_avg = time_operations(pre_var, start_year, end_year, \
                                       "average", time_avg, True)
             var_std = interannual_variability(pre_var, start_year, end_year, \
-                                              time_avg)
+                                              time_avg, None)
             delete(pre_var)
 
             ;; Assign to global array
