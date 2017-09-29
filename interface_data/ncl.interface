@@ -2,6 +2,3024 @@
 ;------------------------------------------------------
 load "./interface_scripts/messaging.ncl"
 
+
+dictkeys = True
+dictkeys@dictkeys = (/"CMIP5_ETHZ_ACCESS1-0_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_ACCESS1-3_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CESM1-BGC_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CMCC-CESM_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CMCC-CM_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CMCC-CMS_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CNRM-CM5-2_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_CSIRO-Mk3L-1-2_${MIP}_${EXP}_r1i2p1_1986_2005", \
+                      "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_1986_2005", \
+                      "CMIP5_ETHZ_FGOALS-s2_${MIP}_${EXP}_r2i1p1_1986_2005", \
+                      "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p2_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p3_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-H-CC_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-R-CC_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p2_1986_2005", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p3_1986_2005", \
+                      "CMIP5_ETHZ_HadCM3_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_HadGEM2-CC_${MIP}_${EXP}_r1i1p1_1986_2004", \
+                      "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_1986_2004", \
+                      "CMIP5_ETHZ_inmcm4_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_IPSL-CM5B-LR_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MPI-ESM-P_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_MRI-ESM1_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_1986_2005", \
+                      "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CESM1-WACCM_${MIP}_${EXP}_r2i1p1_2081_2099", \
+                      "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_2081_2100", \
+                      "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_2081_2099", \
+                      "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_2081_2099", \
+                      "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_ACCESS1-0_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_ACCESS1-3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CESM1-BGC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CMCC-CM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CMCC-CMS_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_2081_2100", \
+                      "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H-CC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R-CC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-CC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_2081_2100", \
+                      "CMIP5_ETHZ_inmcm4_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5B-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_ACCESS1-0_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_ACCESS1-3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CESM1-BGC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CMCC-CESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CMCC-CM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CMCC-CMS_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_2081_2100", \
+                      "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-H-CC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R-CC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-CC_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_2081_2100", \
+                      "CMIP5_ETHZ_inmcm4_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_IPSL-CM5B-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_MRI-ESM1_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_2081_2100", \
+                      "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_2081_2100"/)
+
+figfiles_suffix = (/"CMIP5_ETHZ_ACCESS1-0_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_ACCESS1-3_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CESM1-BGC_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CMCC-CESM_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CMCC-CM_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CMCC-CMS_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CNRM-CM5-2_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_CSIRO-Mk3L-1-2_${MIP}_${EXP}_r1i2p1_1986-2005", \
+                    "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_1986-2005", \
+                    "CMIP5_ETHZ_FGOALS-s2_${MIP}_${EXP}_r2i1p1_1986-2005", \
+                    "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p2_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p3_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-H-CC_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-R-CC_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p2_1986-2005", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p3_1986-2005", \
+                    "CMIP5_ETHZ_HadCM3_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_HadGEM2-CC_${MIP}_${EXP}_r1i1p1_1986-2004", \
+                    "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_1986-2004", \
+                    "CMIP5_ETHZ_inmcm4_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_IPSL-CM5B-LR_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MPI-ESM-P_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_MRI-ESM1_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_1986-2005", \
+                    "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CESM1-WACCM_${MIP}_${EXP}_r2i1p1_2081-2099", \
+                    "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_2081-2100", \
+                    "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_2081-2099", \
+                    "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_2081-2099", \
+                    "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_ACCESS1-0_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_ACCESS1-3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CESM1-BGC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CMCC-CM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CMCC-CMS_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_2081-2100", \
+                    "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H-CC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R-CC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-CC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_2081-2100", \
+                    "CMIP5_ETHZ_inmcm4_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5B-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_ACCESS1-0_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_ACCESS1-3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_bcc-csm1-1_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_bcc-csm1-1-m_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_BNU-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CanESM2_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CCSM4_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CESM1-BGC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CESM1-CAM5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CMCC-CESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CMCC-CM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CMCC-CMS_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CNRM-CM5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_CSIRO-Mk3-6-0_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_EC-EARTH_${MIP}_${EXP}_r8i1p1_2081-2100", \
+                    "CMIP5_ETHZ_FGOALS-g2_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_FIO-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-CM3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-ESM2G_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GFDL-ESM2M_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-H-CC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R-CC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_GISS-E2-R_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-AO_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-CC_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_HadGEM2-ES_${MIP}_${EXP}_r2i1p1_2081-2100", \
+                    "CMIP5_ETHZ_inmcm4_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5A-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5A-MR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_IPSL-CM5B-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC5_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC-ESM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MIROC-ESM-CHEM_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MPI-ESM-LR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MPI-ESM-MR_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MRI-CGCM3_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_MRI-ESM1_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_NorESM1-M_${MIP}_${EXP}_r1i1p1_2081-2100", \
+                    "CMIP5_ETHZ_NorESM1-ME_${MIP}_${EXP}_r1i1p1_2081-2100"/)
+
+infile_paths  = (/"/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ", \
+                  "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ"/)
+
+infiles = (/"CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-0_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-BGC_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CMS_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5-2_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3L-1-2_r1i2p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-s2_r2i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p2_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p3_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H-CC_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R-CC_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p2_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p3_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadCM3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-CC_r1i1p1_${FIELD}_${VARIABLE}_1986-2004.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_1986-2004.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_inmcm4_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5B-LR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-P_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MRI-ESM1_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-WACCM_r2i1p1_${FIELD}_${VARIABLE}_2081-2099.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2099.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2099.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-BGC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CMS_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_inmcm4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5B-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-BGC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CMS_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_inmcm4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5B-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_MRI-ESM1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+            "CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc"/)
+
+fullpaths = (/"/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-0_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-BGC_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CMS_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5-2_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3L-1-2_r1i2p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-s2_r2i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p2_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p3_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H-CC_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R-CC_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p2_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p3_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadCM3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-CC_r1i1p1_${FIELD}_${VARIABLE}_1986-2004.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_1986-2004.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_inmcm4_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5B-LR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-P_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MRI-ESM1_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_1986-2005.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-WACCM_r2i1p1_${FIELD}_${VARIABLE}_2081-2099.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2099.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2099.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-BGC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CMS_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_inmcm4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5B-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_ACCESS1-3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_bcc-csm1-1-m_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_BNU-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CanESM2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CCSM4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-BGC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CESM1-CAM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CMCC-CMS_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CNRM-CM5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_CSIRO-Mk3-6-0_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_EC-EARTH_r8i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FGOALS-g2_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_FIO-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-CM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2G_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GFDL-ESM2M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-H-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_GISS-E2-R_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-AO_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-CC_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_HadGEM2-ES_r2i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_inmcm4_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5A-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_IPSL-CM5B-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC5_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MIROC-ESM-CHEM_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-LR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MPI-ESM-MR_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MRI-CGCM3_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_MRI-ESM1_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-M_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc", \
+              "/net/tropo/climphys/rlorenz/ESMVal/work/climo/CMIP5_ETHZ/CMIP5_ETHZ_${MIP}_${EXP}_NorESM1-ME_r1i1p1_${FIELD}_${VARIABLE}_2081-2100.nc"/)
+
+diag_script = "map_diff_mmm_stippandhatch_ipcc12.ncl"
+diag_script_cfg = "./nml/cfg_collins13ipcc/cfg_clt_mmm_sig_ipcc_1217.ncl"
+
+variables = (/"clt"/)
+var_attr_mip = (/"None"/)
+var_attr_exp = (/"None"/)
+var_attr_ref = (/"None"/)
+var_attr_exclude = (/"None"/)
+model_attr_skip  = (/"None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None", \
+                     "None"/)
+variable_def_dir = (/"./variable_defs/"/)
+derived_var = (/"Undefined"/)
+
+field_types = (/"T2Ms"/)
+derived_field_type = (/"T2Ms"/)
+
+out_refs = (/"/net/tropo/climphys/rlorenz/ESMVal/work/refs-acknows_collins13ipcc.log"/)
+xml = (/"nml/namelist_collins13ipcc.xml"/)
+xml_name = (/"namelist_collins13ipcc.xml"/)
+in_refs = (/"/home/rlorenz/ESMValTool/ESMValTool-private/doc/MASTER_authors-refs-acknow.txt"/)
+
+output_file_type = (/"png"/)
+plot_dir = (/"/home/rlorenz/ESMValTool/ESMValTool-private/work/plots"/)
+wrk_dir = (/"/net/tropo/climphys/rlorenz/ESMVal/work"/)
+regridding_dir = (/"/net/tropo/climphys/rlorenz/ESMVal/work/regridding_tmp"/)
+write_netcdf = (/True/)
+read_from_vault = (/False/)
+cwd = (/"/home/rlorenz/ESMValTool/ESMValTool-private"/)
+force_processing = (/False/)
+
+; climate.ncl variables
+
+max_data_filesize = (/100/)
+
+begin
+    loadscript("./nml/cfg_collins13ipcc/cfg_clt_mmm_sig_ipcc_1217.ncl")
+end
+
+
+models = True
+models@project    = (/"CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ", \
+                      "CMIP5_ETHZ"/)
+models@name       = (/"ACCESS1-0", \
+                      "ACCESS1-3", \
+                      "bcc-csm1-1", \
+                      "bcc-csm1-1-m", \
+                      "BNU-ESM", \
+                      "CanESM2", \
+                      "CCSM4", \
+                      "CESM1-BGC", \
+                      "CESM1-CAM5", \
+                      "CMCC-CESM", \
+                      "CMCC-CM", \
+                      "CMCC-CMS", \
+                      "CNRM-CM5", \
+                      "CNRM-CM5-2", \
+                      "CSIRO-Mk3-6-0", \
+                      "CSIRO-Mk3L-1-2", \
+                      "EC-EARTH", \
+                      "FGOALS-s2", \
+                      "FGOALS-g2", \
+                      "FIO-ESM", \
+                      "GFDL-CM3", \
+                      "GFDL-ESM2G", \
+                      "GFDL-ESM2M", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H-CC", \
+                      "GISS-E2-R-CC", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "HadCM3", \
+                      "HadGEM2-AO", \
+                      "HadGEM2-CC", \
+                      "HadGEM2-ES", \
+                      "inmcm4", \
+                      "IPSL-CM5A-LR", \
+                      "IPSL-CM5A-MR", \
+                      "IPSL-CM5B-LR", \
+                      "MIROC5", \
+                      "MIROC-ESM", \
+                      "MIROC-ESM-CHEM", \
+                      "MPI-ESM-LR", \
+                      "MPI-ESM-MR", \
+                      "MPI-ESM-P", \
+                      "MRI-CGCM3", \
+                      "MRI-ESM1", \
+                      "NorESM1-M", \
+                      "NorESM1-ME", \
+                      "bcc-csm1-1", \
+                      "bcc-csm1-1-m", \
+                      "BNU-ESM", \
+                      "CanESM2", \
+                      "CCSM4", \
+                      "CESM1-CAM5", \
+                      "CESM1-WACCM", \
+                      "CNRM-CM5", \
+                      "CSIRO-Mk3-6-0", \
+                      "EC-EARTH", \
+                      "FGOALS-g2", \
+                      "FIO-ESM", \
+                      "GFDL-CM3", \
+                      "GFDL-ESM2G", \
+                      "GFDL-ESM2M", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "HadGEM2-AO", \
+                      "HadGEM2-ES", \
+                      "IPSL-CM5A-LR", \
+                      "IPSL-CM5A-MR", \
+                      "MIROC5", \
+                      "MIROC-ESM", \
+                      "MIROC-ESM-CHEM", \
+                      "MPI-ESM-LR", \
+                      "MPI-ESM-MR", \
+                      "MRI-CGCM3", \
+                      "NorESM1-M", \
+                      "NorESM1-ME", \
+                      "ACCESS1-0", \
+                      "ACCESS1-3", \
+                      "bcc-csm1-1", \
+                      "bcc-csm1-1-m", \
+                      "BNU-ESM", \
+                      "CanESM2", \
+                      "CCSM4", \
+                      "CESM1-BGC", \
+                      "CESM1-CAM5", \
+                      "CMCC-CM", \
+                      "CMCC-CMS", \
+                      "CNRM-CM5", \
+                      "CSIRO-Mk3-6-0", \
+                      "EC-EARTH", \
+                      "FGOALS-g2", \
+                      "FIO-ESM", \
+                      "GFDL-CM3", \
+                      "GFDL-ESM2G", \
+                      "GFDL-ESM2M", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H-CC", \
+                      "GISS-E2-R-CC", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "HadGEM2-AO", \
+                      "HadGEM2-CC", \
+                      "HadGEM2-ES", \
+                      "inmcm4", \
+                      "IPSL-CM5A-LR", \
+                      "IPSL-CM5A-MR", \
+                      "IPSL-CM5B-LR", \
+                      "MIROC5", \
+                      "MIROC-ESM", \
+                      "MIROC-ESM-CHEM", \
+                      "MPI-ESM-LR", \
+                      "MPI-ESM-MR", \
+                      "MRI-CGCM3", \
+                      "NorESM1-M", \
+                      "NorESM1-ME", \
+                      "ACCESS1-0", \
+                      "ACCESS1-3", \
+                      "bcc-csm1-1", \
+                      "bcc-csm1-1-m", \
+                      "BNU-ESM", \
+                      "CanESM2", \
+                      "CCSM4", \
+                      "CESM1-BGC", \
+                      "CESM1-CAM5", \
+                      "CMCC-CESM", \
+                      "CMCC-CM", \
+                      "CMCC-CMS", \
+                      "CNRM-CM5", \
+                      "CSIRO-Mk3-6-0", \
+                      "EC-EARTH", \
+                      "FGOALS-g2", \
+                      "FIO-ESM", \
+                      "GFDL-CM3", \
+                      "GFDL-ESM2G", \
+                      "GFDL-ESM2M", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H", \
+                      "GISS-E2-H-CC", \
+                      "GISS-E2-R-CC", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "GISS-E2-R", \
+                      "HadGEM2-AO", \
+                      "HadGEM2-CC", \
+                      "HadGEM2-ES", \
+                      "inmcm4", \
+                      "IPSL-CM5A-LR", \
+                      "IPSL-CM5A-MR", \
+                      "IPSL-CM5B-LR", \
+                      "MIROC5", \
+                      "MIROC-ESM", \
+                      "MIROC-ESM-CHEM", \
+                      "MPI-ESM-LR", \
+                      "MPI-ESM-MR", \
+                      "MRI-CGCM3", \
+                      "MRI-ESM1", \
+                      "NorESM1-M", \
+                      "NorESM1-ME"/)
+models@mip        = (/"Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon", \
+                      "Amon"/)
+models@experiment = (/"historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85"/)
+models@ensemble   = (/"r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i2p1", \
+                      "r8i1p1", \
+                      "r2i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p2", \
+                      "r1i1p3", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p2", \
+                      "r1i1p3", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r2i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r2i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r8i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r2i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r8i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r2i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r8i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r2i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1", \
+                      "r1i1p1"/)
+models@start_year = (/"1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "1986", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081", \
+                      "2081"/)
+models@end_year   = (/"2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2004", \
+                      "2004", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2005", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2099", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2099", \
+                      "2099", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100", \
+                      "2100"/)
+models@dir        = (/"/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/", \
+                      "/net/atmos/data/cmip5/"/)
+models@case_name  = (/"historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "historical", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp26", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp45", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85", \
+                      "rcp85"/)
+
+model_attr_id = (/"ACCESS1-0", \
+                  "ACCESS1-3", \
+                  "bcc-csm1-1", \
+                  "bcc-csm1-1-m", \
+                  "BNU-ESM", \
+                  "CanESM2", \
+                  "CCSM4", \
+                  "CESM1-BGC", \
+                  "CESM1-CAM5", \
+                  "CMCC-CESM", \
+                  "CMCC-CM", \
+                  "CMCC-CMS", \
+                  "CNRM-CM5", \
+                  "CNRM-CM5-2", \
+                  "CSIRO-Mk3-6-0", \
+                  "CSIRO-Mk3L-1-2", \
+                  "EC-EARTH", \
+                  "FGOALS-s2", \
+                  "FGOALS-g2", \
+                  "FIO-ESM", \
+                  "GFDL-CM3", \
+                  "GFDL-ESM2G", \
+                  "GFDL-ESM2M", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H-CC", \
+                  "GISS-E2-R-CC", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "HadCM3", \
+                  "HadGEM2-AO", \
+                  "HadGEM2-CC", \
+                  "HadGEM2-ES", \
+                  "inmcm4", \
+                  "IPSL-CM5A-LR", \
+                  "IPSL-CM5A-MR", \
+                  "IPSL-CM5B-LR", \
+                  "MIROC5", \
+                  "MIROC-ESM", \
+                  "MIROC-ESM-CHEM", \
+                  "MPI-ESM-LR", \
+                  "MPI-ESM-MR", \
+                  "MPI-ESM-P", \
+                  "MRI-CGCM3", \
+                  "MRI-ESM1", \
+                  "NorESM1-M", \
+                  "NorESM1-ME", \
+                  "bcc-csm1-1", \
+                  "bcc-csm1-1-m", \
+                  "BNU-ESM", \
+                  "CanESM2", \
+                  "CCSM4", \
+                  "CESM1-CAM5", \
+                  "CESM1-WACCM", \
+                  "CNRM-CM5", \
+                  "CSIRO-Mk3-6-0", \
+                  "EC-EARTH", \
+                  "FGOALS-g2", \
+                  "FIO-ESM", \
+                  "GFDL-CM3", \
+                  "GFDL-ESM2G", \
+                  "GFDL-ESM2M", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "HadGEM2-AO", \
+                  "HadGEM2-ES", \
+                  "IPSL-CM5A-LR", \
+                  "IPSL-CM5A-MR", \
+                  "MIROC5", \
+                  "MIROC-ESM", \
+                  "MIROC-ESM-CHEM", \
+                  "MPI-ESM-LR", \
+                  "MPI-ESM-MR", \
+                  "MRI-CGCM3", \
+                  "NorESM1-M", \
+                  "NorESM1-ME", \
+                  "ACCESS1-0", \
+                  "ACCESS1-3", \
+                  "bcc-csm1-1", \
+                  "bcc-csm1-1-m", \
+                  "BNU-ESM", \
+                  "CanESM2", \
+                  "CCSM4", \
+                  "CESM1-BGC", \
+                  "CESM1-CAM5", \
+                  "CMCC-CM", \
+                  "CMCC-CMS", \
+                  "CNRM-CM5", \
+                  "CSIRO-Mk3-6-0", \
+                  "EC-EARTH", \
+                  "FGOALS-g2", \
+                  "FIO-ESM", \
+                  "GFDL-CM3", \
+                  "GFDL-ESM2G", \
+                  "GFDL-ESM2M", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H-CC", \
+                  "GISS-E2-R-CC", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "HadGEM2-AO", \
+                  "HadGEM2-CC", \
+                  "HadGEM2-ES", \
+                  "inmcm4", \
+                  "IPSL-CM5A-LR", \
+                  "IPSL-CM5A-MR", \
+                  "IPSL-CM5B-LR", \
+                  "MIROC5", \
+                  "MIROC-ESM", \
+                  "MIROC-ESM-CHEM", \
+                  "MPI-ESM-LR", \
+                  "MPI-ESM-MR", \
+                  "MRI-CGCM3", \
+                  "NorESM1-M", \
+                  "NorESM1-ME", \
+                  "ACCESS1-0", \
+                  "ACCESS1-3", \
+                  "bcc-csm1-1", \
+                  "bcc-csm1-1-m", \
+                  "BNU-ESM", \
+                  "CanESM2", \
+                  "CCSM4", \
+                  "CESM1-BGC", \
+                  "CESM1-CAM5", \
+                  "CMCC-CESM", \
+                  "CMCC-CM", \
+                  "CMCC-CMS", \
+                  "CNRM-CM5", \
+                  "CSIRO-Mk3-6-0", \
+                  "EC-EARTH", \
+                  "FGOALS-g2", \
+                  "FIO-ESM", \
+                  "GFDL-CM3", \
+                  "GFDL-ESM2G", \
+                  "GFDL-ESM2M", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H", \
+                  "GISS-E2-H-CC", \
+                  "GISS-E2-R-CC", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "GISS-E2-R", \
+                  "HadGEM2-AO", \
+                  "HadGEM2-CC", \
+                  "HadGEM2-ES", \
+                  "inmcm4", \
+                  "IPSL-CM5A-LR", \
+                  "IPSL-CM5A-MR", \
+                  "IPSL-CM5B-LR", \
+                  "MIROC5", \
+                  "MIROC-ESM", \
+                  "MIROC-ESM-CHEM", \
+                  "MPI-ESM-LR", \
+                  "MPI-ESM-MR", \
+                  "MRI-CGCM3", \
+                  "MRI-ESM1", \
+                  "NorESM1-M", \
+                  "NorESM1-ME"/)
+
+
+str_vault_sep = "-"
+
+; Data structures to hold information on the
+; reference/acknowledgement output file
+
+undef("interface_get_idx_var")
+function interface_get_idx_var(variable)
+local idx_var
+begin
+    if (derived_var .eq. "Undefined") then
+        idx_var = ind(variable .eq. variables)
+    else
+        idx_var = ind(derived_var .eq. variables)
+    end if
+    return idx_var
+end
+
+undef("interface_get_var_mip")
+function interface_get_var_mip(idx [1] : integer,
+                               variable [1] : string,
+                               array [*] : string)
+; Description:
+;    Fetches the current MIP table, either from the models@-data
+;    structure or, if specified, from the specific variable attribute
+local array_local, idx_var
+begin
+    array_local = array
+    ;; Default case (no variable attribute is specified)
+    if (variable .eq. "default") then
+        if (isatt(models, "mip")) then
+            array_local = str_sub_str(array_local, "${MIP}", models@mip(idx))
+        end if
+    else  ; Variable attribute specified and should replace the models@-entry
+        idx_var = interface_get_idx_var(variable)
+
+        if (var_attr_mip(idx_var) .ne. "None") then
+            array_local = str_sub_str(array_local, "${MIP}", var_attr_mip(idx_var))
+        else
+            if (isatt(models, "mip")) then
+                array_local = str_sub_str(array_local, "${MIP}", models@mip(idx))
+            end if
+        end if
+    end if
+    return array_local
+end
+
+undef("interface_get_var_exp")
+function interface_get_var_exp(idx [1] : integer,
+                               variable [1] : string,
+                               array [*] : string)
+; Description:
+;    Fetches the current experiment type, either from the models@-data
+;    structure or, if specified, from the specific variable attribute
+local array_local, idx_var
+begin
+    array_local = array
+    ;; Default case (no variable attribute is specified)
+    if (variable .eq. "default") then
+        if (isatt(models, "experiment")) then
+            array_local = str_sub_str(array_local, "${EXP}", models@experiment(idx))
+        end if
+    else  ; Variable attribute specified and should replace the models@-entry
+        idx_var = interface_get_idx_var(variable)
+
+        if (var_attr_exp(idx_var) .ne. "None") then
+            array_local = str_sub_str(array_local, "${EXP}", var_attr_exp(idx_var))
+        else
+            if (isatt(models, "experiment")) then
+                array_local = str_sub_str(array_local, "${EXP}", models@experiment(idx))
+            end if
+        end if
+    end if
+    return array_local
+end
+
+undef("interface_replace_place_holders")
+function interface_replace_place_holders(variable [1] : string,
+                                         field [1] : string,
+                                           idx [1] : integer,
+                      array_with_place_holders [*] : string)
+;                                   return val [1] : string
+; Arguments:
+;         @brief Reconstructs the current (idx) input path + filename
+;         @param variable  -  Current variable
+;         @param idx  -  The index to the current model
+;         @param field  -  Current field type
+;         @param array_with_place_holders  - array with place holder strings
+local verbosity, idx_var, array_local_copy
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_replace_place_holders", verbosity, 6)
+
+    array_local_copy = str_sub_str(array_with_place_holders(idx), "${VARIABLE}", variable)
+    array_local_copy = str_sub_str(array_local_copy, "${FIELD}", field)
+
+    array_local_copy = interface_get_var_mip(idx, variable, array_local_copy)
+    array_local_copy = interface_get_var_exp(idx, variable, array_local_copy)
+
+    info_output(">>>>>>>> Leaving interface_replace_place_holders", verbosity, 6)
+    return array_local_copy
+end
+
+undef("interface_get_figure_filename")
+function interface_get_figure_filename(diag_script_base [1] : string,
+                                           variable [1] : string,
+                                         field_type [1] : string,
+                                           aux_info [1] : string,
+                                            idx_mod [1] : integer)
+;                                        return val [1] : string
+;   Arguments:
+;         @brief Construct a figure output file name
+;         @param diags_script_base  -  The current running diag script without
+;                                      it's suffix
+;         @param variable  -  Current variable
+;         @param field_type  -  Current field type
+;         @param aux_info  -  User supplied info to put in figure filename
+;         @param idx_mod  -  Current model number, set to -1 if not applicable
+local verbosity, aux_sep, figure_name, fig_file_local_copy, use_this_for_var
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_get_figure_filename", verbosity, 4)
+    sep = "_"  ; Default separator
+    aux_sep = "_"  ; Auxiliary info separator
+    if (aux_info .eq. "") then
+        aux_sep = ""  ; Auxiliary info separator if no aux-info
+    else
+        aux_info = str_sub_str(aux_info, "_", "-")
+    end if
+
+    if (idx_mod .eq. -1) then
+        figure_name = diag_script_base + sep + variable \
+                                       + sep + field_type \
+                                       + aux_sep + aux_info
+    else
+        if (any(ismissing(ind(variable .eq. variables)))) then
+            use_this_for_var = "default"
+        else
+            use_this_for_var = variable
+        end if
+
+        fig_file_local_copy = interface_replace_place_holders(use_this_for_var,\
+                                                              field_type,\
+                                                              idx_mod,\
+                                                              figfiles_suffix)
+        figure_name = diag_script_base + sep + variable \
+                                       + sep + field_type \
+                                       + sep + aux_info + aux_sep \
+                                       + fig_file_local_copy
+    end if
+    info_output(">>>>>>>> Leaving interface_get_figure_filename", verbosity, 4)
+    return figure_name
+end
+
+undef("interface_get_fullpath")
+function interface_get_fullpath(variable [1] : string,
+                                   field [1] : string,
+                                     idx [1] : integer)
+;                             return val [1] : string
+; Arguments:
+;         @brief Reconstructs the current (idx) input path + filename
+;         @param variable  -  Current variable
+;         @param idx  -  The index to the current model
+;         @param field  -  Current field type
+local verbosity, idx_var, fullpaths_local_copy
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_get_fullpath", verbosity, 4)
+    fullpaths_local_copy = interface_replace_place_holders(variable, field, idx, fullpaths)
+    info_output(">>>>>>>> Leaving interface_get_fullpath", verbosity, 4)
+    return fullpaths_local_copy
+end
+
+undef("interface_get_infile")
+function interface_get_infile(variable [1] : string,
+                                 field [1] : string,
+                                   idx [1] : integer)
+;                           return val [1] : string
+; Arguments:
+;         @brief Reconstructs the current (idx) input filename
+;         @param variable  -  Current variable
+;         @param idx  -  The index to the current model
+;         @param field  -  Current field type
+local verbosity, infiles_local_copy
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_get_infile", verbosity, 4)
+    infiles_local_copy = interface_replace_place_holders(variable, field, idx, infiles)
+    info_output(">>>>>>>> Leaving interface_get_infile", verbosity, 4)
+    return infiles_local_copy
+end
+
+undef("interface_get_inpaths")
+function interface_get_inpaths(idx [1] : integer)
+;                       return val [1] : string
+; Arguments:
+;         @brief Returns the current (idx) path to the input filename
+;         @param idx  -  The index to the current model
+local verbosity
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_get_inpaths", verbosity, 4)
+    info_output(">>>>>>>> Leaving interface_get_inpaths", verbosity, 4)
+    return infile_paths(idx)
+end
+
+undef("interface_get_dictkeys")
+function interface_get_dictkeys(variable [1] : string,
+                                     idx [1] : integer)
+;                             return val [1] : string
+; Arguments:
+;         @brief Reconstructs the current (idx) dictionary keys
+;         @param variable  -  Current variable
+;         @param idx  -  The index to the current model
+;         @param field  -  Current field type
+local verbosity, idx_var, dictkeys_local_copy
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_get_dictkeys", verbosity, 4)
+    dictkeys_local_copy = interface_replace_place_holders(variable, "NO_FIELD", idx, dictkeys@dictkeys)
+    info_output(">>>>>>>> Leaving interface_get_dictkeys", verbosity, 4)
+    return dictkeys_local_copy
+end
+
+undef("interface_get_dictkeys_no_var")
+function interface_get_dictkeys_no_var(idx [1] : integer)
+;                             return val [1] : string
+; Arguments:
+;         @brief Reconstructs the current (idx) dictionary keys
+;         @param idx  -  The index to the current model
+;         @param field  -  Current field type
+local verbosity, idx_var, dictkeys_local_copy
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering interface_get_dictkeys", verbosity, 4)
+    dictkeys_local_copy = interface_replace_place_holders("default", "NO_FIELD", idx, dictkeys@dictkeys)
+    info_output(">>>>>>>> Leaving interface_get_dictkeys", verbosity, 4)
+    return dictkeys_local_copy
+end
+
+undef("noop")
+procedure noop()
+; no-operation
+begin
+end
+
+; == Wrapper definitions used extend/redefine existing NCL routines ==
+
+undef("addfile_wrapper")
+function addfile_wrapper(filename [1]: string, operation [1]:string)
+;                       return [file]: file_handle
+; Description:
+;         Logs any file access using the addfile function to a log file.
+;         To use the wrapper, run the following line to replace all
+;          addfile-occurances
+;
+; find . -type f -name '*ncl' ! -iregex '.*to_be_checked.*' -exec sed -i 's/addfile/addfile_wrapper/g' {} \;
+;
+local fhandle, logfile, datestamp, use_addfile_wrapper
+begin
+    verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
+    info_output("<<<<<<<< Entering addfile_wrapper", verbosity, 4)
+
+    logfile = "addfile_access.log"
+    datestamp = systemfunc("date -u")
+    operation = str_lower(operation)
+    if (operation .eq. "r") then
+        logfile_prefix = "'READ:   '"
+    else if (operation .eq. "w") then
+        logfile_prefix = "'WRITE:  '"
+    else if (operation .eq. "c") then
+        logfile_prefix = "'CREATE: '"
+    end if
+    end if
+    end if
+
+    system("echo " + datestamp + "  --  " + logfile_prefix + filename + " >> " + logfile)
+    fhandle = addfile(filename, operation)
+
+    info_output(">>>>>>>> Leaving addfile_wrapper", verbosity, 4)
+    return fhandle
+end
+
 undef("isfilepresent_esmval")
 function isfilepresent_esmval(file_path [1]: string)
 ;                             return_val [dimsizes(file_path)] :  logical
