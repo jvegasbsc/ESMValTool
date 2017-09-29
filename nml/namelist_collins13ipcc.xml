@@ -35,12 +35,13 @@ This namelist is part of the ESMValTool
     <max_data_blocksize type="integer">     500      </max_data_blocksize>
     <verbosity  type="integer">               5      </verbosity>
     <exit_on_warning  type="boolean">     False      </exit_on_warning>
-    <output_file_type>                      png      </output_file_type>
+    <output_file_type>                      ps       </output_file_type>
     <force_calc type="boolean">           False      </force_calc>
     <force_gradecalc type="boolean">      False      </force_gradecalc>
     <force_taylorcalc type="boolean">     False      </force_taylorcalc>
     <read_from_vault type="boolean">      False      </read_from_vault>
     <regridding_dir type="path">        @{REGRPATH}  </regridding_dir>
+    <tags>                          P_crescendo, D_collins13ipcc   </tags>
 </GLOBAL>
 
 <MODELS>
@@ -65,6 +66,7 @@ This namelist is part of the ESMValTool
         <variable>                      tas              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
@@ -286,6 +288,7 @@ This namelist is part of the ESMValTool
         <variable>                      rtmt             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
@@ -462,6 +465,7 @@ This namelist is part of the ESMValTool
         <variable>                      rlut             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
@@ -638,6 +642,7 @@ This namelist is part of the ESMValTool
         <variable>                      rsut             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1850 2005 @{MODELPATH} </model>
@@ -822,6 +827,7 @@ This namelist is part of the ESMValTool
         <variable>                      tas              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -930,6 +936,7 @@ This namelist is part of the ESMValTool
         <variable>                      tas              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -1195,6 +1202,7 @@ This namelist is part of the ESMValTool
         <variable>                      tas              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -1465,6 +1473,7 @@ This namelist is part of the ESMValTool
         <variable>                      tas              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -1515,6 +1524,7 @@ This namelist is part of the ESMValTool
         <variable>                      tas              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -1938,6 +1948,7 @@ This namelist is part of the ESMValTool
         <variable>                      rtmt              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -1978,6 +1989,7 @@ This namelist is part of the ESMValTool
         <variable>                      rsut              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -2018,6 +2030,7 @@ This namelist is part of the ESMValTool
         <variable>                        rlut            </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -2063,6 +2076,8 @@ This namelist is part of the ESMValTool
         <variable>                      rtmt             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
+
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
         <model> CMIP5_ETHZ bcc-csm1-1     Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
@@ -2144,6 +2159,7 @@ This namelist is part of the ESMValTool
         <variable>                      rlut             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
@@ -2226,6 +2242,8 @@ This namelist is part of the ESMValTool
         <variable>                      rsut             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
+
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
         <model> CMIP5_ETHZ bcc-csm1-1     Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
@@ -2309,6 +2327,7 @@ This namelist is part of the ESMValTool
         <variable>                      rsut             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1900 1950 @{MODELPATH} </model>
@@ -2399,6 +2418,7 @@ This namelist is part of the ESMValTool
         <variable>                          clt          </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys, T_clouds  </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -2440,6 +2460,7 @@ This namelist is part of the ESMValTool
         <variable>                      clt              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys, T_clouds  </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -2631,6 +2652,7 @@ This namelist is part of the ESMValTool
         <variable>                          psl          </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -2671,6 +2693,7 @@ This namelist is part of the ESMValTool
         <variable>                      psl              </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -2863,6 +2886,7 @@ This namelist is part of the ESMValTool
         <variable>                      hurs             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -2910,6 +2934,7 @@ This namelist is part of the ESMValTool
         <variable>                      hurs             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -3045,6 +3070,7 @@ This namelist is part of the ESMValTool
         <variable>                      pr               </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -3095,6 +3121,7 @@ This namelist is part of the ESMValTool
         <variable>                      pr               </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -3220,6 +3247,7 @@ This namelist is part of the ESMValTool
         <variable>                      mrsos            </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_land, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Lmon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ bcc-csm1-1     Lmon piControl r1i1p1    1  500 @{MODELPATH} </model>
@@ -3262,6 +3290,7 @@ This namelist is part of the ESMValTool
         <variable>                      mrsos            </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_land, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Lmon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Lmon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -3419,6 +3448,7 @@ This namelist is part of the ESMValTool
         <variable>                      mrro             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_land, T_phys            </tags>
 
         <model> CMIP5_ETHZ bcc-csm1-1     Lmon piControl r1i1p1    1  500 @{MODELPATH} </model>
         <model> CMIP5_ETHZ bcc-csm1-1-m   Lmon piControl r1i1p1    1  400 @{MODELPATH} </model>
@@ -3461,6 +3491,7 @@ This namelist is part of the ESMValTool
         <variable>                      mrro             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_land, T_phys            </tags>
 
         <model> CMIP5_ETHZ bcc-csm1-1     Lmon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ bcc-csm1-1-m   Lmon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -3612,6 +3643,7 @@ This namelist is part of the ESMValTool
         <variable>                      evspsbl          </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -3660,6 +3692,7 @@ This namelist is part of the ESMValTool
         <variable>                      evspsbl             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -3864,6 +3897,7 @@ This namelist is part of the ESMValTool
         <variable>                      ta               </variable>
         <field_type>                    T3M              </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -3909,6 +3943,7 @@ This namelist is part of the ESMValTool
         <variable>                      ta               </variable>
         <field_type>                    T3M              </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -4102,6 +4137,7 @@ This namelist is part of the ESMValTool
         <variable>                      thetao               </variable>
         <field_type>                    T3M              </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_ocean, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Omon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Omon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -4138,6 +4174,7 @@ This namelist is part of the ESMValTool
         <variable>                      thetao               </variable>
         <field_type>                    T3M              </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_ocean, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Omon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Omon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -4238,6 +4275,7 @@ This namelist is part of the ESMValTool
         <variable>                      ua               </variable>
         <field_type>                    T3M              </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -4279,6 +4317,7 @@ This namelist is part of the ESMValTool
         <variable>                      ua               </variable>
         <field_type>                    T3M              </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_atmos, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -4473,6 +4512,7 @@ This namelist is part of the ESMValTool
         <variable>                       sos             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_ocean, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Omon piControl r1i1p1  300  799 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Omon piControl r1i1p1  250  749 @{MODELPATH} </model>
@@ -4506,6 +4546,7 @@ This namelist is part of the ESMValTool
         <variable>                      sos             </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_ocean, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      Omon historical r1i1p1 1986 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ ACCESS1-3      Omon historical r1i1p1 1986 2005 @{MODELPATH} </model>
@@ -4586,6 +4627,7 @@ This namelist is part of the ESMValTool
         <variable>                      snw_area         </variable>
         <field_type>                    T2Ms             </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_collins13ipcc/  </diag_script_cfg_dir>
+        <tags>                R_landIce, T_phys            </tags>
 
         <model> CMIP5_ETHZ ACCESS1-0      LImon historical r1i1p1 1980 2005 @{MODELPATH} </model>
         <model> CMIP5_ETHZ bcc-csm1-1     LImon historical r1i1p1 1980 2005 @{MODELPATH} </model>
