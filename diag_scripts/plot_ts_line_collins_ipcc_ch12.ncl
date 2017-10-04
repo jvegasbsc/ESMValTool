@@ -36,6 +36,7 @@
 ;;    rcp4.5, rcp6.0, rcp8.5)
 ;;
 ;; Modification history
+;;    20171002-A_lore_ru: Added tags for searching
 ;;    20170523-A_lore_ru: separated plotting from calculations
 ;;    20160625-A_lore_ru: adapted to ESMValTool in ts_line_collins_ipcc_ch12
 ;;    20130506-A_sedl_ja: written for IPCC AR5.
@@ -56,6 +57,8 @@ load "./interface_scripts/messaging.ncl"
 
 load "./plot_scripts/ncl/aux_plotting.ncl"
 
+load "./diag_scripts/lib/ncl/meta_data.ncl"
+
 begin
     ;;##############################################################
     ;;# Fetch general parameters, set in namelist_collins13ipcc.xml#
@@ -72,6 +75,7 @@ begin
 
     ;; 'models', 'variables' and 'field_types' are fetched from the
     ;; above 'ncl.interface' file
+    dim_MOD = dimsizes(models@name)
     dim_VAR = dimsizes(variables)
     var0 = variables(0)
     field_type0 = field_types(0)
@@ -129,6 +133,13 @@ begin
         error_msg("f", diag_script, "", "missing variable attribute " + \
                   "'long_name'")
     end if
+
+    climofiles = new(dim_MOD, string)
+    do ii = 0, dim_MOD - 1
+        climofiles(ii) = \
+            interface_get_inpaths(ii) + "/" \
+            + interface_get_infile(variables(0), field_types(0), ii)
+    end do
 
     ;;###########################################
     ;;# Get data                                #
@@ -267,6 +278,38 @@ begin
     end if
     draw(wks)
     frame(wks)
+
+    alltags = array_append_record(tags,\
+           (/"DM_glob", "PT_times", "ST_mean", "ST_stddev", "ST_anomaly"/), 0)
+    string1 = "Time series of global annual mean  " + variable_info@long_name +\
+              " anomalies (relative to " + models@start_year(0)+ "-" + \
+              models@end_year(0) + ") from CMIP5 concentration drive " + \
+              "experiments. Projections are shown for each RCP for the " + \
+              "multi-model mean (solid lines) and the 5 to 95% range " + \
+              "(+-1.64 standar deviation) across the distribution of " + \
+              "individual models (shading). "
+    if (nperiods .gt. 1) then
+        string2 = "Discontinuities at 2100 are due to different numbers of" + \
+		  "models performing the extension runs beyond the 21st " + \
+		  "century and have no physical meaning. Only one ensemble " + \
+		  "member is used from each model and numbers in the " + \
+		  "figure indicate the number of different models " + \
+		  "contributing to the different time periods. No ranges " + \
+		  "are given for the RCP6.0 projections beyond 2100 as only" + \
+                  " 2 models are available."
+    else
+        string2 = ""
+    end if
+    caption = string1 + string2
+    id = diag_script + "_" + variables(0)
+
+    contrib_authors = (/"A_lore_ru", "A_sedl_ja"/)
+    ESMValMD(wks@fullname, alltags, \
+             caption, id, variables(0), models@name, \
+             climofiles, diag_script, contrib_authors)
+
+    delete([/alltags, caption, id, climofiles/])
+
     info_output(" Wrote " + plot_dir + "/" + diagscript + "/" + \
                 diagscript + "_" + outfile + "." + file_type, verbosity, 1)
 end

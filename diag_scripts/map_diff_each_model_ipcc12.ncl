@@ -36,6 +36,7 @@
 ;;    in namelist which exist for both, historical and rcp.
 ;;
 ;; Modification history
+;;    20171002-A_lore_ru: Added tags for searching
 ;;    20160428-A_lore_ru: adapted to ESMValTool
 ;;    20130501-A_sedl_ja: written for IPCC AR5.
 ;;
@@ -57,6 +58,9 @@ load "./interface_scripts/messaging.ncl"
 load "./diag_scripts/lib/ncl/statistics.ncl"
 load "./plot_scripts/ncl/contour_maps.ncl"
 load "./diag_scripts/lib/ncl/ensemble.ncl"
+
+load "./diag_scripts/lib/ncl/meta_data.ncl"
+
 begin
     ;;##############################################################
     ;;# Fetch general parameters, set in namelist_collins13ipcc.xml#
@@ -162,6 +166,7 @@ begin
         printVarSummary(data1)
     end if
 
+    climofiles = new(dim_MOD, string)
     i = 0
     do imod = 0, dim_MOD / 2 - 1
         if (imod .eq. 0) then
@@ -171,6 +176,9 @@ begin
             data2 = time_operations(A0, -1, -1, "average", \
                                     diag_script_info@time_avg, True)
         end if
+        climofiles = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+
         idx_rcp = find_model_index(models@name(imod), models@name, \
                                    diag_script_info@experiment, \
                                    models@experiment, models@ensemble(imod), \
@@ -178,6 +186,9 @@ begin
         A1 = extract_data(idx_rcp, data, -1, 0, 0)
         data3 = time_operations(A1, -1, -1, "average", \
                                 diag_script_info@time_avg, True)
+
+        climofiles = interface_get_inpaths(idx_rcp) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), idx_rcp)
 
         ;;##############################################
         ;;# Calculate change from period 1 to period 2 #
@@ -335,5 +346,24 @@ begin
     ;pres@pmLabelBarWidthF = .6
 
     outfile = panelling(wks, maps, nvert, nhori, pres)
+
+;;# add tags
+    alltags = array_append_record(tags, \
+           (/"DM_glob", "PT_geo", "ST_clim"/), 0)
+    caption = "Surface change in " + variable_info@long_name + " in " + \
+              models@start_year(idx_rcp)+ "-" + models@end_year(idx_rcp) + \
+              " displayed as anomalies with respect to " + \
+              models@start_year(0)+ "-" + models@end_year(0) + " for " + \
+              models@case_name(idx_rcp) + " from one ensemble member of each" +\
+              " of the concentration driven models available in the CMIP5 " + \
+              "archive. Similar to Figure 12.9 of Collins et a. (2013)."
+    id = diag_script + "_" + variables(0) + "_" + diag_script_info@time_avg
+    contrib_authors = (/"A_lore_ru", "A_sedl_ja"/)
+
+    ESMValMD(outfile, alltags, caption, id, variables(0), models@name, \
+             climofiles, diag_script, contrib_authors)
+
+    delete([/alltags, caption, id, climofiles/])
+
     info_output(" Wrote " + outfile, verbosity, 1)
 end
