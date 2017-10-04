@@ -62,6 +62,7 @@
 ;;    Can either plot seasonal means or annual means in one panel, but not both
 ;;
 ;; Modification history
+;;    20171002-A_lore_ru: Added tags for searching
 ;;    20170530-A_lore_ru: multiple variables possible
 ;;    20170120-A_lore_ru: adapted towritten for ESMValTool
 ;;                        based on IPCC AR5 scripts.
@@ -85,6 +86,8 @@ load "./diag_scripts/lib/ncl/style.ncl"
 load "./plot_scripts/ncl/contour_maps.ncl"
 load "./plot_scripts/ncl/aux_plotting.ncl"
 
+load "./diag_scripts/lib/ncl/meta_data.ncl"
+
 begin
     ;;##############################################################
     ;;# Fetch general parameters, set in namelist_collins13ipcc.xml#
@@ -101,6 +104,7 @@ begin
 
     ;; 'models', 'variables' and 'field_types' are fetched from the
     ;; above 'ncl.interface' file
+    dim_MOD = dimsizes(models@name)
     dim_VAR = dimsizes(variables)
     if (diag_script_info@diagscript .eq. \
         "calc_map_diff_scaleT_mmm_stipp_ipcc12") then
@@ -169,6 +173,13 @@ begin
         error_msg("f", diag_script, "", "missing variable attribute " + \
                   "'long_name'")
     end if
+
+    climofiles = new(dim_MOD, string)
+    do ii = 0, dim_MOD - 1
+        climofiles(ii) = \
+            interface_get_inpaths(ii) + "/" \
+            + interface_get_infile(variables(0), field_types(0), ii)
+    end do
 
     ;;###########################################
     ;;# Get data                                #
@@ -501,5 +512,59 @@ begin
     ;pres@pmLabelBarOrthogonalPosF = -0.01
 
     outfile = panelling(wks, maps, nvert, nhori, pres)
+
+;;# add tags
+    alltags = array_append_record(tags, \
+           (/"DM_glob", "PT_geo", "ST_clim"/), 0)
+    if (diag_script_info@diagscript .eq. \
+        "calc_map_diff_scaleT_mmm_stipp_ipcc12") then
+        string1 = variable_info@long_name + \
+                  " change patterns derived from transient " + \
+                  "simulations from the CMIP5 ensemble, scaled to 1C of " + \
+                  "global mean surface temperature change. The patterns " + \
+                  " have been calculated by computing 20-year averages " + \
+                  "starting in " + str_join(diag_script_info@periods, ", ") +  \
+                  " and over the period " + models@start_year(0)+ "-" +  \
+                  models@end_year(0) + " for the available simulations" + \
+                  "under all RCP's, taking their difference "
+        if (variables(0) .eq. "pr") then
+            string2 = "(percentage difference in the case of precipitation) "
+        else
+            string2 = ""
+        end if
+        string3 = "and normalizing it, grid-point by grid-point, by the " + \
+        "corresponding value of global average temperature change for " + \
+        "each model and scenario. The normalized patterns have then been " + \
+        "averaged across models and scenarios. Stippling indicates where " + \
+        "the mean change averaged over all ralizations is larger than the " + \
+        "95% percentile of the distribution of models." + \
+        " Similar to Figure 12.10 of Collins et al. (2013)."
+        caption = string1 + string2 + string3
+    else
+        caption = "Multi-model ensemble average of " + \
+              variable_info@long_name + \
+              " change (compared to " + models@start_year(0)+ "-" + \
+              models@end_year(0) + " base period) for 20 year periods " + \
+              "starting in " + str_join(diag_script_info@periods, ", ")  + \
+              " for " + str_join(diag_script_info@scenarios, ", ") + \
+              ". Hatching indicates " + \
+              "regions where the multi-model mean change is less than one " + \
+              "standard deviation of internal variability. Stippling " + \
+              "indicates regions where the multi-model change is greater " + \
+              "than two standard deviations of internal variability and " + \
+              "where at least 90% of the models agree on the sign of change." +\
+              " The number of CMIP5 models used is indicated in the upper " + \
+              "right corner of each plot. " + \
+              "Similar to Figure 12.9 of Collins et al. (2013)."
+    end if
+
+    id = diag_script + "_" + variables(0) + "_" + diag_script_info@time_avg
+    contrib_authors = (/"A_lore_ru", "A_sedl_ja"/)
+
+    ESMValMD(outfile, alltags, caption, id, variables(0), models@name, \
+             climofiles, diag_script, contrib_authors)
+
+    delete([/alltags, caption, id, climofiles/])
+
     info_output(" Wrote " + outfile, verbosity, 1)
 end

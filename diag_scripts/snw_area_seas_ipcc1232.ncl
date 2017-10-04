@@ -652,7 +652,10 @@ begin
     ncdf_file@existing = "overwrite"
     ;; Function in ~/interface_scripts/auxiliary.ncl
     ncdf_outfile = ncdf_write(to_plot, ncdf_file)
-    ;ncdf_file@existing = "append"
-    ;ncdf_outfile = ncdf_write(runs, ncdf_file)
+    if(isatt(diag_script_info, "model_nr") .and. \
+        diag_script_info@model_nr .eq. True) then
+        ncdf_file@existing = "append"
+        ncdf_outfile = ncdf_write(runs, ncdf_file)
+    end if
 
 end
