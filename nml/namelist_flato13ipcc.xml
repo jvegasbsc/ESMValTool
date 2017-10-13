@@ -7,7 +7,7 @@ namelist_flato13ipcc.xml
 Description
 Reproducing selected figures from IPCC AR5, chap. 9 (Flato et al., 2013):
 Figs. 9.2a/b/c, 9.3, 9.4, 9.5, 9,7, 9.8, 9.10, 9.24a, 9.28, 9.29, 9.30, 9.31,
-9.32, 9.35, 9.36, 9.45b
+9.32, 9.35, 9.36, 9.42b, 9.45b
 
 Authors
 Axel Lauer (DLR, Germany - axel.lauer@dlr.de)
@@ -1929,12 +1929,12 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ HadGEM2-A    3hr amip r1i1p1 2004 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> CMIP5_ETHZ IPSL-CM5A-LR 3hr amip r1i1p1 2004 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
 
-        <diag_script cfg="cfg_DiurnalCycle_25N-70N_land_JJA.ncl">      DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_25N-70N_ocean_JJA.ncl">     DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_25S-25N_land_JJA+DJF.ncl">  DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_25S-25N_ocean_JJA+DJF.ncl"> DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_50S-25S_land_DJF.ncl">      DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_50S-25S_ocean_DJF.ncl">     DiurnalCycle_box.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25N-70N_land_JJA.ncl">      ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25N-70N_ocean_JJA.ncl">     ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25S-25N_land_JJA+DJF.ncl">  ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25S-25N_ocean_JJA+DJF.ncl"> ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_50S-25S_land_DJF.ncl">      ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_50S-25S_ocean_DJF.ncl">     ipcc-fig-9-30.ncl </diag_script>
     </diag>
 
 <!-- *********************************************************************** -->
@@ -2189,6 +2189,93 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ NorESM1-ME     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> OBS CMAP mergedanaly 1 1980 2005 @{OBSPATH}/Tier2/CMAP </model>
         <diag_script cfg="cfg_ipcc-fig-9-36.ncl"> ipcc-fig-9-36.ncl </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.42b                                               * -->
+<!-- * =================================================================== * -->
+<!-- * Equilibrium climate sensitivity (ECS) vs. transient climate         * -->
+<!-- * response (TCR)                                                      * -->
+<!-- * Contribution by Ricarda Rettinger, DLR, namelist_ECS.xml            * -->
+<!-- *                                                                     * -->
+<!-- * Notes:                                                              * -->
+<!-- * (1) IT IS IMPORTANT TO KEEP THE MODELS IN ALPHABETICAL ORDER!       * -->
+<!-- * (2) PLEASE INDICATE THE APPROPRIATE YEARS (150 PER EXPERIMENT)      * -->
+<!-- * (3) THE TIME STEPS OF THE EXPERIMENTS CAN VARY                      * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description> ECS (needed as input for ECS vs TCR) </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>   
+        <variable>            rtmt                </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ECS/      </diag_script_cfg_dir>
+        <tags>                R_atmos             </tags>
+        <diag_script cfg="cfg_ECS_anomaly.ncl"> ECS.ncl </diag_script>
+        <model>  CMIP5_ETHZ  ACCESS1-0          Amon  abrupt4xCO2  r1i1p1  0300 0449  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  ACCESS1-0          Amon  piControl    r1i1p1  0300 0449  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  ACCESS1-3          Amon  abrupt4xCO2  r1i1p1  0250 0399  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  ACCESS1-3          Amon  piControl    r1i1p1  0250 0399  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  abrupt4xCO2  r1i1p1  0160 0309  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  piControl    r1i1p1  0160 0309  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1-m       Amon  abrupt4xCO2  r1i1p1  0240 0389  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1-m       Amon  piControl    r1i1p1  0240 0389  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  BNU-ESM            Amon  abrupt4xCO2  r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  BNU-ESM            Amon  piControl    r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CanESM2            Amon  abrupt4xCO2  r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CanESM2            Amon  piControl    r1i1p1  2015 2164  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CCSM4              Amon  abrupt4xCO2  r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CCSM4              Amon  piControl    r1i1p1  0800 0949  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CNRM-CM5           Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CNRM-CM5           Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0      Amon  abrupt4xCO2   r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0      Amon  piControl     r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  FGOALS-g2          Amon  abrupt4xCO2   r1i1p1  0490 0639  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  FGOALS-g2          Amon  piControl     r1i1p1  0490 0639  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GFDL-CM3           Amon  abrupt4xCO2   r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GFDL-CM3           Amon  piControl     r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-H          Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-H          Amon  piControl     r1i1p1  1200 1349  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-R          Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-R          Amon  piControl     r1i1p1  3331 3480  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  inmcm4             Amon  abrupt4xCO2   r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  inmcm4             Amon  piControl     r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  abrupt4xCO2   r1i1p1  1850 1989  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  piControl     r1i1p1  1850 1989  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC-ESM          Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC-ESM          Amon  piControl     r1i1p1  1800 1949  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC5             Amon  abrupt4xCO2   r1i1p1  2100 2249  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC5             Amon  piControl     r1i1p1  2100 2249  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-MR         Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-MR         Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  NorESM1-M          Amon  abrupt4xCO2   r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  NorESM1-M          Amon  piControl     r1i1p1  0700 0849  @{MODELPATH}/ETHZ_CMIP5/ </model>
+    </diag>
+
+    <diag>
+        <description> ECS vs TCR (fig 9.42b)      </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_TCR/      </diag_script_cfg_dir>
+        <tags>                R_atmos             </tags>
+        <diag_script cfg="cfg_TCR.ncl"> TCR.ncl        </diag_script>
+        <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  1pctCO2   r1i1p1  0160 0299  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CanESM2            Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  inmcm4             Amon  1pctCO2   r1i1p1  2090 2169  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC-ESM          Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
     </diag>
 
 <!-- *********************************************************************** -->

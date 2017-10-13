@@ -98,6 +98,9 @@ begin
     ;; ||          REFERENCES INFO               ||
     ;; ||                                        ||
     ;; ============================================
+
+    contrib_authors = (/"A_eval_ma", "A_davi_ed", "A_orlo_bo"/)
+
     write_references(diag_script,                  \  ; script name
                      (/"A_eval_ma"/),              \  ; authors
                      (/"A_davi_ed", "A_orlo_bo"/), \  ; contributors
@@ -143,6 +146,11 @@ begin
     required_attributes = (/"cn_levels_mean_basic",\
                             "cn_levels_mean_diff_basic"/)
     exit_if_missing_atts(diag_script_info, required_attributes)
+
+    ;; 'output_file_type' if fetched from ncl.interface
+    if (.not. isdefined("output_file_type")) then
+        output_file_type = "PS"
+    end if
 
     ;; Abbreviate a little...
     di = diag_script_info
@@ -336,8 +344,7 @@ begin
 
         ;; Atach metadata to plots
         alltags = array_append_record(tags,\
-           (/"DM_global", "PT_geo", "ST_mean", "ST_rmsd", "ST_diff", \
-             "ST_corr", "ST_clim"/), 0)
+           (/"DM_global", "PT_geo", "ST_mean", "ST_diff", "ST_clim"/), 0)
         do imod = 0, dim_MOD - 1
             if (any(imod .eq. idx_ref)) then
                 continue
@@ -354,15 +361,14 @@ begin
                       " and " + models@name(imod)
 
             id = diag_script + "_" + base_name + "_" + di@season + models@name(imod)
-            models_tag = (/models@name(imod), models@name(idx_ref)/)
+            models_tag = (/models@name(imod), models@name(idx_ref(0))/)
             climofiles = new(2, "string")
             climofiles(0) = interface_get_inpaths(imod) + "/" + \
                         interface_get_infile(variables(0), field_types(0), imod) 
-            climofiles(1) = interface_get_inpaths(idx_ref) + "/" + \
-                        interface_get_infile(variables(0), field_types(0), idx_ref)
-            contrib_authors = (/"A_eval_ma", "A_davi_ed", "A_orlo_bo"/)
+            climofiles(1) = interface_get_inpaths(idx_ref(0)) + "/" + \
+                        interface_get_infile(variables(0), field_types(0), idx_ref(0))
 
-            ESMValMD(outfile+".png", alltags, caption, id, variables, models_tag, climofiles, diag_script, contrib_authors)
+            ESMValMD(outfile + "." + output_file_type, alltags, caption, id, variables, models_tag, climofiles, diag_script, contrib_authors)
             delete([/caption, id, climofiles, outfile/])
         end do
         delete(alltags)
@@ -391,8 +397,7 @@ begin
 
         ;; Attach metadata to plots
         alltags = array_append_record(tags,\
-           (/"DM_global", "PT_geo", "ST_mean", \
-             "ST_clim", "ST_corr"/), 0)
+           (/"DM_global", "PT_geo", "ST_mean", "ST_clim"/), 0)
         figures_per_page = get_figures_per_page(dim_MOD,\
                                             max_figures_pp,\
                                             min_figures_pp)
@@ -429,9 +434,8 @@ begin
                         interface_get_inpaths(imod) + "/" + \
                         interface_get_infile(variables(0), field_types(0), imod)
             end do
-            contrib_authors = (/"A_eval_ma", "A_davi_ed", "A_orlo_bo"/)
 
-            ESMValMD(outfile+".png", alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+            ESMValMD(outfile + "." + output_file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
             delete([/caption, id, climofiles, outfile/])
         end do
         delete(alltags)
@@ -449,8 +453,7 @@ begin
 
         ;; Attach metadata to plots
         alltags = array_append_record(tags,\
-           (/"DM_global", "PT_geo", "ST_mean", "ST_rmsd", "ST_diff", \
-             "ST_clim"/), 0)
+           (/"DM_global", "PT_geo", "ST_mean", "ST_diff", "ST_clim"/), 0)
         figures_per_page = get_figures_per_page(dim_MOD,\
                                             max_figures_pp,\
                                             min_figures_pp)
@@ -488,9 +491,8 @@ begin
                         interface_get_inpaths(imod) + "/" + \
                         interface_get_infile(variables(0), field_types(0), imod)
             end do
-            contrib_authors = (/"A_eval_ma", "A_davi_ed", "A_orlo_bo"/)
 
-            ESMValMD(outfile+".png", alltags, caption, id, variables, mod_tags, climofiles, diag_script, contrib_authors)
+            ESMValMD(outfile + "." + output_file_type, alltags, caption, id, variables, mod_tags, climofiles, diag_script, contrib_authors)
             delete([/caption, id, climofiles, outfile, mod_inds, mod_tags/])
         end do
         delete(alltags)

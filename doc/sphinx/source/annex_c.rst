@@ -28,6 +28,14 @@ v1.1 are described in
     \newpage 
     \pagebreak 
 
+.. include:: namelists/namelist_autoassess_rad.rst
+
+.. raw:: latex
+
+    \clearpage
+    \newpage 
+    \pagebreak 
+
 .. include:: namelists/namelist_catchment.rst
 
 .. raw:: latex
@@ -61,6 +69,14 @@ v1.1 are described in
     \pagebreak
 
 .. include:: namelists/namelist_carbon_emergent_constraints.rst
+
+.. raw:: latex
+
+    \clearpage
+    \newpage 
+    \pagebreak
+
+.. include:: namelists/namelist_ecs_tcr.rst
 
 .. raw:: latex
 

@@ -86,6 +86,9 @@ begin
     ;; ||          REFERENCES INFO               ||
     ;; ||                                        ||
     ;; ============================================
+
+    contrib_authors = (/"A_eval_ma", "A_levi_ri", "A_mart_gi"/)
+
     write_references(diag_script,            \  ; script name
                      "A_eval_ma",               \  ; authors
                      (/"A_levi_ri", "A_mart_gi"/), \  ; contributors
@@ -101,6 +104,10 @@ begin
 end
 
 begin
+    ;; 'output_file_type' if fetched from ncl.interface
+    if (.not. isdefined("output_file_type")) then
+        output_file_type = "ps"
+    end if
 
     ;; 'show_debuginfo' if fetched from ncl.interface
     if (.not. isdefined("show_debuginfo")) then
@@ -434,11 +441,13 @@ begin
     suffix = get_file_suffix(xml_name, 0)
     base_name = str_sub_str(xml_name, suffix, "")
 
-    contrib_authors = (/"A_eval_ma", "A_levi_ri", "A_mart_gi"/)
     diag_script_base = basename(diag_script)
     output_dir = get_output_dir(plot_dir, diag_script_base)
 
     do idx_mod = 0, dim_MOD - 1
+        if (any(idx_mod .eq. plot_settings@idx_ref)) then
+            continue
+        end if
         caption = "Contour plot with the correlation between precipitaion over "\
                   + "India and SST in the Nino 3.4 area"
         alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "ST_diff", "PT_geo"/), 0)
@@ -456,11 +465,11 @@ begin
                                                     var0 + var1,\
                                                     field_type0 + field_type1,\
                                                     aux_filename_info, idx_mod)
-        output_file_path = output_dir + output_filename + ".png"
+        output_file_path = output_dir + output_filename + "." + output_file_type
 
         ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
+        delete([/alltags, caption, id, climofiles/])
     end do
-    delete([/alltags, caption, id, climofiles/])
 
     res = orig_res
     plot_settings@gsn_right_string = False
@@ -491,7 +500,7 @@ begin
                                                     var0 + var1,\
                                                     field_type0 + field_type1,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + ".png"
+    output_file_path = output_dir + output_filename + "." + output_file_type
 
     ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
 
@@ -510,8 +519,6 @@ begin
 
     id = diag_script + "_mean_diff" + variables(0)
 
-    contrib_authors = (/"A_eval_ma", "A_levi_ri", "A_mart_gi"/)
-
     diag_script_base = basename(diag_script)
     output_dir = get_output_dir(plot_dir, diag_script_base)
     aux_title_info = di@season + "-mean-diff"
@@ -519,7 +526,7 @@ begin
                                                     var0 + var1,\
                                                     field_type0 + field_type1,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + ".png"
+    output_file_path = output_dir + output_filename + "." + output_file_type
 
     ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
 

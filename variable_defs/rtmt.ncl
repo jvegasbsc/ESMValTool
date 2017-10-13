@@ -14,3 +14,4 @@ variable_info@map_diff_Levels = ispan(-30, 30, 5)
 
 ; Add global average to the plot
 variable_info@show_global_avg = True
+
