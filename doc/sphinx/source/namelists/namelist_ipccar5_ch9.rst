@@ -36,6 +36,8 @@ The plots will be done based on a collection of individual namelists. The follow
 
 * Figure 9.36: ENSO metrics for pre-industrial control simulations in CMIP3 and CMIP5. (a) and (b): SST anomaly standard deviation (deg C) in Nino 3 and Nino 4, respectively, (c) precipitation response (standard deviation, mm/day) in Nino4. 
 
+* Figure 9.42: (b) Equilibrium climate sensitivity (ECS) against transient climate response (TCR).
+
 * Figure 9.45: The carbon cycle-climate feedback (gamma\ :sub:`LT`\) versus the short-term sensitivity of atmospheric CO\ :sub:`2`\  to interannual temperature variability (gamma\ :sub:`IAV`\) in the tropics for CMIP5 models. The red line shows the best fit line across the CMIP5 simulations and the vertical dashed lines show the observed range of gamma\ :sub:`IAV`\. (b) Probability distribution function (PDF) for gamma\ :sub:`LT`\. The solid line is derived after applying the interannual variability (IAV) constraint to the models while the dashed line is the prior PDF derived purely from the models before applying the IAV constraint.
 
 
@@ -63,6 +65,8 @@ Diagnostics are stored in diag_scripts/
 
 * create_co2flux.ncl (fig. 9.45b: Emergent constraints on carbon cycle feedbacks)
 
+* ECS.ncl (fig. 9.42b: ECS vs. TCR)
+
 * enso_mem.ncl (fig. 9.35: Maximum entropy power spectra of surface air temperature averaged over the NINO3 region)
 
 * eyring13jgr_fig02.ncl (fig. 9.10: Ozone and associated climate impacts)
@@ -85,6 +89,8 @@ Diagnostics are stored in diag_scripts/
 
 * seasonality_mm.ncl (fig. 9.30: Seasonality)
 
+* TCR.ncl (fig. 9.42b: ECS vs. TCR)
+
 * tsline.ncl (fig. 9.29: Aerosol; fig. 9.45: Emergent constraints on carbon cycle feedbacks)
 
 * tsline_IPCC_Fig_9_8.ncl (fig. 9.8: Time series of anomalies of annual and global surface temperature)
@@ -97,6 +103,7 @@ See individual diagnostics (Annex C):
 * Aerosol
 * Clouds
 * Emergent constraints on carbon cycle feedbacks
+* Equilibrium Climate Sensitivity (ECS) & Transcient Climate Response (TCR)
 * Ozone and associated climate impacts
 * Performance metrics for essential climate parameters
 * Sea ice
@@ -115,6 +122,7 @@ Variables
 * pr (atmos, 3-hr/monthly mean, longitude, latitude, time)
 * rlut, rlutcs (atmos, monthly mean, longitude, latitude, time)
 * rsut, rsutcs (atmos, monthly mean, longitude, latitude, time)
+* rtmt (atmos, monthly mean, longitude, latitude, time)
 * sic (ocean, monthly mean, longitude, latitude, time)
 * ta (atmos, monthly mean, longitude, latitude, level, time)
 * tas (atmos, monthly mean, longitude, latitude, time)
@@ -239,6 +247,11 @@ Example plots
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.36.
+
+.. figure:: ../../source/namelists/figures/ecs_tcr/TCR.png
+   :width: 50%
+
+   Resembling Flato et al. (2013), Fig. 9.42b.
 
 .. figure:: ../../source/namelists/figures/ipccar5_ch9/fig11_ipccar5_ch9.png
    :width: 80%
