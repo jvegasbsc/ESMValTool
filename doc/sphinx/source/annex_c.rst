@@ -108,6 +108,14 @@ v1.1 are described in
     \newpage 
     \pagebreak
 
+.. include:: namelists/namelist_ipccar5_ch12.rst
+
+.. raw:: latex
+
+    \clearpage
+    \newpage 
+    \pagebreak
+
 .. include:: namelists/namelist_carbon_cycle.rst
 
 .. raw:: latex
