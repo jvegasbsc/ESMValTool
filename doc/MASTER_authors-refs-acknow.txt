@@ -48,6 +48,7 @@ A_kras_jo = Krasting, John (NOAA, USA - john.krasting 'at' noaa.gov)
 A_kune_dm = Kunert, Dominik (DLR, Germany - dominik.kunert 'at' dlr.de)
 A_levi_ri = Levine, Richard (MetOffice, UK - richard.levine 'at' metoffice.gov.uk)
 A_litt_bi = Little, Bill (MetOffice, UK - bill.little 'at' metoffice.gov.uk)
+A_lore_ru = Lorenz, Ruth (ETH Zurich, Switzerland, ruth.lorenz 'at' env.ethz.ch)
 A_maek_ja = Makela, Jarmo ('at')
 A_malo_er = Maloney, Eric (Colorado State University - emaloney 'at' atmos.colostate.edu)
 A_maso_er = Mason, Erik (NOAA, USA - erik.mason 'at' noaa.gov)
@@ -66,6 +67,7 @@ A_rett_ri = Rettinger, Ricarda (DLR, Germany - ricarda.rettinger 'at' dlr.de)
 A_ring_ma = Ringer, Mark (MetOffice, UK - mark.ringer 'at' metoffice.gov.uk)
 A_rio_ca  = Rio, Catherine (IPSL, France - catherine.rio 'at' lmd.jussieu.fr)
 A_roeh_ro = Roehrig, Romain (MeteoFr, France - romain.roehrig 'at' meteo.fr)
+A_sedl_ja = Sedlacek, Jan (ETH Zurich, jan.sedlacek 'at' env.ethz.ch)
 A_senf_da = Senftleben, Daniel (DLR, Germany - daniel.senftleben 'at' dlr.de)
 A_somm_ph = Sommer, Philipp (Univ. of Hamburg, Germany - 'at')
 A_ster_an = Sterl, Andreas (KNMI, Netherlands - sterl 'at' knmi.nl)
@@ -135,6 +137,7 @@ D_aquila11gmd = Aquila et al., Geosci. Model Dev. 4, 325-355, doi:10.5194/gmd-4-
 D_bakker14essd, Bakker, D. C. E. et al., Earth Syst. Sci. Data, 6, 69-90, doi:10.5194/essd-6-69-2014, 2014.
 D_bianchi12gbc, Bianchi, D. et al., Global Biogeochem. Cy., 26, GB2009, doi:10.1029/2011GB004209, 2012.
 D_cionni11acp = Cionni et al., Atmos. Chem. Phys., 11, 11267-11292, doi:10.5194/acp-11-11267-2011, 2011.
+D_collins13ipcc = Collins et al., IPCC AR5, Chaper 12, 1029-1136, doi:10.1017/CBO9781107415324.024, 2013.
 D_clivar09jclim = CLIVAR Madden-Julian Oscillation Working Group, J. Climate, 22, 3006–3030, doi: http://dx.doi.org/10.1175/2008JCLI2731.1 (2009)
 D_dong08grl = Dong, S. et al., J. Geophys. Res., 113, C06013, doi:10.1029/2006JC004051 (2008)
 D_duemenil00mpimr: Duemenil Gates et al., Observed historical discharge data from major rivers for climate model validation. Max Planck Institute for Meteorology Report 307, Hamburg, Germany (2000)
