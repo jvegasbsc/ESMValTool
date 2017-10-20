@@ -1,6 +1,7 @@
 ;
 ; Requires: none
 ;
-variable_info = False
+variable_info = True
 variable_info@derived = False
-
+variable_info@long_name = "Total Runoff"
+variable_info@units = "kg m-2 s-1"

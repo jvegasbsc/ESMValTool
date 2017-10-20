@@ -471,6 +471,8 @@ function scatterplot_markers(wks_in[1],
 ;; Caveats
 ;;
 ;; Modification history
+;;    20171013-A_laue_ax: use scatterplot_markers: use colors, markers and annots
+;;                        defined by the calling routine (if present)
 ;;    20151105_righ_ma: written.
 ;;
 local funcname, scriptname, verbosity, data, xpts, ypts, defaults, var, wks, \
@@ -505,9 +507,29 @@ begin
     wks = get_wks(wks_in, diag_script, var)
 
     ;; Define style
-    annots = project_style(diag_script_info, "annots")
-    colors  = project_style(diag_script_info, "colors")
-    markers = project_style(diag_script_info, "markers")
+
+; A_laue_ax+
+;    annots = project_style(diag_script_info, "annots")
+;    colors  = project_style(diag_script_info, "colors")
+;    markers = project_style(diag_script_info, "markers")
+
+    ; use colors, markers and annots defined by calling routine (if present)
+    if (isatt(data, "colors")) then
+        colors = data@colors
+    else
+        colors = project_style(diag_script_info, "colors")
+    end if
+    if (isatt(data, "markers")) then
+        markers = data@markers
+    else
+        markers = project_style(diag_script_info, "markers")
+    end if
+    if (isatt(data, "annots")) then
+        annots = data@annots
+    else
+        annots = project_style(diag_script_info, "annots")
+    end if
+; A_laue_ax-
 
     ;; Create a 2D scatter plot
     res = True

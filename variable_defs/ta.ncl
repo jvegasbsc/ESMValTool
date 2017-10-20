@@ -3,6 +3,8 @@
 ;
 variable_info          = True
 variable_info@derived  = False
+variable_info@long_name = "Air Temperature"
+variable_info@units = "K"
 
 ; Countour levels for zonalmean_profile.ncl
 variable_info@zonal_ref_Levels = ispan(200, 300, 10)

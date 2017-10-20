@@ -1,0 +1,100 @@
+<namelist>
+<include href="./config_private.xml"/>
+<namelist_summary>
+###############################################################################
+namelist_ECS.xml
+
+Description
+Namelist to calculate the Equilibrium Climate Sensitivity (ECS) using
+abrupt4xCO2 and piControl runs for the variables rtmt and tas. 
+
+Authors
+Ricarda Rettinger
+
+Project
+DLR ESMVal
+CRESCENDO
+
+Reference
+Andrews et al., 2012, Forcing, feedbacks and climate sensitivity in CMIP5 
+coupled atmosphere-ocean climate models, Geophysical Research Letters, 39.
+DOI: 10.1029/2012GL051607
+
+This namelist is part of the ESMValTool
+###############################################################################
+</namelist_summary>
+
+<GLOBAL>
+    <write_plots type="boolean">              True         </write_plots>
+    <write_netcdf type="boolean">             True         </write_netcdf>
+    <force_processing type="boolean">        False         </force_processing>
+    <wrk_dir type="path">                    ./work/       </wrk_dir>
+    <plot_dir type="path">                   ./work/plots/ </plot_dir>
+    <climo_dir type="path">                  ./work/climo/ </climo_dir>
+    <write_plot_vars type="boolean">          True         </write_plot_vars>
+    <max_data_filesize type="integer">         100         </max_data_filesize>
+    <max_data_blocksize type="integer">        500         </max_data_blocksize>
+    <verbosity  type="integer">                  1         </verbosity>
+    <exit_on_warning  type="boolean">        False         </exit_on_warning>
+    <output_file_type>                          ps         </output_file_type>
+    <force_calc type="boolean">              False         </force_calc>
+    <force_gradecalc type="boolean">         False         </force_gradecalc>
+    <force_taylorcalc type="boolean">        False         </force_taylorcalc>
+    <tags> D_andrews12,P_crescendo                         </tags>
+</GLOBAL>
+
+<MODELS>
+
+<!-- ##################################################################### -->
+<!-- IT IS IMPORTANT TO KEEP THE MODELS IN ALPHABETICAL ORDER! - SEE BELOW -->
+<!-- PLEASE INDICATE THE APPROPRIATE YEARS (150 PER EXPERIMENT)            -->
+<!-- THE TIME STEPS OF THE EXPERIMENTS CAN VARY                            -->
+<!-- ##################################################################### -->
+ 
+</MODELS>
+
+<DIAGNOSTICS>
+
+<!--  Caculate ECS  ######################################################## -->
+
+<diag>
+   <description> ECS (needed as input for ECS vs TCR) </description>
+   <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+   <variable>            tas                 </variable>   
+   <variable>            rtmt                </variable>
+   <field_type>          T2Ms                </field_type>
+   <diag_script_cfg_dir> ./nml/cfg_ECS/      </diag_script_cfg_dir>
+   <tags>                R_atmos             </tags>
+
+   <model>  CMIP5_ETHZ  CanESM2            Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  CanESM2            Amon  piControl     r1i1p1  2015 2164  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+
+   <diag_script cfg="cfg_ECS_anomaly.ncl"> ECS.ncl </diag_script>
+</diag>
+
+<!-- ###################################################################### -->
+<!--             Caculate TCR and plot IPCC AR5 fig 9.42b                   -->
+<!-- ###################################################################### -->
+
+<diag>
+   <description> ECS vs TCR (fig 9.42b)      </description>
+   <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+   <variable>            tas                 </variable>
+   <field_type>          T2Ms                </field_type>
+   <diag_script_cfg_dir> ./nml/cfg_TCR/      </diag_script_cfg_dir>
+   <tags>                R_atmos             </tags>
+
+   <model>  CMIP5_ETHZ  CanESM2            Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+   <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  1pctCO2   r1i1p1  1850 1929  @{MODELPATH}/ETHZ_CMIP5/ </model>
+
+  <diag_script cfg="cfg_TCR.ncl"> TCR.ncl        </diag_script>
+</diag>
+
+</DIAGNOSTICS>
+
+</namelist>

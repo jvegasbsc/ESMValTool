@@ -603,6 +603,8 @@ function ncdf_write(data,
 ;;    http://www.ncl.ucar.edu/Support/talk_archives/2009/0367.html
 ;;
 ;; Modification history
+;;    20170508_A_lore_ru: no ncdf_define if appending additional variable to
+;;                        existing file, only filevardef to get correct dims
 ;;    20131107-A_gott_kl: written.
 ;;
 local funcname, scriptname, verbosity, data, outfile, outfile_in, ncdf, varname
@@ -642,15 +644,29 @@ begin
             ncdf = addfile(outfile, "c")
             info_output(" Keeping existing " + outfile + " with suffix ." + \
                         sysdate, verbosity, 2)
+            ncdf = ncdf_define(ncdf, data)	
         else if (existing .eq. "append") then
             ncdf = addfile(outfile, "w")
+            dimNames = getvardims(data)
+            filevardef(ncdf, varname, typeof(data), dimNames)
+            dim_dim = dimsizes(dimNames)
+            ;; Copy attributes associated with each variable to the file
+            do i = 0, dim_dim - 1
+                ;; No attribute assignment to variable if no attributes are available
+                if (.not.(all(ismissing(getvaratts(data&$dimNames(i)$))))) then
+                    filevarattdef(ncdf, dimNames(i), data&$dimNames(i)$)
+                end if
+            end do
+            filevarattdef(ncdf, varname, data)
         else
             system("rm -f " + outfile)
             ncdf = addfile(outfile, "c")
+            ncdf = ncdf_define(ncdf, data)
         end if
         end if
     else  ; Outfile does not exist yet
         ncdf = addfile(outfile, "c")
+        ncdf = ncdf_define(ncdf, data)
     end if
 
     ;; Write to netCDF
@@ -658,7 +674,6 @@ begin
 ;    ncdf->$varname$ = data
     ;; Option 2: write with explicit file definition
     dimNames = getvardims(data)
-    ncdf = ncdf_define(ncdf, data)
     do i = 0, dimsizes(dimNames) - 1
         if (typeof(data&$dimNames(i)$).eq."string") then
             ;; Convert string array to two dimensional character array
