@@ -764,6 +764,7 @@ function regrid_3D_to_rectilinear_grid(data_in:numeric,
 ;; References
 ;;
 ;; Modification history
+;;    20170511_A_lore_ru: added 1degCMOR and 2.5degCMOR as possible grids
 ;;    20151026_A_righ_ma: added warning for unavailable lat/lon vertices
 ;;                        in input.
 ;;    20151023_A_righ_ma: moved to regridding.ncl and renamed
@@ -807,7 +808,7 @@ begin
 
     Opt = True
 
-    Opt@SrcMask2D = where(.not.ismissing(temp), 1, 0)
+    Opt@Mask2D = where(.not.ismissing(temp), 1, 0)
     Opt@SrcRegional = True  ; Setting True to avoid artefacts from incomplete
                             ; Src grids. Activate if only part of the sphere
                             ; is given
@@ -841,21 +842,35 @@ begin
     if (grid_resolution.eq."0.5deg") then
         dNLON = 720
         dNLAT = 360
-        Opt@DstLLCorner = (/-89.75, 0.75 /)
-        Opt@DstURCorner = (/ 89.75, 359.75 /)
+        Opt@LLCorner = (/-89.75, 0.75 /)
+        Opt@URCorner = (/ 89.75, 359.75 /)
         latlon_to_SCRIP(dstGridName, "0.5deg", Opt)
     else if (grid_resolution.eq."1deg") then
         dNLON = 360
         dNLAT = 180
-        Opt@DstLLCorner = (/-89.75, 0.75 /)
-        Opt@DstURCorner = (/ 89.75, 359.75 /)
+        Opt@LLCorner = (/-89.75, 0.75 /)
+        Opt@URCorner = (/ 89.75, 359.75 /)
         latlon_to_SCRIP(dstGridName, "1x1", Opt)
+    else if (grid_resolution.eq."1degCMOR") then
+        dNLON = 360
+        dNLAT = 180
+        Opt@LLCorner = (/-89.5, 0.5 /)
+        Opt@URCorner = (/89.5, 359.5 /)
+        latlon_to_SCRIP(dstGridName, "1x1", Opt)
+    else if (grid_resolution.eq."2.5degCMOR") then
+        dNLON = 144
+        dNLAT = 72
+        Opt@LLCorner = (/-88.75, 1.25/)
+        Opt@URCorner = (/88.75, 358.75/)
+        latlon_to_SCRIP(dstGridName, "2.5x2.5", Opt)
     else
         dNLON = 180
         dNLAT = 90
         Opt@LLCorner = (/-89.5, 0.00/)
         Opt@URCorner = (/89.5, 359.5/)
         latlon_to_SCRIP(dstGridName, "2x2", Opt)
+    end if
+    end if
     end if
     end if
     delete(Opt)
@@ -874,14 +889,15 @@ begin
 
     ;; Interpolating models from original grid final grid
     Opt = True
+    Opt@ForceOverwrite = True
     Opt@PrintTimings = False
     data_out = new((/ntime, dNLAT, dNLON/), typeof(data_in))
     copy_VarCoords_2(data_in, data_out)
 
     ;; Regrid over time data
     do t = 0, ntime - 1
-        var = data_in(t, :, :)
-        data_out(t, :, :) = ESMF_regrid_with_weights(var, wgtFile, Opt)
+	var = data_in(t, :, :)
+	data_out(t, :, :) = ESMF_regrid_with_weights(var, wgtFile, Opt)
     end do
 
     system("rm -f " + \

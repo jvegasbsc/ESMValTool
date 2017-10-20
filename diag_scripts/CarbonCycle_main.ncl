@@ -82,6 +82,8 @@ load "./diag_scripts/lib/ncl/set_operators.ncl"
 load "./plot_scripts/ncl/xy_line.ncl"
 load "./plot_scripts/ncl/scatterplot.ncl"
 
+load "./diag_scripts/lib/ncl/meta_data.ncl"
+
 begin
 
     verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
@@ -91,6 +93,7 @@ begin
     info_output("++++++++++++++++++++++++++++++++++++++++++", verbosity, 1)
 
     dim_MOD = dimsizes(models@name)
+    dim_MOD_org = dim_MOD
     dim_VAR = dimsizes(variables)
     var0 = variables(0)
     field_type0 = field_types(0)
@@ -98,7 +101,7 @@ begin
     ;; Read model data - take into account land mask for CRU observations
     data = True
     do idx_mod = 0, dim_MOD - 1
-            data = read_data(idx_mod, var0, field_type0)
+        data = read_data(idx_mod, var0, field_type0)
     end do
 end
 
@@ -117,6 +120,11 @@ begin
 
     ;; Basename of diag_script
     diag_script_base = basename(diag_script)
+
+    ;; Basename of nml
+    xml_name = getenv("ESMValTool_xml_name")
+    suffix = get_file_suffix(xml_name, 0)
+    base_name = str_sub_str(xml_name, suffix, "")
 
     ;; Define file type
     file_type = getenv("ESMValTool_output_file_type")
@@ -144,6 +152,7 @@ begin
         region = (/diag_script_info@region(0), diag_script_info@region(1), 0., 360./)        
         region@name = flt2string(diag_script_info@region(0)) + "_-_" + \
                       flt2string(diag_script_info@region(1))
+        region@DM_tag = "DM_reg"
         else
             error_msg("f", diag_script, "", \
                   diag_script_info@region + " is an invalid region type")
@@ -260,7 +269,7 @@ begin
                                    toint(models@end_year(imod)), \
                                     "average", "yearly", True)
 
-         ;; Calculate mean annual cycle
+            ;; Calculate mean annual cycle
             data_monthly = \
                     time_operations(var, max((/mean_minyear, \
                                     toint(models@start_year(imod))/)), \
@@ -449,6 +458,37 @@ begin
         plot = cycle_plot(wks, data_arr, var0)
         draw(plot)
         frame(wks)
+
+        ;; Attach Metadata to plot
+
+        alltags = array_append_record(tags, region@DM_tag, 0)
+        alltags := array_append_record(alltags,\
+               (/"PT_seas", "ST_mean"/), 0)
+        caption = "Seasonal Cycle plot for " + variables(0) + \
+                  " over the period " + start_year + \
+                  "-" + end_year
+        id = diag_script + "_" + base_name
+        isize = dim_MOD_org * dimsizes(variables)
+        if (isatt(diag_script_info, "obsfile")) then
+            isize = isize + 1
+        end if
+        climofiles = new(isize, string)
+        do n_var = 0, dimsizes(variables) - 1
+            do imod = 0, dim_MOD_org - 1
+                climofiles(n_var * dim_MOD_org + imod) = \
+                            interface_get_inpaths(imod) + "/" + \
+                            interface_get_infile(variables(n_var), field_types(n_var), imod)
+            end do
+        end do
+        if (isatt(diag_script_info, "obsfile")) then
+            climofiles(isize - 1) = diag_script_info@obsfile
+        end if
+        contrib_authors = (/"A_anav_al", "A_wenz_sa", "A_righ_ma"/)
+
+        ESMValMD(outfile+"."+file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        delete([/alltags, caption, id, climofiles/])
+
         delete(plot)
         delete(wks)
         delete(data_arr)
@@ -496,6 +536,39 @@ begin
         plot = errorbar_plot(wks, data_arr, var0)
         draw(plot)
         frame(wks)
+
+        ;; Attach Metadata to plot
+
+        alltags = array_append_record(tags, region@DM_tag, 0)
+        alltags := array_append_record(alltags,\
+               (/"PT_errorbar", "ST_stddev", "ST_mean"/), 0)
+        caption = "Errorbar plot for " + variables(0) + \
+                  " over the period " + start_year + \
+                  "-" + end_year + ". Similar to Anav 2013 fig 6."
+        id = diag_script + "_" + base_name
+
+        isize = dim_MOD_org * dimsizes(variables)
+        if (isatt(diag_script_info, "obsfile")) then
+            isize = isize + 1
+        end if
+        climofiles = new(isize, string)
+        do n_var = 0, dimsizes(variables) - 1
+            do imod = 0, dim_MOD_org - 1
+                climofiles(n_var * dim_MOD_org + imod) = \
+                            interface_get_inpaths(imod) + "/" + \
+                            interface_get_infile(variables(n_var), field_types(n_var), imod)
+            end do
+        end do
+        if (isatt(diag_script_info, "obsfile")) then
+            climofiles(isize - 1) = diag_script_info@obsfile
+        end if
+
+        contrib_authors = (/"A_anav_al", "A_wenz_sa", "A_righ_ma"/)
+
+        ESMValMD(outfile+"."+file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        delete([/alltags, caption, id, climofiles/])
+
         delete(plot)
         delete(wks)
         delete(data_arr)
@@ -546,6 +619,38 @@ begin
         delete(plot)
         delete(wks)
         delete(data_arr)
+
+        ;; Attach Metadata to plot
+
+        alltags = array_append_record(tags, region@DM_tag, 0)
+        alltags := array_append_record(alltags,\
+               (/"PT_scatter", "ST_mean"/), 0)
+        caption = "Scatterplot for " + variables(0) + \
+                  " over the period " + start_year + \
+                  "-" + end_year + ". Like Anav 2013 Fig 17."
+        id = diag_script + "_" + base_name
+
+        isize = dim_MOD_org * dimsizes(variables)
+        if (isatt(diag_script_info, "obsfile")) then
+            isize = isize + 1
+        end if
+        climofiles = new(isize, string)
+        do n_var = 0, dimsizes(variables) - 1
+            do imod = 0, dim_MOD_org - 1
+                climofiles(n_var * dim_MOD_org + imod) = \
+                            interface_get_inpaths(imod) + "/" + \
+                            interface_get_infile(variables(n_var), field_types(n_var), imod)
+            end do
+        end do
+        if (isatt(diag_script_info, "obsfile")) then
+            climofiles(isize - 1) = diag_script_info@obsfile
+        end if
+
+        contrib_authors = (/"A_anav_al", "A_wenz_sa", "A_righ_ma"/)
+
+        ESMValMD(outfile+"."+file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        delete([/alltags, caption, id, climofiles/])
 
     end if
     
@@ -620,7 +725,6 @@ begin
         if (isatt(diag_script_info, "evolution_plot_color")) then
             data_arr@contour_color = diag_script_info@evolution_plot_color
         end if
-  
 
         wks = gsn_open_wks(file_type, outfile)
         wks@legendfile = outfile + "_legend"
@@ -689,10 +793,48 @@ begin
         plot3 = gsn_csm_xy(wks_out, data_arr(4, :), data_arr(:1, :), res)
 
         NhlAddOverlay(plot1, plot3, plot1)
-        
 
         draw(plot1)
         frame(wks)
+
+        ;; Attach Metadata to plot
+
+        alltags = array_append_record(tags, region@DM_tag, 0)
+        alltags := array_append_record(alltags,\
+               (/"PT_times"/), 0)
+        if (anomaly) then
+            alltags := array_append_record(alltags,\
+                   (/"ST_anomaly"/), 0)
+            tagstr = " (anomalies) "
+        else
+            alltags := array_append_record(alltags,\
+                   (/"ST_mean"/), 0)
+            tagstr = " "
+        end if
+        caption = "Time series of " + variables(0) + tagstr + "."
+        id = diag_script + "_" + base_name
+
+        isize = dim_MOD_org * dimsizes(variables)
+        if (isatt(diag_script_info, "obsfile")) then
+            isize = isize + 1
+        end if
+        climofiles = new(isize, string)
+        do n_var = 0, dimsizes(variables) - 1
+            do imod = 0, dim_MOD_org - 1
+                climofiles(n_var * dim_MOD_org + imod) = \
+                            interface_get_inpaths(imod) + "/" + \
+                            interface_get_infile(variables(n_var), field_types(n_var), imod)
+            end do
+        end do
+        if (isatt(diag_script_info, "obsfile")) then
+            climofiles(isize - 1) = diag_script_info@obsfile
+        end if
+
+        contrib_authors = (/"A_anav_al", "A_wenz_sa", "A_righ_ma"/)
+
+        ESMValMD(outfile+"."+file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        delete([/alltags, caption, id, climofiles/])
 
         delete([/data_arr, anomaly/])
 
@@ -701,3 +843,4 @@ begin
     leave_msg(diag_script, "", 2)
 
 end
+
