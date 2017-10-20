@@ -63,7 +63,7 @@ Diagnostics are stored in diag_scripts/
 
 * carbon_dummy.ncl (fig. 9.45b: Emergent constraints on carbon cycle feedbacks)
 
-* CarbonCycle_main.ncl (fig. 9.26 + 9.27: CO\ :sub:`2`\ fluxes)
+* CarbonCycle_main.ncl (fig. 9.26 + 9.27: CO\ :sub:`2`\  fluxes)
 
 * clouds_bias.ncl (figs. 9.2 a,b,c + 9.4 a,b: Clouds)
 
