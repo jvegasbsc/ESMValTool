@@ -66,6 +66,8 @@ User settings
 
 Configuration files are stored in nml/cfg_collins13ipcc/
 
+**Warning:** IAV_mmm_stippandhatch_ipcc12.ncl and IAV_for_stippandhatch_ipcc12.ncl need a lot of memory for 3D variables (e.g. thetao). If diag_script_info@periodlength is used more than 100 years (+ periodlength) of data are needed as the first 100 years are discarded (to avoid possible drifts at the beginning of the runs). If you run out of memory, try deleting diag_script_info@periodlength in the corresponding configuration file and use a shorter piControl time period in the namelist. Then IAV is simply calculated over the whole time period given from the namelist.
+
 Variables
 ---------
 
