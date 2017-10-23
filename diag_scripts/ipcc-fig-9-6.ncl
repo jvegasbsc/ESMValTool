@@ -27,6 +27,7 @@
 ;;     Effect of different regridding methods not yet determined
 ;;
 ;; Modification history
+;;    20171020-A_laue_ax: added tags for reporting
 ;;    20170404-A_gier_be: written.
 ;;
 ;;#############################################################################
@@ -42,6 +43,8 @@ load "./diag_scripts/lib/ncl/latlon.ncl"
 load "./diag_scripts/lib/ncl/statistics.ncl"
 
 load "./plot_scripts/ncl/scatterplot.ncl"
+
+load "./diag_scripts/lib/ncl/meta_data.ncl"
 
 begin    
     verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
@@ -65,6 +68,20 @@ begin
         data = read_data(imod, var0, field_type0)
     end do
 
+    climofiles = new(dim_MOD * dim_VAR, string)
+
+    i = 0
+    do jj = 0, dim_VAR - 1
+        do ii = 0, dim_MOD - 1
+            climofiles(i) = \
+                interface_get_inpaths(ii) + "/" \
+                + interface_get_infile(variables(jj), field_types(jj), ii)
+            i = i + 1
+        end do
+    end do
+
+    alltags = array_append_record(tags, (/"PT_other", "ST_clim", "ST_corr", "DM_global"/), 0)
+
 end
 
 begin
@@ -73,8 +90,10 @@ begin
 end
 
 begin
+    authors = "A_gier_be"
+
     write_references(diag_script,                  \
-                     (/""/),                       \  ; authors
+                     authors,                      \  ; authors
                      (/""/),                       \  ; contributors
                      (/""/),                       \  ; diag_references
                      (/""/),                       \  ; obs_references
@@ -315,8 +334,6 @@ begin
             error_msg("f", diag_script, "", "cannot find correlation list")
         end if
 
-
-
         ;; Remove temporary correlation list
         system("rm -f " + temp_dir)
 
@@ -443,7 +460,6 @@ end
         res_text@txFontHeightF      = 0.02                  ; change text size
         res_text@txJust             = "CenterLeft"          ; text justification
         
-           
         ;; gsn_csm_xy won't plot just one point -> double up on it
         if dimsizes(x_val).eq.1 then
             x_val_new = (/x_val, x_val/)
@@ -497,6 +513,18 @@ end
 
         draw(plot)
         frame(wks)
+
+        ; =====================================================================
+        ; add meta data to plot (for reporting)
+
+        caption = "Centered pattern correlations between models and observations" \
+                  + " for the annual mean climatologies (similar to IPCC ch. 9 fig. 9.6)."
+        id = diag_script
+
+        ESMValMD(wks@fullname, alltags, caption, id, variables, models@name, \
+                 climofiles, diag_script, authors)
+        ; =====================================================================
+
     end if
 
     leave_msg(diag_script, "", 2)

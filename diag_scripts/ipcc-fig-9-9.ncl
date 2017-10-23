@@ -25,7 +25,10 @@
 ;;     Effect of different regridding methods not yet determined
 ;;
 ;; Modification history
-;;    201704010-A_gier_be: written.
+;;    20171023-A_laue_ax: replaced annual means with low-pass filter
+;;                        bug fix: using prw average instead of sum
+;;    20171020-A_laue_ax: added tags for reporting
+;;    20170410-A_gier_be: written.
 ;;
 ;;#############################################################################
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
@@ -40,6 +43,8 @@ load "./diag_scripts/lib/ncl/style.ncl"
 load "./diag_scripts/lib/ncl/latlon.ncl"
 load "./diag_scripts/lib/ncl/statistics.ncl"
 
+load "./diag_scripts/lib/ncl/meta_data.ncl"
+
 begin    
     verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
     enter_msg(diag_script, "", 2)
@@ -53,6 +58,20 @@ begin
     var1 = variables(1)
     field_type0 = field_types(0)
     field_type1 = field_types(1)
+
+    climofiles = new(dim_MOD * dim_VAR, string)
+
+    i = 0
+    do jj = 0, dim_VAR - 1
+        do ii = 0, dim_MOD - 1
+            climofiles(i) = \
+                interface_get_inpaths(ii) + "/" \
+                + interface_get_infile(variables(jj), field_types(jj), ii)
+            i = i + 1
+        end do
+    end do
+
+    alltags = array_append_record(tags, (/"PT_scatter", "ST_trend", "DM_trop"/), 0)
 end
 
 begin
@@ -61,8 +80,10 @@ begin
 end
 
 begin
+    authors = "A_gier_be"
+
     write_references(diag_script,                  \
-                     (/""/),                       \  ; authors
+                     authors,                      \  ; authors
                      (/""/),                       \  ; contributors
                      (/""/),                       \  ; diag_references
                      (/""/),                       \  ; obs_references
@@ -98,11 +119,6 @@ begin
     ;; Set region
     region = select_region(diag_script_info@region)
 
-    ;; Determine time range
-    start_year = min(stringtoint(models@start_year))
-    end_year = max(stringtoint(models@end_year))
-    all_years = ispan(start_year, end_year, 1)
-
     ;; GLobal array for collecting all data
     all_data_A = new((/dim_MOD/), float)
     all_data_A!0 = "model"
@@ -117,10 +133,7 @@ begin
 
         info_output("Processing " + all_data_A&model(imod), verbosity, 1)
 
-        mod_start = ind(all_years.eq.toint(models@start_year(imod)))
-        mod_end = ind(all_years.eq.toint(models@end_year(imod)))
-
-        ;; First variable
+        ;; First variable (TLT)
         if (var_attr_exclude(0).ne.model_attr_id(imod)) then
 
             ;; Read data
@@ -137,29 +150,55 @@ begin
             varA = var
             varA = varA * conform(var, sftof, (/1, 2/))
             delete(var)
+;            filename = models@name(imod) + ".nc"
+;            system ("rm " + filename)
+;            debugfile = addfile(filename, "c")
+;            debugfile->mask = sftof
+;            debugfile->var = varA
+;            delete(filename)
+;            delete(debugfile)
             delete(sftof)
 
-            ;; Computing annual mean
-            tmpA = time_operations(varA, toint(models@start_year(imod)), \
-                                  toint(models@end_year(imod)), "average", \
-                                   "yearly", True)
+            yyyymmdd = cd_calendar (varA&time, 2)
+            if isatt(yyyymmdd, "calendar") then
+                ; The "proleptic_gregorian" calendar is not supported by the NCL
+                ; function "yyyymmdd_to_yyyyfrac". The error by changing the calendar
+                ; to standard is negligible.
+                if (yyyymmdd@calendar.eq."proleptic_gregorian") then
+                    yyyymmdd@calendar = "standard"
+                end if
+            end if
+            regtime = yyyymmdd_to_yyyyfrac(yyyymmdd, 0)
+            delete(yyyymmdd)
+
+            ;; Computing area-weighted average
+            avg_A = area_operations(varA, region(0), region(1), region(2), \
+                                    region(3), "average", True)
             delete(varA)
 
-            ;; Computing area-weighted sum
-            avg_A = area_operations(tmpA, region(0), region(1), region(2), \
-                                    region(3), "average", True)
-            delete(tmpA)
-            rc = regline((1.0*all_years(mod_start:mod_end)), avg_A)
+            ; apply low-pass filter with a cutoff period of 12 months
 
+            ihp   = 0                             ; low_pass
+            sigma = 1.0                           ; Lanczos sigma
+            nWgt  = 25                            ; loose 12 months each end                            
+            fca   = 1./12.                        ; 12 months
+            wgt   = filwgts_lanczos(nWgt, ihp, fca, -999., sigma)
 
-            ;; Assign to global array
-            all_data_A(imod) = rc
+            filtered_A = wgt_runave(avg_A, wgt, 0)
+
             delete(avg_A)
+            delete(wgt)
+
+            rc = regline(regtime, filtered_A)
+            ;; Assign to global array
+            all_data_A(imod) = tofloat(rc)
+            delete(filtered_A)
             delete(rc)
+            delete(regtime)
 
         end if
 
-        ;; Second variable
+        ;; Second variable (prw)
         if (var_attr_exclude(1).ne.model_attr_id(imod)) then
 
             ;; Read data
@@ -178,28 +217,45 @@ begin
             delete(var)
             delete(sftof)
 
-            ;; Computing annual mean
-            tmpB = time_operations(varB, toint(models@start_year(imod)), \
-                                   toint(models@end_year(imod)), "average", \
-                                   "yearly", True)
+            yyyymmdd = cd_calendar (varB&time, 2)
+            if isatt(yyyymmdd, "calendar") then
+                ; The "proleptic_gregorian" calendar is not supported by the NCL
+                ; function "yyyymmdd_to_yyyyfrac". The error by changing the calendar
+                ; to standard is negligible.
+                if (yyyymmdd@calendar.eq."proleptic_gregorian") then
+                    yyyymmdd@calendar = "standard"
+                end if
+            end if
+            regtime = yyyymmdd_to_yyyyfrac(yyyymmdd, 0)
+            delete(yyyymmdd)
 
+            ;; Computing area-weighted average (prw)
+            avg_B = area_operations(varB, region(0), region(1), region(2), \
+                                    region(3), "average", True)
             delete(varB)
-            
-            ;; Computing area-weighted sum, prw is a flux variable
-            avg_B = area_operations(tmpB, region(0), region(1), region(2), \
-                                    region(3), "sum", True)
+
+            ; apply low-pass filter with a cutoff period of 12 months
+
+            ihp   = 0                             ; low_pass
+            sigma = 1.0                           ; Lanczos sigma
+            nWgt  = 25                            ; loose 12 months each end                            
+            fca   = 1./12.                        ; 12 months
+            wgt   = filwgts_lanczos(nWgt, ihp, fca, -999., sigma)
+
+            filtered_B = wgt_runave(avg_B, wgt, 0)
+
+            delete(avg_B)
+            delete(wgt)
 
             ;; Computing anomaly in percent
-            anomaly_B = (avg_B - avg(avg_B))/avg(avg_B)*100
-            delete(tmpB)
-            ;print(anomaly_B)
-            rc = regline(1.0*all_years(mod_start:mod_end), anomaly_B)
+            anomaly_B = (filtered_B - avg(filtered_B)) / avg(filtered_B) * 100.
+            rc = regline(regtime, anomaly_B)
             ;; Assign to global array
-            all_data_B(imod) = rc
+            all_data_B(imod) = tofloat(rc)
             delete(rc)
-            delete(avg_B)
             delete(anomaly_B)
-
+            delete(regtime)
+            delete(filtered_B)
         end if
 
     end do
@@ -287,7 +343,7 @@ begin
 
 ;---Resources for X/Y axes.
   res@trYMinF            =  0.               ; min value on y-axis
-  res@trYMaxF    = 4.5
+  res@trYMaxF    = 3.5
  ; res@trYMaxF            =  3.5               ; max value on y-axis
   res@trXMinF            =  0.                  ; min value on x-axis
   res@trXMaxF            =  0.6                  ; max value on x-axis
@@ -398,5 +454,17 @@ begin
                 0.45,0.45,txres)
 
   frame(wks)    ; Now advance the frame.
+
+    ; =========================================================================
+    ; add meta data to plot (for reporting)
+
+    caption = "Scatter plot of decadal trands in tropical " \
+              + variables(0) + " as a function of " + variables(1) \
+              + " over the world's oceans (similar to IPCC ch. 9 fig. 9.9)."
+    id = diag_script
+
+    ESMValMD(outfile, alltags, caption, id, variables, models@name, \
+             climofiles, diag_script, authors)
+    ; =========================================================================
 
 end
