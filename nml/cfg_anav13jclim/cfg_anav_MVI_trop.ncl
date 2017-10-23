@@ -19,3 +19,7 @@ end if
 if (variables(0).eq."NBP") then
     diag_script_info@ref_model = "JMA-TRANSCOM"
 end if
+
+;; For regridding
+diag_script_info@dst_grid = "./diag_scripts/aux/CDO/cdo_dst_grid_g020" 
+             ; path to destination grid file, required by cdo_remapdis

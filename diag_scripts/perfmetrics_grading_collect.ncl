@@ -267,7 +267,11 @@ begin
         caption = "Portrait diagramm. Similar to Figure 3 od Gleckler et al. (2008)."
         id = diag_script + "_example_id"
         allmodelnames = data_all&models
-        allmodelnames := array_append_record(allmodelnames, data_all&reference, 0)
+
+        if (isatt(data_all, "reference")) then
+            allmodelnames := array_append_record(allmodelnames, data_all&reference, 0)
+        end if
+
         climofiles = new(data_all@num_climofiles, string)
         do iclim = 0, data_all@num_climofiles-1
             num_climo = "climofile_"+iclim
@@ -278,8 +282,6 @@ begin
         ESMValMD(outfile_plot+"."+file_type, alltags, caption, id, variables(0), allmodelnames, climofiles, diag_script, contrib_authors)
 
         delete([/alltags, caption, id, climofiles/])
-
-        
 
         info_output(" gv " + outfile_plot + "." + file_type, verbosity, 1)
 

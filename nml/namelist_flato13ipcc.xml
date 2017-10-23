@@ -6,8 +6,8 @@ namelist_flato13ipcc.xml
 
 Description
 Reproducing selected figures from IPCC AR5, chap. 9 (Flato et al., 2013):
-Figs. 9.2a/b/c, 9.3, 9.4, 9.5, 9,7, 9.8, 9.10, 9.24a, 9.28, 9.29, 9.30, 9.31,
-9.32, 9.35, 9.36, 9.42b, 9.45b
+Figs. 9.2a/b/c, 9.3, 9.4, 9.5, 9,7, 9.8, 9.10, 9.24a, 9.26, 9.27, 9.28, 9.29,
+9.30, 9.31, 9.32, 9.35, 9.36, 9.42b, 9.45b
 
 Authors
 Axel Lauer (DLR, Germany - axel.lauer@dlr.de)
@@ -16,11 +16,13 @@ Veronika Eyring (DLR, Germany - veronika.eyring@dlr.de)
 Contributors
 Lisa Bock, DLR (Fig. 9.8)
 Irene Cionni, ENEA, namelist_eyring13jgr.xml (Fig. 9.10)
+Bettina Gier, DLR, Germany (Figs. 9.26, 9.27)
 Ricard Levine, UK Met Office, namelist_SAMonsoon.xml (Fig. 9.32)
+Ricarda Rettinger, DLR, Germany, namelist_ECS.xml (Fig. 9.42b)
 Mattia Righi, DLR, namelist_perfmetrics_CMIP5.xml (Fig. 9.7),
     namelist_aerosol_CMIP5.xml (Figs. 9.28, 9.29)
 Daniel Senftleben, DLR, namelist_SeaIce.xml (Fig. 9.24)
-Sabrina Welzel, DLR, namelist_wenzel14jgr.xml (Fig. 9.45)
+Sabrina Welzel, DLR, namelist_wenzel14jgr.xml (Fig. 9.45b)
 
 Projects
 CRESCENDO
@@ -1808,6 +1810,128 @@ This namelist is part of the ESMValTool
                            @{OBSPATH}/Tier2/NSIDC/OBS_NSIDC-BT_sat_SH_T2Ms_sic_197811-201312.nc </model>
 
         <diag_script cfg="cfg_SeaIce_SH.ncl"> SeaIce_tsline.ncl      </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.26                                                * -->
+<!-- * =================================================================== * -->
+<!-- * Ensemble-mean global ocean carbon uptake (top) and global land      * -->
+<!-- * carbon uptake (bottom) in the CMIP5 ESMs for the historical period  * -->
+<!-- * 1901-2005                                                           * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description>         global evolution plot FGCO2   </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Omon"> FGCO2                         </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+ 
+        <model> CMIP5_ETHZ   bcc-csm1-1       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   CanESM2          MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2G       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2M       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-CC       MIP_VAR_DEF   historical   r1i1p1   1901 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-ES       MIP_VAR_DEF   historical   r1i1p1   1901 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-LR     MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-MR     MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5B-LR     MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MIROC-ESM        MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model> 
+        <model> CMIP5_ETHZ   MIROC-ESM-CHEM   MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-MR       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <diag_script cfg="cfg_ipcc_fig_9_26.ncl">  CarbonCycle_main.ncl      </diag_script>
+    </diag>    
+
+    <diag>
+        <description>         Global evolution plot NBP     </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Lmon"> NBP                           </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+ 
+        <model> CMIP5_ETHZ   BNU-ESM          MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   CanESM2          MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   CESM1-BGC        MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2G       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2M       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-CC       MIP_VAR_DEF   historical   r1i1p1   1901 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-ES       MIP_VAR_DEF   historical   r1i1p1   1901 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-LR     MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-MR     MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5B-LR     MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MIROC-ESM        MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MIROC-ESM-CHEM   MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-MR       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+  
+        <diag_script cfg="cfg_ipcc_fig_9_26.ncl"> CarbonCycle_main.ncl  </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.27                                                * -->
+<!-- * =================================================================== * -->
+<!-- * Simulation of global mean (a) atmosphere-ocean CO2 fluxes (‘fgCO2’) * -->
+<!-- * and (b) net atmosphere-land CO2 fluxes (‘NBP’), by ESMs for the     * -->
+<!-- *  period 1986-2005                                                   * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description>         Errorbar plot FGCO2           </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Omon"> FGCO2                         </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+ 
+        <model> CMIP5_ETHZ   bcc-csm1-1       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   CanESM2          MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2G       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2M       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-CC       MIP_VAR_DEF   historical   r1i1p1   1986 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-ES       MIP_VAR_DEF   historical   r1i1p1   1986 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-LR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-MR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5B-LR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MIROC-ESM        MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model> 
+        <model> CMIP5_ETHZ   MIROC-ESM-CHEM   MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-MR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> OBS          JMA-TRANSCOM                   reanaly      1        1986 2005   @{OBSPATH}/Tier3/JMA-TRANSCOM </model>
+       
+        <diag_script cfg="cfg_ipcc_fig_9_27.ncl">  CarbonCycle_main.ncl      </diag_script>
+    </diag>    
+
+    <diag>
+        <description>         Errorbar plot NBP             </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Lmon"> NBP                           </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+ 
+        <model> CMIP5_ETHZ   BNU-ESM          MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   CanESM2          MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   CESM1-BGC        MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2G       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   GFDL-ESM2M       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-CC       MIP_VAR_DEF   historical   r1i1p1   1986 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   HadGEM2-ES       MIP_VAR_DEF   historical   r1i1p1   1986 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-LR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5A-MR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   IPSL-CM5B-LR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MIROC-ESM        MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MIROC-ESM-CHEM   MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   MPI-ESM-MR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> OBS          JMA-TRANSCOM                   reanaly      1        1986 2005   @{OBSPATH}/Tier3/JMA-TRANSCOM </model>
+
+        <diag_script cfg="cfg_ipcc_fig_9_27.ncl"> CarbonCycle_main.ncl  </diag_script>
     </diag>
 
 <!-- *********************************************************************** -->

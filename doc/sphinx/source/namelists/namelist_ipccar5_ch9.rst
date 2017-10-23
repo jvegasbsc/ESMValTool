@@ -22,6 +22,10 @@ The plots will be done based on a collection of individual namelists. The follow
 
 * Figure 9.24 a,b: Time series (1960-2005) of (a) September mean Arctic and (b) February mean Antarctic sea ice extent from the CMIP5 historical simulations. The CMIP5 ensemble mean is highlighted in dark red and the individual ensemble members of each model (colored lines) are shown in different line styles. The model results are compared to observations from the NSIDC (1978-2011, black solid line) and the Hadley Centre Sea ice and Sea Surface Temperature (HadISST, 1978-2011, black dashed line).
 
+* Figure 9.26: Time series of the ensemble-mean global ocean carbon uptake and global land carbon uptake.
+
+* Figure 9.27: Global mean atmosphere-ocean CO\ :sub:`2`\ fluxes ('fgCO2') and net atmosphere-land CO\ :sub:`2`\ fluxes ('NBP').
+
 * Figure 9.28: Multi-year average aerosol optical depth (AOD) in comparison with satellite data.
 
 * Figure 9.29: Time series of global oceanic mean aerosol optical depth (AOD) from individual CMIP5 models historical (1850-2005) and RCP 4.5 (2006-2010) simulations compared with MODIS and ESACCI-AEROSOL satellite data.
@@ -58,6 +62,8 @@ Diagnostics are stored in diag_scripts/
 * carbon_corr_2var.ncl (fig. 9.45b: Emergent constraints on carbon cycle feedbacks)
 
 * carbon_dummy.ncl (fig. 9.45b: Emergent constraints on carbon cycle feedbacks)
+
+* CarbonCycle_main.ncl (fig. 9.26 + 9.27: CO\ :sub:`2`\  fluxes)
 
 * clouds_bias.ncl (figs. 9.2 a,b,c + 9.4 a,b: Clouds)
 
@@ -212,6 +218,16 @@ Example plots
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.24 (Eyring et al., 2016: Fig. 17).
+
+.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-26.png
+   :width: 80%
+
+   Similar to Flato et al. (2013), Fig. 9.26.
+
+.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-27.png
+   :width: 80%
+
+   Similar to Flato et al. (2013), Fig. 9.27.
 
 .. figure:: ../../source/namelists/figures/ipccar5_ch9/fig7_ipccar5_ch9.png
    :width: 80%
