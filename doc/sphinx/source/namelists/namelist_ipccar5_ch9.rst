@@ -83,7 +83,7 @@ Diagnostics are stored in diag_scripts/
 
 * ipcc-fig-9-6.ncl (fig. 9.6: Centered pattern correlations)
 
-* ipcc-fig-9-9.ncl (fig. 9.6: Trends in TLT vs. precitable water)
+* ipcc-fig-9-9.ncl (fig. 9.9: Trends in TLT vs. precitable water)
 
 * ipcc-fig-9-30.ncl (fig. 9.30: Composite diurnal cycle of precipitation)
 
