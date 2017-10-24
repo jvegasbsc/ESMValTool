@@ -213,9 +213,9 @@ begin
     copy_VarMeta(tmp_ta, tmp_land)
     copy_VarMeta(tmp_ta, tmp_oce)
     land_tlt = dim_sum_n_Wrap(tmp_land, 1)
-    land_tlt = land_tlt + tas_land*tas_lw
+    land_tlt = land_tlt + tas_land*tas_lw/land_scale
     oce_tlt = dim_sum_n_Wrap(tmp_oce, 1)
-    oce_tlt = oce_tlt + tas_oce*tas_ow  
+    oce_tlt = oce_tlt + tas_oce*tas_ow/ocean_scale  
 
      ;; Add TLT
     dum = land_tlt + oce_tlt
