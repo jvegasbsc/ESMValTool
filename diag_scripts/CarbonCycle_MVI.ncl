@@ -26,6 +26,7 @@
 ;;    in order to have a consistent land mask for all models.
 ;;
 ;; Modification history
+;;    20170316-A_gier_be: Added cdo regridding, landmask for CRU obs
 ;;    20151130-A_laue_ax: moved call to write_references to beginning of code
 ;;    20151104-A_righ_ma: graphic part moved to external plot_scripts.
 ;;    20151102-A_righ_ma: replacing area functions with ESMValTool functions.
@@ -33,6 +34,8 @@
 ;;    201505??-A_anav_al: written.
 ;;
 ;;#############################################################################
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/shea_util.ncl"
+
 load "./interface_data/ncl.interface"
 
 load "./interface_scripts/auxiliary.ncl"
@@ -103,8 +106,20 @@ begin
     end if
     delete(plot_fields)
 
-    ;; Set region
-    region = select_region(diag_script_info@region)
+    ;; Set region - supports 2D array for lat and strings
+    if isstring(diag_script_info@region) then
+        region = select_region(diag_script_info@region)
+    else if dimsizes(diag_script_info@region).eq.2 then
+        region = (/diag_script_info@region(0), \
+                   diag_script_info@region(1), 0., 360./)        
+        region@name = flt2string(diag_script_info@region(0)) + "_-_" + \
+                      flt2string(diag_script_info@region(1))
+        region@DM_tag = "DM_reg"
+        else
+            error_msg("f", diag_script, "", \
+                  diag_script_info@region + " is an invalid region type")
+        end if
+    end if
 
     ;; Output plot directory
     plot_dir = getenv("ESMValTool_plot_dir")
@@ -115,16 +130,48 @@ begin
     end_year = max(stringtoint(models@end_year))
     all_years = ispan(start_year, end_year, 1)
 
+    ;; Computed mean over all years, remember that some models have 
+    ;; longer timespan than what we analyze here
+    ;; Anav mean and MVI over 1986-2005! -> put this in cfg as var?
+    mean_minyear = 1986
+    mean_maxyear = 2005
+    minyear_ind = ind(all_years.eq.mean_minyear)
+    maxyear_ind = ind(all_years.eq.mean_maxyear)
+
+    ;; Check for irregular grid
+    l_irreg = new(dim_MOD, logical)
+    l_irreg = False
+    do imod = 0, dim_MOD - 1
+        cnt = interface_get_dictkeys(var0, imod) + "_dimNames"
+        dims = data@$cnt$
+        ndims = dimsizes(dims)
+        if (ndims.lt.2) then
+            continue
+        end if
+        if (ndims.eq.2 .and. dims(0).eq."time") then
+            continue
+        end if
+        if (dims(ndims - 1).ne."lon" .and. dims(ndims - 2).ne."lat") then
+            l_irreg(imod) = True
+            continue
+        end if
+    end do
+    delete([/cnt, dims, ndims/])
+
+
     ;; Regrid to destination grid
     grid_resolution        = diag_script_info@grid
 
     if (grid_resolution.eq."0.5deg")    then
+        dst_grid = "./diag_scripts/aux/CDO/cdo_dst_grid_g005"
         dNLON = 720
         dNLAT = 360
     else if (grid_resolution.eq."1deg") then
+        dst_grid = "./diag_scripts/aux/CDO/cdo_dst_grid_g010"
         dNLON = 360
         dNLAT = 180
     else if (grid_resolution.eq."2deg") then
+        dst_grid = "./diag_scripts/aux/CDO/cdo_dst_grid_g020"
         dNLON = 180
         dNLAT = 90
     else
@@ -141,6 +188,7 @@ begin
     all_data_yearly!1 = "year"
     all_data_yearly!2 = "lat"
     all_data_yearly!3 = "lon"
+    all_data_yearly&model = models@name
 
     ;; Gridded matrix for a given resolution where all MVI data are stored
     MVI_all_data = new((/dim_MOD, dNLAT, dNLON/), float)
@@ -154,6 +202,7 @@ begin
     Trend_all_data!1 = "lat"
     Trend_all_data!2 = "lon"
 
+
     ;; Loop over models and regrid
     do imod = 0, dim_MOD - 1
 
@@ -161,6 +210,44 @@ begin
 
         ;; Extract model corresponding data
         var  = extract_data_extended(imod, var0, data, -1, 0, 0)
+
+        ;; Regridding - do always since regrid to 2x2 after?
+        ;;if (l_irreg(imod)) then
+            regr_file = basename(diag_script) + "_" + models@name(imod)+ "_" + \
+                        var0 + "_" + start_year + "-" + end_year + "_grid_" + \
+                       grid_resolution
+            regr_path = wrk_dir + "/CDO/" + regr_file + ".nc"            
+            if (isfilepresent(regr_path)) then
+                var_regrid = ncdf_read(regr_path, var0)
+            else
+                var_regrid = cdo_remapdis(var0, var, imod, data, \
+                             dst_grid, regr_file)
+            end if
+;;            if (var_regrid!0.eq."lon") then  ; reorder dimensions
+                var_regrid := var_regrid(time|:, lat|:, lon|:)
+;;            end if
+
+            delete(var)
+            var = var_regrid
+            delete(var_regrid)
+        ;;else
+            
+        ;;end if
+
+
+        ;; CRU is only land-based - Need landmask and additionally cut off Antarctica
+        if (isatt(diag_script_info, "ref_model")).and.diag_script_info@ref_model.eq."CRU" then
+            f = addfile("$NCARG_ROOT/lib/ncarg/data/cdf/landsea.nc", "r")
+            a = f->LSMASK
+            sftlf = byte2flt(landsea_mask(a, var&lat, var&lon))
+            sftlf = where(sftlf.gt.1., 1., sftlf)
+            sftlf = where(sftlf.eq.0, sftlf@_FillValue, sftlf)
+        ;; Mask out Antarctica (below 60degS)
+            sftlf({:-60}, :) = sftlf@_FillValue
+        ;; Apply mask
+            var = var * conform(var, sftlf, (/1, 2/))
+            delete([/sftlf, a, f/])
+        end if
 
         ;; Computing annual mean
         data_annual = time_operations(var, toint(models@start_year(imod)), \
@@ -171,20 +258,25 @@ begin
         idx1 = start_year - toint(models@start_year(imod))
         idx2 = dimsizes(all_years) - \
             (end_year - toint(models@end_year(imod))) - 1
+        
+        all_data_yearly(imod, idx1:idx2, :, :) = data_annual
+;;                regrid_3D_to_rectilinear_grid(data_annual, var&lon, var&lat, \
+;;                                              grid_resolution, "", True)
 
-        ;; If lat and lon are 2D arrays, assume irregular grid
-        if (dimsizes(dimsizes(var&lat)).ge.2 .and. \
-            dimsizes(dimsizes(var&lon)).ge.2) then
-            filename = interface_get_fullpath(var0, field_type0, imod)
-            all_data_yearly(imod, idx1:idx2, :, :) = \
-                regrid_3D_to_rectilinear_grid(data_annual, var&lon, var&lat, \
-                                              grid_resolution, filename, False)
-        else  ; Regular grid
-            all_data_yearly(imod, idx1:idx2, :, :) = \
-                regrid_3D_to_rectilinear_grid(data_annual, var&lon, var&lat, \
-                                              grid_resolution, "", True)
-        end if
-        all_data_yearly&model = models@name
+        ;;If lat and lon are 2D arrays, assume irregular grid
+;;        if (dimsizes(dimsizes(var&lat)).ge.2 .and. \
+;;            dimsizes(dimsizes(var&lon)).ge.2) then
+;;            filename = interface_get_fullpath(var0, field_type0, imod)
+;;            all_data_yearly(imod, idx1:idx2, :, :) = \
+;;                regrid_3D_to_rectilinear_grid(data_annual, var&lon, var&lat, \
+;;                                              grid_resolution, filename, False)
+
+;;        else  ; Regular grid
+;;            all_data_yearly(imod, idx1:idx2, :, :) = \
+;;                regrid_3D_to_rectilinear_grid(data_annual, var&lon, var&lat, \
+;;                                              grid_resolution, "", True)
+;;        end if
+;;        all_data_yearly&model = models@name
 
         ;; Cleaning up
         delete(var)
@@ -210,27 +302,28 @@ begin
     end if
 
     info_output("Reference model: " + models@name(ref_ind), verbosity, 1)
-    reference = all_data_yearly(ref_ind, :, :, :)
+    ; Remember to restrict MVI to time period 1986-2005
+    reference = all_data_yearly(ref_ind, minyear_ind:maxyear_ind, :, :)
     ref = dim_stddev_n(reference, 0)
     ref = where(ref.ne.0, ref, all_data_yearly@_FillValue)
 
     ;; Loop over models
     do imod = 0, dim_MOD - 1
 
-        temp  = all_data_yearly(imod, :, :, :)
+        temp  = all_data_yearly(imod, minyear_ind:maxyear_ind, :, :)
         model = dim_stddev_n(temp, 0)
 
         ;; Prevents a division by 0
         model = where(model.ne.0, model, all_data_yearly@_FillValue)
 
         ;; Commpute MVI
-        MVI_all_data(imod, :, :) = (model/ref - ref/model) ^ 2
+        MVI_all_data(imod, :, :) = (model/ ref -  ref/model) ^ 2
         delete(model)
         delete(temp)
 
         model = all_data_yearly(imod, :, :, :)
 
-         ;; Commpute Trend
+         ;; Commpute Trend (for ALL years)
         rc = regCoef_n(1.0 * all_years, model, 0, 0)
         rc!0 = "lat"
         rc!1 = "lon"
@@ -242,7 +335,13 @@ begin
 
     end do
 
-    ;; Put a cap. Where MVI > 1000 we assing a FillValue
+    ;; Put a cap. Where MVI > 1000 we assign a FillValue
+    ;;info_output(" Total points: " + num(.not.ismissing(MVI_all_data)), verbosity, 1)
+    ;;info_output(" Points with MVI>10: " +  num(MVI_all_data.gt.10) + \
+    ;; "  MVI > 50: " + num(MVI_all_data.gt.50) + "  MVI > 100: " + \
+    ;; num(MVI_all_data.gt.100) + "  MVI > 1000: " + num(MVI_all_data.gt.1000), verbosity, 1)
+    ;; How is 50 a fill value? Often more than half the MVI lie above 10!
+    ;; This doesn't make any sense....
     MVI_all_data = where(MVI_all_data.lt.10, MVI_all_data, 50)
 
     ;; Special case for LAI
@@ -253,7 +352,7 @@ begin
                                 all_data_yearly, 1.e20)
     end if
 
-    all_annual_mean = dim_avg_n(all_data_yearly, 1)
+    all_annual_mean = dim_avg_n(all_data_yearly(:, minyear_ind:maxyear_ind, :, :), 1)
     all_annual_mean!0 = "model"
     all_annual_mean!1 = "lat"
     all_annual_mean!2 = "lon"
@@ -319,6 +418,13 @@ begin
         Trend_var@units = "degC decade-1"
         l_conv = True
     end if
+    if (var0.eq."tos") then
+        Mean_var = Mean_var - 273.15
+        Mean_var@units = "degC"
+        Trend_var = Trend_var * 10.
+        Trend_var@units = "degC decade-1"
+        l_conv = True
+    end if
     if (any(var0.eq.(/"NBP", "GPP"/))) then
         ;; [kg s-1] --> [Pg y-1]
         Mean_var = Mean_var * 3600. * 24. * 365 / 1.e12
@@ -333,6 +439,7 @@ begin
         l_conv = True
     end if
 
+
     ;; Check conversions
     if (.not.l_conv) then
         error_msg("f", diag_script, "", "no unit conversion applied to " + \
@@ -344,8 +451,8 @@ begin
 
         ;; Mean
         new_path = get_output_dir(get_work_dir(), basename(diag_script))
-        new_path = new_path + \
-            basename(diag_script) + "_mean_" + var0 + ".nc"
+        new_path = new_path + basename(diag_script) + \
+                   "_mean_" + var0 + "_" + region@name + ".nc"
         Mean_var@var = var0
         Mean_var@diag_script = diag_script
         Mean_var@ncdf = new_path
@@ -353,8 +460,8 @@ begin
 
         ;; Trend
         new_path = get_output_dir(get_work_dir(), basename(diag_script))
-        new_path = new_path + \
-            basename(diag_script) + "_trend_" + var0 + ".nc"
+        new_path = new_path + basename(diag_script) + \
+                   "_trend_" + var0 +  "_" + region@name + ".nc"
         Trend_var@var = var0
         Trend_var@diag_script = diag_script
         Trend_var@ncdf = new_path
@@ -362,8 +469,8 @@ begin
 
         ;; MVI
         new_path = get_output_dir(get_work_dir(), basename(diag_script))
-        new_path = new_path + \
-            basename(diag_script) + "_MVI_" + var0 + ".nc"
+        new_path = new_path + basename(diag_script) + \
+                   "_MVI_" + var0 +  "_" + region@name + ".nc"
         MVI_var@var = var0
         MVI_var@diag_script = diag_script
         MVI_var@ncdf = new_path
@@ -398,7 +505,7 @@ begin
     delete(tmp)
 
     ;; Draw a 3D scatterplot
-    data_arr@res_tiMainString = var0 + " - " + diag_script_info@region
+    data_arr@res_tiMainString = var0 + " - " + region@name
     plot = scatterplot3D(wks, data_arr, var0, levs)
     draw(plot)
     frame(wks)

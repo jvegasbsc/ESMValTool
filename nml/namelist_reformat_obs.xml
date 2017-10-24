@@ -60,6 +60,7 @@ This namelist is part of the ESMValTool
 <!--   <reformat_script id="ESRL">                    ./reformat_scripts/obs/reformat_obs_ESRL.ncl                    </reformat_script> -->
 <!--   <reformat_script id="ETH-SOM-FFN">             ./reformat_scripts/obs/reformat_obs_ETH-SOM-FFN.csh             </reformat_script> -->
 <!--   <reformat_script id="GLOBALVIEW">              ./reformat_scripts/obs/reformat_obs_GLOBALVIEW.ncl              </reformat_script> -->
+<!--   <reformat_script id="GCP">                     ./reformat_scripts/obs/reformat_obs_GCP.ncl                     </reformat_script> -->
 <!--   <reformat_script id="GPCC">                    ./reformat_scripts/obs/reformat_obs_GPCC.ncl                    </reformat_script> -->
 <!--   <reformat_script id="GTO-ECV">                 ./reformat_scripts/obs/reformat_obs_GTO-ECV.ncl                 </reformat_script> -->
 <!--   <reformat_script id="HadCRUT4">                ./reformat_scripts/obs/reformat_obs_HadCRUT4.ncl                </reformat_script> -->

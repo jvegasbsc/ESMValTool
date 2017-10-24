@@ -658,7 +658,7 @@ begin
     end if
 
     if (region.eq."Northern Hemisphere") then
-        region_array = (/20., 90., 0., 360./)
+        region_array = (/0., 90., 0., 360./)
         region_array@name = "NH"
         region_array@DM_tag = "DM_nh"
         leave_msg(scriptname, funcname, 10)
@@ -666,7 +666,7 @@ begin
     end if
 
     if (region.eq."Southern Hemisphere") then
-        region_array = (/-90., -20., 0., 360./)
+        region_array = (/-90., 0., 0., 360./)
         region_array@name = "SH"
         region_array@DM_tag = "DM_sh"
         leave_msg(scriptname, funcname, 10)
