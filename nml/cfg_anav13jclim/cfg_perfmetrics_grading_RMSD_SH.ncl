@@ -15,7 +15,7 @@ diag_script_info@valid_fraction = 0.10
 diag_script_info@level = "all"
 
 ;; Selected region (Global, Tropics, NH extratropics, SH extratropics)
-diag_script_info@region = "Southern Hemisphere"
+diag_script_info@region = "SH extratropics"
 
 ;; Selected grid ("ref", "coarest", "finest")
 diag_script_info@grid = "ref"
