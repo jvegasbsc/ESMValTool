@@ -46,7 +46,7 @@ local tmp1, tmp2, dum, verbosity, land_weights, land_w, oce_weights, oce_w, \
       f, a, sftlf, l_weights, o_weights, tas_lw, tas_ow, \
       tmp_ta, tmp_tas, tmp_land, tmp_ocean, land_tlt, oce_tlt, xregrid, \
       yregrid, var_hreg, p_cut, o_weights_ini, land_scale, ocean_scale, \
-      l_weights_ini
+      l_weights_ini, l_scale, o_scale
 begin
 
     funcname = "calculate"
@@ -186,11 +186,11 @@ begin
     ;;                    ocean_weight_arr(:, iplev, :, :))
     ;;end do
 
-    land_scale = conform(land_weight_arr, dim_sum_n(land_weight_arr, 1) + \
-                         tas_lw, (/0, 2, 3/))
+    l_scale = dim_sum_n(land_weight_arr, 1) + tas_lw
+    land_scale = conform(land_weight_arr, l_scale, (/0, 2, 3/))
     land_weight_arr = land_weight_arr / land_scale
-    ocean_scale = conform(ocean_weight_arr, dim_sum_n(ocean_weight_arr, 1) + \
-                         tas_ow, (/0, 2, 3/))
+    o_scale = dim_sum_n(ocean_weight_arr, 1) + tas_ow
+    ocean_scale = conform(ocean_weight_arr, o_scale, (/0, 2, 3/))
     ocean_weight_arr = ocean_weight_arr / ocean_scale
 
     ;; Read NCL standard mask
@@ -213,9 +213,9 @@ begin
     copy_VarMeta(tmp_ta, tmp_land)
     copy_VarMeta(tmp_ta, tmp_oce)
     land_tlt = dim_sum_n_Wrap(tmp_land, 1)
-    land_tlt = land_tlt + tas_land*tas_lw/land_scale
+    land_tlt = land_tlt + tas_land*tas_lw/l_scale
     oce_tlt = dim_sum_n_Wrap(tmp_oce, 1)
-    oce_tlt = oce_tlt + tas_oce*tas_ow/ocean_scale  
+    oce_tlt = oce_tlt + tas_oce*tas_ow/o_scale  
 
      ;; Add TLT
     dum = land_tlt + oce_tlt
