@@ -5,6 +5,7 @@
 variable_info = True
 variable_info@derived = True
 variable_info@long_name = "Lower tropospheric temperature"
+variable_info@short_name = "TLT"
 variable_info@units = "K"
 
 ;;###############################################################
@@ -39,6 +40,7 @@ function calculate(index [1] : integer,
 ;;    accessed 2017-04-06
 ;;
 ;; Modification history
+;;    20171024-A_gier_be: Added checks for pressure levels
 ;;    20170517-A_gier_be: Added treatment for missing values
 ;;    20170410-A_gier_be: written.
 ;;
@@ -60,6 +62,20 @@ begin
     tmp_ta = extract_data_extended(index, "ta", tmp1, -1, 0, 0)
     tmp_tas = extract_data_extended(index, "tas", tmp2, -1, 0, 0)
     delete([/tmp1, tmp2/])
+
+    ;; Check if plev satisfies assumptions: dim 1
+    ;; Give error if not - do not want to reorder 3D fields
+    ;; CAVEAT: does not check for known aliases like p, plevs, lev_p
+    if (tmp_ta!1).ne."plev" then
+        error_msg("f", scriptname, funcname, "Input field does not " + \
+                  "have plev as second coordinate.")
+    end if
+
+    ;; Check that plev is Monotonic -> required for weight calculation
+    if isMonotonic(tmp_ta&plev).eq.0 then
+        error_msg("f", scriptname, funcname, "Pressure levels are not " + \
+                  "monotonic. Please adapt input field.")
+    end if
 
     ;; Only works if tas, ta on same grid, regrid tas if not
     if ((dimsizes(tmp_ta&lat).ne.dimsizes(tmp_tas&lat)) .or. \
@@ -100,7 +116,7 @@ begin
         delete(var_hreg)
         delete(xregrid)
         delete(yregrid)
-    end if
+    end if    
 
     ;; Loading weight functions
     weight_folder = "variable_defs/variable_defs_aux/"
@@ -152,26 +168,50 @@ begin
 
     ;; Variant 1: add up all weights and apply to lowest level available data
     ;; used because it resembles RSS obs the most, smoother
-    do iplev = 0, p_cut
-        land_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
-                        tmp_ta(:, iplev, :, :)), \
-                        land_weight_arr(:, iplev, :, :) + \ 
-                        land_weight_arr(:, iplev + 1, :, :), \ 
-                        land_weight_arr(:, iplev + 1, :, :))
-        land_weight_arr(:, iplev, :, :)  = where(ismissing( \
-                        tmp_ta(:, iplev, :, :)), \
-                        land_weight_arr@_FillValue, \ 
-                        land_weight_arr(:, iplev, :, :))
-        ocean_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
-                        tmp_ta(:, iplev, :, :)), \
-                        ocean_weight_arr(:, iplev, :, :) + \ 
-                        ocean_weight_arr(:, iplev + 1, :, :), \ 
-                        ocean_weight_arr(:, iplev + 1, :, :))
-        ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
-                        tmp_ta(:, iplev, :, :)), \
-                        ocean_weight_arr@_FillValue, \ 
-                        ocean_weight_arr(:, iplev, :, :))
-    end do
+    if isMonotonic(tmp_ta&plev).eq.(-1) then
+	do iplev = 0, p_cut
+	    land_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    land_weight_arr(:, iplev, :, :) + \ 
+			    land_weight_arr(:, iplev + 1, :, :), \ 
+			    land_weight_arr(:, iplev + 1, :, :))
+	    land_weight_arr(:, iplev, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    land_weight_arr@_FillValue, \ 
+			    land_weight_arr(:, iplev, :, :))
+	    ocean_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    ocean_weight_arr(:, iplev, :, :) + \ 
+			    ocean_weight_arr(:, iplev + 1, :, :), \ 
+			    ocean_weight_arr(:, iplev + 1, :, :))
+	    ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    ocean_weight_arr@_FillValue, \ 
+			    ocean_weight_arr(:, iplev, :, :))
+	end do
+    else
+        do nplev = 0, dimsizes(tmp_ta&plev)-1 - p_cut
+            iplev = dimsizes(tmp_ta&plev) - 1 - nplev
+	    land_weight_arr(:, iplev - 1, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    land_weight_arr(:, iplev, :, :) + \ 
+			    land_weight_arr(:, iplev - 1, :, :), \ 
+			    land_weight_arr(:, iplev - 1, :, :))
+	    land_weight_arr(:, iplev, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    land_weight_arr@_FillValue, \ 
+			    land_weight_arr(:, iplev, :, :))
+	    ocean_weight_arr(:, iplev - 1, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    ocean_weight_arr(:, iplev, :, :) + \ 
+			    ocean_weight_arr(:, iplev - 1, :, :), \ 
+			    ocean_weight_arr(:, iplev - 1, :, :))
+	    ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
+			    tmp_ta(:, iplev, :, :)), \
+			    ocean_weight_arr@_FillValue, \ 
+			    ocean_weight_arr(:, iplev, :, :))
+	end do
+    end if
 
     ;; Variant 2: set missing values and scale the remaining weights
     ;; not used due to sharper edges, not resembling given TLT obserations
