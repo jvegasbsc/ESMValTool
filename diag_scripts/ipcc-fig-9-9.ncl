@@ -298,8 +298,8 @@ begin
   tr_pr = all_data_B*10
   nmodel = dimsizes(model_names)
 
-  print(tr_tlt)
-  print(tr_pr)
+;;  print(tr_tlt)
+;;  print(tr_pr)
 
   markertab = project_style(diag_script_info, "markers")
   colortab  = project_style(diag_script_info, "colors")
@@ -396,7 +396,7 @@ begin
 ;----------------------------------------------------------------------
  ;; Regression line needs at least 3 models
  rc  = regline(tr_tlt,tr_pr)
- print(rc)
+ ;;print(rc)
  x = (-0.5-rc@yintercept)/rc
  y = rc*0.6 + rc@yintercept
 

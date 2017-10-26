@@ -40,6 +40,8 @@ function calculate(index [1] : integer,
 ;;    accessed 2017-04-06
 ;;
 ;; Modification history
+;;    20171025-A_laue_ax: changed procedure to calculate vertical weights
+;;             added scaling of weight for surface temperature
 ;;    20171024-A_gier_be: Added checks for pressure levels
 ;;    20170517-A_gier_be: Added treatment for missing values
 ;;    20170410-A_gier_be: written.
@@ -47,8 +49,10 @@ function calculate(index [1] : integer,
 local tmp1, tmp2, dum, verbosity, land_weights, land_w, oce_weights, oce_w, \
       f, a, sftlf, l_weights, o_weights, tas_lw, tas_ow, \
       tmp_ta, tmp_tas, tmp_land, tmp_ocean, land_tlt, oce_tlt, xregrid, \
-      yregrid, var_hreg, p_cut, o_weights_ini, land_scale, ocean_scale, \
-      l_weights_ini, l_scale, o_scale
+      yregrid, var_hreg, p_cut, l_scale, land_scale, ocean_scale, \
+      o_scale, land_height, oce_height, pfine, o_weights_fine, l_weights_fine, \
+      o_heights_fine, l_heights_fine, n, odz, ldz, ibot, itop, pbot, ptop, \
+      omean, lmean
 begin
 
     funcname = "calculate"
@@ -116,123 +120,9 @@ begin
         delete(var_hreg)
         delete(xregrid)
         delete(yregrid)
-    end if    
-
-    ;; Loading weight functions
-    weight_folder = "variable_defs/variable_defs_aux/"
-    ;; Pressure levels in column 4, weights col 6
-    land_weights = readAsciiTable(weight_folder + \
-       "std_atmosphere_wt_function_chan_tlt_land.txt", 6, "float", 7)
-    land_w = land_weights(:, 5)
-    land_w!0 = "pressure"
-    land_w&pressure = land_weights(:, 3)
-
-    oce_weights = readAsciiTable(weight_folder + \
-       "std_atmosphere_wt_function_chan_tlt_ocean.txt", 6, "float", 7)
-    oce_w = oce_weights(:, 5)
-    oce_w!0 = "pressure"
-    oce_w&pressure = oce_weights(:, 3)
-
-    ;; surface weight is listed before header, not in table
-    tas_lw = asciiread(weight_folder + \
-       "std_atmosphere_wt_function_chan_tlt_land.txt", 1, "float")
-    tas_ow = asciiread(weight_folder + \
-       "std_atmosphere_wt_function_chan_tlt_ocean.txt", 1, "float")
-
-    ;; Calculate weights depending on the level of the ta array
-    l_cumsum = cumsum(land_w*0.3, 2)
-    o_cumsum = cumsum(oce_w*0.3, 2)
-    l_weights_ini = tofloat(ftcurv(land_w&pressure(::-1), l_cumsum(::-1), \
-                    tmp_ta&plev))
-    o_weights_ini = tofloat(ftcurv(oce_w&pressure(::-1), o_cumsum(::-1), \
-                    tmp_ta&plev))
-    l_weights = l_weights_ini(1:) - l_weights_ini(:dimsizes(l_weights_ini)-2)
-    l_weights := array_append_record(l_weights, sum(land_w*0.3) - \
-                l_weights_ini(dimsizes(l_weights_ini) - 1), 0)
-    o_weights = o_weights_ini(1:) - o_weights_ini(:dimsizes(o_weights_ini)-2)
-    o_weights := array_append_record(o_weights, sum(oce_w*0.3) - \
-                l_weights_ini(dimsizes(o_weights_ini) - 1), 0)
-    delete([/l_weights_ini, o_weights_ini/])
-
-    ;; Some land over mountains have missing values in pressure levels
-    ;; Treat these like in TLT from RSS - "Land areas w/ surface height
-    ;; exceeding threshold of 1500m (~85 000 Pa) were excluded"
-    ;; Missing values change per time and height, so 4D weighting
-    ;; array is required
-
-    p_cut = ind_nearest_coord(85000, tmp_ta&plev, 0)
-    land_weight_arr = conform(tmp_ta, l_weights, 1)
-    land_weight_arr@_FillValue = default_fillvalue(typeof(land_weight_arr))
-    ocean_weight_arr = conform(tmp_ta, o_weights, 1)
-    ocean_weight_arr@_FillValue = default_fillvalue(typeof(ocean_weight_arr))
-
-    ;; Variant 1: add up all weights and apply to lowest level available data
-    ;; used because it resembles RSS obs the most, smoother
-    if isMonotonic(tmp_ta&plev).eq.(-1) then
-	do iplev = 0, p_cut
-	    land_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    land_weight_arr(:, iplev, :, :) + \ 
-			    land_weight_arr(:, iplev + 1, :, :), \ 
-			    land_weight_arr(:, iplev + 1, :, :))
-	    land_weight_arr(:, iplev, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    land_weight_arr@_FillValue, \ 
-			    land_weight_arr(:, iplev, :, :))
-	    ocean_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    ocean_weight_arr(:, iplev, :, :) + \ 
-			    ocean_weight_arr(:, iplev + 1, :, :), \ 
-			    ocean_weight_arr(:, iplev + 1, :, :))
-	    ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    ocean_weight_arr@_FillValue, \ 
-			    ocean_weight_arr(:, iplev, :, :))
-	end do
-    else
-        do nplev = 0, dimsizes(tmp_ta&plev)-1 - p_cut
-            iplev = dimsizes(tmp_ta&plev) - 1 - nplev
-	    land_weight_arr(:, iplev - 1, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    land_weight_arr(:, iplev, :, :) + \ 
-			    land_weight_arr(:, iplev - 1, :, :), \ 
-			    land_weight_arr(:, iplev - 1, :, :))
-	    land_weight_arr(:, iplev, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    land_weight_arr@_FillValue, \ 
-			    land_weight_arr(:, iplev, :, :))
-	    ocean_weight_arr(:, iplev - 1, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    ocean_weight_arr(:, iplev, :, :) + \ 
-			    ocean_weight_arr(:, iplev - 1, :, :), \ 
-			    ocean_weight_arr(:, iplev - 1, :, :))
-	    ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
-			    tmp_ta(:, iplev, :, :)), \
-			    ocean_weight_arr@_FillValue, \ 
-			    ocean_weight_arr(:, iplev, :, :))
-	end do
     end if
 
-    ;; Variant 2: set missing values and scale the remaining weights
-    ;; not used due to sharper edges, not resembling given TLT obserations
-    ;;do iplev = 0, p_cut
-    ;;    land_weight_arr(:, iplev, :, :)  = where(ismissing( \
-    ;;                    tmp_ta(:, iplev, :, :)), \
-    ;;                    land_weight_arr@_FillValue, \ 
-    ;;                    land_weight_arr(:, iplev, :, :))
-    ;;    ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
-    ;;                    tmp_ta(:, iplev, :, :)), \
-    ;:                    ocean_weight_arr@_FillValue, \ 
-    ;;                    ocean_weight_arr(:, iplev, :, :))
-    ;;end do
-
-    l_scale = dim_sum_n(land_weight_arr, 1) + tas_lw
-    land_scale = conform(land_weight_arr, l_scale, (/0, 2, 3/))
-    land_weight_arr = land_weight_arr / land_scale
-    o_scale = dim_sum_n(ocean_weight_arr, 1) + tas_ow
-    ocean_scale = conform(ocean_weight_arr, o_scale, (/0, 2, 3/))
-    ocean_weight_arr = ocean_weight_arr / ocean_scale
-
+    ;; Requires landsea mask due to different weights
     ;; Read NCL standard mask
     f = addfile("$NCARG_ROOT/lib/ncarg/data/cdf/landsea.nc", "r")
     a = f->LSMASK
@@ -245,11 +135,157 @@ begin
     tmp_land = tmp_ta * conform(tmp_ta, sftlf, (/2,3/))
     tas_land = tmp_tas * conform(tmp_tas, sftlf, (/1,2/))
     tmp_oce = tmp_ta * conform(tmp_ta, sftof, (/2,3/))
-    tas_oce = tmp_tas * conform(tmp_tas, sftof, (/1,2/))
+    tas_oce = tmp_tas * conform(tmp_tas, sftof, (/1,2/))    
+
+    ;; Loading weight functions
+    weight_folder = "variable_defs/variable_defs_aux/"
+    ;; Pressure levels in column 4, weights col 6
+    land_weights = readAsciiTable(weight_folder + \
+       "std_atmosphere_wt_function_chan_tlt_land.txt", 6, "float", 7)
+    land_w = land_weights(:, 5)
+    land_w!0 = "pressure"
+    land_w&pressure = land_weights(:, 3)
+    land_height = land_weights(:,1) ;height in m
+
+    oce_weights = readAsciiTable(weight_folder + \
+       "std_atmosphere_wt_function_chan_tlt_ocean.txt", 6, "float", 7)
+    oce_w = oce_weights(:, 5)
+    oce_w!0 = "pressure"
+    oce_w&pressure = oce_weights(:, 3)
+    oce_height = oce_weights(:,1) ;height in m
+
+    ;; surface weight is listed before header, not in table
+    tas_lw = asciiread(weight_folder + \
+       "std_atmosphere_wt_function_chan_tlt_land.txt", 1, "float")
+    tas_ow = asciiread(weight_folder + \
+       "std_atmosphere_wt_function_chan_tlt_ocean.txt", 1, "float")
+
+    ;; calculate weights for levels in ta array
+    ;; weight = average over level times layer thickness in km
+
+    pfine = fspan(0., 101325., 1013)
+
+    o_weights_fine = tofloat(ftcurv(oce_w&pressure(::-1), oce_w(::-1), pfine))
+    l_weights_fine = tofloat(ftcurv(land_w&pressure(::-1), land_w(::-1), pfine))
+    o_heights_fine = tofloat(ftcurv(oce_w&pressure(::-1), oce_height(::-1), pfine))
+    l_heights_fine = tofloat(ftcurv(land_w&pressure(::-1), land_height(::-1), pfine))
+
+    n = dimsizes(tmp_ta&plev)
+
+    o_weights = new((/n/), float)
+    l_weights = new((/n/), float)
+
+    do i = 0, n - 1
+        if (i.gt.0) then
+            pbot = 0.5*tofloat((tmp_ta&plev(i) + tmp_ta&plev(i-1)))
+        else
+            pbot = 101325.
+        end if
+        if (i.lt.n-1) then
+            ptop = 0.5*tofloat((tmp_ta&plev(i) + tmp_ta&plev(i+1)))
+        else
+            ptop = 0.
+        end if
+
+        ibot = ind_nearest_coord(pbot, pfine, 0)
+        itop = ind_nearest_coord(ptop, pfine, 0)
+
+        omean = avg(o_weights_fine(ibot:itop))
+        odz = (o_heights_fine(itop) - o_heights_fine(ibot)) / 1000.0 ; in km
+        o_weights(i) = omean * odz
+
+        lmean = avg(l_weights_fine(ibot:itop))
+        ldz = (l_heights_fine(itop) - l_heights_fine(ibot)) / 1000.0 ; in km
+        l_weights(i) = lmean * ldz
+    end do
+
+    ;; Some land over mountains have missing values in pressure levels
+    ;; Treat these like in TLT from RSS - "Land areas w/ surface height
+    ;; exceeding threshold of 1500m (~85 000 Pa) were excluded"
+    ;; Missing values change per time and height, so 4D weighting
+    ;; array is required
+
+    p_cut = ind_nearest_coord(85000, tmp_ta&plev, 0)
+
+    ;; Variant 1: add up all weights and apply to lowest level available data
+    ;; used because it resembles RSS obs the most, smoother
+    ;; Only execute loop if missing values exist!
+    if any(ismissing(tmp_ta)) then
+        info_output("Treating missing values.", verbosity, 1)
+        land_weight_arr = conform(tmp_ta, l_weights, 1)
+        land_weight_arr@_FillValue = default_fillvalue(typeof(land_weight_arr))
+        ocean_weight_arr = conform(tmp_ta, o_weights, 1)
+        ocean_weight_arr@_FillValue = default_fillvalue(typeof(ocean_weight_arr))
+
+        if isMonotonic(tmp_ta&plev).eq.(-1) then
+            do iplev = 0, p_cut
+                land_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
+                                tmp_ta(:, iplev, :, :)), \
+                                land_weight_arr(:, iplev, :, :) + \
+                                land_weight_arr(:, iplev + 1, :, :), \
+                                land_weight_arr(:, iplev + 1, :, :))
+                land_weight_arr(:, iplev, :, :)  = where(ismissing( \
+                                tmp_ta(:, iplev, :, :)), \
+                                land_weight_arr@_FillValue, \ 
+                                land_weight_arr(:, iplev, :, :))
+                ocean_weight_arr(:, iplev + 1, :, :)  = where(ismissing( \
+                                 tmp_ta(:, iplev, :, :)), \
+                                 ocean_weight_arr(:, iplev, :, :) + \ 
+                                 ocean_weight_arr(:, iplev + 1, :, :), \ 
+                                 ocean_weight_arr(:, iplev + 1, :, :))
+                ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
+                                 tmp_ta(:, iplev, :, :)), \
+                                 ocean_weight_arr@_FillValue, \ 
+                                 ocean_weight_arr(:, iplev, :, :))
+            end do
+        else
+            do nplev = 0, dimsizes(tmp_ta&plev)-1 - p_cut
+                iplev = dimsizes(tmp_ta&plev) - 1 - nplev
+                land_weight_arr(:, iplev - 1, :, :)  = where(ismissing( \
+                                tmp_ta(:, iplev, :, :)), \
+                                land_weight_arr(:, iplev, :, :) + \ 
+                                land_weight_arr(:, iplev - 1, :, :), \ 
+                                land_weight_arr(:, iplev - 1, :, :))
+                land_weight_arr(:, iplev, :, :)  = where(ismissing( \
+                                tmp_ta(:, iplev, :, :)), \
+                                land_weight_arr@_FillValue, \ 
+                                land_weight_arr(:, iplev, :, :))
+                ocean_weight_arr(:, iplev - 1, :, :)  = where(ismissing( \
+                                 tmp_ta(:, iplev, :, :)), \
+                                 ocean_weight_arr(:, iplev, :, :) + \ 
+                                 ocean_weight_arr(:, iplev - 1, :, :), \ 
+                                 ocean_weight_arr(:, iplev - 1, :, :))
+                ocean_weight_arr(:, iplev, :, :)  = where(ismissing( \
+                                 tmp_ta(:, iplev, :, :)), \
+                                 ocean_weight_arr@_FillValue, \ 
+                                 ocean_weight_arr(:, iplev, :, :))
+            end do
+        end if
+
+        l_scale = dim_sum_n(land_weight_arr, 1) + tas_lw
+        land_scale = conform(land_weight_arr, l_scale, (/0, 2, 3/))
+        land_weight_arr = land_weight_arr / land_scale
+        o_scale = dim_sum_n(ocean_weight_arr, 1) + tas_ow
+        ocean_scale = conform(ocean_weight_arr, o_scale, (/0, 2, 3/))
+        ocean_weight_arr = ocean_weight_arr / ocean_scale
+
+    else
+        l_scale = sum(l_weights)+tas_lw
+        o_scale = sum(o_weights)+tas_ow
+
+        ;; If no missing values -> weights the same
+        land_weight_arr = conform(tmp_land, l_weights, 1) / l_scale
+        ocean_weight_arr = conform(tmp_oce, o_weights, 1) / o_scale
+
+    end if
 
     ;; Apply weights and calc TLT for land, oce seperately
-    tmp_land = tmp_land * land_weight_arr;conform(tmp_land, l_weights, 1)
-    tmp_oce = tmp_oce * ocean_weight_arr;conform(tmp_oce, o_weights, 1)
+    tmp_land = tmp_land * land_weight_arr
+    tmp_oce = tmp_oce * ocean_weight_arr
+
+    delete(land_weight_arr)
+    delete(ocean_weight_arr)
+
     copy_VarMeta(tmp_ta, tmp_land)
     copy_VarMeta(tmp_ta, tmp_oce)
     land_tlt = dim_sum_n_Wrap(tmp_land, 1)
@@ -257,13 +293,18 @@ begin
     oce_tlt = dim_sum_n_Wrap(tmp_oce, 1)
     oce_tlt = oce_tlt + tas_oce*tas_ow/o_scale  
 
-     ;; Add TLT
+    ;; Add TLT
     dum = land_tlt + oce_tlt
     copy_VarMeta(land_tlt, dum)
 
+    delete(land_tlt)
+    delete(oce_tlt)
+
     ;; Take out all points with missing values above the allowed cutoff
     dum = where(ismissing(tmp_ta(:, p_cut, :, :)), \
-               dum@_FillValue, dum) 
+               dum@_FillValue, dum)
+    
+    delete(tmp_ta)
 
     data_new = True
     dum@long_name = variable_info@long_name
