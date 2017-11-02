@@ -428,6 +428,7 @@ This namelist is part of the ESMValTool
 
   <!-- ### Figure 12 ############################################################################################################# -->
   <!-- Missing models due to unavailable data: bcc-csm1-1-m, BNU-ESM, CESM1-BGC; NBP more like NEP: INMCM4 (s. Anav Table3) ###### -->
+  <!-- Currently does not include litter, and as such will differ from Anav fig 12 ############################################### -->
   <diag>
     <description>         Two-variable scatter plot CSOIL-CVEG  </description>
     <variable_def_dir>    ./variable_defs/                      </variable_def_dir>
@@ -443,7 +444,7 @@ This namelist is part of the ESMValTool
     <model> CMIP5_ETHZ   GFDL-ESM2M       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ   HadGEM2-CC       MIP_VAR_DEF   historical   r1i1p1   1986 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ   HadGEM2-ES       MIP_VAR_DEF   historical   r1i1p1   1986 2004   @{MODELPATH}/ETHZ_CMIP5 </model>
-    <model> CMIP5_ETHZ   inmcm4           MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+    <model> CMIP5_ETHZ   inmcm4           MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ   IPSL-CM5A-LR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ   IPSL-CM5A-MR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
     <model> CMIP5_ETHZ   IPSL-CM5B-LR     MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
