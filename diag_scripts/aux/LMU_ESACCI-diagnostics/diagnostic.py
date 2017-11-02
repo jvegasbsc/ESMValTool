@@ -15,6 +15,7 @@ import matplotlib.cm as cm
 from geoval.core.data import GeoData
 from geoval.core.mapping import SingleMap
 import extended_data
+import extended_mapping
 from easyhov import easyhov_diff
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
@@ -289,6 +290,12 @@ class Diagnostic(object):
     def run_diagnostic(self):
         """
         run diagnostics
+        """
+        assert False, 'This routine needs to be implemented in child class!'
+        
+    def _specific_diag(self):
+        """
+        run specific diagnostics
         """
         assert False, 'This routine needs to be implemented in child class!'
 
@@ -682,6 +689,8 @@ class BasicDiagnostics(Diagnostic):
                 self.cfg.climatologies:
             self._climatologies_statistics(self.refname)
             self._climatologies_statistics(self.modname)
+            
+        self._specific_diag()
 
     def _write_basic_diagnostic_header(self):
         print('*****************************')

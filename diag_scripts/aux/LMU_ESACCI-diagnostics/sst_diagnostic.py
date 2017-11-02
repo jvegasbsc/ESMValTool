@@ -38,15 +38,14 @@ class SeaSurfaceTemperatureDiagnostic(BasicDiagnostics):
         running the diagnostics
         """
         super(SeaSurfaceTemperatureDiagnostic, self).run_diagnostic()
+        
 
-        self._specific_diag(percentile=self.cfg.percentile)
-
-    def _specific_diag(self, percentile=True):
+    def _specific_diag(self):
         """
         Diagnostic management
         """
 
-        if percentile:
+        if "percentile" in self.cfg.__dict__.keys() and self.cfg.percentile:
             self._percentile_comparison(plist=np.arange(
                 self.cfg.percentile_pars[0],
                 self.cfg.percentile_pars[1] +

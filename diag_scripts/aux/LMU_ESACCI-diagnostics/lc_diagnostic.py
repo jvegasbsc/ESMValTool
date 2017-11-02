@@ -40,14 +40,13 @@ class LandCoverDiagnostic(BasicDiagnostics):
 
         super(LandCoverDiagnostic, self).run_diagnostic()
 
-        self._specific_diag(single_years=self.cfg.single_years)
-
-    def _specific_diag(self, single_years=True):
+    def _specific_diag(self):
         """
         Diagnostic management
         """
 
-        if single_years:
+        if "single_years" in self.cfg.__dict__.keys() \
+            and self.cfg.single_years:
             self._year_uncertainty()
 
     def write_data(self, plot=True):
