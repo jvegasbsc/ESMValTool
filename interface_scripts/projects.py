@@ -3773,6 +3773,86 @@ class ESGF_CMIP5(ESGF, CMIP5):
         except:
             return 'cf_areafile_not_available'
 
+    def get_cf_lmaskfile(self, project_info, model):
+        """
+        """
+        import copy
+        variable = 'sftlf'
+        fxmodel = copy.deepcopy(model)
+        mml = fxmodel.split_entries()
+        mml[6] = 'fx'
+        mml[7] = 'atmos'
+        mml[8] = 'fx'
+        mml[9] = 'r0i0p0'
+        fxmodel.__init__(' '.join(mml),fxmodel.attributes,fxmodel.diag_specific)
+        try:
+            indir = ESGF.get_cf_indir(self,
+                                      project_info,
+                                      fxmodel,
+                                      variable,
+                                      self.ESGF_facet_names,
+                                      ESGF_project = 'CMIP5')
+
+            # Get model sections, as python dictionary
+            msd = self.get_model_sections(fxmodel)
+
+            infile = '_'.join([variable,
+                               msd['mip'],
+                               msd['model'], # in CMIP5 class this was 'name'
+                               msd['experiment'],
+                               msd['ensemble']]) + '.nc'
+
+            if (not os.path.isfile(os.path.join(indir, infile))):
+                infile = '_'.join([variable,
+                                   msd['mip'],
+                                   msd['model'], # in CMIP5 class this was 'name'
+                                   msd['experiment'],
+                                   msd['ensemble']]) + '*.nc'
+
+            return os.path.join(indir, infile)
+        except:
+            return 'cf_lmaskfile_not_available'
+
+    def get_cf_licefile(self, project_info, model):
+        """
+        """
+        import copy
+        variable = 'sftgif'
+        fxmodel = copy.deepcopy(model)
+        mml = fxmodel.split_entries()
+        mml[6] = 'fx'
+        mml[7] = 'land'
+        mml[8] = 'fx'
+        mml[9] = 'r0i0p0'
+        fxmodel.__init__(' '.join(mml),fxmodel.attributes,fxmodel.diag_specific)
+        try:
+            indir = ESGF.get_cf_indir(self,
+                                      project_info,
+                                      fxmodel,
+                                      variable,
+                                      self.ESGF_facet_names,
+                                      ESGF_project = 'CMIP5')
+
+            # Get model sections, as python dictionary
+            msd = self.get_model_sections(fxmodel)
+
+            infile = '_'.join([variable,
+                               msd['mip'],
+                               msd['model'], # in CMIP5 class this was 'name'
+                               msd['experiment'],
+                               msd['ensemble']]) + '.nc'
+
+            if (not os.path.isfile(os.path.join(indir, infile))):
+                infile = '_'.join([variable,
+                                   msd['mip'],
+                                   msd['model'], # in CMIP5 class this was 'name'
+                                   msd['experiment'],
+                                   msd['ensemble']]) + '*.nc'
+
+            return os.path.join(indir, infile)
+        except:
+            return 'cf_lmaskfile_not_available'
+
 class ESGF_CMIP5_fx(ESGF_CMIP5):
     """
        THIS CLASS HAS UNDERGONE PRELIMIARY TESTING,

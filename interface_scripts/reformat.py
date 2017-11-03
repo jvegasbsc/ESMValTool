@@ -94,6 +94,7 @@ def cmor_reformat(currProject, project_info, variable, model):
 
     # Land-mask file name for land variables
     lmaskfile_path = currProject.get_cf_lmaskfile(project_info, model)
+    licefile_path = currProject.get_cf_licefile(project_info, model)
     omaskfile_path = currProject.get_cf_omaskfile(project_info, model)
 
     # Porosity file name for land variables
@@ -148,6 +149,7 @@ def cmor_reformat(currProject, project_info, variable, model):
     project_info['TEMPORARY']['infile_path'] = os.path.join(indir, infile)
     project_info['TEMPORARY']['areafile_path'] = areafile_path
     project_info['TEMPORARY']['lmaskfile_path'] = lmaskfile_path
+    project_info['TEMPORARY']['licefile_path'] = licefile_path
     project_info['TEMPORARY']['omaskfile_path'] = omaskfile_path
     project_info['TEMPORARY']['porofile_path'] = porofile_path
     project_info['TEMPORARY']['start_year'] = start_year

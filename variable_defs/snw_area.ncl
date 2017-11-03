@@ -44,20 +44,19 @@ begin
     data = read_data(index, "snw", "*2*s")
     tmp = extract_data_extended(index, "snw" , data, -1, 0, 0)
 
-    inpath = models@dir(index)
-    infile = inpath + "/" + models@experiment(index) + "/fx/sftgif/" + \
-             models@name(index)+ "/r0i0p0/sftgif_fx_" + models@name(index) \
-             + "_" + models@experiment(index) + "_r0i0p0.nc"
-    print(infile)
-    f = addfile(infile, "r")
-    sftgif = f->sftgif
+    f = addfile(interface_get_fullpath("snw", field_types(0), index), "r")
+    if (isfilevar(f, "sftgif")) then
+        sftgif = f->sftgif
+    else
+        error_msg("f", scriptname, funcname, "sftgif not found")
+    end if
 
-    infile2 = inpath + "/" + models@experiment(index) + "/fx/sftlf/" + \
-             models@name(index)+ "/r0i0p0/sftlf_fx_" + models@name(index) \
-             + "_" + models@experiment(index) + "_r0i0p0.nc"
-
-    f = addfile(infile2, "r")
-    sftlf = f->sftlf
+    f = addfile(interface_get_fullpath("snw", field_types(0), index), "r")
+    if (isfilevar(f, "sftlf")) then
+        sftlf = f->sftlf
+    else
+        error_msg("f", scriptname, funcname, "sftlf not found")
+    end if
 
     sftgif_0 = sftgif * (- 0.01)
     sftgif_1 = sftgif_0 + 1
