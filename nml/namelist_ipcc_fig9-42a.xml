@@ -1,60 +1,83 @@
 <namelist>
 <include href="./config_private.xml"/>
+
+
 <namelist_summary>
 ###############################################################################
-namelist_MyDiag.xml
+namelist_ipcc_fig9-42a.xml
 
 Description
-Sandbox namelist for implementing new diagnostics
+Reproducing selected figures from IPCC AR5, chap. 9 (Flato et al., 2013):
+Fig. 9.42a
 
-Author
-Klaus-Dirk Gottschaldt (DLR, Germany -  Klaus-Dirk.Gottschaldt@dlr.de)
+Authors
+Manuel Schlund (DLR, Germany - manuel.schlund@dlr.de)
 
-Contributor(s)
-n/a
-
-Project
-EMBRACE
+Projects
+ESMVal
 
 Reference
+Flato, G. et al., Evaluation of climate models, in: Climate Change 2013: the 
+Physical Science Basis, contribution of Working Group I to the Fifth Assessment 
+Report of the Intergovernmental Panel on Climate Change, edited by: Stocker, T. F.,
+in, D., Plattner, G.-K., Tignor, M., Allen, S. K., Boschung, J., Nauels, A., Xia,
+Y., Bex, V., and Midgley, P. M., Cambridge University Press, Cambridge, UK and
+New York, NY, USA (2013)
 
 This namelist is part of the ESMValTool
 ###############################################################################
 </namelist_summary>
 
+
 <GLOBAL>
-    <write_plots type="boolean">           True         </write_plots>
-    <write_netcdf type="boolean">          True         </write_netcdf>
-    <force_processing type="boolean">     False         </force_processing>
-    <wrk_dir type="path">                  @{WORKPATH}  </wrk_dir>
-    <plot_dir type="path">                 @{PLOTPATH}/ </plot_dir>
-    <climo_dir type="path">                @{CLIMOPATH} </climo_dir>
-    <write_plot_vars type="boolean">       True         </write_plot_vars>
-    <max_data_filesize type="integer">      100         </max_data_filesize>
-    <max_data_blocksize type="integer">     500         </max_data_blocksize>
-    <verbosity  type="integer">               1         </verbosity>
-    <exit_on_warning  type="boolean">      True         </exit_on_warning>
-    <output_file_type>                       ps         </output_file_type>
-    <tags>                            P_embrace         </tags>
+    <write_plots type="boolean">           True      </write_plots>
+    <write_netcdf type="boolean">          True      </write_netcdf>
+    <force_processing type="boolean">     False      </force_processing>
+    <wrk_dir type="path">               @{WORKPATH}  </wrk_dir>
+    <plot_dir type="path">              @{PLOTPATH}  </plot_dir>
+    <climo_dir type="path">             @{CLIMOPATH} </climo_dir>
+    <regridding_dir type="path">        @{REGRPATH}  </regridding_dir>
+    <write_plot_vars type="boolean">       True      </write_plot_vars>
+    <max_data_filesize type="integer">      100      </max_data_filesize>
+    <max_data_blocksize type="integer">     500      </max_data_blocksize>
+    <verbosity  type="integer">               1      </verbosity>
+    <exit_on_warning  type="boolean">     False      </exit_on_warning>
+    <output_file_type>                       ps      </output_file_type>
+    <force_calc type="boolean">           False      </force_calc>
+    <force_gradecalc type="boolean">      False      </force_gradecalc>
+    <force_taylorcalc type="boolean">     False      </force_taylorcalc>
+    <read_from_vault type="boolean">      False      </read_from_vault>
+    <tags> D_flato13ipcc, P_esmval </tags>
 </GLOBAL>
 
+
 <MODELS>
-    <model>  CMIP5_ETHZ  MPI-ESM-LR    Amon  historical   r1i1p1  2000 2004  @{MODELPATH}/ETHZ_CMIP5/ </model> 
+    <model> CMIP5_ETHZ MPI-ESM-LR Amon historical r1i1p1 2000 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
 </MODELS>
 
-<!-- Please do not change anything below this line, 
-     unless you want to modify the standard diagnostic settings. -->
+
 <DIAGNOSTICS>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.42a                                               * -->
+<!-- * =================================================================== * -->
+<!-- * Equilibrium climate sensitivity (ECS) vs. Global mean surface       * -->
+<!-- * temperature (GMST)                                                  * -->
+<!-- * Contribution by Manuel Schlund, DLR                                 * -->
+<!-- *********************************************************************** -->
+
     <diag>
-        <description>         Tutorial diagnostic  </description>
-        <variable_def_dir>    ./variable_defs/     </variable_def_dir>
-        <variable>            MyVar                </variable>
-        <field_type>          T3M                  </field_type>
-        <diag_script_cfg_dir> ./nml/cfg_MyDiag/    </diag_script_cfg_dir>
-        <tags>                R_atmos, T_atmDyn, T_phys </tags>
-        
-        <diag_script cfg="cfg_MyDiag.ncl"> MyDiag.ncl  </diag_script>
+        <description> ECS vs GMST (fig 9.42a)     </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+
+        <diag_script cfg="cfg_ipcc_fig_9_42a.py"> ipcc_fig_9_42a.py </diag_script>
     </diag>
+
 </DIAGNOSTICS>
+
 
 </namelist>
