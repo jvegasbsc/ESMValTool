@@ -160,6 +160,16 @@ class Project:
         """
         return None
 
+    def get_cf_licefile(self, project_info, model):
+        """ @brief Returns the path to the sftgif file
+            @param project_info Current namelist in dictionary format
+            @param model One of the <model>-tags in the XML namelist file
+            @return A string (maskfile path)
+
+            This function looks for the maskfile of the ocean grid
+        """
+        return None
+
     def get_cf_omaskfile(self, project_info, model):
         """ @brief Returns the path to the sftof file used for masking
                    ocean variables (irregular grid)
