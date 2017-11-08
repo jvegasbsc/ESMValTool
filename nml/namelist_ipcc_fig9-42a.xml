@@ -18,11 +18,11 @@ ESMVal
 
 Reference
 Flato, G. et al., Evaluation of climate models, in: Climate Change 2013: the 
-Physical Science Basis, contribution of Working Group I to the Fifth Assessment 
-Report of the Intergovernmental Panel on Climate Change, edited by: Stocker, T. F.,
-in, D., Plattner, G.-K., Tignor, M., Allen, S. K., Boschung, J., Nauels, A., Xia,
-Y., Bex, V., and Midgley, P. M., Cambridge University Press, Cambridge, UK and
-New York, NY, USA (2013)
+Physical Science Basis, contribution of Working Group I to the Fifth Assessment
+Report of the Intergovernmental Panel on Climate Change, edited by:
+Stocker, T. F., in, D., Plattner, G.-K., Tignor, M., Allen, S. K.,
+Boschung, J., Nauels, A., Xia, Y., Bex, V., and Midgley, P. M.,
+Cambridge University Press, Cambridge, UK and New York, NY, USA (2013)
 
 This namelist is part of the ESMValTool
 ###############################################################################
@@ -52,29 +52,30 @@ This namelist is part of the ESMValTool
 
 
 <MODELS>
-    <model> CMIP5_ETHZ MPI-ESM-LR Amon historical r1i1p1 2000 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
 </MODELS>
 
 
 <DIAGNOSTICS>
 
-<!-- *********************************************************************** -->
-<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
-<!-- * similar to fig. 9.42a                                               * -->
-<!-- * =================================================================== * -->
-<!-- * Equilibrium climate sensitivity (ECS) vs. Global mean surface       * -->
-<!-- * temperature (GMST)                                                  * -->
-<!-- * Contribution by Manuel Schlund, DLR                                 * -->
-<!-- *********************************************************************** -->
+<!-- ********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                            * -->
+<!-- * similar to fig. 9.42a                                              * -->
+<!-- * ================================================================== * -->
+<!-- * Equilibrium climate sensitivity (ECS) vs. global mean surface      * -->
+<!-- * temperature (GMSAT)                                                * -->
+<!-- * Contribution by Manuel Schlund, DLR                                * -->
+<!-- ********************************************************************** -->
 
     <diag>
-        <description> ECS vs GMST (fig 9.42a)     </description>
+        <description> ECS vs GMSAT (fig 9.42a)    </description>
         <variable_def_dir>    ./variable_defs/    </variable_def_dir>
         <variable>            tas                 </variable>
         <field_type>          T2Ms                </field_type>
         <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
 
         <diag_script cfg="cfg_ipcc_fig_9_42a.py"> ipcc_fig_9_42a.py </diag_script>
+
+        <model> CMIP5_ETHZ  CCSM4   Amon    abrupt4xCO2  r1i1p1  1850    1999    @{MODELPATH}/ETHZ_CMIP5/ </model>
     </diag>
 
 </DIAGNOSTICS>
