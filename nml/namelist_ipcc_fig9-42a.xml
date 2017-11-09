@@ -73,7 +73,7 @@ This namelist is part of the ESMValTool
         <field_type>          T2Ms                </field_type>
         <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
 
-        <diag_script cfg="cfg_ipcc_fig_9_42a.py"> ipcc_fig_9_42a.py </diag_script>
+        <diag_script cfg="cfg_ipcc_fig_9_42a.conf"> ipcc_fig_9_42a.py </diag_script>
 
         <model> CMIP5_ETHZ  CCSM4   Amon    abrupt4xCO2  r1i1p1  1850    1999    @{MODELPATH}/ETHZ_CMIP5/ </model>
     </diag>
