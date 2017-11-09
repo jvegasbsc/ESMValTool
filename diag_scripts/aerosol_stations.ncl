@@ -292,7 +292,7 @@ begin
         id = diag_script + "_" + variables(0)
         alltags = array_append_record(tags,(/"ST_clim", "PT_times", "DM_reg"/),0)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
-        modelsname = array_append_record(models@name, diag_script_info@network + "_" + data_arr@stname, 0)
+        modelsname = array_append_record(models@name, diag_script_info@network, 0)
         climofiles_mod = array_append_record(climofiles, stations_file(stID), 0)
         ESMValMD(plot_file+"."+file_type, alltags, caption, id, variables(0), \
                  modelsname, climofiles_mod, diag_script, contrib_authors)
@@ -382,7 +382,7 @@ begin
             stname = str_squeeze(str_get_field( \
                 obser_model_pts&station(stID), 1, ";"))
             modelsname_mod := array_append_record(models@name(mID), \
-                       diag_script_info@network + "_" + stname, 0)
+                       diag_script_info@network, 0)
         end do
         climofiles_mod := array_append_record(climofiles(mID), stations_file, 0)
         ESMValMD(plot_file+"."+file_type, alltags, caption, id, variables(0), \
@@ -506,7 +506,7 @@ begin
             stname = str_squeeze(str_get_field( \
                 obser_model_pts&station(stID), 1, ";"))
             modelsname_mod := array_append_record(models@name(mID), \
-                       diag_script_info@network + "_" + stname, 0)
+                       diag_script_info@network, 0)
         end do
         climofiles_mod := array_append_record(climofiles(mID), stations_file, 0)
         ESMValMD(plot_file+"."+file_type, alltags, caption, id, variables(0), \
