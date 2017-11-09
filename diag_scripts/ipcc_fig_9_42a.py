@@ -25,7 +25,7 @@ Required variable attributes (defined in namelist)
 Caveats
 
 Modification history
-    20171107-A_schl_ma: written
+    20171109-A_schl_ma: written
 
 #############################################################################
 """
@@ -33,12 +33,18 @@ Modification history
 
 # Basic python packages
 import sys
+import ConfigParser
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 # NetCDF4
 import netCDF4 as nc
 
 # ESMValTool python packages
 from esmval_lib import ESMValProject
+from auxiliary import info
 
 
 def main(project_info):
@@ -48,16 +54,32 @@ def main(project_info):
     Parameters
     ----------
     project_info : dict
-        Dictionary with project information
+        Dictionary containing project information
     """
+
+    # Highlight user output:
+    print("\n****************************************************************")
 
     # Create instance of ESMValProject wrapper
     E = ESMValProject(project_info)
 
+    # Get important information
     config_file = E.get_configfile()    # Config files
-    plot_dir = E.get_plot_dir()         # Plot directory
-    datakeys = E.get_currVars()         # Current variables
-    verbosity = E.get_verbosity()       # Verbosity state
+    plot_dir    = E.get_plot_dir()      # Plot directory
+    datakeys    = E.get_currVars()      # Current variables
+    verbosity   = E.get_verbosity()     # Verbosity state
+    experiment  = "equatorial"          # Current experiment
+
+    # Print for dev. purposes
+    print("config file: {0}".format(config_file))
+    print("plot directory: {0}".format(plot_dir))
+    print("datakeys: {0}".format(datakeys))
+    print("verbosity: {0}".format(verbosity))
+
+    # Read configuration file
+    modelconfig = ConfigParser.ConfigParser()
+    modelconfig.read(config_file)
+    area = modelconfig.get(experiment, "area")
 
     # Get model information for desired variable 'tas'
     tas_models = {}
@@ -65,8 +87,7 @@ def main(project_info):
         if (datakey == "tas"):
             tas_key = datakey
             tas_models = E.get_clim_model_filenames(tas_key)
-    print(tas_models)                   # Print for dev. purposes
-
+    print("models: {0}\n".format(tas_models)) # Print for dev. purposes
 
     # Iterate over all models
     for model in tas_models:
@@ -75,6 +96,34 @@ def main(project_info):
         # Initiallize model specific file
         tas_file = nc.Dataset(tas_models[model], 'r')
 
+        # Get variables of file
+        tas_variables = tas_file.variables
+        print("CONTENT OF FILE: {0}\n".format(tas_variables))
+        # print("CONTENT OF TAS: {0}\n".format(tas_variables["tas"]))
+        # print("TAS: {0}\n".format(tas_variables["tas"][:]))
+        # print("TIME: {0}\n".format(tas_variables["time"][:]))
+
+        # Get mean surface temp of every day
+        
+
         # Get units
         tas_units = tas_file.variables[tas_key].units
-        print(tas_units)
+        print("units: {0}".format(tas_units))
+
+        # Get plotting information
+        color, dashes, width = E.get_model_plot_style(model)
+        print("color: {0}".format(color))
+        print("dashes: {0}".format(dashes))
+        print("width: {0}\n".format(width))
+
+        # Get model data (equatorial experiment, Atlantic Ocean)
+        tas_data = E.get_model_data(modelconfig,
+                                    experiment,
+                                    area,
+                                    tas_key,
+                                    tas_file)
+        # Print model data
+        print("SHAPE OF EXPERIMENT DATA: {0}".format(np.shape(tas_data)))
+        print("LENGTH OF EXPERIMENT DATA: {0}".format(len(tas_data)))
+
+    print("\n****************************************************************")
