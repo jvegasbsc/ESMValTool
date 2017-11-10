@@ -2,9 +2,8 @@
 ###############################################################################
 # GENERAL COLLECTION OF PHYSICAL CONSTANTS
 ###############################################################################
-The constants are stored as static members of te class in the class "Constant"
-to avoid the use of global variables. They can be accessed by using
-"Constant.<variable>".
+The constants are stored as static members of the class "Constant" to avoid the
+use of global variables.
 
 Contents:
     Earth radius [m]
