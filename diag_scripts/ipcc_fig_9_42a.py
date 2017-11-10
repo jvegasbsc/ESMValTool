@@ -1,14 +1,14 @@
 """
-#############################################################################
+###############################################################################
 ipcc_fig_9_42a.py
 Author: Manuel Schlund (DLR, Germany)
 ESMVal project
-#############################################################################
+###############################################################################
 
 Description
-    Calculate and plot the equilibrium climate sensitivity (ECS) vs. the
-    global mean surface temperature (GMSAT) for several CMIP5 models
-    (see IPCC AR5 WG1 ch. 9, fig. 9.42a)
+    Calculate and plot the equilibrium climate sensitivity (ECS) vs. the global
+    mean surface temperature (GMSAT) for several CMIP5 models (see IPCC AR5 WG1
+    ch. 9, fig. 9.42a)
 
 Required diag_script_info attributes (diagnostics specific)
     none
@@ -27,34 +27,32 @@ Caveats
 Modification history
     20171109-A_schl_ma: written
 
-#############################################################################
+###############################################################################
 """
 
 
-# Basic python packages
-import sys
-import ConfigParser
-import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+# ESMValTool python packages
+from esmval_lib import ESMValProject
+from latlon import gridcell_area
 
 # NetCDF4
 import netCDF4 as nc
 
-# ESMValTool python packages
-from esmval_lib import ESMValProject
-from auxiliary import info
+# Basic python packages
+import ConfigParser
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+import sys
 
 
 def main(project_info):
     """
-    This is the main routine
+    This is the main routine of the diagnostic.
 
-    Parameters
-    ----------
-    project_info : dict
-        Dictionary containing project information
+    Arguments
+        project_info : Dictionary containing project information
     """
 
     # Highlight user output:
@@ -104,7 +102,7 @@ def main(project_info):
         # print("TIME: {0}\n".format(tas_variables["time"][:]))
 
         # Get mean surface temp of every day
-        
+
 
         # Get units
         tas_units = tas_file.variables[tas_key].units
@@ -122,8 +120,21 @@ def main(project_info):
                                     area,
                                     tas_key,
                                     tas_file)
+
+        # Calculate annual means
+        raw_data = tas_data[2]
+        print("PURE DATA: {0}\n".format(raw_data))
+
+        # Get average for every year
+        annual_averages = E.average_data(raw_data, 0)
+        print("ANNUAL AVERAGES: {0}\n".format(annual_averages))
+
         # Print model data
         print("SHAPE OF EXPERIMENT DATA: {0}".format(np.shape(tas_data)))
-        print("LENGTH OF EXPERIMENT DATA: {0}".format(len(tas_data)))
+        print("LENGTH OF EXPERIMENT DATA: {0}\n".format(len(tas_data)))
+
+        # Print example areas of grid:
+        print("GRID(1,2,3,4) = {0}".format(gridcell_area(1,2,3,4)))
+        print("GRID(90,92,45,42) = {0}".format(gridcell_area(90,92,45,42)))
 
     print("\n****************************************************************")
