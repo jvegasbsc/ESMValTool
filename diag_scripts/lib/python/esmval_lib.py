@@ -61,15 +61,6 @@ class ESMValProject(object):
                 for lat in xrange(means.shape[1]):
                     for lon in xrange(means.shape[2]):
                         means[month, lat, lon] = np.mean(data[month::12, lat, lon])
-        elif (dim_index == 'annual'):
-            new_shape = data.shape
-            new_shape = list(new_shape)
-            new_shape[0] = 12
-            means = np.zeros((new_shape))
-            for month in xrange(12):
-                for lat in xrange(means.shape[1]):
-                    for lon in xrange(means.shape[2]):
-                        means[month, lat, lon] = np.mean(data[month::12, lat, lon])
         return means
 
     def check_model_instances(self, first_set, second_set):
