@@ -82,11 +82,12 @@ def map_area(latitudes, longitudes):
         20171113-A_schl_ma: written
     """
 
-    # Check correct dimension of the arguments
+    # Check if all arguments are valid
     valid_input = True
     monotonic_input = True
     try:
-        valid_input = (np.ndim(latitudes)==1 and np.ndim(longitudes)==1) and \
+        valid_input = (np.array_equal(latitudes, np.hstack(latitudes)) and \
+                       np.array_equal(longitudes, np.hstack(longitudes))) and \
                       (len(latitudes)>1 and len(longitudes)>1)
         monotonic_input = (latitudes == sorted(latitudes) or \
                            latitudes == sorted(latitudes, reverse=True)) and \

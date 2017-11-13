@@ -148,5 +148,6 @@ def main(project_info):
         print("GRID(-4,0,360) = {0}".format(gridcell_area(-4,0,360)))
         print("GRID(0,-4,360) = {0}".format(gridcell_area(0,-4,360)))
         print("map_area = {0}".format(map_area([1,2,4],[4,3,-1])))
+        print("map_area = {0}".format(map_area([3,[1,2]],[4,3,-1])))
 
     print("\n****************************************************************")
