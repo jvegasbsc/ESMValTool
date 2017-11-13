@@ -8,7 +8,7 @@ ESMVal project
 Description
     Calculate and plot the equilibrium climate sensitivity (ECS) vs. the global
     mean surface temperature (GMSAT) for several CMIP5 models (see IPCC AR5 WG1
-    ch. 9, fig. 9.42a)
+    ch. 9, fig. 9.42a).
 
 Required diag_script_info attributes (diagnostics specific)
     none
@@ -33,7 +33,7 @@ Modification history
 
 # ESMValTool python packages
 from esmval_lib import ESMValProject
-from latlon import gridcell_area
+from latlon import *
 
 # NetCDF4
 import netCDF4 as nc
@@ -49,10 +49,11 @@ import sys
 
 def main(project_info):
     """
-    This is the main routine of the diagnostic.
-
     Arguments
         project_info : Dictionary containing project information
+
+    Description
+        This is the main routine of the diagnostic.
     """
 
     # Highlight user output:
@@ -96,10 +97,18 @@ def main(project_info):
 
         # Get variables of file
         tas_variables = tas_file.variables
-        print("CONTENT OF FILE: {0}\n".format(tas_variables))
-        # print("CONTENT OF TAS: {0}\n".format(tas_variables["tas"]))
-        # print("TAS: {0}\n".format(tas_variables["tas"][:]))
-        # print("TIME: {0}\n".format(tas_variables["time"][:]))
+        print("VARIABLES OF FILE: {0}\n".format(tas_variables))
+        print("DIMENSIONS OF FILE: {0}\n".format(tas_file.dimensions))
+
+        data = tas_variables["tas"][:]
+        print("SHAPE: {0}".format(data.shape))
+        print("TYPE: {0}".format(type(data)))
+        print("DIM: {0}\n".format(np.ndim(data)))
+
+        lat = tas_variables["lat"][:]
+        print("LAT: {0}\n".format(lat))
+        lon = tas_variables["lon"][:]
+        print("LON: {0}\n".format(lon))
 
         # Get mean surface temp of every day
 
@@ -123,18 +132,21 @@ def main(project_info):
 
         # Calculate annual means
         raw_data = tas_data[2]
-        print("PURE DATA: {0}\n".format(raw_data))
 
         # Get average for every year
         annual_averages = E.average_data(raw_data, 0)
         print("ANNUAL AVERAGES: {0}\n".format(annual_averages))
 
         # Print model data
-        print("SHAPE OF EXPERIMENT DATA: {0}".format(np.shape(tas_data)))
-        print("LENGTH OF EXPERIMENT DATA: {0}\n".format(len(tas_data)))
+        print("SHAPE OF EXPERIMENT DATA: {0}".format(raw_data.shape))
+        print("TYPE: {0}".format(type(raw_data)))
+        print("DIM: {0}".format(np.ndim(raw_data)))
+        print("LENGTH OF EXPERIMENT DATA: {0}\n".format(len(raw_data)))
 
         # Print example areas of grid:
-        print("GRID(1,2,3,4) = {0}".format(gridcell_area(1,2,3,4)))
-        print("GRID(90,92,45,42) = {0}".format(gridcell_area(90,92,45,42)))
+        print("GRID(1,2,1) = {0}".format(gridcell_area(1,2,1)))
+        print("GRID(-4,0,360) = {0}".format(gridcell_area(-4,0,360)))
+        print("GRID(0,-4,360) = {0}".format(gridcell_area(0,-4,360)))
+        print("map_area = {0}".format(map_area([1,2,4],[4,3,-1])))
 
     print("\n****************************************************************")
