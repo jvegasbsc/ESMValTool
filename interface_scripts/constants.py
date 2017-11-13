@@ -2,8 +2,11 @@
 ###############################################################################
 # GENERAL COLLECTION OF PHYSICAL CONSTANTS
 ###############################################################################
-The constants are stored as static members of the class "Constant" to avoid the
-use of global variables.
+
+Description:
+    Collection of important physical constants. The constants are stored as
+    static members of the class "Constant" to avoid the use of global
+    variables.
 
 Contents:
     Earth radius [m]
