@@ -1,17 +1,17 @@
 """
 ###############################################################################
-# GENERAL COLLECTION OF PHYSICAL CONSTANTS
+GENERAL COLLECTION OF PHYSICAL CONSTANTS
 ###############################################################################
 
-Description:
+Description
     Collection of important physical constants. The constants are stored as
     static members of the class "Constant" to avoid the use of global
     variables.
 
-Contents:
+Contents
     Earth radius [m]
 
-Source:
+Source
     https://physics.nist.gov/cuu/Constants/Table/allascii.txt
 
 ###############################################################################
