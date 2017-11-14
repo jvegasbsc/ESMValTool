@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 ###############################################################################
 ipcc_fig_9_42a.py
@@ -56,8 +58,11 @@ def main(project_info):
         This is the main routine of the diagnostic.
     """
 
-    # Highlight user output:
+    # Highlight user output
     print("\n****************************************************************")
+
+    # Print project info
+    print("PROJECT: {0}\n".format(project_info))
 
     # Create instance of ESMValProject wrapper
     E = ESMValProject(project_info)
@@ -101,6 +106,7 @@ def main(project_info):
         print("DIMENSIONS OF FILE: {0}\n".format(tas_file.dimensions))
 
         data = tas_variables["tas"][:]
+        print("DATA: {0}".format(data))
         print("SHAPE: {0}".format(data.shape))
         print("TYPE: {0}".format(type(data)))
         print("DIM: {0}\n".format(np.ndim(data)))
@@ -109,9 +115,15 @@ def main(project_info):
         print("LAT: {0}\n".format(lat))
         lon = tas_variables["lon"][:]
         print("LON: {0}\n".format(lon))
+        time = tas_variables["time"][:]
+        print("TIME: {0}\n".format(time))
 
-        # Get mean surface temp of every day
-
+        # Get mean surface temp of every month
+        means = np.zeros(len(time))
+        weights = map_area(lat, lon)
+        for m in xrange(len(time)):
+            means[m] = spatial_average(data[m], lat, lon, weights=weights)
+        print(means)
 
         # Get units
         tas_units = tas_file.variables[tas_key].units
@@ -122,32 +134,5 @@ def main(project_info):
         print("color: {0}".format(color))
         print("dashes: {0}".format(dashes))
         print("width: {0}\n".format(width))
-
-        # Get model data (equatorial experiment, Atlantic Ocean)
-        tas_data = E.get_model_data(modelconfig,
-                                    experiment,
-                                    area,
-                                    tas_key,
-                                    tas_file)
-
-        # Calculate annual means
-        raw_data = tas_data[2]
-
-        # Get average for every year
-        annual_averages = E.average_data(raw_data, 0)
-        print("ANNUAL AVERAGES: {0}\n".format(annual_averages))
-
-        # Print model data
-        print("SHAPE OF EXPERIMENT DATA: {0}".format(raw_data.shape))
-        print("TYPE: {0}".format(type(raw_data)))
-        print("DIM: {0}".format(np.ndim(raw_data)))
-        print("LENGTH OF EXPERIMENT DATA: {0}\n".format(len(raw_data)))
-
-        # Print example areas of grid:
-        print("GRID(1,2,1) = {0}".format(gridcell_area(1,2,1)))
-        print("GRID(-4,0,360) = {0}".format(gridcell_area(-4,0,360)))
-        print("GRID(0,-4,360) = {0}".format(gridcell_area(0,-4,360)))
-        print("map_area = {0}".format(map_area([1,2,4],[4,3,-1])))
-        print("map_area = {0}".format(map_area([3,[1,2]],[4,3,-1])))
 
     print("\n****************************************************************")

@@ -1,16 +1,19 @@
+# -*- coding: utf-8 -*-
+
 """
 ###############################################################################
-# GENERAL ROUTINES FOR OPERATIONS ON A (RECTILINEAR) GRID
+GENERAL ROUTINES FOR OPERATIONS ON A (RECTILINEAR) GRID
 ###############################################################################
 
-Description:
+Description
     Collection of useful operations on a grid. Please consider extending
     existing routines before adding new ones. Check the header of each routine
     for documentation.
 
-Contents:
+Contents
    function gridcell_area
    function map_area
+   function spatial_average
 
 ###############################################################################
 """
@@ -36,21 +39,21 @@ def gridcell_area(lat_bot, lat_top, lon_delta):
     Description
         Calculates the area of a grid cell on the surface of the Earth.
 
-    Modification history:
+    Modification history
         20171110-A_schl_ma: written
     """
 
-    # Check correct ranges of arguments
+    # Check if all arguments are valid
     try:
         lat_bot = float(lat_bot)
         lat_top = float(lat_top)
         lon_delta = float(lon_delta)
     except:
-        raise TypeError("Invalid input: No numerical values given")
+        raise TypeError("Invalid input")
 
-    valid_input = (lat_bot>=-90.0 and lat_bot<=90.0) and \
-                  (lat_top>=-90.0 and lat_top<=90.0) and \
-                  (lon_delta>=-360.0 and lon_delta<=360.0)
+    valid_input = all([lat_bot>=-90.0, lat_bot<=90.0,
+                       lat_top>=-90.0, lat_top<=90.0,
+                       lon_delta>=-360.0, lon_delta<=360.0])
     if (not valid_input):
         raise ValueError("Invalid input: Value(s) out of bonds")
 
@@ -63,65 +66,65 @@ def gridcell_area(lat_bot, lat_top, lon_delta):
 
 ###############################################################################
 
-def map_area(latitudes, longitudes):
+def map_area(lat, lon):
     """
     Arguments
-        latitudes  : monotonic numeric array of dimension 1 with at least two
-                     elements containing the latitudes of the grid
-        longitudes : monotonic numeric array of dimension 1 with at least two
-                     elements containing the longitudes of the grid
+        lat : 1D monotonic numeric array with at least two elements
+              describing the latitudes of the grid
+        lon : 1D monotonic numeric array with at least two elements
+              describing the longitudes of the grid
 
     Return value
-        Numeric array of dimension 2 containing the area of each grid cell
+        2D numeric array containing the area of each grid cell
         Shape: (latitude, longitude)
 
     Description
-        Calculates the area of  each cell of a specified grid.
+        Calculates the area of each cell of a specified grid.
 
-    Modification history:
+    Modification history
         20171113-A_schl_ma: written
     """
 
     # Check if all arguments are valid
-    valid_input = True
-    monotonic_input = True
     try:
-        valid_input = (np.array_equal(latitudes, np.hstack(latitudes)) and \
-                       np.array_equal(longitudes, np.hstack(longitudes))) and \
-                      (len(latitudes)>1 and len(longitudes)>1)
-        monotonic_input = (latitudes == sorted(latitudes) or \
-                           latitudes == sorted(latitudes, reverse=True)) and \
-                          (longitudes == sorted(longitudes) or \
-                           longitudes == sorted(longitudes, reverse=True))
+        lat = np.array(lat)
+        lon = np.array(lon)
+        valid_input = all([np.array_equal(lat, np.hstack(lat)),
+                           np.array_equal(lon, np.hstack(lon)),
+                           len(lat)>1, len(lon)>1])
+        monoton_input = (np.array_equal(lat, sorted(lat)) or \
+                         np.array_equal(lat, sorted(lat, reverse=True))) and \
+                        (np.array_equal(lon, sorted(lon)) or \
+                         np.array_equal(lon, sorted(lon, reverse=True)))
     except:
-        raise TypeError("Invalid input: function only accepts numeric arrays")
+        raise TypeError("Invalid input")
 
     if (not valid_input):
-        raise ValueError("Invalid input: arrays need to be of dimension 1 " + \
-                         "and contain at least two elements")
-    if (not monotonic_input):
+        raise ValueError("Invalid input: arrays have to be " + \
+                         "one-dimensional and contain at least two elements")
+    if (not monoton_input):
         raise ValueError("Invalid input: arrays need to be monotonic")
 
     # Calculate latitude interfaces
-    lat_n = len(latitudes)
+    lat_n = len(lat)
     lat_interfaces = np.zeros(lat_n + 1)
 
-    lat_bottom = (3*latitudes[0] - latitudes[1]) / 2.0
-    lat_top = (3*latitudes[lat_n-1] - latitudes[lat_n-2]) / 2.0
+    lat_bottom = (3*lat[0] - lat[1]) / 2.0
+    lat_top = (3*lat[lat_n-1] - lat[lat_n-2]) / 2.0
 
     lat_interfaces[0] = max([lat_bottom, -90.0])
     for i in xrange(1, lat_n):
-        lat_interfaces[i] = (latitudes[i] + latitudes[i-1]) / 2.0
+        lat_interfaces[i] = (lat[i] + lat[i-1]) / 2.0
     lat_interfaces[lat_n] = min([lat_top, 90.0])
 
     # Calculate longitude interfaces
-    lon_n = len(longitudes)
+    lon_n = len(lon)
     lon_interfaces = np.zeros(lon_n + 1)
 
-    lon_interfaces[0] = (3*longitudes[0] - longitudes[1]) / 2.0
+    lon_interfaces[0] = (3*lon[0] - lon[1]) / 2.0
     for i in xrange(1, lon_n):
-        lon_interfaces[i] = (longitudes[i] + longitudes[i-1]) / 2.0
-    lon_interfaces[lon_n] = (3*longitudes[lon_n-1] - longitudes[lon_n-2]) / 2.0
+        lon_interfaces[i] = (lon[i] + lon[i-1]) / 2.0
+    lon_interfaces[lon_n] = (3*lon[lon_n-1] - lon[lon_n-2]) / 2.0
 
     # Calculate areas
     areas = np.zeros((lat_n, lon_n))
@@ -134,5 +137,85 @@ def map_area(latitudes, longitudes):
                 lon_delta)
 
     return areas
+
+###############################################################################
+
+def spatial_average(field, lat, lon, axis="all", weights=None):
+    """
+    Arguments
+        field   : 2D numeric array containing the variable which should be
+                  averaged
+                  Shape: (latitude, longitude)
+        lat     : 1D monotonic numeric array with at least two elements
+                  describing the latitudes of the grid
+        lon     : 1D monotonic numeric array with at least two elements
+                  describing the longitudes of the grid
+        axis    : Axis along which the average is computed
+                  Possible values: 'lat', 'lon', 'all'
+        weights : 2D numeric array of weights with the same shape as field
+                  'None': Equal weights
+
+    Return value
+        Average value(s) of the given variable
+
+    Description
+        Calculates the (weighted) average of a certain variable over a
+        specified spatial domain.
+
+    Modification history
+        20171114-A_schl_ma: written
+    """
+
+    # Check if all arguments are valid
+    try:
+        field = np.array(field)
+        lat = np.array(lat)
+        lon = np.array(lon)
+        valid_field = (np.ndim(field) == 2 and \
+                       np.shape(field) == (len(lat), len(lon)))
+        valid_latlon = all([np.array_equal(lat, np.hstack(lat)),
+                            np.array_equal(lon, np.hstack(lon)),
+                            len(lat)>1, len(lon)>1])
+        monoton_latlon = (np.array_equal(lat, sorted(lat)) or \
+                          np.array_equal(lat, sorted(lat, reverse=True))) and \
+                         (np.array_equal(lon, sorted(lon)) or \
+                          np.array_equal(lon, sorted(lon, reverse=True)))
+        valid_axis = any([axis == "lat", axis == "lon", axis == "all"])
+        if (np.array_equal(weights, None)):
+            valid_weights = True
+        else:
+            valid_weights = (np.ndim(weights) == 2 and \
+                             np.shape(weights) == (len(lat), len(lon)))
+    except:
+        raise TypeError("Invalid input")
+
+    if (not valid_field):
+        raise ValueError("Invalid input: field array has to be " + \
+                         "two-dimensional and match the shape of the " + \
+                         "given grid")
+    if (not valid_latlon):
+        raise ValueError("Invalid input: latitude/longitude arrays have " + \
+                         "to be one-dimensional and contain at least two " + \
+                         "elements")
+    if (not monoton_latlon):
+        raise ValueError("Invalid input: latitude/longitude arrays need to " +\
+                         "be monotonic")
+    if (not valid_axis):
+        raise ValueError("Invalid input: axis need to be 'lat', 'lon' or " + \
+                         "'all'")
+    if (not valid_weights):
+        raise ValueError("Invalid input: weights array has to be " + \
+                         "two-dimensional and match the shape of the " + \
+                         " given grid")
+
+    # Get correct axis index
+    axis_index = None
+    if (axis == "lat"):
+        axis_index = 0
+    if (axis == "lon"):
+        axis_index = 1
+
+    # Get desired average value
+    return np.average(field, axis=axis_index, weights=weights)
 
 ###############################################################################
