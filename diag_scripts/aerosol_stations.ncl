@@ -242,9 +242,6 @@ begin
         ;; Attach station info as attribute
         data_arr@stname = str_squeeze(str_get_field( \
             obser_model_pts&station(stID), 1, ";"))
-        ;data_arr@stname = str_sub_str(data_arr@stname, " ", "_")
-        ;data_arr@stname = str_sub_str(data_arr@stname, "(", "_")
-        ;data_arr@stname = str_sub_str(data_arr@stname, ")", "_")
         data_arr@stlat  = tofloat(str_get_field( \
             obser_model_pts&station(stID), 2, ";"))
         data_arr@stlon  = tofloat(str_get_field( \
@@ -287,8 +284,8 @@ begin
 
         ; -------------------------------------------------------------------------------
         ; add meta data to plot (for reporting)
-        caption = "Timeseries of " + variables(0) + " at " + diag_script_info@network \
-                   + " station " + data_arr@stname + "."
+        caption = "Timeseries of " + variables(0) + " at one" + diag_script_info@network \
+                   + " station." 
         id = diag_script + "_" + variables(0)
         alltags = array_append_record(tags,(/"ST_clim", "PT_times", "DM_reg"/),0)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
@@ -379,8 +376,6 @@ begin
         alltags = (/"ST_clim", "PT_scatter", "DM_reg"/)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
         do stID = 0, dimsizes(obser_model_pts&station) - 1
-            stname = str_squeeze(str_get_field( \
-                obser_model_pts&station(stID), 1, ";"))
             modelsname_mod := array_append_record(models@name(mID), \
                        diag_script_info@network, 0)
         end do
@@ -503,8 +498,6 @@ begin
         alltags = (/"ST_clim", "PT_geo", "DM_global"/)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
         do stID = 0, dimsizes(obser_model_pts&station) - 1
-            stname = str_squeeze(str_get_field( \
-                obser_model_pts&station(stID), 1, ";"))
             modelsname_mod := array_append_record(models@name(mID), \
                        diag_script_info@network, 0)
         end do
