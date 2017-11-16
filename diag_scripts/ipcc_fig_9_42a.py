@@ -62,7 +62,8 @@ def main(project_info):
     print("\n****************************************************************")
 
     # Print project info
-    print("PROJECT: {0}\n".format(project_info))
+    for key in project_info:
+        print("{0}: {1}\n".format(key, project_info[key]))
 
     # Create instance of ESMValProject wrapper
     E = ESMValProject(project_info)
@@ -85,52 +86,36 @@ def main(project_info):
     modelconfig.read(config_file)
     area = modelconfig.get(experiment, "area")
 
-    # Get model information for desired variable 'tas'
-    tas_models = {}
-    for datakey in datakeys:
-        if (datakey == "tas"):
-            tas_key = datakey
-            tas_models = E.get_clim_model_filenames(tas_key)
-    print("models: {0}\n".format(tas_models)) # Print for dev. purposes
+    # Get models
+    models = E.get_cmip_clim_models()
 
     # Iterate over all models
-    for model in tas_models:
+    for model in models:
+        model_name = models[model][0]["name"]
+        model_var = models[model][0]["var"]
+        model_path = models[model][1]
+
+        print("--------------MODEL: {0}------------------".format(model_name))
 
         # Initiallize model specific file
-        tas_file = nc.Dataset(tas_models[model], 'r')
+        file = nc.Dataset(model_path, 'r')
 
-        # Get variables of file
-        tas_variables = tas_file.variables
-        print("VARIABLES OF FILE: {0}\n".format(tas_variables))
-        print("DIMENSIONS OF FILE: {0}\n".format(tas_file.dimensions))
-
-        data = tas_variables["tas"][:]
-        print("DATA: {0}".format(data))
-        print("SHAPE: {0}".format(data.shape))
-        print("TYPE: {0}".format(type(data)))
-        print("DIM: {0}\n".format(np.ndim(data)))
-
-        lat = tas_variables["lat"][:]
-        print("LAT: {0}\n".format(lat))
-        lon = tas_variables["lon"][:]
-        print("LON: {0}\n".format(lon))
-        time = tas_variables["time"][:]
-        print("TIME: {0}\n".format(time))
+        # Get data (tas)
+        variables = file.variables
+        data = variables[model_var][:]
+        lat = variables["lat"][:]
+        lon = variables["lon"][:]
+        time = variables["time"][:]
+        unit = file.variables[model_var].units
 
         # Get mean surface temp of every month
         GridOps = GridOperations(data, time, lat, lon)
-        print("TOTAL MEAN = {0}".format(GridOps.spatial_average()))
-        print("LAT MEAN = {0}".format(GridOps.spatial_average(axis="lat")))
-        print("LON MEAN = {0}".format(GridOps.spatial_average(axis="lon")))
-
-        # Get units
-        tas_units = tas_file.variables[tas_key].units
-        print("units: {0}".format(tas_units))
+        avg = GridOps.spatial_average()
+        print("**** TOTAL AVERAGE: {0} = {1} {2} ****\n".format(model_var,
+                                                              np.mean(avg),
+                                                              unit))
 
         # Get plotting information
-        color, dashes, width = E.get_model_plot_style(model)
-        print("color: {0}".format(color))
-        print("dashes: {0}".format(dashes))
-        print("width: {0}\n".format(width))
+        color, dashes, width = E.get_model_plot_style(model_name)
 
     print("\n****************************************************************")

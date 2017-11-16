@@ -59,14 +59,14 @@ class GridOperations(object):
 
             valid_field = (np.ndim(self.field) == 3 and \
                            np.shape(self.field) == \
-                                (self.time_n, self.lat_n, self.lon_n))
+                           (self.time_n, self.lat_n, self.lon_n))
             valid_time = np.array_equal(self.time, np.hstack(self.time))
             valid_latlon = all([np.array_equal(self.lat, np.hstack(self.lat)),
                                 np.array_equal(self.lon, np.hstack(self.lon)),
                                 self.lat_n>1, self.lon_n>1])
             mon_time = (np.array_equal(self.time, sorted(self.time)) or \
-                          np.array_equal(self.time,
-                                         sorted(self.time, reverse=time)))
+                        np.array_equal(self.time,
+                                       sorted(self.time, reverse=time)))
             mon_latlon = (np.array_equal(self.lat, sorted(self.lat)) or \
                           np.array_equal(self.lat,
                                          sorted(self.lat, reverse=True))) and \
@@ -210,7 +210,7 @@ class GridOperations(object):
         # Check if all arguments are valid
         try:
             valid_axis = any([axis == "lat", axis == "lon", axis == "all"])
-            valid_weighting = (weighting == True or weighting == False)
+            valid_weighting = (weighting is True or weighting is False)
         except:
             raise TypeError("Invalid input")
 

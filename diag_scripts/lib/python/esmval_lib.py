@@ -270,6 +270,48 @@ class ESMValProject(object):
         configfile_name = os.path.splitext(configfile_fullname)[0]
         return configfile_name
 
+    def get_cmip_clim_models(self):
+        """
+        Returns a dictionary containing the model information and paths of all
+        models for the current diagnostic of the namelist. This function only
+        works for CMIP models.
+        """
+
+        # Get current diagnostic and its attributes
+        curr_diag = self.project_info["RUNTIME"]["currDiag"]
+        vars = curr_diag.get_variables()
+        field_types = curr_diag.get_field_types()
+        mip = curr_diag.get_var_attr_mip()
+        exp = curr_diag.get_var_attr_exp()
+
+        # Iterate over all variables and models
+        models_dic = {}
+        for var_index in xrange(len(vars)):
+            for model in self.project_info["MODELS"]:
+                model_entries = model.split_entries()
+
+                # Get filepath
+                curr_proj = getattr(projects, model_entries[0])()
+                model_path = curr_proj.get_cf_fullpath(self.project_info,
+                                                       model,
+                                                       field_types[var_index],
+                                                       vars[var_index],
+                                                       mip[var_index],
+                                                       exp[var_index])
+                model_key = ""
+                for i in xrange(1,5):
+                    model_key += model_entries[i] + "_"
+
+                # Get model information
+                model_info = {"name": model_entries[1],
+                              "field_type": field_types[var_index],
+                              "var": vars[var_index],
+                              "mip": mip[var_index],
+                              "exp": exp[var_index]}
+                models_dic.update({model_key: (model_info, model_path)})
+
+        return models_dic
+
     def get_currVars(self):
         """ returns the diagnostic variables """
         currDiag = self.project_info['RUNTIME']['currDiag']
