@@ -35,7 +35,7 @@ Modification history
 
 # ESMValTool python packages
 from esmval_lib import ESMValProject
-from latlon import *
+from grid_operations import GridOperations
 
 # NetCDF4
 import netCDF4 as nc
