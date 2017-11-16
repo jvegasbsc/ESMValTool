@@ -95,7 +95,6 @@ def main(project_info):
 
     # Iterate over all models
     for model in tas_models:
-        pass
 
         # Initiallize model specific file
         tas_file = nc.Dataset(tas_models[model], 'r')
@@ -119,11 +118,10 @@ def main(project_info):
         print("TIME: {0}\n".format(time))
 
         # Get mean surface temp of every month
-        means = np.zeros(len(time))
-        weights = map_area(lat, lon)
-        for m in xrange(len(time)):
-            means[m] = spatial_average(data[m], lat, lon, weights=weights)
-        print(means)
+        GridOps = GridOperations(data, time, lat, lon)
+        print("TOTAL MEAN = {0}".format(GridOps.spatial_average()))
+        print("LAT MEAN = {0}".format(GridOps.spatial_average(axis="lat")))
+        print("LON MEAN = {0}".format(GridOps.spatial_average(axis="lon")))
 
         # Get units
         tas_units = tas_file.variables[tas_key].units
