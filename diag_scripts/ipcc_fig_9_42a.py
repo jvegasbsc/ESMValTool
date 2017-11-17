@@ -34,6 +34,7 @@ Modification history
 
 
 # ESMValTool python packages
+from auxiliary import error, info
 from esmval_lib import ESMValProject
 from grid_operations import GridOperations
 
@@ -61,41 +62,64 @@ def main(project_info):
     # Highlight user output
     print("\n****************************************************************")
 
-    # Print project info
-    for key in project_info:
-        print("{0}: {1}\n".format(key, project_info[key]))
-
     # Create instance of ESMValProject wrapper
     E = ESMValProject(project_info)
 
     # Get important information
+    diag_name = E.get_diag_script_name()
     config_file = E.get_configfile()    # Config files
-    plot_dir    = E.get_plot_dir()      # Plot directory
-    datakeys    = E.get_currVars()      # Current variables
-    verbosity   = E.get_verbosity()     # Verbosity state
-    experiment  = "equatorial"          # Current experiment
+    plot_dir = E.get_plot_dir()         # Plot directory
+    vars = E.get_currVars()             # Current variables
+    verbosity = E.get_verbosity()       # Verbosity state
+
+    # Write references:
+    E.write_references(diag_name,       # diagnostic script name
+                       ["A_schl_ma"],   # authors
+                       [""],            # contributors
+                       ["D_andrews12"], # diagnostic
+                       [""],            # observations
+                       ["P_esmval"],    # project
+                       project_info,
+                       verbosity,
+                       False)
+
 
     # Print for dev. purposes
     print("config file: {0}".format(config_file))
     print("plot directory: {0}".format(plot_dir))
-    print("datakeys: {0}".format(datakeys))
+    print("variables: {0}".format(vars))
     print("verbosity: {0}".format(verbosity))
+    print("")
 
     # Read configuration file
     modelconfig = ConfigParser.ConfigParser()
     modelconfig.read(config_file)
-    area = modelconfig.get(experiment, "area")
+    area = modelconfig.get("test", "area")
 
     # Get models
-    models = E.get_cmip_clim_models()
+    models = E.get_all_clim_models(["tas", "tas-degC"])
 
     # Iterate over all models
-    for model in models:
-        model_name = models[model][0]["name"]
-        model_var = models[model][0]["var"]
-        model_path = models[model][1]
+    for model_path in models:
+        model_info = models[model_path]
 
-        print("--------------MODEL: {0}------------------".format(model_name))
+        # Try to get needed model information
+        model_var = None
+        model_name = None
+        model_exp = None
+        try:
+            model_var = model_info["var"]
+            model_name = model_info["name"]
+            model_exp = model_info["experiment"]
+        except KeyError:
+            info("Could not retrieve all desired model information.",
+                 verbosity, 0)
+        except:
+            error("Unknown error while retrieving desired model information")
+
+        print("---------MODEL: {0}-----------".format(model_name + "_" + \
+                                                     model_exp + "_" + \
+                                                     model_var))
 
         # Initiallize model specific file
         file = nc.Dataset(model_path, 'r')
@@ -112,8 +136,8 @@ def main(project_info):
         GridOps = GridOperations(data, time, lat, lon)
         avg = GridOps.spatial_average()
         print("**** TOTAL AVERAGE: {0} = {1} {2} ****\n".format(model_var,
-                                                              np.mean(avg),
-                                                              unit))
+                                                                np.mean(avg),
+                                                                unit))
 
         # Get plotting information
         color, dashes, width = E.get_model_plot_style(model_name)

@@ -17,7 +17,7 @@ Projects
 ESMVal
 
 Reference
-Flato, G. et al., Evaluation of climate models, in: Climate Change 2013: the 
+Flato, G. et al., Evaluation of climate models, in: Climate Change 2013: the
 Physical Science Basis, contribution of Working Group I to the Fifth Assessment
 Report of the Intergovernmental Panel on Climate Change, edited by:
 Stocker, T. F., in, D., Plattner, G.-K., Tignor, M., Allen, S. K.,
@@ -71,11 +71,14 @@ This namelist is part of the ESMValTool
         <description> ECS vs GMSAT (fig 9.42a)    </description>
         <variable_def_dir>    ./variable_defs/    </variable_def_dir>
         <variable>            tas-degC            </variable>
+        <variable>            tas                 </variable>
+        <variable>            rtmt                </variable>
         <field_type>          T2Ms                </field_type>
         <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
 
         <diag_script cfg="cfg_ipcc_fig_9_42a.conf"> ipcc_fig_9_42a.py </diag_script>
 
+        <!-- GMSAT calculation -->
         <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  piControl   r1i1p1  0160 0299  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  CanESM2            Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -92,6 +95,52 @@ This namelist is part of the ESMValTool
         <model>  CMIP5_ETHZ  MIROC-ESM          Amon  piControl   r1i1p1  1800 1949  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+
+        <!-- ECS calculation -->
+        <model>  CMIP5_ETHZ  ACCESS1-0          Amon  abrupt4xCO2 r1i1p1  0300 0449  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  ACCESS1-0          Amon  piControl   r1i1p1  0300 0449  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  ACCESS1-3          Amon  abrupt4xCO2 r1i1p1  0250 0399  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  ACCESS1-3          Amon  piControl   r1i1p1  0250 0399  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  abrupt4xCO2 r1i1p1  0160 0309  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  piControl   r1i1p1  0160 0309  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1-m       Amon  abrupt4xCO2 r1i1p1  0240 0389  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  bcc-csm1-1-m       Amon  piControl   r1i1p1  0240 0389  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  BNU-ESM            Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  BNU-ESM            Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CanESM2            Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CanESM2            Amon  piControl   r1i1p1  2015 2164  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CCSM4              Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CCSM4              Amon  piControl   r1i1p1  0800 0949  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CNRM-CM5           Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CNRM-CM5           Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0      Amon  abrupt4xCO2 r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0      Amon  piControl   r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  FGOALS-g2          Amon  abrupt4xCO2 r1i1p1  0490 0639  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  FGOALS-g2          Amon  piControl   r1i1p1  0490 0639  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GFDL-CM3           Amon  abrupt4xCO2 r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GFDL-CM3           Amon  piControl   r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-H          Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-H          Amon  piControl   r1i1p1  1200 1349  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-R          Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  GISS-E2-R          Amon  piControl   r1i1p1  3331 3480  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  inmcm4             Amon  abrupt4xCO2 r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  inmcm4             Amon  piControl   r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  abrupt4xCO2 r1i1p1  1850 1989  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  piControl   r1i1p1  1850 1989  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC-ESM          Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC-ESM          Amon  piControl   r1i1p1  1800 1949  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC5             Amon  abrupt4xCO2 r1i1p1  2100 2249  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MIROC5             Amon  piControl   r1i1p1  2100 2249  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-MR         Amon  abrupt4xCO2 r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-MR         Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  NorESM1-M          Amon  abrupt4xCO2 r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  NorESM1-M          Amon  piControl   r1i1p1  0700 0849  @{MODELPATH}/ETHZ_CMIP5/ </model>
     </diag>
 
     <diag>
@@ -107,6 +156,5 @@ This namelist is part of the ESMValTool
     </diag>
 
 </DIAGNOSTICS>
-
 
 </namelist>
