@@ -50,6 +50,9 @@ class VAR_REQ:
 
         For derived variables, this class will holds all
         their dependencies (all required variables/fields)
+
+        Caveats
+            A_schl_ma: __iter__ uses self.var_attrs, which is NOT defined!
     """
     def __init__(self, vars, fields):
             self.var = vars
@@ -85,7 +88,7 @@ class Diag_tag:
 
     def get_tag_variable(self):
         return self.variable
-    
+
     # bn_muel ++
     def get_tag_tags(self):
         return self.tags
@@ -132,14 +135,19 @@ class Diagnostic:
         # bn_muel++
         self.tags = tags
         # bn_muel++
-    
-        
+
+        # A_schl_ma+
+        self.var_attrs = var_attrs
+        # A_schl_ma-
+
+
+
         # List valid variable attributes
         possible_var_attr_keys = ["mip", "exp", "ref_model", "id", "exclude", "only"]
         attrs = {}
         for key in possible_var_attr_keys:
             tmp_attr = []
-            for var_attr in var_attrs:
+            for var_attr in self.var_attrs:
                 if key in var_attr.keys():
                     tmp_attr.append(var_attr[key])
                 else:
@@ -201,7 +209,7 @@ class Diagnostic:
         return [item.only for item in self.variables]
 
     def get_var_attrs(self):
-        return self.var_attr
+        return self.var_attrs
 
     def get_field_types(self):
         return [item.fld for item in self.variables]
@@ -211,7 +219,7 @@ class Diagnostic:
 
     def get_variable_def_dir(self):
         return self.variable_def_dir
-    
+
     # bn_muel++
     def get_tags(self):
         return self.tags
