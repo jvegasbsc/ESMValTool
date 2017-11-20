@@ -38,8 +38,8 @@ This namelist is part of the ESMValTool
     <exit_on_warning type="boolean">   False          </exit_on_warning>
     <output_file_type>                  png           </output_file_type>
     <force_calc type="boolean">         False          </force_calc>
-    <force_gradecalc type="boolean">    False          </force_gradecalc>
-    <force_taylorcalc type="boolean">   False          </force_taylorcalc>
+    <force_gradecalc type="boolean">    True          </force_gradecalc>
+    <force_taylorcalc type="boolean">   True          </force_taylorcalc>
     <tags> D_anav13jclim, A_anav_al </tags>
 </GLOBAL>
 
