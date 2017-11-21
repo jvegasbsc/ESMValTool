@@ -28,7 +28,7 @@ The following section gives a brief description of the steps required by a user 
 5. The output will be written to a subdirectory named like the diagnostics package (e.g., *MyDiag*) in the directories specified in the <GLOBAL> section of the namelist (see step 1 and also :numref:`nml_config`). The default directories are: *work/MyDiag* for the NetCDF output and *work/plots/MyDiag* for the plot(s) (see also :numref:`fig_example`). Acknowledgements and references are written to the file *work/refs-acknows_MyDiag.txt*.
 
 .. _fig_example:
-.. figure::  ../../source/figures/example_figure3.png
+.. figure::  /figures/example_figure3.png
    :align:   center
    :width:   50%
    
@@ -208,6 +208,7 @@ This reformat namelist file contains the tag <REFORMAT> that can hold multiple
 <reformat_script>-tags specifying the reformat scripts to be called: 
 
 .. code-block:: xml
+
      <REFORMAT>
      <reformat_script> /PATH/TO/REFORMATSCRIPT</reformat_script>
      </REFORMAT>
@@ -248,9 +249,9 @@ are given in :numref:`tab_obs_data`.
    **Table S9** Observational data for use with the ESMValTool. See headers of the
    reformatting routines for downloading and processing instructions.
 
-.. _tab_obs_data:
-
 .. tabularcolumns:: |p{1.8cm}|p{0.6cm}|p{2.3cm}|p{1.6cm}|p{1.5cm}|p{1.9cm}|p{4.2cm}|
+
+.. _tab_obs_data:
 
 +--------------------+---------+-------------------------------+---------------------+-------------+----------------+-------------------------------+
 | **Name**           |**Tier** |**Description**                | **Variables**       | **Type**    | **Time range** | **Script name**               |
