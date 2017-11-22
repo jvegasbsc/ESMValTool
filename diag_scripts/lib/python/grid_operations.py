@@ -24,14 +24,14 @@ class GridOperations(object):
         Check the header of each method for documentation.
 
     Contents
-        helper method reset
-        helper method check_latlon_available
-        helper method check_time_avaiable
-        helper method select_region
-        helper method gridcell_area
-        helper method map_area
-        helper method spatial_average
-        helper method temporal_average
+        helper method _reset
+        helper method _check_latlon_available
+        helper method _check_time_avaiable
+        helper method _select_region
+        helper method _gridcell_area
+        helper method _map_area
+        helper method _spatial_average
+        helper method _temporal_average
         method average
     """
 
@@ -88,9 +88,12 @@ class GridOperations(object):
         except:
             self.lon_available = False
 
+        # Initialize member variables
+        self._reset()
+
     ###########################################################################
 
-    def reset(self):
+    def _reset(self):
         """
         Arguments
             None
@@ -118,6 +121,7 @@ class GridOperations(object):
             except:
                 raise AttributeError("Invalid input: time variable does " + \
                                      "contain calendar or units information")
+            self.dates = nc.num2date(self.time, self.time_units, self.calendar)
 
         # Get lat/lon arrays
         if (self.lat_available):
@@ -129,7 +133,7 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def check_latlon_available(self):
+    def _check_latlon_available(self):
         """
         Arguments
             None
@@ -150,7 +154,7 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def check_time_available(self):
+    def _check_time_available(self):
         """
         Arguments
             None
@@ -170,7 +174,7 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def select_region(self, region="global", reset=True):
+    def _select_region(self, region="global", reset=True):
         """
         Arguments
             region : Region which should be selected
@@ -192,7 +196,7 @@ class GridOperations(object):
         """
 
         # Check if lat/lon data is available
-        self.check_latlon_available()
+        self._check_latlon_available()
 
         # Check if all arguments are valid
         try:
@@ -221,15 +225,15 @@ class GridOperations(object):
                              "with values -90<=lat<=+90, 0<=lon<=360, " + \
                              "lat_min<lat_max and lon_min<lon_max")
         if (not valid_reset):
-            raise ValueError("Invalid input: rest has to be True or False")
+            raise ValueError("Invalid input: reset has to be True or False")
 
         # Reset arrays if desired
         if (reset is True):
-            self.reset()
+            self._reset()
 
         # Get correct region
         if (type(region) == str):
-            self.reset()
+            self._reset()
         else:
             lat_indices = (np.where((self.lat>=region[0,0]) & \
                                     (self.lat<=region[0,1])))[0]
@@ -246,7 +250,7 @@ class GridOperations(object):
 
             # Try to reshape arrays
             try:
-                self.var = self.var[:, lat_indices, lon_indices]
+                self.var = self.var[..., lat_indices, lon_indices]
                 self.lat = self.lat[lat_indices]
                 self.lon = self.lon[lon_indices]
             except:
@@ -258,7 +262,7 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def gridcell_area(self, lat_bot, lat_top, lon_delta):
+    def _gridcell_area(self, lat_bot, lat_top, lon_delta):
         """
         Arguments
             lat_bot   : bottom boundary of the cell [deg]
@@ -297,7 +301,7 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def map_area(self):
+    def _map_area(self):
         """
         Arguments
             None
@@ -315,7 +319,7 @@ class GridOperations(object):
         """
 
         # Check if lat/lon data is available
-        self.check_latlon_available()
+        self._check_latlon_available()
 
         # Calculation is only possible if more grid contains enough cells
         if (self.lat_n<2 or self.lon_n<2):
@@ -348,7 +352,7 @@ class GridOperations(object):
             for lon_index in xrange(self.lon_n):
                 lon_delta = lon_interfaces[lon_index+1] - \
                             lon_interfaces[lon_index]
-                map[lat_index, lon_index] = self.gridcell_area(
+                map[lat_index, lon_index] = self._gridcell_area(
                     lat_interfaces[lat_index],
                     lat_interfaces[lat_index + 1],
                     lon_delta)
@@ -357,7 +361,7 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def spatial_average(self, axis="all", weighting=True, region="global",
+    def _spatial_average(self, axis="all", weighting=True, region="global",
                         reset=True):
         """
         Arguments
@@ -386,7 +390,7 @@ class GridOperations(object):
         """
 
         # Check if lat/lon data is available
-        self.check_latlon_available()
+        self._check_latlon_available()
 
         # Check if arguments (axis and weighting) are valid
         try:
@@ -402,13 +406,11 @@ class GridOperations(object):
                              "False")
 
         # Get correct region (includes check if region and reset are valid)
-        self.select_region(region, reset)
+        self._select_region(region, reset)
 
         # Get correct weighting
         if (weighting):
-            weights = self.map_area()
-            print(self.var.shape)
-            print(weights.shape)
+            weights = self._map_area()
         else:
             weights = None
 
@@ -419,24 +421,28 @@ class GridOperations(object):
                 var[time_index] = np.average(self.var[time_index],
                                              axis=None, weights=weights)
             self.var = var
-            self.lat_available = False
-            self.lon_available = False
+            self.lat = np.array([0])
+            self.lat_n = 1
+            self.lon = np.array([0])
+            self.lon_n = 1
         elif (axis == "lat"):
             if (weights is not None):
                 weights = np.mean(weights, axis=1)
             self.var = np.average(self.var, axis=1, weights=weights)
-            self.lat_available = False
+            self.lat = np.array([0])
+            self.lat_n = 1
         elif (axis == "lon"):
             if (weights is not None):
                 weights = np.mean(weights, axis=0)
             self.var = np.average(self.var, axis=2, weights=weights)
-            self.lon_available = False
+            self.lon = np.array([0])
+            self.lon_n = 1
 
         return self.var
 
     ###########################################################################
 
-    def temporal_average(self, period="annual", reset=True):
+    def _temporal_average(self, period="annual", reset=True):
         """
         Arguments
             type  : Defines the period of time over which the average is
@@ -455,11 +461,11 @@ class GridOperations(object):
             period of time.
 
         Modification history
-            20171120-A_schl_ma: written
+            20171122-A_schl_ma: written
         """
 
         # Check if time data is available
-        self.check_time_available()
+        self._check_time_available()
 
         # Check if all arguments are valid
         try:
@@ -473,15 +479,63 @@ class GridOperations(object):
 
         # Reset arrays if desired
         if (reset is True):
-            self.reset()
+            self._reset()
 
-        # Average over defined period of time
+        # Total average
         if (period == "total"):
-            pass
-        dates = nc.num2date(self.time, self.time_units, self.calendar)
-        months = [d.month for d in dates]
-        for m in month:
-            pass
-        return months
+            self.var = np.mean(self.var, axis=0)
+            self.time = np.array([np.mean(self.time)])
+            self.time_n = 1
+
+        # Annual average
+        if (period == "annual"):
+            means = []
+            times = []
+
+            # Get unique list of years
+            years = np.array([date_.year for date_ in self.dates])
+            years_uniq = np.sort(list(set(years)))
+            for y in years_uniq:
+                year_indices = (np.where(years == y))[0]
+                year_indices = slice(year_indices[0], year_indices[-1]+1)
+
+                # Get variables of the certain year and perform mean
+                var_year = self.var[year_indices,...]
+                time_year = self.time[year_indices]
+                means.append(np.mean(var_year, axis=0))
+                times.append(np.mean(time_year))
+
+            # Set new arrays
+            self.var = np.array(means)
+            self.time = np.array(times)
+            self.time_n = len(self.time)
+
+        # Monthly average
+        if (period == "monthly"):
+            means = []
+            times = []
+
+            # Get unique list of year/month combination
+            months = [(date_.year, date_.month) for date_ in self.dates]
+            dtype_ = [("year", int), ("month", int)]
+            months_uniq = np.array(list(set(months)), dtype=dtype_)
+            months_uniq = np.sort(months_uniq, order="year")
+            months = np.array(months, dtype=dtype_)
+            for m in months_uniq:
+                month_indices = (np.where(months == m))[0]
+                month_indices = slice(month_indices[0], month_indices[-1]+1)
+
+                # Get variables of the certain year and perform mean
+                var_month = self.var[month_indices,...]
+                time_month = self.time[month_indices]
+                means.append(np.mean(var_month, axis=0))
+                times.append(np.mean(time_month))
+
+            # Set new arrays
+            self.var = np.array(means)
+            self.time = np.array(times)
+            self.time_n = len(self.time)
+
+        return self.var
 
     ###########################################################################

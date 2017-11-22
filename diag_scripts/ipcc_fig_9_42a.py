@@ -140,12 +140,11 @@ def main(project_info):
 
         # tas
         if (model_var == "tas"):
-            tas_file = nc.Dataset(model_path, "r")
-            time = tas_file["time"]
-
             GO = GridOperations(model_path, "tas")
-            avg = GO.spatial_average(region=np.array([[0,20],[0,20]]))
-            print(avg)
+            avg1 = GO._spatial_average(region=[[0,20],[70,90]])
+            avg2 = GO._temporal_average(period="monthly")
+            # print(avg1)
+            # print(avg2)
 
         """
         print("---------MODEL: {0}-----------".format(model_name + "_" + \
