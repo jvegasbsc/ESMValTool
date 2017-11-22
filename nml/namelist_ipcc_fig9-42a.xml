@@ -52,7 +52,6 @@ This namelist is part of the ESMValTool
 
 
 <MODELS>
-    <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
 </MODELS>
 
 
@@ -80,21 +79,13 @@ This namelist is part of the ESMValTool
 
         <!-- GMSAT calculation -->
         <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  bcc-csm1-1         Amon  piControl   r1i1p1  0160 0299  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  CanESM2            Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  CanESM2            Amon  piControl   r1i1p1  2015 2164  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  inmcm4             Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  inmcm4             Amon  piControl   r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  IPSL-CM5A-MR       Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  IPSL-CM5B-LR       Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  MIROC-ESM          Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  MIROC-ESM          Amon  piControl   r1i1p1  1800 1949  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model>  CMIP5_ETHZ  MPI-ESM-LR         Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
 
         <!-- ECS calculation -->
         <model>  CMIP5_ETHZ  ACCESS1-0          Amon  abrupt4xCO2 r1i1p1  0300 0449  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -141,18 +132,6 @@ This namelist is part of the ESMValTool
         <model>  CMIP5_ETHZ  MPI-ESM-MR         Amon  piControl   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  NorESM1-M          Amon  abrupt4xCO2 r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model>  CMIP5_ETHZ  NorESM1-M          Amon  piControl   r1i1p1  0700 0849  @{MODELPATH}/ETHZ_CMIP5/ </model>
-    </diag>
-
-    <diag>
-        <description> ECS vs GMSAT (fig 9.42a)    </description>
-        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
-        <variable>            pr                  </variable>
-        <field_type>          T2Ms                </field_type>
-        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
-
-        <diag_script cfg="cfg_ipcc_fig_9_42a.conf"> ipcc_fig_9_42a.py </diag_script>
-
-        <model>  CMIP5_ETHZ  inmcm4             Amon  piControl   r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
     </diag>
 
 </DIAGNOSTICS>

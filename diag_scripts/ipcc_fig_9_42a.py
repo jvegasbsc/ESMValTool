@@ -72,6 +72,14 @@ def main(project_info):
     vars = E.get_currVars()             # Current variables
     verbosity = E.get_verbosity()       # Verbosity state
 
+    # Check if all needed varibles are present
+    if ("tas-degC" not in vars):
+        error("no data for 'tas-degC' available, please check your namelist")
+    if ("tas" not in vars):
+        error("no data for 'tas' available, please check your namelist")
+    if ("rtmt" not in vars):
+        error("no data for 'rtmt' available, please check your namelist")
+
     # Write references:
     E.write_references(diag_name,       # diagnostic script name
                        ["A_schl_ma"],   # authors
@@ -82,7 +90,6 @@ def main(project_info):
                        project_info,
                        verbosity,
                        False)
-
 
     # Print for dev. purposes
     print("config file: {0}".format(config_file))
@@ -96,8 +103,21 @@ def main(project_info):
     modelconfig.read(config_file)
     area = modelconfig.get("test", "area")
 
-    # Get models
-    models = E.get_all_clim_models(["tas", "tas-degC"])
+    # Get all models
+    models = E.get_all_clim_models()
+
+
+    ###########################################################################
+    # ECS calculation
+    ###########################################################################
+
+    # Dictionaries which will collect the data
+    tas_piC = {}
+    tas_4xCO2 = {}
+    tas_delta = {}
+    rtmt_piC = {}
+    rtmt_4xCO2 = {}
+    rtmt_delta = {}
 
     # Iterate over all models
     for model_path in models:
@@ -112,11 +132,22 @@ def main(project_info):
             model_name = model_info["name"]
             model_exp = model_info["experiment"]
         except KeyError:
-            info("Could not retrieve all desired model information.",
-                 verbosity, 0)
+            info("Could not retrieve all desired model information of " +
+                 "model {0}".format(model_info), verbosity, 0)
+            continue
         except:
             error("Unknown error while retrieving desired model information")
 
+        # tas
+        if (model_var == "tas"):
+            tas_file = nc.Dataset(model_path, "r")
+            time = tas_file["time"]
+
+            GO = GridOperations(model_path, "tas")
+            avg = GO.spatial_average(region=np.array([[0,20],[0,20]]))
+            print(avg)
+
+        """
         print("---------MODEL: {0}-----------".format(model_name + "_" + \
                                                      model_exp + "_" + \
                                                      model_var))
@@ -141,5 +172,6 @@ def main(project_info):
 
         # Get plotting information
         color, dashes, width = E.get_model_plot_style(model_name)
+        """
 
     print("\n****************************************************************")
