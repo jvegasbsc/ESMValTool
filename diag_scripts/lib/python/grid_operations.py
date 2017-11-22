@@ -519,7 +519,7 @@ class GridOperations(object):
             months = [(date_.year, date_.month) for date_ in self.dates]
             dtype_ = [("year", int), ("month", int)]
             months_uniq = np.array(list(set(months)), dtype=dtype_)
-            months_uniq = np.sort(months_uniq, order="year")
+            months_uniq = np.sort(months_uniq, order=["year", "month"])
             months = np.array(months, dtype=dtype_)
             for m in months_uniq:
                 month_indices = (np.where(months == m))[0]
