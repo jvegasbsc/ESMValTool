@@ -148,15 +148,12 @@ def main(project_info):
 
         # tas-degC:
         if (model_var==TASDEGC and model_exp in VARIABLES[TASDEGC]):
-            print(model_name)
-            print(model_var)
-            print(model_exp)
-
             # Get GMSAT
             gmsat = grid_op.average(spatial_axis="all", period="total",
                                     spatial_weighting=True, region="global")
-            print(gmsat)
-            print("")
+            gmsat_units = grid_op.get_var_units()
+            print("{0}-{1}: GMSAT = {2} {3}".format(model_name, model_exp,
+                                                    gmsat[0], gmsat_units))
 
         """
         print("---------MODEL: {0}-----------".format(model_name + "_" + \

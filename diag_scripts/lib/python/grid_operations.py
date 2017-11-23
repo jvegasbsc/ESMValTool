@@ -33,6 +33,7 @@ class GridOperations(object):
         helper method _spatial_average
         helper method _temporal_average
         method average
+        method get_var_units
     """
 
     ###########################################################################
@@ -497,9 +498,12 @@ class GridOperations(object):
 
         # Annual average
         elif (period == "annual"):
-            # Get unique list of years
             years = np.array([date_.year for date_ in self.dates])
+
+            # Get unique list of years
             years_uniq = np.sort(list(set(years)))
+
+            # Get average for each year
             for y in years_uniq:
                 year_indices = (np.where(years == y))[0]
                 year_indices = slice(year_indices[0], year_indices[-1]+1)
@@ -512,12 +516,15 @@ class GridOperations(object):
 
         # Monthly average
         elif (period == "monthly"):
-            # Get unique list of year/month combination
             months = [(date_.year, date_.month) for date_ in self.dates]
+
+            # Get unique list of year/month combination
             dtype_ = [("year", int), ("month", int)]
             months_uniq = np.array(list(set(months)), dtype=dtype_)
             months_uniq = np.sort(months_uniq, order=["year", "month"])
             months = np.array(months, dtype=dtype_)
+
+            # Get average for each month
             for m in months_uniq:
                 month_indices = (np.where(months == m))[0]
                 month_indices = slice(month_indices[0], month_indices[-1]+1)
@@ -617,5 +624,24 @@ class GridOperations(object):
             self._temporal_average(period=period, reset=False)
 
         return self.var
+
+    ###########################################################################
+
+    def get_var_units(self):
+        """
+        Arguments
+            None
+
+        Return value
+            None
+
+        Description
+            Returns the units of the members main variable.
+
+        Modification history
+            20171123-A_schl_ma: written
+        """
+
+        return self.var_nc.units
 
     ###########################################################################
