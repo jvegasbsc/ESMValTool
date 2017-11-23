@@ -241,7 +241,10 @@ alt_name =
 std_name = xco2
 alt_name = 
 
-std_name=alb
+std_name = TLT
+alt_name = 
+
+std_name = alb
 alt_name =
 
 std_name = baresoilFrac
@@ -258,3 +261,4 @@ alt_name =
 
 std_name = clisccp
 alt_name = 
+
