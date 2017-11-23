@@ -433,7 +433,7 @@ begin
     plot_settings@part_of_header = " filtered " + filter_period + " daily rainfall"
     plot_settings@var_base_length = 0
     debuginfo@description = SAMonsoon_daily_precip_filter_descr(di)
-    multipanel(storage_vault,\
+    page_models = multipanel(storage_vault,\
                di,\
                plot_settings,\
                "stddev",\
@@ -450,27 +450,60 @@ begin
 
     id = diag_script + "_stddev_panel_" + variables(0)
 
-    climofiles = new(dimsizes(models@name), string)
-    do imod = 0, dimsizes(models@name) - 1
-            climofiles(imod) = interface_get_inpaths(imod) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), imod)
-    end do
-
     aux_title_info = di@season + "-stddev"
     output_filename = interface_get_figure_filename(diag_script_base,\
                                                     var0,\
                                                     field_type0,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + "." + output_file_type
 
-    ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+      
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx) 
+               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)       
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+ 
+        delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = output_dir + output_filename + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+ 
+    end if
 
     plot_settings@lb_units = "pr/pr~B~clim~N~ (areas with pr~B~clim~N~<1 mm/day removed)"
     plot_settings@part_of_header = " of filtered " + filter_period + " daily rainfall"
     plot_settings@var_base_length = 6  ; Number of string cols to keep of
                                        ; storage name in header
     debuginfo@description = SAMonsoon_daily_precip_filter_norm_descr(di)
-    multipanel(storage_vault,\
+    page_models = multipanel(storage_vault,\
                di,\
                plot_settings,\
                "stddev_norm",\
@@ -490,9 +523,48 @@ begin
                                                     var0,\
                                                     field_type0,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + "." + output_file_type
 
-    ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+      
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx) 
+               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)       
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+        delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = output_dir + output_filename + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+ 
+    end if
 
     delete([/alltags, caption, id/])
 

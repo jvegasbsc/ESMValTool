@@ -1355,7 +1355,7 @@ begin
 end
 
 undef("multipanel")
-procedure multipanel(storage_vault [1] : logical,
+function multipanel(storage_vault [1] : logical,
                      di [1] : logical,
                      plot_settings [1] : logical,
                      storage_name [1] : string,
@@ -1571,6 +1571,8 @@ begin
             frame(wks_debug)
         end if
     end do  ; curr_fig = 1, figures_per_page(curr_page) - 1
+
+    return( [/figures_per_page,model_panel_placement/] )
 end
 
 undef("plot_multipanel_vector")

@@ -422,25 +422,59 @@ begin
     plot_settings@skip_default_title = False
     plot_settings@part_of_header = " lag-lat propagation of filtered daily Precip anom"
     debuginfo@description = SAMonsoon_daily_precip_propagation_descr(di)
-    multipanel(storage_vault, di, plot_settings, "rp-timelat", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "rp-timelat", debuginfo, valid_statistics, res)
 
     ;; Attach Metadata to plot
     id = diag_script + "_lat_panel" + variables(0)
-
-    climofiles = new(dimsizes(models@name), string)
-    do imod = 0, dimsizes(models@name) - 1
-            climofiles(imod) = interface_get_inpaths(imod) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), imod)
-    end do
 
     aux_title_info = di@season + "-rp-timelat"
     output_filename = interface_get_figure_filename(diag_script_base,\
                                                     var0,\
                                                     field_type0,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + "." + output_file_type
 
-    ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+        delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = output_dir + output_filename + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
+
 
     delete(valid_statistics)
     valid_statistics = (/"yrs"/)
@@ -449,7 +483,7 @@ begin
     plot_settings@skip_default_title = False
     plot_settings@part_of_header = " lag-lon propagation of filtered daily Precip anom"
     debuginfo@description = SAMonsoon_daily_precip_propagation_descr(di)
-    multipanel(storage_vault, di, plot_settings, "rp-timelon", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "rp-timelon", debuginfo, valid_statistics, res)
 
     ;; Attach Metadata to plot
     id = diag_script + "_lon_panel" + variables(0)
@@ -459,9 +493,49 @@ begin
                                                     var0,\
                                                     field_type0,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + "." + output_file_type
 
-    ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+        delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = output_dir + output_filename + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
+
 
     info_output(">>>>>>>> Leaving " + diag_script, verbosity, 4)
 end

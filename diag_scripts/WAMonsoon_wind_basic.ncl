@@ -485,7 +485,7 @@ begin
     if (di@plot_stddev) then
         plot_settings@type = "mean"
         plot_settings@part_of_header = " of stddev of " + variable_info@long_name
-        multipanel(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
+        page_models = multipanel(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
 
         ;; Attach Metadata to plot
         alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
@@ -503,15 +503,54 @@ begin
                                                         var0 + var1,\
                                                         field_type0 + field_type1,\
                                                         aux_title_info, -1)
-        output_file_path = output_dir + output_filename + "." + output_file_type
 
-        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+        figures_per_page = page_models[0]
+        model_panel_placement = page_models[1]
+        delete(page_models)
+
+        if (dimsizes(figures_per_page).gt.1) then
+
+            curr_idx=0
+
+            do ipage=0,dimsizes(figures_per_page)-1
+
+                climofiles = new(figures_per_page(ipage),string)
+                modelsname = new(figures_per_page(ipage),string)
+                do ifig = 0, figures_per_page(ipage)-1
+                   imod = model_panel_placement(curr_idx)
+                   climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+                   modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+                   curr_idx=curr_idx+1
+                end do
+
+            output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+            delete([/climofiles,modelsname/])
+
+            end do
+
+        else
+
+            climofiles = new(dimsizes(models@name), string)
+            do imod = 0, dimsizes(models@name) - 1
+                    climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+            end do
+
+            output_file_path = output_dir + output_filename + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        end if
 
         delete([/alltags, caption, id/])
 
         plot_settings@type = "diff"
         plot_settings@part_of_header = " of stddev of " + variable_info@long_name
-        multipanel(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
+        page_models = multipanel(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
 
         ;; Attach Metadata to plot
         alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "ST_diff", "PT_geo"/), 0)
@@ -519,8 +558,6 @@ begin
         caption = "Difference in interannual standard deviation of zonal and meridional wind component over the " + \
            di@season + " season." + \
            " Zonal wind is in shading and total wind is in vector."
-        caption = "Difference in interannual standard deviation of variable "  + variables(0) + \
-                   " and " + variables(1) + " over given seasons (" + di@season + ")"
 
         id = diag_script + "_stddev_diff" + variables(0)
 
@@ -531,9 +568,48 @@ begin
                                                         var0 + var1,\
                                                         field_type0 + field_type1,\
                                                         aux_title_info, -1)
-        output_file_path = output_dir + output_filename + "." + output_file_type
 
-        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+        figures_per_page = page_models[0]
+        model_panel_placement = page_models[1]
+        delete(page_models)
+
+        if (dimsizes(figures_per_page).gt.1) then
+
+            curr_idx=0
+
+            do ipage=0,dimsizes(figures_per_page)-1
+
+                climofiles = new(figures_per_page(ipage),string)
+                modelsname = new(figures_per_page(ipage),string)
+                do ifig = 0, figures_per_page(ipage)-1
+                   imod = model_panel_placement(curr_idx)
+                   climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+                   modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+                   curr_idx=curr_idx+1
+                end do
+
+            output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+            delete([/climofiles,modelsname/])
+
+            end do
+
+        else
+
+            climofiles = new(dimsizes(models@name), string)
+            do imod = 0, dimsizes(models@name) - 1
+                    climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+            end do
+
+            output_file_path = output_dir + output_filename + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        end if
 
         delete([/alltags, caption, id, climofiles/])
 
