@@ -13,10 +13,12 @@ Description
     ch. 9, fig. 9.42a).
 
 Required diag_script_info attributes (diagnostics specific)
-    none
+    [ecs_plots]
+        plot: Switch to plot the linear regression needed for the ECS calculation
 
 Optional diag_script_info attributes (diagnostic specific)
-    none
+    [ecs_plots]
+        file_type: File type of the plots (default: 'eps')
 
 Required variable_info attributes (variable specific)
     none
@@ -42,6 +44,7 @@ from grid_operations import GridOperations
 import netCDF4 as nc
 
 # Basic python packages
+from scipy import stats
 import ConfigParser
 import matplotlib
 matplotlib.use("Agg")
@@ -70,7 +73,7 @@ def main(project_info):
     PICONTROL = "piControl"
     ABRUPT4XCO2 = "abrupt4xCO2"
 
-    VARIABLES = {TASDEGC: [HISTORICAL],
+    VARIABLES = {TASDEGC: [PICONTROL, HISTORICAL],
                  TAS: [PICONTROL, ABRUPT4XCO2],
                  RTMT: [PICONTROL, ABRUPT4XCO2]}
 
@@ -84,9 +87,9 @@ def main(project_info):
 
     # Get information
     diag_name = E.get_diag_script_name()
+    vars = E.get_currVars()
     config_file = E.get_configfile()
     plot_dir = E.get_plot_dir()
-    vars = E.get_currVars()
     verbosity = E.get_verbosity()
 
     # Check if all needed varibles are present
@@ -109,7 +112,6 @@ def main(project_info):
     # Read configuration file
     modelconfig = ConfigParser.ConfigParser()
     modelconfig.read(config_file)
-    area = modelconfig.get("test", "area")
 
     # Get all models
     models = E.get_all_clim_models()
@@ -119,10 +121,15 @@ def main(project_info):
     # Collect data of the models
     ###########################################################################
 
+    info("", verbosity, 1)
+    info("Starting calculation", verbosity, 1)
+    info("", verbosity, 1)
+
     # Dictionaries which will collect the data for all models
-    tasdegC_data = {}
-    tas_data = {}
-    rtmt_data = {}
+    tasdegC_data = {exp: {} for exp in VARIABLES[TASDEGC]}
+    tas_data = {exp: {} for exp in VARIABLES[TAS]}
+    rtmt_data = {exp: {} for exp in VARIABLES[RTMT]}
+    units = {}
 
     # Iterate over all models
     for model_path in models:
@@ -140,46 +147,106 @@ def main(project_info):
             info("Could not retrieve all desired model information of " +
                  "model {0}".format(model_info), verbosity, 0)
             continue
-        except:
-            error("Unknown error while retrieving desired model information")
 
         # Setup GridOperations member
         grid_op = GridOperations(model_path, model_var)
+        info("Retrieving '{0}' from model '{1}' [{2}]".format(model_var,
+                                                              model_name,
+                                                              model_exp),
+             verbosity, 1)
+        units.update({model_var: grid_op.get_var_units()})
 
-        # tas-degC:
+        # tas-degC
         if (model_var==TASDEGC and model_exp in VARIABLES[TASDEGC]):
-            # Get GMSAT
             gmsat = grid_op.average(spatial_axis="all", period="total",
-                                    spatial_weighting=True, region="global")
-            gmsat_units = grid_op.get_var_units()
-            print("{0}-{1}: GMSAT = {2} {3}".format(model_name, model_exp,
-                                                    gmsat[0], gmsat_units))
+                                    spatial_weighting=True, region="global")[0]
+            tasdegC_data[model_exp].update({model_name: gmsat})
 
-        """
-        print("---------MODEL: {0}-----------".format(model_name + "_" + \
-                                                     model_exp + "_" + \
-                                                     model_var))
+        # tas
+        if (model_var==TAS and model_exp in VARIABLES[TAS]):
+            tas = grid_op.average(spatial_axis="all", period="annual",
+                                  spatial_weighting=True, region="global")
+            tas_data[model_exp].update({model_name: tas})
 
-        # Initiallize model specific file
-        file = nc.Dataset(model_path, 'r')
+        # rtmt
+        if (model_var==RTMT and model_exp in VARIABLES[RTMT]):
+            rtmt = grid_op.average(spatial_axis="all", period="annual",
+                                   spatial_weighting=True, region="global")
+            # Add to dictionary
+            rtmt_data[model_exp].update({model_name: rtmt})
 
-        # Get data (tas)
-        variables = file.variables
-        data = variables[model_var][:]
-        lat = variables["lat"][:]
-        lon = variables["lon"][:]
-        time = variables["time"][:]
-        unit = file.variables[model_var].units
+    # Empty line
+    info("", verbosity, 1)
 
-        # Get mean surface temp of every month
-        GridOps = GridOperations(data, time, lat, lon)
-        avg = GridOps._spatial_average()
-        print("**** TOTAL AVERAGE: {0} = {1} {2} ****\n".format(model_var,
-                                                                np.mean(avg),
-                                                                unit))
 
+    ###########################################################################
+    # Process data
+    ###########################################################################
+
+    # Check if data is missing
+    missing_models = [model for model in tas_data[PICONTROL] if \
+                      model not in tas_data[ABRUPT4XCO2]]
+    for model in missing_models:
+        info("Warning: model '{0}' does not contain data ".format(model) + \
+             "of all needed experiments, check your namelist", verbosity, 0)
+
+    # ECS calculation (cf. Andrews et al. 2015)
+    tas_piC = tas_data[PICONTROL]
+    tas_4xCO2 = tas_data[ABRUPT4XCO2]
+    rtmt_piC = rtmt_data[PICONTROL]
+    rtmt_4xCO2 = rtmt_data[ABRUPT4XCO2]
+    ecs_data = {}
+
+    # Iterate over all models (same for all variables)
+    for model in tas_piC:
+        if (model in tas_4xCO2):
+            delta_tas = tas_4xCO2[model]-tas_piC[model]
+            delta_rtmt = rtmt_4xCO2[model]-rtmt_piC[model]
+
+            # Perform linear regression
+            reg_stats = stats.linregress(delta_tas, delta_rtmt)
+            ecs = -reg_stats.intercept / (2*reg_stats.slope)
+            ecs_data.update({model: ecs})
+
+            # Create plot for this linear regression if desired
+            try:
+                create_plot = modelconfig.getboolean("ecs_plots", "plot")
+            except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+                info("Warning: config file {0} does ".format(config_file) + \
+                     "not contain option 'plot' in section 'ecs_plot'",
+                     verbosity, 0)
+                create_plot = False
+            if (create_plot is True):
+                ecs_dir = plot_dir + "ecs_reg/"
+                E.ensure_directory(ecs_dir)
+                info("Create ECS regression plot for " + \
+                     "model '{0}'".format(model), verbosity, 1)
+
+                # Plot
+                fig = plt.figure()
+                axes = fig.add_subplot(111)
+                axes.scatter(delta_tas, delta_rtmt)
+                axes.set_title(model)
+                axes.set_xlabel(TAS + " / " + units[TAS])
+                axes.set_ylabel(RTMT + " / " + units[RTMT])
+
+                # Get file name
+                default_filetype = "eps"
+                try:
+                    filetype = modelconfig.get("ecs_plots", "filetype")
+                    if (filetype not in fig.canvas.get_supported_filetypes()):
+                        filetype = default_filetype
+                except (ConfigParser.NoSectionError,
+                        ConfigParser.NoOptionError):
+                    filetype = default_filetype
+                filename = model + "." + filetype
+
+                # Save plot
+                fig.savefig(ecs_dir + filename)
+
+    print(ecs_data)
+
+    """
         # Get plotting information
         color, dashes, width = E.get_model_plot_style(model_name)
-        """
-
-    print("\n****************************************************************")
+    """
