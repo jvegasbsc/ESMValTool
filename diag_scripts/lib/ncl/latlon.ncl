@@ -824,10 +824,11 @@ function cdo_remapdis(var[1]:string,
 ;;    var          name of the variable
 ;;    field        a numeric array of rank 2 (lon, lat) or
 ;;                   rank 3 (time, lon, lat), higher ranks not tested yet
-;;    index        index of current model in data_pointer
-;;    data_pointer see interface_scripts/data_handling.ncl
-;;    dst_grid     path to file containing destination grid information
-;;    opt          unused
+;;    index        = index of current model in data_pointer
+;;    data_pointer = see interface_scripts/data_handling.ncl
+;;    dst_grid     = path to file containing destination grid information
+;;    opt          = filename to save regridded field in
+;;                   start with diag_script name to be unambigious
 ;;
 ;; Return value:
 ;;    The field regridded to the destination grid specified in dst_grid
