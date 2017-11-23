@@ -26,7 +26,7 @@ class GridOperations(object):
     Contents
         helper method _reset
         helper method _check_latlon_available
-        helper method _check_time_avaiable
+        helper method _check_time_available
         helper method _select_region
         helper method _gridcell_area
         helper method _map_area
@@ -59,7 +59,7 @@ class GridOperations(object):
 
         # Check if variable is valid
         try:
-            valid_var = (type(variable) == str)
+            valid_var = isinstance(variable, basestring)
             self.variable = variable
         except:
             raise TypeError("Invalid input: variable")
@@ -202,7 +202,7 @@ class GridOperations(object):
         try:
             valid_region_str = True
             valid_region = True
-            if (type(region) == str):
+            if (isinstance(region, basestring)):
                 valid_region_str = (region == "global")
             else:
                 region = np.array(region)
@@ -232,7 +232,7 @@ class GridOperations(object):
             self._reset()
 
         # Get correct region
-        if (type(region) == str):
+        if (isinstance(region, basestring)):
             self._reset()
         else:
             lat_indices = (np.where((self.lat>=region[0,0]) & \
@@ -437,6 +437,8 @@ class GridOperations(object):
             self.var = np.average(self.var, axis=2, weights=weights)
             self.lon = np.array([0])
             self.lon_n = 1
+        else:
+            pass
 
         return self.var
 
@@ -445,13 +447,13 @@ class GridOperations(object):
     def _temporal_average(self, period="annual", reset=True):
         """
         Arguments
-            type  : Defines the period of time over which the average is
-                    performed
-                    Possible values: 'monthly', 'annual', 'total'
-            reset : True: perform calculation on the data of the input
-                          netCDF file
-                    False: perform calculation on current internal arrays
-                           (may be modified by former calculations)
+            period  : Defines the period of time over which the average is
+                      performed
+                      Possible values: 'monthly', 'annual', 'total'
+            reset   : True: perform calculation on the data of the input
+                            netCDF file
+                       False: perform calculation on current internal arrays
+                             (may be modified by former calculations)
 
         Return value
             Averaged value(s) of the given variable
@@ -471,27 +473,30 @@ class GridOperations(object):
         try:
             valid_period = any([period == "monthly", period == "annual",
                                 period == "total"])
+            valid_reset = (reset is True or reset is False)
         except:
             raise TypeError("Invalid input")
         if (not valid_period):
             raise ValueError("Invalid input: period has to be 'monthly', " + \
                              "'annual' or 'total'")
+        if (not valid_reset):
+            raise ValueError("Invalid input: reset has to be True or False")
 
         # Reset arrays if desired
         if (reset is True):
             self._reset()
 
+        # Variables for average
+        means = []
+        times = []
+
         # Total average
         if (period == "total"):
-            self.var = np.mean(self.var, axis=0)
-            self.time = np.array([np.mean(self.time)])
-            self.time_n = 1
+            means = [np.mean(self.var, axis=0)]
+            times = [np.mean(self.time)]
 
         # Annual average
-        if (period == "annual"):
-            means = []
-            times = []
-
+        elif (period == "annual"):
             # Get unique list of years
             years = np.array([date_.year for date_ in self.dates])
             years_uniq = np.sort(list(set(years)))
@@ -505,16 +510,8 @@ class GridOperations(object):
                 means.append(np.mean(var_year, axis=0))
                 times.append(np.mean(time_year))
 
-            # Set new arrays
-            self.var = np.array(means)
-            self.time = np.array(times)
-            self.time_n = len(self.time)
-
         # Monthly average
-        if (period == "monthly"):
-            means = []
-            times = []
-
+        elif (period == "monthly"):
             # Get unique list of year/month combination
             months = [(date_.year, date_.month) for date_ in self.dates]
             dtype_ = [("year", int), ("month", int)]
@@ -531,10 +528,93 @@ class GridOperations(object):
                 means.append(np.mean(var_month, axis=0))
                 times.append(np.mean(time_month))
 
-            # Set new arrays
-            self.var = np.array(means)
-            self.time = np.array(times)
-            self.time_n = len(self.time)
+        # Other cases
+        else:
+            means = self.var
+            times = self.time
+
+        # Set new arrays
+        self.var = np.array(means)
+        self.time = np.array(times)
+        self.time_n = len(self.time)
+
+        return self.var
+
+    ###########################################################################
+
+    def average(self, spatial_axis="all", period="total",
+                spatial_weighting=True, region="global"):
+        """
+        Arguments
+            spatialöaxis     : Defines the spatial axis along which the
+                                average is computed
+                                Possible values: None, 'lat', 'lon', 'all'
+            period           :  Defines the period of time over which the
+                                average is computed
+                                Possible values: None, 'monthly', 'annual',
+                                                 'total'
+            spatial_weighting : Weight the spatial average with the areas of
+                                the grid cells
+                                Possible values: True or False
+            region            : Spatial area over which the average is computed
+                                Possible values: 'global' or 2D array of the
+                                form [lat_min, lat_max], [lon_min, lon_max]]
+
+        Return value
+            Averaged value(s) of the given variable
+
+        Description
+            Calculates the average of a certain variable.
+
+        Modification history
+            20171123-A_schl_ma: written
+        """
+
+        # Check if arguments (spatial_axis and period) are valid
+        try:
+            valid_axis = any([spatial_axis is None,
+                              spatial_axis == "lat",
+                              spatial_axis == "lon",
+                              spatial_axis == "all"])
+            valid_period = any([period is None,
+                                period == "monthly",
+                                period == "annual",
+                                period == "total"])
+        except:
+            raise TypeError("Invalid input")
+        if (not valid_axis):
+            raise ValueError("Invalid input: spatial axis has to be " + \
+                             " None, 'lat', 'lon' or 'all'")
+        if (not valid_period):
+            raise ValueError("Invalid input: period has to be None, " + \
+                             "'monthly', 'annual' or 'total'")
+
+        # No average
+        if (spatial_axis is None and period is None):
+            pass
+
+        # Only spatial average
+        elif (period is None):
+            self._check_latlon_available()
+            self._spatial_average(axis=spatial_axis,
+                                  weighting=spatial_weighting,
+                                  region=region,
+                                  reset=True)
+
+        # Only temporal average
+        elif (spatial_axis is None):
+            self._check_time_available()
+            self._temporal_average(period=period, reset=True)
+
+        # Mixed average
+        else:
+            self._check_latlon_available()
+            self._check_time_available()
+            self._spatial_average(axis=spatial_axis,
+                                  weighting=spatial_weighting,
+                                  region=region,
+                                  reset=True)
+            self._temporal_average(period=period, reset=False)
 
         return self.var
 

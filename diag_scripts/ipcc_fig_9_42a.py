@@ -59,26 +59,41 @@ def main(project_info):
         This is the main routine of the diagnostic.
     """
 
-    # Highlight user output
-    print("\n****************************************************************")
+    ###########################################################################
+    # Variables and experiments needed for this diagnostic
+    ###########################################################################
+
+    TASDEGC = "tas-degC"
+    TAS = "tas"
+    RTMT = "rtmt"
+    HISTORICAL = "historical"
+    PICONTROL = "piControl"
+    ABRUPT4XCO2 = "abrupt4xCO2"
+
+    VARIABLES = {TASDEGC: [HISTORICAL],
+                 TAS: [PICONTROL, ABRUPT4XCO2],
+                 RTMT: [PICONTROL, ABRUPT4XCO2]}
+
+
+    ###########################################################################
+    # Get namelist information
+    ###########################################################################
 
     # Create instance of ESMValProject wrapper
     E = ESMValProject(project_info)
 
-    # Get important information
+    # Get information
     diag_name = E.get_diag_script_name()
-    config_file = E.get_configfile()    # Config files
-    plot_dir = E.get_plot_dir()         # Plot directory
-    vars = E.get_currVars()             # Current variables
-    verbosity = E.get_verbosity()       # Verbosity state
+    config_file = E.get_configfile()
+    plot_dir = E.get_plot_dir()
+    vars = E.get_currVars()
+    verbosity = E.get_verbosity()
 
     # Check if all needed varibles are present
-    if ("tas-degC" not in vars):
-        error("no data for 'tas-degC' available, please check your namelist")
-    if ("tas" not in vars):
-        error("no data for 'tas' available, please check your namelist")
-    if ("rtmt" not in vars):
-        error("no data for 'rtmt' available, please check your namelist")
+    for var in VARIABLES:
+        if (var not in vars):
+            error("no data for variable '{0}' available, ".format(var) + \
+                  "please check your namelist")
 
     # Write references:
     E.write_references(diag_name,       # diagnostic script name
@@ -91,13 +106,6 @@ def main(project_info):
                        verbosity,
                        False)
 
-    # Print for dev. purposes
-    print("config file: {0}".format(config_file))
-    print("plot directory: {0}".format(plot_dir))
-    print("variables: {0}".format(vars))
-    print("verbosity: {0}".format(verbosity))
-    print("")
-
     # Read configuration file
     modelconfig = ConfigParser.ConfigParser()
     modelconfig.read(config_file)
@@ -108,22 +116,19 @@ def main(project_info):
 
 
     ###########################################################################
-    # ECS calculation
+    # Collect data of the models
     ###########################################################################
 
-    # Dictionaries which will collect the data
-    tas_piC = {}
-    tas_4xCO2 = {}
-    tas_delta = {}
-    rtmt_piC = {}
-    rtmt_4xCO2 = {}
-    rtmt_delta = {}
+    # Dictionaries which will collect the data for all models
+    tasdegC_data = {}
+    tas_data = {}
+    rtmt_data = {}
 
     # Iterate over all models
     for model_path in models:
         model_info = models[model_path]
 
-        # Try to get needed model information
+        # Try to get necessary model information
         model_var = None
         model_name = None
         model_exp = None
@@ -138,13 +143,20 @@ def main(project_info):
         except:
             error("Unknown error while retrieving desired model information")
 
-        # tas
-        if (model_var == "tas"):
-            GO = GridOperations(model_path, "tas")
-            avg1 = GO._spatial_average(region=[[0,20],[70,90]])
-            avg2 = GO._temporal_average(period="monthly")
-            # print(avg1)
-            # print(avg2)
+        # Setup GridOperations member
+        grid_op = GridOperations(model_path, model_var)
+
+        # tas-degC:
+        if (model_var==TASDEGC and model_exp in VARIABLES[TASDEGC]):
+            print(model_name)
+            print(model_var)
+            print(model_exp)
+
+            # Get GMSAT
+            gmsat = grid_op.average(spatial_axis="all", period="total",
+                                    spatial_weighting=True, region="global")
+            print(gmsat)
+            print("")
 
         """
         print("---------MODEL: {0}-----------".format(model_name + "_" + \
@@ -164,7 +176,7 @@ def main(project_info):
 
         # Get mean surface temp of every month
         GridOps = GridOperations(data, time, lat, lon)
-        avg = GridOps.spatial_average()
+        avg = GridOps._spatial_average()
         print("**** TOTAL AVERAGE: {0} = {1} {2} ****\n".format(model_var,
                                                                 np.mean(avg),
                                                                 unit))

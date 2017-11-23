@@ -164,7 +164,7 @@ class ESMValProject(object):
         if (variables is None):
             vars = valid_vars
         else:
-            if (type(variables) == str):
+            if (isinstance(variables, basestring)):
                 variables = [variables]
             try:
                 for var in variables:
