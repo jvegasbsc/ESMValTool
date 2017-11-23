@@ -14,9 +14,13 @@ The plots will be done based on a collection of individual namelists. The follow
 
 * Figure 9.5: Climatological (1985-2005) annual-mean cloud radiative effects in Wm\ :sup:`-2` for the CMIP5 models against CERES EBAF (2001-2011) in Wm\ :sup:`-2`. Top row shows the shortwave effect; middle row the longwave effect, and bottom row the net effect. Multi-model-mean biases against CERES EBAF 2.6 are shown on the left, whereas the right panels show zonal averages from CERES EBAF 2.6 (black), the individual CMIP5 models (thin gray lines), and the multi-model mean (thick red line).
 
+* Figure 9.6: Centred pattern correlations between models and observations for the annual mean climatology over the period 1980-1999. Results are shown for CMIP5 models as thin dashes, along with the corresponding ensemble average (thick dash) and median (open circle). The four variables shown are surface air temperature (TAS), top of the atmosphere (TOA) outgoing longwave radiation (RLUT), precipitation (PR) and TOA shortwave cloud radiative effect (SW CRE). The correlations between the default and alternate observations are also shown (solid green circles).
+
 * Figure 9.7: Relative space-time root-mean square error (RMSE) calculated from the 1980-2005 climatological seasonal cycle of the CMIP5 historical simulations. A relative performance is displayed, with blue shading indicating performance being better and red shading worse, than the median of all model results. A diagonal split of a grid square shows the relative error with respect to the reference data set (lower right triangle) and the alternate data set (upper left triangle). White boxes are used when data is not available for the given model and variable or no alternate data set has been used. The figure shows that performance varies across CMIP5 models and variables, with some models comparing better with observations for one variable and another model performing better for a different variable.
 
 * Figure 9.8: Observed and simulated time series of the anomalies in annual and global mean surface temperature. All anomalies are differences from the 1961-1990 time-mean of each individual time series. The reference period 1961-1990 is indicated by yellow shading; vertical dashed grey lines represent times of major volcanic eruptions. Single simulations for CMIP5 models (thin lines); multi-model mean (thick red line); different observations (thick black lines).
+
+* Figure 9.9: Scatter plot of decadal trends in tropical (20S to 20N) precipitable water as a function of trends in lower tropospheric temperature (TLT) over the world's oceans. Colored symbols are from CMIP5 models; black symbols are from satellite observations or from reanalysis output.
 
 * Figure 9.10: Total column ozone time series for (a) annual global and (b) Antarctic October mean. CMIP5 models are shown in colored lines and the multi-model mean in thick black, their standard deviation as gray shaded area, and observations (NIWA) (black symbols).
 
@@ -77,6 +81,10 @@ Diagnostics are stored in diag_scripts/
 
 * eyring13jgr_fig02.ncl (fig. 9.10: Ozone and associated climate impacts)
 
+* ipcc-fig-9-6.ncl (fig. 9.6: Centered pattern correlations)
+
+* ipcc-fig-9-9.ncl (fig. 9.9: Trends in TLT vs. precitable water)
+
 * ipcc-fig-9-30.ncl (fig. 9.30: Composite diurnal cycle of precipitation)
 
 * ipcc-fig-9-31.ncl (fig. 9.31: Two leading Empirical Orthogonal Functions (EOFs) of the observed outgoing longwave radiation (OLR).)
@@ -126,6 +134,7 @@ Variables
 * nbp (land, monthly mean, longitude, latitude, time)
 * od550aer (aero, monthly mean, longitude, latitude, time)
 * pr (atmos, 3-hr/monthly mean, longitude, latitude, time)
+* prw (atmos, monthly mean, longitude, latitude, time)
 * rlut, rlutcs (atmos, monthly mean, longitude, latitude, time)
 * rsut, rsutcs (atmos, monthly mean, longitude, latitude, time)
 * rtmt (atmos, monthly mean, longitude, latitude, time)
@@ -148,17 +157,20 @@ Observations and reformat scripts
 * AIRS L3 (hus -- obs4mips)
 * CERES-EBAF (rlut, rlutcs, rsut, rsutcs -- obs4mips)
 * CMAP (pr -- reformat_scripts/obs/reformat_obs_CMAP.ncl)
-* ERA-Interim (tas, ta, ua, va, zg, hus -- reformat_scripts/obs/reformat_obs_ERA-Interim.ncl)
+* ERA-Interim (tas, ta, ua, va, zg, hus, prw -- reformat_scripts/obs/reformat_obs_ERA-Interim.ncl)
 * ESACCI-AEROSOL (od550aer -- reformat_scripts/obs/reformat_obs_ESACCI-AEROSOL.ncl)
+* JRA-25 (prw, ta, tas -- ana4mips)
 * GCP -- Global carbon budget including land (nbp) and ocean (fgco2) carbon fluxes (reformat_scripts/obs/reformat_obs_GCP.ncl)
 * GPCP-SG (pr -- obs4mips)
 * HadISST (sic -- reformat_scripts/obs/reformat_obs_HadISST.ncl)
-* MERRA (pr -- obs4mips)
+* MERRA (ta, prw, pr -- obs4mips)
 * MODIS-L3 (od550aer -- obs4mips)
 * NCEP (tas, ta, ua, va, zg -- reformat_scripts/obs/reformat_obs_NCEP.ncl)
 * NIWA (toz -- reformat_scripts/obs/reformat_obs_NIWA.ncl)
 * NSIDC-NT (sic -- reformat_scripts/obs/reformat_obs_NSIDC.ncl)
+* RSS (prw, TLT -- reformat_scripts/obs/reformat_obs_RSS_prw.ncl, reformat_scripts/obs/reformat_obs_RSS.ncl)
 * TRMM-3B42 (pr -- reformat_scripts/obs/reformat_obs_TRMM-3B42-3hourly.ncl)
+* UAH (prw, ta, tas)
 
 
 
@@ -179,97 +191,111 @@ Example plots
 -------------
 
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-2.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-2.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.2a,b,c.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-3.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-3.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.3.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-4.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-4.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.4.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig3_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig3_ipccar5_ch9.png
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.5 (Eyring et al., 2016: Fig. 12).
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig4_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-6.png
+   :width: 40%
+
+   Resembling Flato et al. (2013), Fig. 9.6.
+
+.. figure:: /namelists/figures/ipccar5_ch9/fig4_ipccar5_ch9.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.7 (Eyring et al., 2016: Fig. 2).
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-8.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-8.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.8.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig5_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-9.png
+   :width: 50%
+
+   Resembling Flato et al. (2013), Fig. 9.9.
+
+.. figure:: /namelists/figures/ipccar5_ch9/fig5_ipccar5_ch9.png
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.10 (Eyring et al., 2016: Fig. 25).
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig6_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig6_ipccar5_ch9.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.24 (Eyring et al., 2016: Fig. 17).
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-26.png
-   :width: 80%
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-26.png
+   :width: 60%
 
    Similar to Flato et al. (2013), Fig. 9.26.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-27.png
-   :width: 80%
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-27.png
+   :width: 60%
 
    Similar to Flato et al. (2013), Fig. 9.27.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig7_ipccar5_ch9.png
-   :width: 80%
+.. raw:: latex
+
+    \clearpage
+
+.. figure:: /namelists/figures/ipccar5_ch9/fig7_ipccar5_ch9.png
+   :width: 60%
 
    Similar to Flato et al. (2013), Fig. 9.28.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig8_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig8_ipccar5_ch9.png
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.29 (Eyring et al., 2016: Fig. 23).
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-30.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-30.png
    :width: 80%
 
    Similar to Flato et al. (2013), Fig. 9.30.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-31.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-31.png
    :width: 60%
 
    Similar to Flato et al. (2013), Fig. 9.31.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig10_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig10_ipccar5_ch9.png
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.32 (Eyring et al., 2016: Fig. 5).
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-35.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-35.png
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.35.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-36.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig-9-36.png
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.36.
 
-.. figure:: ../../source/namelists/figures/ecs_tcr/TCR.png
+.. figure:: /namelists/figures/ecs_tcr/TCR.png
    :width: 50%
 
    Resembling Flato et al. (2013), Fig. 9.42b.
 
-.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig11_ipccar5_ch9.png
+.. figure:: /namelists/figures/ipccar5_ch9/fig11_ipccar5_ch9.png
    :width: 80%
 
    Resembling Flato et al. (2013), Fig. 9.45b (Eyring et al., 2016: Fig. 26).
