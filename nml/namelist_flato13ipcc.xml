@@ -2203,9 +2203,9 @@ This namelist is part of the ESMValTool
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
 <!-- * similar to fig. 9.27                                                * -->
 <!-- * =================================================================== * -->
-<!-- * Simulation of global mean (a) atmosphere-ocean CO2 fluxes (‘fgCO2’) * -->
-<!-- * and (b) net atmosphere-land CO2 fluxes (‘NBP’), by ESMs for the     * -->
-<!-- *  period 1986-2005                                                   * -->
+<!-- * Simulation of global mean (a) atmosphere-ocean CO2 fluxes (fgCO2)   * -->
+<!-- * and (b) net atmosphere-land CO2 fluxes (NBP), by ESMs for the       * -->
+<!-- * period 1986-2005                                                    * -->
 <!-- *********************************************************************** -->
 
     <diag>
@@ -2363,7 +2363,7 @@ This namelist is part of the ESMValTool
 <!-- * =================================================================== * -->
 <!-- * Composite diurnal cycle of precipitation averaged over              * -->
 <!-- * land / ocean for different latitude bands at local time and season  * -->
-<!-- * (June–July–August (JJA), December–January–February (DJF),           * -->
+<!-- * (June-July-August (JJA), December-January-February (DJF),           * -->
 <!-- * or their sum).                                                      * -->
 <!-- *********************************************************************** -->
 
@@ -2466,7 +2466,7 @@ This namelist is part of the ESMValTool
      * similar to fig. 9.35                                                *
      * =================================================================== *
      * Maximum entropy power spectra of surface air temperature averaged   *
-     * over the NINO3 region (5°N to 5°S, 150°W to 90°W)                   *
+     * over the NINO3 region (5N to 5S, 150W to 90W)                       *
      *********************************************************************** -->
 
     <diag>
@@ -2795,7 +2795,7 @@ This namelist is part of the ESMValTool
     <diag>
         <description> Dummy diagnostic to preprocess NBP for carbon_constraint.ncl </description>
         <variable_def_dir>    ./variable_defs/  </variable_def_dir>
-        <variable >           NBP               </variable>
+        <variable>            NBP               </variable>
         <field_type>          T2Ms              </field_type>
         <diag_script_cfg_dir> ./nml/cfg_carbon/ </diag_script_cfg_dir>
         <tags> R_atmos, R_land, T_carbon, T_bgchem, T_ec </tags>
