@@ -14,11 +14,18 @@ Description
 
 Required diag_script_info attributes (diagnostics specific)
     [ecs_plots]
-        plot: Switch to plot the linear regression needed for the ECS calculation
+        plot : Switch to plot the linear regression needed for the ECS
+               calculation
 
 Optional diag_script_info attributes (diagnostic specific)
+    [main_plot]
+        fontsize : Fonzsize used in the plot
     [ecs_plots]
-        file_type: File type of the plots (default: 'eps')
+        fontsize : Fontsize used in the plot
+        xmin     : Left boundary of the plot
+        xmax     : Right boundary of the plot
+        ymin     : Lower boundary of the plot
+        ymax     : Upper boundary of the plot
 
 Required variable_info attributes (variable specific)
     none
@@ -90,7 +97,13 @@ def main(project_info):
     vars = E.get_currVars()
     config_file = E.get_configfile()
     plot_dir = E.get_plot_dir()
+    plot_file_type = E.get_graphic_format()
+    write_plots = E.get_write_plots()
     verbosity = E.get_verbosity()
+    if (plot_file_type not in plt.gcf().canvas.get_supported_filetypes()):
+        info("Warning: selected file type for plots is not supported",
+             verbosity, 0)
+        plot_file_type = "ps"
 
     # Check if all needed varibles are present
     for var in VARIABLES:
@@ -114,7 +127,7 @@ def main(project_info):
     modelconfig.read(config_file)
 
     # Get all models
-    models = E.get_all_clim_models()
+    models = E.get_all_clim_models([TASDEGC, TAS, RTMT])
 
 
     ###########################################################################
@@ -148,7 +161,11 @@ def main(project_info):
                  "model {0}".format(model_info), verbosity, 0)
             continue
 
-        # Setup GridOperations member
+        # Skip unnecesseary calculations
+        if (model_var not in VARIABLES):
+            continue
+        if (model_exp not in VARIABLES[model_var]):
+            continue
         grid_op = GridOperations(model_path, model_var)
         info("Retrieving '{0}' from model '{1}' [{2}]".format(model_var,
                                                               model_name,
@@ -157,19 +174,19 @@ def main(project_info):
         units.update({model_var: grid_op.get_var_units()})
 
         # tas-degC
-        if (model_var==TASDEGC and model_exp in VARIABLES[TASDEGC]):
+        if (model_var==TASDEGC):
             gmsat = grid_op.average(spatial_axis="all", period="total",
                                     spatial_weighting=True, region="global")[0]
             tasdegC_data[model_exp].update({model_name: gmsat})
 
         # tas
-        if (model_var==TAS and model_exp in VARIABLES[TAS]):
+        if (model_var==TAS):
             tas = grid_op.average(spatial_axis="all", period="annual",
                                   spatial_weighting=True, region="global")
             tas_data[model_exp].update({model_name: tas})
 
         # rtmt
-        if (model_var==RTMT and model_exp in VARIABLES[RTMT]):
+        if (model_var==RTMT):
             rtmt = grid_op.average(spatial_axis="all", period="annual",
                                    spatial_weighting=True, region="global")
             # Add to dictionary
@@ -184,11 +201,13 @@ def main(project_info):
     ###########################################################################
 
     # Check if data is missing
-    missing_models = [model for model in tas_data[PICONTROL] if \
-                      model not in tas_data[ABRUPT4XCO2]]
-    for model in missing_models:
-        info("Warning: model '{0}' does not contain data ".format(model) + \
-             "of all needed experiments, check your namelist", verbosity, 0)
+    E.compare_models(tas_data[PICONTROL], tas_data[ABRUPT4XCO2], TAS+"/"+RTMT)
+    E.compare_models(tasdegC_data[PICONTROL], tasdegC_data[HISTORICAL],
+                     TASDEGC)
+
+    # GMSAT
+    gmsat_piC = tasdegC_data[PICONTROL]
+    gmsat_hist = tasdegC_data[HISTORICAL]
 
     # ECS calculation (cf. Andrews et al. 2015)
     tas_piC = tas_data[PICONTROL]
@@ -209,44 +228,112 @@ def main(project_info):
             ecs_data.update({model: ecs})
 
             # Create plot for this linear regression if desired
-            try:
-                create_plot = modelconfig.getboolean("ecs_plots", "plot")
-            except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-                info("Warning: config file {0} does ".format(config_file) + \
-                     "not contain option 'plot' in section 'ecs_plot'",
-                     verbosity, 0)
-                create_plot = False
+            if (not write_plots):
+                continue
+            ecs_section = "ecs_plots"
+            create_plot = E.get_config_option(modelconfig, ecs_section,
+                                              "plot", False)
             if (create_plot is True):
                 ecs_dir = plot_dir + "ecs_reg/"
                 E.ensure_directory(ecs_dir)
                 info("Create ECS regression plot for " + \
-                     "model '{0}'".format(model), verbosity, 1)
+                     "model '{0}' in '{1}'".format(model, ecs_dir),
+                     verbosity, 1)
+
+                # Get values from configuration file
+                cfg_options = {"fontsize": 18.0,
+                               "xmin": 0.0, "xmax": 7.0,
+                               "ymin": -2.0, "ymax": 10.0}
+                cfg = E.get_config_options(modelconfig, ecs_section,
+                                           cfg_options)
+
+                # Get x and y of regression line
+                x_reg = [cfg["xmin"]-1, cfg["xmax"]+1]
+                y_reg = [reg_stats.slope*(cfg["xmin"]-1) + reg_stats.intercept,
+                         reg_stats.slope*(cfg["xmax"]+1) + reg_stats.intercept]
 
                 # Plot
-                fig = plt.figure()
-                axes = fig.add_subplot(111)
-                axes.scatter(delta_tas, delta_rtmt)
-                axes.set_title(model)
-                axes.set_xlabel(TAS + " / " + units[TAS])
-                axes.set_ylabel(RTMT + " / " + units[RTMT])
+                fig, axes = plt.subplots()
+                axes.plot(delta_tas, delta_rtmt, linestyle="none",
+                          markeredgecolor="blue", markerfacecolor="none",
+                          marker="s")
+                axes.plot(x_reg, y_reg, color="black", linestyle="-")
 
-                # Get file name
-                default_filetype = "eps"
-                try:
-                    filetype = modelconfig.get("ecs_plots", "filetype")
-                    if (filetype not in fig.canvas.get_supported_filetypes()):
-                        filetype = default_filetype
-                except (ConfigParser.NoSectionError,
-                        ConfigParser.NoOptionError):
-                    filetype = default_filetype
-                filename = model + "." + filetype
+                # Options
+                axes.set_title(model, size=cfg["fontsize"]+4)
+                axes.set_xlabel(TAS + " / " + units[TAS],
+                                size=cfg["fontsize"])
+                axes.set_ylabel(RTMT + " / " + units[RTMT],
+                                size=cfg["fontsize"])
+                axes.set_xlim(cfg["xmin"], cfg["xmax"])
+                axes.set_ylim(cfg["ymin"], cfg["ymax"])
+                axes.tick_params(labelsize=cfg["fontsize"]-2)
+                axes.axhline(linestyle="dotted", c="black")
+                axes.text(cfg["xmin"]+0.1, cfg["ymin"]+0.5,
+                          "r = {:.2f}".format(reg_stats.rvalue),
+                          size=cfg["fontsize"])
 
                 # Save plot
+                filename = model + "." + plot_file_type
+                fig.tight_layout()
                 fig.savefig(ecs_dir + filename)
 
-    print(ecs_data)
+    # Empty line
+    info("", verbosity, 1)
 
-    """
-        # Get plotting information
-        color, dashes, width = E.get_model_plot_style(model_name)
-    """
+
+    ###########################################################################
+    # Plot data
+    ###########################################################################
+
+    E.compare_models(ecs_data, gmsat_piC, "ECS/GMSAT[piControl]")
+    E.compare_models(ecs_data, gmsat_hist, "ECS/GMSAT[historical]")
+    piC_data = {}
+    hist_data = {}
+
+    # Collect data
+    for model in ecs_data:
+        if (model in gmsat_piC):
+            piC_data.update({model: [ecs_data[model], gmsat_piC[model]]})
+        if (model in gmsat_hist):
+            hist_data.update({model: [ecs_data[model], gmsat_hist[model]]})
+
+    # Plot data
+    if (write_plots):
+        info("Create IPCC AR5 WG1 fig. 9.42a plot in {0}".format(plot_dir),
+             verbosity, 1)
+        fig, axes = plt.subplots()
+
+        # Get values from configuration file
+        main_plot_section = "main_plot"
+        cfg_options = {"fontsize": 18.0}
+        cfg = E.get_config_options(modelconfig, main_plot_section, cfg_options)
+
+        # piControl
+        for model in piC_data:
+            color, dashes, width = E.get_model_plot_style(model)
+            axes.plot(piC_data[model][0], piC_data[model][1], linestyle="none",
+                      markeredgecolor=color, markerfacecolor="none",
+                      marker="o", markersize=cfg["fontsize"]-6,
+                      label="_"+model)
+
+        # historical
+        for model in hist_data:
+            color, dashes, width = E.get_model_plot_style(model)
+            axes.plot(hist_data[model][0], hist_data[model][1],
+                      linestyle="none", markeredgecolor=color,
+                      markerfacecolor="none", marker="o",
+                      markersize=cfg["fontsize"]-2, label=model)
+
+        # Options
+        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"]+4)
+        axes.set_xlabel("ECS (degC)", size=cfg["fontsize"])
+        axes.set_ylabel("GMSAT (degC)", size=cfg["fontsize"])
+        axes.set_xlim(-4.0, 6.0)
+        axes.tick_params(labelsize=cfg["fontsize"]-2)
+        legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"])
+
+        # Save plot
+        filename = "IPCC-AR5-WG1_fig9-42a." + plot_file_type
+        fig.tight_layout()
+        fig.savefig(plot_dir + filename)

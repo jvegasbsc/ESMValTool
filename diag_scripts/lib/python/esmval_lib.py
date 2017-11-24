@@ -2,6 +2,7 @@
 
 """
 
+from netCDF4 import Dataset
 import ConfigParser
 import os
 import pdb
@@ -9,7 +10,7 @@ import sys
 import projects
 import numpy as np
 
-from netCDF4 import Dataset
+from auxiliary import info
 
 
 class ESMValProject(object):
@@ -89,6 +90,30 @@ class ESMValProject(object):
                 print("PY  ERROR: Stopping the script and exiting")
                 sys.exit()
 
+    def compare_models(self, model1, model2, variable):
+        """
+        Arguments
+            model1   : Dictionary of first model
+            model2   : Dictionary of second model
+            variable : Variable for which the data may be missing
+
+        Return value
+            None
+
+        Description
+            Compares two dictionaries of models (key = name of model), if model
+            is missing output error message.
+
+        Modification history
+            20171121-A_schl_ma: written
+        """
+
+        missing_models = [model for model in model1 if model not in model2]
+        for model in missing_models:
+            info("Warning: model '{0}' does not contain ".format(model) + \
+                 "'{0}' data of all needed experiments. ".format(variable) + \
+                 "Please check your namelist", 0, 0)
+
     def ensure_directory(self, path):
         """ Checks if a given directory exists and creates it if necessary. """
         if not (os.path.exists(path)):
@@ -146,10 +171,16 @@ class ESMValProject(object):
         Arguments
             variables : List which specifies which models should be returned
 
+        Return value
+            Dictionary containing paths and information of all desired models
+            of the current diagnostic
+
         Description
-            Returns a dictionary containing the informations and paths of all
-            models (for the specified variables) for the current diagnostic of
-            the namelist.
+            Analyzes the current diagnostics and returns all models with the
+            desired variables.
+
+        Modification history
+            20171117-A_schl_ma: written
         """
 
         # Get current diagnostic and its attributes
@@ -324,6 +355,78 @@ class ESMValProject(object):
         del model_filenames[obs]
         return obs, obs_file, model_filenames
 
+    def get_config_option(self, config_parser, section, option, default_value,
+                          return_type=None):
+        """
+        Arguments
+            config_parser : Reference to the ConfigParser member
+            section       : Section in the configuration file
+            option        : Option in the configuration file
+            default_value : Default option if value is missing in the file
+            return_type   : Type of the return value (None, bool, int or float)
+
+        Return value
+            Desired value of the option
+
+        Description
+            Checks if the specified option is included in the configuration
+            file and returns the value if possible. If not, return the default
+            value.
+
+        Modification history
+            20171124-A_schl_ma: written
+        """
+
+        if (not config_parser.has_section(section)):
+            info("Warning: configuration file does not contain section " + \
+                 "'{0}'. Using default value ".format(section) + \
+                 "'{0}' for option '{1}'".format(default_value, option), 0, 0)
+            return default_value
+        if (not config_parser.has_option(section, option)):
+            info("Warning: configuration file does not contain option " + \
+                 "'{0}' in section '{1}'. ".format(option, section) + \
+                 "Using default value '{0}'".format(default_value), 0, 0)
+            return default_value
+        if (return_type == None):
+            return_type = type(default_value)
+        if (return_type == bool):
+            return config_parser.getboolean(section, option)
+        elif (return_type == int):
+            return config_parser.getint(section, option)
+        elif (return_type == float):
+            return config_parser.getfloat(section, option)
+        else:
+            return config_parser.get(section, option)
+
+    def get_config_options(self, config_parser, section, options):
+        """
+        Arguments
+            config_parser  : Reference to the ConfigParser member
+            section        : Section in the configuration file
+            options        : Dictionary containing the desired options and
+                             default values
+
+        Return value
+            Dictionary with the desired options
+
+        Description
+            Checks if the specified options are included in the configuration
+            file and returns the values if possible. If not, return the default
+            values.
+
+        Modification history
+            20171124-A_schl_ma: written
+        """
+
+        vals = {}
+        for option in options:
+            default_value = options[option]
+            vals.update({option: self.get_config_option(config_parser,
+                                                        section,
+                                                        option,
+                                                        default_value)})
+        return vals
+
     def get_configfile(self):
         """ returns the cfg file full location """
         currDiag = self.project_info['RUNTIME']['currDiag']
@@ -338,7 +441,17 @@ class ESMValProject(object):
 
     def get_curr_diag(self):
         """
-        Returns the current diagnostic instance.
+        Arguments
+            None
+
+        Return value
+            Current diagnostic instance
+
+        Descrption
+            Returns the current diagnostic.
+
+        Modification history
+            20171116-A_schl_ma: written
         """
         return self.project_info["RUNTIME"]["currDiag"]
 
@@ -838,6 +951,24 @@ class ESMValProject(object):
                             del tmp_dir, tmp_files
 
         return res
+
+    def get_write_plots(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Boolean which decides if plots should be plotted
+
+        Description
+            Return write_plot boolean from the global configuration of
+            the namelist
+
+        Modification history
+            20171124-A_schl_ma: written
+        """
+
+        return self.project_info["GLOBAL"]["write_plots"]
 
     # ##################################################################
     # write info for call to "write_references" (NCL) to temporary file,
