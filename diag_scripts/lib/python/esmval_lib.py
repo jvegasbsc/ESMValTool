@@ -29,6 +29,7 @@ class ESMValProject(object):
         self.firstime = True
         self.oldvar = ""
 #        self.version = os.environ['0_ESMValTool_version']
+        self.verbosity = self.get_verbosity()
 
     def _get_path_with_sep(self, p):
         """ ensure that a pathname has the path separator at the end """
@@ -653,13 +654,20 @@ class ESMValProject(object):
                 pass
         return model_id
 
-    def get_model_plot_style(self, model):
+    def get_model_plot_style(self, model, file="default"):
         """ Returns the style in which to plot the model:
         color (rgb), dashes and linewidth
         Check TropicalVariability.py for an example on the use of dashes."""
-        # First we check that the style file for python is in place
 
-        style_file = './diag_scripts/lib/python/style.cfg'
+        # Default path and file
+        default_path = "./diag_scripts/lib/python/styles/"
+        default_file = "default.style"
+
+        # First we check that the style file for python is in place
+        if (file == "default"):
+            style_file = default_path + default_file
+        else:
+            style_file = default_path + file
         if os.path.isfile(style_file):
             styleconfig = ConfigParser.ConfigParser()
             styleconfig.read(style_file)
@@ -716,6 +724,66 @@ class ESMValProject(object):
             print("PY  warning: " + os.getcwd())
 
         return color, dashes, width
+
+    def get_model_style(self, model, file="default"):
+        """
+        Arguments
+            model : Name of the model
+            file  : Name of the file in which the styles are defined
+                    (Located in ./diag_scripts/lib/python/styles)
+
+        Return value
+            Dictionary containing style information for the given model
+
+        Description
+            Retrieves the style information for the given model from the given
+            file and returns it as a dictionary.
+
+        Modification history
+            20171127-A_schl_ma: written
+        """
+
+        # Default path
+        default_path = "./diag_scripts/lib/python/styles/"
+        default_file = "cmip5.style"
+
+        # Check if file is valid
+        if (file == "default"):
+            style_file = default_path + default_file
+        else:
+            style_file = default_path + file
+        if os.path.isfile(style_file):
+            styleconfig = ConfigParser.ConfigParser()
+            styleconfig.read(style_file)
+        else:
+            raise IOError("Invalid input: could not open style file " + \
+                          "'{0}'".format(style_file))
+
+        # Check if file has entry for unknown model
+        default_model = "default"
+        options = ["color", "dash", "thick", "mark", "avgstd", "facecolor"]
+        if (styleconfig.has_section(default_model)):
+            for option in options:
+                if (not styleconfig.has_option(default_model, option)):
+                    raise IOError("Style file '{0}' ".format(style_file) + \
+                                  "does not contain '{0}' ".format(option) + \
+                                  "default information for unknown models")
+        else:
+            raise IOError("Style file '{0}' does not ".format(style_file) + \
+                          "contain default information for unknown models")
+
+        # Get model information
+        style = {}
+        for option in options:
+            if (styleconfig.has_option(model, option)):
+                style.update({option: styleconfig.get(model, option)})
+            else:
+                info("No style information '{0}' ".format(option) + \
+                     "found for model '{1}', ".format(model) + \
+                     "using default value for unknown models", verbosity, 0)
+                style.update({option: styleconfig.get(default_model, option)})
+
+        return style
 
     def get_plot_dir(self):
         """

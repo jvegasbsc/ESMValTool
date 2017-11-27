@@ -127,7 +127,7 @@ def main(project_info):
     modelconfig.read(config_file)
 
     # Get all models
-    models = E.get_all_clim_models([TASDEGC, TAS, RTMT])
+    models = E.get_all_clim_models([var for var in VARIABLES])
 
 
     ###########################################################################
@@ -270,7 +270,9 @@ def main(project_info):
                 axes.tick_params(labelsize=cfg["fontsize"]-2)
                 axes.axhline(linestyle="dotted", c="black")
                 axes.text(cfg["xmin"]+0.1, cfg["ymin"]+0.5,
-                          "r = {:.2f}".format(reg_stats.rvalue),
+                          "r = {:.2f},  ".format(reg_stats.rvalue) + \
+                          "slope = {:.2f},  ".format(reg_stats.slope) + \
+                          "Y-intercept = {:.2f} ".format(reg_stats.intercept),
                           size=cfg["fontsize"])
 
                 # Save plot
@@ -311,18 +313,18 @@ def main(project_info):
 
         # piControl
         for model in piC_data:
-            color, dashes, width = E.get_model_plot_style(model)
+            style = E.get_model_style(model)
             axes.plot(piC_data[model][0], piC_data[model][1], linestyle="none",
-                      markeredgecolor=color, markerfacecolor="none",
-                      marker="o", markersize=cfg["fontsize"]-6,
-                      label="_"+model)
+                      markeredgecolor=style["color"],
+                      markerfacecolor=style["facecolor"], marker=style["mark"],
+                      markersize=cfg["fontsize"]-6, label="_"+model)
 
         # historical
         for model in hist_data:
-            color, dashes, width = E.get_model_plot_style(model)
+            style = E.get_model_style(model)
             axes.plot(hist_data[model][0], hist_data[model][1],
-                      linestyle="none", markeredgecolor=color,
-                      markerfacecolor="none", marker="o",
+                      linestyle="none", markeredgecolor=style["color"],
+                      markerfacecolor=style["facecolor"], marker=style["mark"],
                       markersize=cfg["fontsize"]-2, label=model)
 
         # Options
@@ -337,3 +339,17 @@ def main(project_info):
         filename = "IPCC-AR5-WG1_fig9-42a." + plot_file_type
         fig.tight_layout()
         fig.savefig(plot_dir + filename)
+
+    # Empty line
+    info("", verbosity, 1)
+
+    # Print data
+    info("RESULTS:", verbosity, 0)
+    for model in ecs_data:
+        try:
+            info("{0}:\tECS = {1}\tT[piC] = {2}\tT[hist] = {3}".format(
+                model, ecs_data[model], gmsat_piC[model], gmsat_hist[model]),
+                verbosity, 0)
+        except KeyError:
+            info("{0}:\tECS = {1}\tT[piC] = n.a.\tT[hist] = n.a.".format(
+                model, ecs_data[model]), verbosity, 0)
