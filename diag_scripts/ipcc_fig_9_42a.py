@@ -328,17 +328,18 @@ def main(project_info):
                       markersize=cfg["fontsize"]-2, label=model)
 
         # Options
-        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"]+4)
-        axes.set_xlabel("ECS (degC)", size=cfg["fontsize"])
-        axes.set_ylabel("GMSAT (degC)", size=cfg["fontsize"])
-        axes.set_xlim(-4.0, 6.0)
-        axes.tick_params(labelsize=cfg["fontsize"]-2)
-        legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"])
+        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"])
+        axes.set_xlabel("ECS (degC)", size=cfg["fontsize"]-4)
+        axes.set_ylabel("GMSAT (degC)", size=cfg["fontsize"]-4)
+        axes.set_xlim(1.5, 5.0)
+        axes.tick_params(labelsize=cfg["fontsize"]-6)
+        legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"]-6,
+                             bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0)
 
         # Save plot
         filename = "IPCC-AR5-WG1_fig9-42a." + plot_file_type
-        fig.tight_layout()
-        fig.savefig(plot_dir + filename)
+        fig.savefig(plot_dir + filename, additional_artists=[legend],
+                    bbox_inches="tight")
 
     # Empty line
     info("", verbosity, 1)
