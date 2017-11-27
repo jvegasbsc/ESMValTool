@@ -554,7 +554,7 @@ facecolor = #000000
 color = #FF0000
 dash = 0
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -610,7 +610,7 @@ facecolor = #F89A1C
 color = #0000FF
 dash = 0
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -618,7 +618,7 @@ facecolor = none
 color = #00FFFF
 dash = 0
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -626,7 +626,7 @@ facecolor = none
 color = #FFC800
 dash = 0
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -634,7 +634,7 @@ facecolor = none
 color = #000000
 dash = 0
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -642,7 +642,7 @@ facecolor = none
 color = #000000
 dash = 0
 thick = 4
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -650,7 +650,7 @@ facecolor = none
 color = #000000
 dash = 1
 thick = 4
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -658,7 +658,7 @@ facecolor = none
 color = #000000
 dash = 2
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
@@ -666,7 +666,7 @@ facecolor = none
 color = #000000
 dash = 12
 thick = 3
-mark = $\\asterisk$
+mark = x
 avgstd = 0
 facecolor = none
 
