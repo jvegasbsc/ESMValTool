@@ -26,6 +26,7 @@ class ESMValProject(object):
             project information like provided by the launcher
         """
         self.project_info = project_info
+        self.global_conf = self.get_global_conf()
         self.firstime = True
         self.oldvar = ""
 #        self.version = os.environ['0_ESMValTool_version']
@@ -277,7 +278,7 @@ class ESMValProject(object):
         return lat_min, lat_max, lon_min, lon_max
 
     def get_clim_dir(self):
-        return self._get_path_with_sep(self.project_info['GLOBAL']['climo_dir'])
+        return self._get_path_with_sep(self.global_conf['climo_dir'])
 
     def get_clim_model_filenames(self, variable=None, monthly=True):
         """
@@ -480,14 +481,14 @@ class ESMValProject(object):
             exit_on_warning boolean
 
         Description
-            Return exit_on_warning  boolean from the global configuration of
+            Returns exit_on_warning boolean from the global configuration of
             the namelist.
 
         Modification history
             20171128-A_schl_ma: written
         """
 
-        return self.project_info["GLOBAL"]["exit_on_warning"]
+        return self.global_conf["exit_on_warning"]
 
     def get_field_type(self):
         """ returns the first (and often only) field type """
@@ -495,11 +496,29 @@ class ESMValProject(object):
         field_type = currDiag.get_field_types()[0]
         return field_type
 
+    def get_global_conf(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Dictionary containing the global configuration of the namelist
+
+        Description
+            Returns dictionary with the global configuration settings of the
+            namelist.
+
+        Modification history
+            20171128-A_schl_ma: written
+        """
+
+        return self.project_info["GLOBAL"]
+
     def get_graphic_format(self):
         """
         returns plotting directory path of project
         """
-        return self.project_info['GLOBAL']['output_file_type']
+        return self.global_conf['output_file_type']
 
     def get_model_data(self, modelconfig, experiment, area,
                        datakey, datafile, extend=''):
@@ -811,7 +830,7 @@ class ESMValProject(object):
         """
         returns plotting directory path of project
         """
-        return self._get_path_with_sep(self.project_info['GLOBAL']['plot_dir'])
+        return self._get_path_with_sep(self.global_conf['plot_dir'])
 
     def get_plot_output_filename(self,
                                  diag_name='',
@@ -976,11 +995,11 @@ class ESMValProject(object):
 
     def get_verbosity(self):
         """ returns verbosity from namelist """
-        return self.project_info['GLOBAL']['verbosity']
+        return self.global_conf['verbosity']
 
     def get_work_dir(self):
         """ returns the work directory """
-        return self._get_path_with_sep(self.project_info['GLOBAL']['wrk_dir'])
+        return self._get_path_with_sep(self.global_conf['wrk_dir'])
 
     def mask_unwanted_values(self, array, low=None, high=None):
         """ Returns the given array masked with values outside the limits.
@@ -1058,7 +1077,7 @@ class ESMValProject(object):
             20171124-A_schl_ma: written
         """
 
-        return self.project_info["GLOBAL"]["write_plots"]
+        return self.global_conf["write_plots"]
 
     # ##################################################################
     # write info for call to "write_references" (NCL) to temporary file,

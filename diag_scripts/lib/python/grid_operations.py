@@ -38,11 +38,12 @@ class GridOperations(object):
 
     ###########################################################################
 
-    def __init__(self, ncfile_path, variable):
+    def __init__(self, ncfile_path, variable, global_conf):
         """
         Arguments
             ncfile_path : Path to the netCDF file
             variable    : Main variable which should be analyzed
+            global_conf : Global configuration dictionary of the namelist
 
         Description
             Initializes class instances.
@@ -59,13 +60,14 @@ class GridOperations(object):
                           " at {0}".format(ncfile_path))
 
         # Check if variable is valid
-        try:
-            valid_var = isinstance(variable, basestring)
-            self.variable = variable
-        except:
-            raise TypeError("Invalid input: variable")
-        if (not valid_var):
+        if (not isinstance(variable, basestring)):
             raise TypeError("Invalid input: variable has to be a string")
+        self.variable = variable
+
+        # Check if global_conf is valid dictionary
+        if (not isinstance(global_conf, dict)):
+            raise TypeError("Invalid input: global_conf has to a dictionary")
+        self.global_conf = global_conf
 
         # Check contents of netCDF file
         try:

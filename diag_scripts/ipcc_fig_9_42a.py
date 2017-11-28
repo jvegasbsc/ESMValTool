@@ -93,9 +93,11 @@ def main(project_info):
     E = ESMValProject(project_info)
 
     # Get information
+    global_conf = E.get_global_conf()
     diag_name = E.get_diag_script_name()
     vars = E.get_currVars()
     config_file = E.get_configfile()
+    work_dir = E.get_work_dir()
     plot_dir = E.get_plot_dir()
     plot_file_type = E.get_graphic_format()
     write_plots = E.get_write_plots()
@@ -167,7 +169,7 @@ def main(project_info):
             continue
         if (model_exp not in VARIABLES[model_var]):
             continue
-        grid_op = GridOperations(model_path, model_var)
+        grid_op = GridOperations(model_path, model_var, global_conf)
         info("Retrieving '{0}' from model '{1}' [{2}]".format(model_var,
                                                               model_name,
                                                               model_exp),
