@@ -219,6 +219,9 @@ def main(project_info):
     rtmt_4xCO2 = rtmt_data[ABRUPT4XCO2]
     ecs_data = {}
 
+    # Matplotlib instance
+    fig, axes = plt.subplots()
+
     # Iterate over all models (same for all variables)
     for model in tas_piC:
         if (model in tas_4xCO2):
@@ -256,7 +259,6 @@ def main(project_info):
                          reg_stats.slope*(cfg["xmax"]+1) + reg_stats.intercept]
 
                 # Plot
-                fig, axes = plt.subplots()
                 axes.plot(delta_tas, delta_rtmt, linestyle="none",
                           markeredgecolor="blue", markerfacecolor="none",
                           marker="s")
@@ -283,7 +285,8 @@ def main(project_info):
                 # Save plot
                 filename = model + "." + plot_file_type
                 fig.tight_layout()
-                fig.savefig(ecs_dir + filename)
+                fig.savefig(ecs_dir + filename, orientation="landscape")
+                axes.cla()
 
     # Empty line
     info("", verbosity, 1)
@@ -309,7 +312,6 @@ def main(project_info):
     if (write_plots):
         info("Create IPCC AR5 WG1 fig. 9.42a plot in {0}".format(plot_dir),
              verbosity, 1)
-        fig, axes = plt.subplots()
 
         # Get values from configuration file
         main_plot_section = "main_plot"
@@ -339,12 +341,13 @@ def main(project_info):
         axes.set_xlim(1.5, 5.0)
         axes.tick_params(labelsize=cfg["fontsize"]-2)
         legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"],
-                             bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0)
+                             bbox_to_anchor=(1.05, 1.0), borderaxespad=0.0)
 
         # Save plot
         filename = "IPCC-AR5-WG1_fig9-42a." + plot_file_type
         fig.savefig(plot_dir + filename, additional_artists=[legend],
-                    bbox_inches="tight")
+                    bbox_inches="tight", orientation="landscape")
+        plt.close("all")
 
     # Empty line
     info("", verbosity, 1)
