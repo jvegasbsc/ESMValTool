@@ -282,9 +282,9 @@ class GridOperations(object):
 
         # Check if all arguments are valid
         try:
-            lat_bot = float(lat_bot)
-            lat_top = float(lat_top)
-            lon_delta = float(lon_delta)
+            lat_bot = np.float_(lat_bot)
+            lat_top = np.float_(lat_top)
+            lon_delta = np.float_(lon_delta)
         except:
             raise TypeError("Invalid input")
         valid_input = all([lat_bot>=-90.0, lat_bot<=90.0,
@@ -519,7 +519,7 @@ class GridOperations(object):
             months = [(date_.year, date_.month) for date_ in self.dates]
 
             # Get unique list of year/month combination
-            dtype_ = [("year", int), ("month", int)]
+            dtype_ = [("year", np.int_), ("month", np.int_)]
             months_uniq = np.array(list(set(months)), dtype=dtype_)
             months_uniq = np.sort(months_uniq, order=["year", "month"])
             months = np.array(months, dtype=dtype_)

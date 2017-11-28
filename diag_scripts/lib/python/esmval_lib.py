@@ -10,7 +10,7 @@ import sys
 import projects
 import numpy as np
 
-from auxiliary import info
+from auxiliary import info, warning
 
 
 class ESMValProject(object):
@@ -30,6 +30,7 @@ class ESMValProject(object):
         self.oldvar = ""
 #        self.version = os.environ['0_ESMValTool_version']
         self.verbosity = self.get_verbosity()
+        self.exit_on_warning = self.get_exit_on_warning()
 
     def _get_path_with_sep(self, p):
         """ ensure that a pathname has the path separator at the end """
@@ -203,12 +204,14 @@ class ESMValProject(object):
                     if (var in valid_vars):
                         vars.append(var)
                     else:
-                        print("PY warning: invalid variable " + \
-                              "('{0}') given".format(var))
+                        warning("get_all_clim_models: invalid variable " + \
+                                "('{0}') given".format(var), self.verbosity, 0,
+                                self.exit_on_warning)
             except:
                 raise TypeError("Invalid input: no iterable object given")
         if (not vars):
-            print("PY  warning: get_all_clim_models: no valid variables given")
+            warning("get_all_clim_models: no valid variables given",
+                    self.verbosity, 0, self.exit_on_warning)
             return {}
 
         # Iterate over desired variables and models
@@ -468,6 +471,24 @@ class ESMValProject(object):
         diag_script_name = os.path.splitext(currDiag.diag_script)[0]
         return diag_script_name
 
+    def get_exit_on_warning(self):
+        """
+        Arguments
+            None
+
+        Return value
+            exit_on_warning boolean
+
+        Description
+            Return exit_on_warning  boolean from the global configuration of
+            the namelist.
+
+        Modification history
+            20171128-A_schl_ma: written
+        """
+
+        return self.project_info["GLOBAL"]["exit_on_warning"]
+
     def get_field_type(self):
         """ returns the first (and often only) field type """
         currDiag = self.project_info['RUNTIME']['currDiag']
@@ -719,9 +740,9 @@ class ESMValProject(object):
             dashes = [7, 4, 1, 1, 5, 1]
         else:
             dashes = []
-            print("PY  warning: You should specify more dashes in function")
-            print("PY  warning: get_model_plot_style, located in file")
-            print("PY  warning: " + os.getcwd())
+            warning("You should specify more dashes in fucntion" + \
+                    "'get_model_plot_style', located in file " + \
+                    os.getcwd(), self.verbosity, 0, exit_on_warning)
 
         return color, dashes, width
 
@@ -780,7 +801,8 @@ class ESMValProject(object):
             else:
                 info("No style information '{0}' ".format(option) + \
                      "found for model '{1}', ".format(model) + \
-                     "using default value for unknown models", verbosity, 0)
+                     "using default value for unknown models",
+                     self.verbosity, 0)
                 style.update({option: styleconfig.get(default_model, option)})
 
         return style
@@ -972,9 +994,9 @@ class ESMValProject(object):
         elif (high is not None):
             out_array = np.ma.masked_greater(array, high)
         elif (low is None and high is None):
-            print("PY  ERROR: You should specify at least one of the limits")
-            print("PY  ERROR: low/high when using function:")
-            print("PY  ERROR: 'mask_unwanted_values'")
+            warning("You should specify at least one of the limits " + \
+                    "low/high when using function 'mask_unwanted_values'",
+                    self.verbosity, 0, self.exit_on_warning)
             out_array = array
         return out_array
 
@@ -1030,7 +1052,7 @@ class ESMValProject(object):
 
         Description
             Return write_plot boolean from the global configuration of
-            the namelist
+            the namelist.
 
         Modification history
             20171124-A_schl_ma: written

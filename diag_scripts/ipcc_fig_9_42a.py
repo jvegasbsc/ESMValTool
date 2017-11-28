@@ -43,7 +43,7 @@ Modification history
 
 
 # ESMValTool python packages
-from auxiliary import error, info
+from auxiliary import info, warning, error
 from esmval_lib import ESMValProject
 from grid_operations import GridOperations
 
@@ -100,6 +100,7 @@ def main(project_info):
     plot_file_type = E.get_graphic_format()
     write_plots = E.get_write_plots()
     verbosity = E.get_verbosity()
+    exit_on_warning = E.get_exit_on_warning()
     if (plot_file_type not in plt.gcf().canvas.get_supported_filetypes()):
         info("Warning: selected file type for plots is not supported",
              verbosity, 0)
@@ -241,7 +242,7 @@ def main(project_info):
                      verbosity, 1)
 
                 # Get values from configuration file
-                cfg_options = {"fontsize": 18.0,
+                cfg_options = {"fontsize": 16.0,
                                "xmin": 0.0, "xmax": 7.0,
                                "ymin": -2.0, "ymax": 10.0}
                 cfg = E.get_config_options(modelconfig, ecs_section,
@@ -260,7 +261,7 @@ def main(project_info):
                 axes.plot(x_reg, y_reg, color="black", linestyle="-")
 
                 # Options
-                axes.set_title(model, size=cfg["fontsize"]+4)
+                axes.set_title(model, size=cfg["fontsize"]+2)
                 axes.set_xlabel(TAS + " / " + units[TAS],
                                 size=cfg["fontsize"])
                 axes.set_ylabel(RTMT + " / " + units[RTMT],
@@ -271,8 +272,10 @@ def main(project_info):
                 axes.axhline(linestyle="dotted", c="black")
                 axes.text(cfg["xmin"]+0.1, cfg["ymin"]+0.5,
                           "r = {:.2f},  ".format(reg_stats.rvalue) + \
-                          "slope = {:.2f},  ".format(reg_stats.slope) + \
-                          "Y-intercept = {:.2f} ".format(reg_stats.intercept),
+                          r"$\alpha$ = {:.2f},  ".format(-reg_stats.slope) + \
+                          "F = {:.2f},  ".format(reg_stats.intercept) + \
+                          "ECS = {:.2f}".format(-reg_stats.intercept / \
+                                                (2*reg_stats.slope)),
                           size=cfg["fontsize"])
 
                 # Save plot
@@ -308,7 +311,7 @@ def main(project_info):
 
         # Get values from configuration file
         main_plot_section = "main_plot"
-        cfg_options = {"fontsize": 18.0}
+        cfg_options = {"fontsize": 16.0}
         cfg = E.get_config_options(modelconfig, main_plot_section, cfg_options)
 
         # piControl
@@ -317,7 +320,7 @@ def main(project_info):
             axes.plot(piC_data[model][0], piC_data[model][1], linestyle="none",
                       markeredgecolor=style["color"],
                       markerfacecolor=style["facecolor"], marker=style["mark"],
-                      markersize=cfg["fontsize"]-6, label="_"+model)
+                      markersize=cfg["fontsize"]-8, label="_"+model)
 
         # historical
         for model in hist_data:
@@ -325,15 +328,15 @@ def main(project_info):
             axes.plot(hist_data[model][0], hist_data[model][1],
                       linestyle="none", markeredgecolor=style["color"],
                       markerfacecolor=style["facecolor"], marker=style["mark"],
-                      markersize=cfg["fontsize"]-2, label=model)
+                      markersize=cfg["fontsize"]-4, label=model)
 
         # Options
-        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"])
-        axes.set_xlabel("ECS (degC)", size=cfg["fontsize"]-4)
-        axes.set_ylabel("GMSAT (degC)", size=cfg["fontsize"]-4)
+        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"]+2)
+        axes.set_xlabel(r"ECS / $^\circ$C", size=cfg["fontsize"])
+        axes.set_ylabel(r"GMSAT / $^\circ$C", size=cfg["fontsize"])
         axes.set_xlim(1.5, 5.0)
-        axes.tick_params(labelsize=cfg["fontsize"]-6)
-        legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"]-6,
+        axes.tick_params(labelsize=cfg["fontsize"]-2)
+        legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"],
                              bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0)
 
         # Save plot
