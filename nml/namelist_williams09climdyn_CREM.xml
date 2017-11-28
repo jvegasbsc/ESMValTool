@@ -49,16 +49,16 @@ This namelist is part of the ESMValTool
   <model> CMIP5  MIROC5       cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
   <model> CMIP5  HadGEM2-A    cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
   <model> CMIP5  MRI-CGCM3    cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  CanAM4       day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  CNRM-CM5     day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  IPSL-CM5A-LR day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  IPSL-CM5B-LR day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  MIROC5       day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  HadGEM2-A    day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  MRI-CGCM3    day   amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
 -->
-    <model> CMIP5_ETHZ MIROC5     MIP_VAR_DEF amip r1i1p1 1985 1987 @{MODELPATH}/ETHZ_CMIP5/ </model>
-    <model> CMIP5_ETHZ MPI-ESM-LR MIP_VAR_DEF amip r1i1p1 1985 1987 @{MODELPATH}/ETHZ_CMIP5/ </model>
+  <model> CMIP5_ETHZ  CanAM4       MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
+  <model> CMIP5_ETHZ  CNRM-CM5     MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
+<!--  <model> CMIP5_ETHZ  IPSL-CM5A-LR MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>-->
+<!--  <model> CMIP5_ETHZ  IPSL-CM5B-LR MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>-->
+  <model> CMIP5_ETHZ  MIROC5       MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
+<!--  <model> CMIP5_ETHZ  HadGEM2-A    MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>-->
+  <model> CMIP5_ETHZ  MPI-ESM-LR   MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
+  <model> CMIP5_ETHZ  MRI-CGCM3    MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
+
 </MODELS>
 
 <DIAGNOSTICS>

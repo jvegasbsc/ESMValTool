@@ -191,7 +191,7 @@ def main(project_info):
              ",".join(['DM_global', 'PT_bar', ','.join(modeltags), ','.join(vartags)]),
              'Cloud Regime Error Metric (CREM) following Williams and Webb (2009, Clim. Dyn.).',
              ['#ID_ww09_crem'],
-             ",".join(climofiles))
+             ",".join(climofiles), "ww09_ESMValTool.py", "A_will_ke")
 
     print("Wrote " + oname)
 
@@ -360,7 +360,7 @@ def read_and_regrid(sSrcFilename, sVarname, lons2, lats2):
     data = np.ma.masked_equal(srcData, srcData._FillValue)
 
     for iT in range(nt):    # range over fields in the file
-        data_rg[iT, :, :] = regrid(data[iT, :, :], lons, lats, lons2, lats2,
+        data_rg[iT, :, :] = regrid(data[iT, :, :], lons, lats, lons2, lats2, False,
                                    xCyclic=360.0)
 
     rgmasked = np.ma.masked_invalid(data_rg)
