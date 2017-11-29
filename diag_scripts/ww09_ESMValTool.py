@@ -23,6 +23,9 @@
 ;; Caveats
 ;;
 ;; Modification history
+;;    20171128-A_laue_ax: added author and diagname to meta data
+;;                        switched off "replacing of exact values"
+;;                        in regridding function
 ;;    20170713-A_laue_ax: added tagging (for reporting)
 ;;    20151117-A_laue_ax: added parameters for call to "write_references"
 ;;    20151113-A_laue_ax: added creation of directory for plots if needed
@@ -166,19 +169,19 @@ def main(project_info):
 
     fig = plt.figure()
     ypos = np.arange(nummod)
-    plt.barh(ypos, crems)
-    plt.yticks(ypos + 0.5, models)
+    plt.barh(ypos, crems, align='center')
+    plt.yticks(ypos, models)
     plt.xlabel('Cloud Regime Error Metric')
 
     # draw observational uncertainties (dashed red line)
-    plt.plot([0.96, 0.96], [0, nummod], 'r--')
+    plt.plot([0.96, 0.96], [-0.5, nummod - 0.5], 'r--')
 
     # if needed, create directory for plots
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
 
     oname = plot_dir + 'ww09_metric_multimodel.' + plot_type
-    plt.savefig(oname)
+    plt.savefig(oname, bbox_inches='tight')
 
     # add meta data to plot (for reporting)
 
@@ -191,7 +194,7 @@ def main(project_info):
              ",".join(['DM_global', 'PT_bar', ','.join(modeltags), ','.join(vartags)]),
              'Cloud Regime Error Metric (CREM) following Williams and Webb (2009, Clim. Dyn.).',
              ['#ID_ww09_crem'],
-             ",".join(climofiles))
+             ",".join(climofiles), "ww09_ESMValTool.py", "A_will_ke")
 
     print("Wrote " + oname)
 
@@ -360,7 +363,7 @@ def read_and_regrid(sSrcFilename, sVarname, lons2, lats2):
     data = np.ma.masked_equal(srcData, srcData._FillValue)
 
     for iT in range(nt):    # range over fields in the file
-        data_rg[iT, :, :] = regrid(data[iT, :, :], lons, lats, lons2, lats2,
+        data_rg[iT, :, :] = regrid(data[iT, :, :], lons, lats, lons2, lats2, False,
                                    xCyclic=360.0)
 
     rgmasked = np.ma.masked_invalid(data_rg)
