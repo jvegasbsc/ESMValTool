@@ -2,6 +2,7 @@
 
 """
 
+from collections import OrderedDict
 from netCDF4 import Dataset
 import ConfigParser
 import os
@@ -175,8 +176,8 @@ class ESMValProject(object):
             variables : List which specifies which models should be returned
 
         Return value
-            Dictionary containing paths and information of all desired models
-            of the current diagnostic
+            Ordered Dictionary containing paths and information of all desired
+            models of the current diagnostic (sorted by appearance in namelist)
 
         Description
             Analyzes the current diagnostics and returns all models with the
@@ -213,10 +214,10 @@ class ESMValProject(object):
         if (not vars):
             warning("get_all_clim_models: no valid variables given",
                     self.verbosity, 0, self.exit_on_warning)
-            return {}
+            return OrderedDict()
 
         # Iterate over desired variables and models
-        models_dic = {}
+        models_dic = OrderedDict()
         for var_index in xrange(len(vars)):
 
             # Get variable information

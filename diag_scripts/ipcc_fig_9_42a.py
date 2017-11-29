@@ -20,6 +20,10 @@ Required diag_script_info attributes (diagnostics specific)
 Optional diag_script_info attributes (diagnostic specific)
     [main_plot]
         fontsize : Fonzsize used in the plot
+        xmin     : Left boundary of the plot
+        xmax     : Right boundary of the plot
+        ymin     : Lower boundary of the plot
+        ymax     : Upper boundary of the plot
     [ecs_plots]
         fontsize : Fontsize used in the plot
         xmin     : Left boundary of the plot
@@ -51,6 +55,7 @@ from grid_operations import GridOperations
 import netCDF4 as nc
 
 # Basic python packages
+from collections import OrderedDict
 from scipy import stats
 import ConfigParser
 import matplotlib
@@ -80,9 +85,9 @@ def main(project_info):
     PICONTROL = "piControl"
     ABRUPT4XCO2 = "abrupt4xCO2"
 
-    VARIABLES = {TASDEGC: [PICONTROL, HISTORICAL],
-                 TAS: [PICONTROL, ABRUPT4XCO2],
-                 RTMT: [PICONTROL, ABRUPT4XCO2]}
+    VARIABLES = OrderedDict([(TASDEGC, [PICONTROL, HISTORICAL]),
+                             (TAS, [PICONTROL, ABRUPT4XCO2]),
+                             (RTMT, [PICONTROL, ABRUPT4XCO2])])
 
 
     ###########################################################################
@@ -142,10 +147,12 @@ def main(project_info):
     info("", verbosity, 1)
 
     # Dictionaries which will collect the data for all models
-    tasdegC_data = {exp: {} for exp in VARIABLES[TASDEGC]}
-    tas_data = {exp: {} for exp in VARIABLES[TAS]}
-    rtmt_data = {exp: {} for exp in VARIABLES[RTMT]}
-    units = {}
+    tasdegC_data = OrderedDict((exp, OrderedDict()) for \
+                               exp in VARIABLES[TASDEGC])
+    tas_data = OrderedDict((exp, OrderedDict()) for \
+                           exp in VARIABLES[TAS])
+    rtmt_data = OrderedDict((exp, OrderedDict()) for exp in VARIABLES[RTMT])
+    units = OrderedDict()
 
     # Iterate over all models
     for model_path in models:
@@ -177,23 +184,27 @@ def main(project_info):
         units.update({model_var: grid_op.get_var_units()})
 
         # tas-degC
-        if (model_var==TASDEGC):
+        if (model_var == TASDEGC):
             gmsat = grid_op.average(spatial_axis="all", period="total",
                                     spatial_weighting=True, region="global")[0]
             tasdegC_data[model_exp].update({model_name: gmsat})
 
         # tas
-        if (model_var==TAS):
+        elif (model_var == TAS):
             tas = grid_op.average(spatial_axis="all", period="annual",
                                   spatial_weighting=True, region="global")
             tas_data[model_exp].update({model_name: tas})
 
         # rtmt
-        if (model_var==RTMT):
+        elif (model_var == RTMT):
             rtmt = grid_op.average(spatial_axis="all", period="annual",
                                    spatial_weighting=True, region="global")
             # Add to dictionary
             rtmt_data[model_exp].update({model_name: rtmt})
+
+        # default
+        else:
+            continue
 
     # Empty line
     info("", verbosity, 1)
@@ -217,7 +228,7 @@ def main(project_info):
     tas_4xCO2 = tas_data[ABRUPT4XCO2]
     rtmt_piC = rtmt_data[PICONTROL]
     rtmt_4xCO2 = rtmt_data[ABRUPT4XCO2]
-    ecs_data = {}
+    ecs_data = OrderedDict()
 
     # Matplotlib instance
     fig, axes = plt.subplots()
@@ -247,7 +258,7 @@ def main(project_info):
                      verbosity, 1)
 
                 # Get values from configuration file
-                cfg_options = {"fontsize": 16.0,
+                cfg_options = {"fontsize": 18.0,
                                "xmin": 0.0, "xmax": 7.0,
                                "ymin": -2.0, "ymax": 10.0}
                 cfg = E.get_config_options(modelconfig, ecs_section,
@@ -265,14 +276,15 @@ def main(project_info):
                 axes.plot(x_reg, y_reg, color="black", linestyle="-")
 
                 # Options
-                axes.set_title(model, size=cfg["fontsize"]+2)
+                axes.set_title(model, size=cfg["fontsize"]+2.0)
                 axes.set_xlabel(TAS + " / " + units[TAS],
                                 size=cfg["fontsize"])
                 axes.set_ylabel(RTMT + " / " + units[RTMT],
                                 size=cfg["fontsize"])
                 axes.set_xlim(cfg["xmin"], cfg["xmax"])
                 axes.set_ylim(cfg["ymin"], cfg["ymax"])
-                axes.tick_params(labelsize=cfg["fontsize"]-2)
+                axes.minorticks_on()
+                axes.tick_params(labelsize=cfg["fontsize"]-2.0)
                 axes.axhline(linestyle="dotted", c="black")
                 axes.text(cfg["xmin"]+0.1, cfg["ymin"]+0.5,
                           "r = {:.2f},  ".format(reg_stats.rvalue) + \
@@ -298,8 +310,8 @@ def main(project_info):
 
     E.compare_models(ecs_data, gmsat_piC, "ECS/GMSAT[piControl]")
     E.compare_models(ecs_data, gmsat_hist, "ECS/GMSAT[historical]")
-    piC_data = {}
-    hist_data = {}
+    piC_data = OrderedDict()
+    hist_data = OrderedDict()
 
     # Collect data
     for model in ecs_data:
@@ -315,7 +327,9 @@ def main(project_info):
 
         # Get values from configuration file
         main_plot_section = "main_plot"
-        cfg_options = {"fontsize": 16.0}
+        cfg_options = {"fontsize": 18.0,
+                       "xmin": 0.0, "xmax": 7.0,
+                       "ymin": -2.0, "ymax": 10.0}
         cfg = E.get_config_options(modelconfig, main_plot_section, cfg_options)
 
         # piControl
@@ -335,11 +349,13 @@ def main(project_info):
                       markersize=cfg["fontsize"]-4, label=model)
 
         # Options
-        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"]+2)
+        axes.set_title("IPCC AR5 WG1 - Fig. 9.42a", size=cfg["fontsize"]+2.0)
         axes.set_xlabel(r"ECS / $^\circ$C", size=cfg["fontsize"])
         axes.set_ylabel(r"GMSAT / $^\circ$C", size=cfg["fontsize"])
-        axes.set_xlim(1.5, 5.0)
-        axes.tick_params(labelsize=cfg["fontsize"]-2)
+        axes.set_xlim(cfg["xmin"], cfg["xmax"])
+        axes.set_ylim(cfg["ymin"], cfg["ymax"])
+        axes.minorticks_on()
+        axes.tick_params(labelsize=cfg["fontsize"]-2.0)
         legend = axes.legend(loc="upper left", fontsize=cfg["fontsize"],
                              bbox_to_anchor=(1.05, 1.0), borderaxespad=0.0)
 
