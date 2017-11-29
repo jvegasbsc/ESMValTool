@@ -33,7 +33,7 @@ This namelist is part of the ESMValTool
   <write_plot_vars type="boolean">    True                        </write_plot_vars>
   <max_data_filesize type="integer">  100                         </max_data_filesize>
   <max_data_blocksize type="integer"> 500                         </max_data_blocksize>
-  <output_file_type>                  ps                          </output_file_type>
+  <output_file_type>                  png                         </output_file_type>
   <verbosity  type="integer">         1                           </verbosity>
   <debuginfo type="boolean">          False                       </debuginfo>
   <exit_on_warning  type="boolean">   True                        </exit_on_warning>
@@ -41,15 +41,6 @@ This namelist is part of the ESMValTool
 </GLOBAL>
 
 <MODELS>
-<!--
-  <model> CMIP5  CanAM4       cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  CNRM-CM5     cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  IPSL-CM5A-LR cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  IPSL-CM5B-LR cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  MIROC5       cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  HadGEM2-A    cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
-  <model> CMIP5  MRI-CGCM3    cfDay amip r1i1p1 1985 1990  @{MODELPATH}/CMIP5/ </model>
--->
   <model> CMIP5_ETHZ  CanAM4       MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
   <model> CMIP5_ETHZ  CNRM-CM5     MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>
 <!--  <model> CMIP5_ETHZ  IPSL-CM5A-LR MIP_VAR_DEF   amip r1i1p1 1985 1987  @{MODELPATH}/ETHZ_CMIP5/ </model>-->
