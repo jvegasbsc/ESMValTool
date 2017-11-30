@@ -19,6 +19,7 @@ diag_script_info@label = (/"RCP2.6", "RCP4.5", "RCP6.0", "RCP8.5"/)
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.24"
   
 ;enable to output to netCDF; either use "default" or give a full file name
 diag_script_info@ncdf = "mrro_mmm_sig_ipcc_1224.nc" 
