@@ -31,6 +31,8 @@ class ESMValProject(object):
         self.firstime = True
         self.oldvar = ""
 #        self.version = os.environ['0_ESMValTool_version']
+        self.curr_diag = self.get_curr_diag()
+        self.tags = self.get_all_tags()
         self.verbosity = self.get_verbosity()
         self.exit_on_warning = self.get_exit_on_warning()
 
@@ -114,9 +116,10 @@ class ESMValProject(object):
 
         missing_models = [model for model in model1 if model not in model2]
         for model in missing_models:
-            info("Warning: model '{0}' does not contain ".format(model) + \
-                 "'{0}' data of all needed experiments. ".format(variable) + \
-                 "Please check your namelist", 0, 0)
+            warning("Model '{0}' does not contain ".format(model) + \
+                    "'{0}' data of all needed experiments. ".format(variable) + \
+                    "Please check your namelist", self.verbosity, 0,
+                    self.exit_on_warning)
 
     def ensure_directory(self, path):
         """ Checks if a given directory exists and creates it if necessary. """
@@ -243,6 +246,25 @@ class ESMValProject(object):
                 models_dic.update({model_path: model_info})
 
         return models_dic
+
+    def get_all_tags(self):
+        """
+        Arguments
+            None
+
+        Return value
+            All tags
+
+        Descrption
+            Returns all tags of the current namelist and diagnostic.
+
+        Modification history
+            20171129-A_schl_ma: written
+        """
+
+        tags = [tag.strip() for tag in self.global_conf["tags"]]
+
+        return tags
 
     def get_area_coordinates(self, modelconfig, experiment, area):
         """Returns the coordinates (lat/lon) of the area of interest. """
@@ -384,14 +406,16 @@ class ESMValProject(object):
         """
 
         if (not config_parser.has_section(section)):
-            info("Warning: configuration file does not contain section " + \
-                 "'{0}'. Using default value ".format(section) + \
-                 "'{0}' for option '{1}'".format(default_value, option), 0, 0)
+            warning("Configuration file does not contain section " + \
+                    "'{0}'. Using default value ".format(section) + \
+                    "'{0}' for option '{1}'".format(default_value, option),
+                    self.verbosity, 0, self.exit_on_warning)
             return default_value
         if (not config_parser.has_option(section, option)):
-            info("Warning: configuration file does not contain option " + \
-                 "'{0}' in section '{1}'. ".format(option, section) + \
-                 "Using default value '{0}'".format(default_value), 0, 0)
+            warning("Configuration file does not contain option " + \
+                    "'{0}' in section '{1}'. ".format(option, section) + \
+                    "Using default value '{0}'".format(default_value),
+                    self.verbosity, 0, self.exit_on_warning)
             return default_value
         if (return_type == None):
             return_type = type(default_value)
@@ -459,6 +483,7 @@ class ESMValProject(object):
         Modification history
             20171116-A_schl_ma: written
         """
+
         return self.project_info["RUNTIME"]["currDiag"]
 
     def get_currVars(self):
@@ -819,10 +844,10 @@ class ESMValProject(object):
             if (styleconfig.has_option(model, option)):
                 style.update({option: styleconfig.get(model, option)})
             else:
-                info("No style information '{0}' ".format(option) + \
-                     "found for model '{1}', ".format(model) + \
-                     "using default value for unknown models",
-                     self.verbosity, 0)
+                warning("No style information '{0}' ".format(option) + \
+                        "found for model '{1}', ".format(model) + \
+                        "using default value for unknown models",
+                        self.verbosity, 0, self.exit_on_warning)
                 style.update({option: styleconfig.get(default_model, option)})
 
         return style
@@ -1061,6 +1086,24 @@ class ESMValProject(object):
                             del tmp_dir, tmp_files
 
         return res
+
+    def get_write_netcdf(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Boolean which decides if netCDF files should be written
+
+        Description
+            Return write_netcdf boolean from the global configuration of
+            the namelist.
+
+        Modification history
+            20171129-A_schl_ma: written
+        """
+
+        return self.global_conf["write_netcdf"]
 
     def get_write_plots(self):
         """

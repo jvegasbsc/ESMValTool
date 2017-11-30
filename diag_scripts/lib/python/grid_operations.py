@@ -54,7 +54,7 @@ class GridOperations(object):
 
         # Check if file exists
         try:
-            self.ncfile = nc.Dataset(ncfile_path, "r")
+            self.ncfile = nc.Dataset(ncfile_path, mode="r")
         except:
             raise IOError("Invalid input: could not open the netCDF file " + \
                           " at {0}".format(ncfile_path))
@@ -66,7 +66,8 @@ class GridOperations(object):
 
         # Check if global_conf is valid dictionary
         if (not isinstance(global_conf, dict)):
-            raise TypeError("Invalid input: global_conf has to a dictionary")
+            raise TypeError("Invalid input: global_conf has to be a " + \
+                            "dictionary")
         self.global_conf = global_conf
 
         # Check contents of netCDF file
@@ -216,7 +217,7 @@ class GridOperations(object):
                                     region[1,1]>=0.0, region[1,1]<=360.0,
                                     region[0,0] < region[0,1],
                                     region[1,0] < region[1,1]])
-            valid_reset = (reset is True or reset is False)
+            valid_reset = isinstance(reset, bool)
         except:
             raise TypeError("Invalid input")
         if (not valid_region_str):
@@ -231,7 +232,7 @@ class GridOperations(object):
             raise ValueError("Invalid input: reset has to be True or False")
 
         # Reset arrays if desired
-        if (reset is True):
+        if (reset):
             self._reset()
 
         # Get correct region
@@ -398,7 +399,7 @@ class GridOperations(object):
         # Check if arguments (axis and weighting) are valid
         try:
             valid_axis = any([axis == "lat", axis == "lon", axis == "all"])
-            valid_weighting = (weighting is True or weighting is False)
+            valid_weighting = isinstance(weighting, bool)
         except:
             raise TypeError("Invalid input: axis or weighting")
         if (not valid_axis):
@@ -476,7 +477,7 @@ class GridOperations(object):
         try:
             valid_period = any([period == "monthly", period == "annual",
                                 period == "total"])
-            valid_reset = (reset is True or reset is False)
+            valid_reset = isinstance(reset, bool)
         except:
             raise TypeError("Invalid input")
         if (not valid_period):
@@ -486,7 +487,7 @@ class GridOperations(object):
             raise ValueError("Invalid input: reset has to be True or False")
 
         # Reset arrays if desired
-        if (reset is True):
+        if (reset):
             self._reset()
 
         # Variables for average

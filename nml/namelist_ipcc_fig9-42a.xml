@@ -42,7 +42,7 @@ This namelist is part of the ESMValTool
     <max_data_blocksize type="integer">     500      </max_data_blocksize>
     <verbosity  type="integer">               1      </verbosity>
     <exit_on_warning  type="boolean">     False      </exit_on_warning>
-    <output_file_type>                       ps      </output_file_type>
+    <output_file_type>                      png      </output_file_type>
     <force_calc type="boolean">           False      </force_calc>
     <force_gradecalc type="boolean">      False      </force_gradecalc>
     <force_taylorcalc type="boolean">     False      </force_taylorcalc>
@@ -74,6 +74,7 @@ This namelist is part of the ESMValTool
         <variable>            rtmt                </variable>
         <field_type>          T2Ms                </field_type>
         <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> D_andrews12, R_atmos </tags>
 
         <diag_script cfg="cfg_ipcc_fig_9_42a.conf"> ipcc_fig_9_42a.py </diag_script>
 
