@@ -284,7 +284,7 @@ begin
 
         ; -------------------------------------------------------------------------------
         ; add meta data to plot (for reporting)
-        caption = "Timeseries of " + variables(0) + " at one" + diag_script_info@network \
+        caption = "Timeseries of " + variables(0) + " at one " + diag_script_info@network \
                    + " station." 
         id = diag_script + "_" + variables(0)
         alltags = array_append_record(tags,(/"ST_clim", "PT_times", "DM_reg"/),0)
