@@ -115,7 +115,7 @@ begin
     end if
 
     ;; Check required diag_script_info attributes
-    req_atts = (/"ncdf", "diagscript"/)
+    req_atts = (/"ncdf", "diagscript", "figure_nr"/)
     exit_if_missing_atts(diag_script_info, req_atts)
 
     ;; Basename of diag_script
@@ -466,7 +466,7 @@ begin
                "the multi-model change mean is greater than two standard " + \
                "deviations of internal variability and where at least 90% " + \
                "of the models agree on the sign of change. " + \
-               "Similar to Figure 12.12 of Collins et al. (2013)."
+               "Similar to Figure + diag_script_info@figure_nr + of Collins et al. (2013)."
     id = diag_script + "_" + variables(0) + "_" + diag_script_info@time_avg
     contrib_authors = (/"A_lore_ru", "A_sedl_ja"/)
 
