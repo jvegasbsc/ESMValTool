@@ -286,10 +286,10 @@ begin
               models@end_year(0) + ") from CMIP5 concentration drive " + \
               "experiments. Projections are shown for each RCP for the " + \
               "multi-model mean (solid lines) and the 5 to 95% range " + \
-              "(+-1.64 standar deviation) across the distribution of " + \
+              "(+-1.64 standard deviation) across the distribution of " + \
               "individual models (shading). "
     if (nperiods .gt. 1) then
-        string2 = "Discontinuities at 2100 are due to different numbers of" + \
+        string2 = "Discontinuities at 2100 are due to different numbers of " + \
 		  "models performing the extension runs beyond the 21st " + \
 		  "century and have no physical meaning. Only one ensemble " + \
 		  "member is used from each model and numbers in the " + \
