@@ -17,7 +17,7 @@
 ;;                     carbon_corr_2var.ncl
 ;;
 ;; Modification history
-;;    * 20170822-A_bock_ls: added tags for reporting
+;;    * 20171127-A_bock_ls: added tags for reporting
 ;;    * 20151027-A_laue_ax: added call to 'write_references'
 ;;    * 201509-A_Sabrina Wenzel: updated to new ESMValTool structure
 ;;    * 201303-A_Sabrina Wenzel: written 
@@ -62,6 +62,8 @@ begin
                      "",               \  ; obs_references
                      (/""/))              ; proj_references
 ; A-laue_ax-
+
+  contrib_authors = "A_wenz_sa"
 
   ;; fields supported
   field_number = field_types
@@ -375,6 +377,38 @@ begin
        pres@trYMinF        = 0.
        xy_line(wks, (/Py_pr,Py/), (/y,y/), 0., pres, False)
    end if
+
+  ; add meta data to plot (for reporting)
+
+  alltags = array_append_record(tags, (/"PT_scatter", "ST_corr", "DM_global"/), 0)
+
+  id = diag_script + "_" + variables(0) + "_" + variables(1)
+
+  climofiles = new(2*dim_MOD, string)
+  do ii = 0, dim_MOD - 1
+      climofiles(ii) = interface_get_inpaths(ii) + "/" \
+           + interface_get_infile(variables(0), field_types(0), ii)
+      climofiles(dim_MOD+ii) = interface_get_inpaths(ii) + "/" \
+           + interface_get_infile(variables(1), field_types(0), ii)
+  end do
+
+  caption = "Carbon Cycle -Climate feedback of tropical land carbon vs. the " \
+            +"sensitivity of co2flux to interannual temperature variability in " \
+            +"the tropics (30°S-30°N). The red line shows the linear best fit " \
+            +"of the regression together with the prediction error (orange shading)" \
+            +" and the gray shading shows the observed range."
+
+  outfile = output_dir + plot_file + ".000001." + file_type
+
+  ESMValMD(outfile, alltags, caption, id, (/variables(0),variables(1)/), models@name, climofiles, diag_script, contrib_authors)
+
+  caption = "Probability Density Functions for the pure CMIP5 ensemble (black " \
+           +"dashed) and after applying the observed constraint to the models (red solid)"
+
+  outfile = output_dir + plot_file + ".000002." + file_type
+
+  ESMValMD(outfile, alltags, caption, id, (/variables(0),variables(1)/), models@name, climofiles, diag_script, contrib_authors)
+
 
 
   info_output("gv " + output_dir + plot_file + "." + file_type, verbosity, 1)
