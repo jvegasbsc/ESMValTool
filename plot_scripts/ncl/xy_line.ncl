@@ -2371,6 +2371,7 @@ begin
     res = True
     res@gsnDraw             = False
     res@gsnFrame            = False
+    res@vpXF                = 0.15
     res@tiMainFont          = 22
     res@tiMainString        = var
     res@tiYAxisString       = "[" + format_units(data@units) + "]"
@@ -2411,11 +2412,11 @@ begin
     resT = True
     resT@txFont = 21
     resT@txFontColor = "black"
-    resT@txFontHeightF = 0.016
+    resT@txFontHeightF = 0.014
     if (.not.diag_script_info@legend_outside) then
         resT@txJust = "CenterLeft"
         resL = True
-        xpos = 0.215
+        xpos = 0.770
         ypos = 0.785
         do mID = 0, dimsizes(data&model) - 1
             resL@gsLineColor = res@xyLineColors(mID)
@@ -2430,7 +2431,8 @@ begin
 
     ;; Append station info
     resT@txJust = "CenterRight"
-    xpos = 0.785
+    resT@txFontHeightF = 0.016
+    xpos = 0.735
     ypos = 0.785
 
     if (isatt(data, "stname")) then
