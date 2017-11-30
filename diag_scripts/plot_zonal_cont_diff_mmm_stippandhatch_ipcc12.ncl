@@ -463,7 +463,7 @@ begin
                " forcing scenarios. Hatching indicates regions where the " + \
                "multi-model mean change is less than one standard deviation "+\
                "of internal variability. Stippling indicates regions where " + \
-               "the multi-model chnage mean is greater than two standard " + \
+               "the multi-model change mean is greater than two standard " + \
                "deviations of internal variability and where at least 90% " + \
                "of the models agree on the sign of change. " + \
                "Similar to Figure 12.12 of Collins et al. (2013)."
