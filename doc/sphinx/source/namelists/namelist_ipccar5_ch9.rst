@@ -289,15 +289,15 @@ Example plots
 
    Resembling Flato et al. (2013), Fig. 9.36.
 
-.. figure:: ../../source/namelists/figures/ecs_tcr/TCR.png
-   :width: 50%
-
-   Resembling Flato et al. (2013), Fig. 9.42b.
-
 .. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-42a.png
    :width: 50%
 
    Resembling Flato et al. (2013), Fig. 9.42a.
+
+.. figure:: ../../source/namelists/figures/ecs_tcr/TCR.png
+   :width: 50%
+
+   Resembling Flato et al. (2013), Fig. 9.42b.
 
 .. figure:: ../../source/namelists/figures/ipccar5_ch9/fig11_ipccar5_ch9.png
    :width: 80%
