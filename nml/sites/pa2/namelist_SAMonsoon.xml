@@ -46,6 +46,7 @@ This namelist is part of the ESMValTool
   <write_netcdf type="boolean">           False        </write_netcdf>
   <read_from_vault type="boolean">        False        </read_from_vault>
   <force_processing type="boolean">       False        </force_processing>
+  <tags> D_phillips14eos, D_lin08jclim, D_webster92qjrms, D_goswami99qjrms, D_wang99bams, D_wang11climdyn, P_embrace  </tags>
 </GLOBAL>
 
 <MODELS>
@@ -74,6 +75,7 @@ This namelist is part of the ESMValTool
     <field_type>                           T2Ms                 </field_type>
     <diag_script_cfg_dir>                 ./nml/cfg_SAMonsoon/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_SAMonsoon_wind_basic_200mb.ncl">   SAMonsoon_wind_basic.ncl               </diag_script>
+    <tags>  R_atmos, T_atmDyn </tags>
 
     <model id="ERAINT"> OBS ERA-Interim reanaly 1 1980 2004 @{OBSPATH}/Tier3/ERA-Interim </model>
     <model> OBS NCEP reanaly 1 1980 2004 @{OBSPATH}/Tier2/NCEP </model>
@@ -87,6 +89,7 @@ This namelist is part of the ESMValTool
     <field_type>                         T2Ms                </field_type>
     <diag_script_cfg_dir>               ./nml/cfg_SAMonsoon/ </diag_script_cfg_dir>
     <diag_script cfg="cfg_SAMonsoon_wind_basic_850mb.ncl">   SAMonsoon_wind_basic.ncl               </diag_script>
+    <tags>  R_atmos, T_atmDyn </tags>
 
     <model id="ERAINT"> OBS ERA-Interim reanaly 1 1980 2004 @{OBSPATH}/Tier3/ERA-Interim </model>
     <model> OBS NCEP reanaly 1 1980 2004 @{OBSPATH}/Tier2/NCEP </model>
@@ -100,6 +103,7 @@ This namelist is part of the ESMValTool
     <field_type>                          T2Ms                 </field_type>
     <diag_script_cfg_dir>                ./nml/cfg_SAMonsoon/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_SAMonsoon_wind_seasonal.ncl">   SAMonsoon_wind_seasonal.ncl          </diag_script>
+    <tags>  R_atmos, T_monsoon, T_atmDyn </tags>
 
     <model id="ERAINT"> OBS ERA-Interim reanaly 1 1980 2004 @{OBSPATH}/Tier3/ERA-Interim </model>
     <model> OBS NCEP reanaly 1 1980 2004 @{OBSPATH}/Tier2/NCEP </model>
@@ -115,6 +119,7 @@ This namelist is part of the ESMValTool
     <diag_script cfg="cfg_SAMonsoon_precip.ncl">    SAMonsoon_precip_basic.ncl    </diag_script>
     <diag_script cfg="cfg_SAMonsoon_precip.ncl">    SAMonsoon_precip_seasonal.ncl </diag_script>
     <diag_script cfg="cfg_SAMonsoon_precip.ncl">    SAMonsoon_precip_domain.ncl   </diag_script>
+    <tags>  R_atmos, T_phys, T_monsoon, T_atmDyn </tags> 
 
     <model> OBS TRMM-L3 v7A 1 1998 2004 @{OBSPATH}/Tier1/TRMM-L3 </model>
     <model> obs4mips GPCP-SG L3 v2.2 1980 2004 @{OBSPATH}/Tier1/ </model>
@@ -131,6 +136,7 @@ This namelist is part of the ESMValTool
     <field_type>                                  T2Ms                       </field_type>
     <diag_script_cfg_dir>                         ./nml/cfg_SAMonsoon/       </diag_script_cfg_dir>
     <diag_script cfg="cfg_SAMonsoon_tele.ncl"> SAMonsoon_teleconnections.ncl </diag_script>
+    <tags>  R_atmos, T_phys, T_monsoon, T_atmDyn </tags>
 
     <model id="trmm"> OBS TRMM-L3 v7A 1 1998 2004 @{OBSPATH}/Tier1/TRMM-L3 </model>
     <model id="hadisst"> OBS HadISST reanaly 1 1980 2004 @{OBSPATH}/Tier2/HadISST </model>
