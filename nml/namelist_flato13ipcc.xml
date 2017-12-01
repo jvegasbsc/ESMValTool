@@ -55,7 +55,7 @@ This namelist is part of the ESMValTool
     <max_data_blocksize type="integer">     500      </max_data_blocksize>
     <verbosity  type="integer">               1      </verbosity>
     <exit_on_warning  type="boolean">     False      </exit_on_warning>
-    <output_file_type>                       ps      </output_file_type>
+    <output_file_type>                      png      </output_file_type>
     <force_calc type="boolean">           False      </force_calc>
     <force_gradecalc type="boolean">      False      </force_gradecalc>
     <force_taylorcalc type="boolean">     False      </force_taylorcalc>
@@ -67,195 +67,6 @@ This namelist is part of the ESMValTool
 </MODELS>
 
 <DIAGNOSTICS>
-
-<!-- *********************************************************************** -->
-<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
-<!-- * similar to figs. 9.2 a/b/c                                          * -->
-<!-- * =================================================================== * -->
-<!-- * Multi model mean, multi model mean bias, and mean absolute error    * --> 
-<!-- * (geographical distributions).                                       * -->
-<!-- *********************************************************************** -->
-
-    <diag>
-        <description> multi model mean bias near-surface temperature </description>
-        <variable_def_dir>    ./variable_defs/   </variable_def_dir>
-        <variable>            tas-degC           </variable>
-        <field_type>          T2Ms               </field_type>
-        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
-        <tags> R_atmos, T_phys </tags>
-
-        <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ bcc-csm1-1     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ bcc-csm1-1-m   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ BNU-ESM        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CanESM2        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CCSM4          Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-BGC      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-CAM5     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-FASTCHEM Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CMCC-CESM      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CNRM-CM5       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CSIRO-Mk3-6-0  Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ FGOALS-g2      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ FIO-ESM        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-CM3       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-ESM2G     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-ESM2M     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-H-CC   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-H      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-R-CC   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-R      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadCM3         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadGEM2-CC     Amon historical r2i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadGEM2-ES     Amon historical r2i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ inmcm4         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5A-LR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5A-MR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5B-LR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC4h        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC5         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC-ESM      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC-ESM-CHEM Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-LR     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-MR     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-P      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MRI-CGCM3      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MRI-ESM1       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ NorESM1-M      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ NorESM1-ME     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-
-        <model> OBS ERA-Interim reanaly     1    1980  2005 	@{OBSPATH}/Tier3/ERA-Interim </model>
-
-        <diag_script cfg="cfg_ipcc-fig-9-2.ncl"> clouds_bias.ncl </diag_script>
-    </diag>
-
-<!-- *********************************************************************** -->
-<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
-<!-- * similar to fig. 9.3                                                 * -->
-<!-- * =================================================================== * -->
-<!-- * Multi model mean seasonality, mean absolute seasonality, mean bias  * -->
-<!-- * in seasonality, and mean bias in absolute seasonality               * -->
-<!-- *********************************************************************** -->
-
-    <diag>
-        <description> multi model mean seasonality near-surface temperature </description>
-        <variable_def_dir>    ./variable_defs/   </variable_def_dir>
-        <variable>            tas-degC           </variable>
-        <field_type>          T2Ms               </field_type>
-        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
-        <tags> R_atmos, T_phys </tags>
-
-        <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ bcc-csm1-1     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ bcc-csm1-1-m   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ BNU-ESM        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CanESM2        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CCSM4          Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-BGC      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-CAM5     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-FASTCHEM Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CMCC-CESM      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CNRM-CM5       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CSIRO-Mk3-6-0  Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ FGOALS-g2      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ FIO-ESM        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-CM3       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-ESM2G     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-ESM2M     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-H-CC   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-H      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-R-CC   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-R      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadCM3         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadGEM2-CC     Amon historical r2i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadGEM2-ES     Amon historical r2i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ inmcm4         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5A-LR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5A-MR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5B-LR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC4h        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC5         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC-ESM      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC-ESM-CHEM Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-LR     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-MR     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-P      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MRI-CGCM3      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MRI-ESM1       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ NorESM1-M      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ NorESM1-ME     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-
-        <model> OBS ERA-Interim reanaly     1    1980  2005 	@{OBSPATH}/Tier3/ERA-Interim </model>
-
-        <diag_script cfg="cfg_ipcc-fig-9-3.ncl"> seasonality_mm.ncl </diag_script>
-    </diag>
-
-<!-- *********************************************************************** -->
-<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
-<!-- * similar to figs. 9.4                                                * -->
-<!-- * =================================================================== * -->
-<!-- * Multi model mean, multi model mean bias, mean absolute error, and   * -->
-<!-- * mean relative error (geographical ditributions)                     * --> 
-<!-- * ******************************************************************* * -->
-
-    <diag>
-        <description> multi model mean bias precipitation </description>
-        <variable_def_dir>    ./variable_defs/   </variable_def_dir>
-        <variable>            pr-mmday           </variable>
-        <field_type>          T2Ms               </field_type>
-        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
-        <tags> R_atmos, T_phys </tags>
-
-        <model> CMIP5_ETHZ ACCESS1-0      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ ACCESS1-3      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ bcc-csm1-1     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ bcc-csm1-1-m   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ BNU-ESM        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CanESM2        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CCSM4          Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-BGC      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-CAM5     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-FASTCHEM Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CMCC-CESM      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CNRM-CM5       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ CSIRO-Mk3-6-0  Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ FGOALS-g2      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ FIO-ESM        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-CM3       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-ESM2G     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GFDL-ESM2M     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-H-CC   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-H      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-R-CC   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ GISS-E2-R      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadCM3         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadGEM2-CC     Amon historical r2i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ HadGEM2-ES     Amon historical r2i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ inmcm4         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5A-LR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5A-MR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ IPSL-CM5B-LR   Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC4h        Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC5         Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC-ESM      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MIROC-ESM-CHEM Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-LR     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-MR     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MPI-ESM-P      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MRI-CGCM3      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ MRI-ESM1       Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ NorESM1-M      Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <model> CMIP5_ETHZ NorESM1-ME     Amon historical r1i1p1 1980 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
-
-        <model> obs4mips GPCP-SG L3 v2.2 1980 2005 @{OBSPATH}/Tier1/ </model>
-
-        <diag_script cfg="cfg_ipcc-fig-9-4.ncl"> clouds_bias.ncl </diag_script>
-    </diag>
 
 <!-- *********************************************************************** -->
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
@@ -457,7 +268,7 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ CCSM4           MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-BGC       MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-CAM5      MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
-        <model> CMIP5_ETHZ CESM1-CAM5-1-FV MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ CESM1-CAM5-1-FV2 MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-FASTCHEM  MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-WACCM     MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CMCC-CESM       MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
@@ -567,7 +378,6 @@ This namelist is part of the ESMValTool
         
         <diag_script cfg="cfg_ipcc-fig-9-6.ncl"> ipcc-fig-9-6.ncl </diag_script>
     </diag>
-
 
     <diag>
         <description> Pattern cor - pr </description>
@@ -904,7 +714,6 @@ This namelist is part of the ESMValTool
         <model>  OBS         ERA-Interim         reanaly      1             1980 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
         <model>  OBS         NCEP                reanaly      1             1980 2005  @{OBSPATH}/Tier2/NCEP            </model>
 
-        <!-- Grading precalculations -->
         <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_main.ncl          </diag_script>
         <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_main.ncl          </diag_script>
         <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
@@ -1634,12 +1443,6 @@ This namelist is part of the ESMValTool
         <model>  OBS_gridfile  ESACCI-SSMI sat  NH   1992  2008  @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-SSMI/
                   @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-SSMI/OBS_ESACCI-SSMI_sat_NH_T2Ms_sic_199201-200812.nc  </model>
 
-<!--     <model>  OBS_gridfile  NSIDC-BT    sat  NH   1980  2005  @{OBSPATH}/Tier2/NSIDC/ -->
-<!--                                       @{OBSPATH}/Tier2/NSIDC/OBS_NSIDC-BT_sat_NH_T2Ms_sic_197811-201312.nc  </model> -->
-<!--     <model>  OBS_gridfile  ESACCI-AMSR sat  NH   2003  2010  @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-AMSR/ -->
-<!--                   @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-AMSR/OBS_ESACCI-AMSR_sat_NH_T2Ms_sic_200301-201012.nc  </model> -->
-
-
         <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_NHpolar_sic.ncl">  perfmetrics_main.ncl                 </diag_script>
         <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_NHpolar_sic.ncl">  perfmetrics_grading.ncl              </diag_script>
     </diag>
@@ -1650,7 +1453,7 @@ This namelist is part of the ESMValTool
         <variable>             ta                           </variable>
         <field_type>           T3M                          </field_type>
         <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
-        <tags> R_atmos, T_phys </tags>
+        <tags> D_gleckler08jgr, R_atmos, T_phys </tags>
 
         <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1980 2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
 
@@ -1827,7 +1630,6 @@ This namelist is part of the ESMValTool
 
         <diag_script cfg="cfg_eyring13jgr_fig02.ncl"> eyring13jgr_fig02.ncl </diag_script>
   </diag> 
-
 
 <!-- *********************************************************************** -->
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
@@ -2775,7 +2577,7 @@ This namelist is part of the ESMValTool
         <field_type>                               T0M                 </field_type>
         <field_type>                               T2Ms                </field_type>
         <diag_script_cfg_dir>                      ./nml/cfg_carbon/   </diag_script_cfg_dir>
-        <tags> R_atmos, R_land, T_carbon, T_bgchem, T_ec   </tags>
+        <tags> D_wenzel14jgr, R_atmos, R_land, T_carbon, T_bgchem, T_ec   </tags>
 
         <model id="GCP">  OBS GCP  reanaly 1 1959 2005 @{OBSPATH}/Tier2/GCP  </model>
         <model id="NCEP"> OBS NCEP reanaly 1 1959 2005 @{OBSPATH}/Tier2/NCEP </model>
@@ -2819,7 +2621,7 @@ This namelist is part of the ESMValTool
         <variable MIP="Amon"> tas               </variable>
         <field_type>          T2Ms              </field_type>
         <diag_script_cfg_dir> ./nml/cfg_carbon/ </diag_script_cfg_dir>
-        <tags> R_atmos, R_land, T_carbon, T_bgchem, T_ec </tags>
+        <tags> D_wenzel14jgr, R_atmos, R_land, T_carbon, T_bgchem, T_ec </tags>
 
         <model> CMIP5_ETHZ CanESM2      MIP_VAR_DEF 1pctCO2 r1i1p1 1880 1960 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-BGC    MIP_VAR_DEF 1pctCO2 r1i1p1 1880 1960 @{MODELPATH}/ETHZ_CMIP5 </model>
