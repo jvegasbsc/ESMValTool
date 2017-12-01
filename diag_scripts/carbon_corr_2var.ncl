@@ -18,6 +18,7 @@
 ;; Caveats
 ;;
 ;; Modification history
+;;    * 20171127-A_bock_ls: added tags for reporting
 ;;    * 20151027-A_laue_ax: added call to 'write_references'
 ;;    * 201404-A_Sabrina Wenzel: updated according to changes in ESMValTool
 ;;    * 201303-A_Sabrina Wenzel: written       
@@ -40,6 +41,8 @@ load "./diag_scripts/aux/SAMonsoon/SAMonsoon.ncl"
 load "./plot_scripts/ncl/scatterplot.ncl"
 load "./plot_scripts/ncl/aux_plotting.ncl"
 
+load "./diag_scripts/lib/ncl/meta_data.ncl"
+
 begin
   plot_script = "corr_2var"
   
@@ -59,6 +62,8 @@ begin
                      "",               \  ; obs_references
                      (/""/))              ; proj_references
 ; A-laue_ax-
+
+  contrib_authors = "A_wenz_sa"
 
   dim_MOD = dimsizes(models@name)
 
@@ -408,6 +413,31 @@ begin
   pan@gsnPanelYWhiteSpacePercent = 5
   gsn_panel(wks,plot,(/mm,mm/),pan)
   frame (wks)
+
+  ; add meta data to plot (for reporting)
+
+  alltags = array_append_record(tags, (/"PT_scatter", "ST_corr", "DM_global"/), 0)
+
+  caption = "Correlations between the interannual variability of global " \
+            +"co2flux (nbp+fgco2) and tropical temperature for the individual " \
+            +"CMIP5 models using esmHistorical simulations, and for observations."
+
+  id = diag_script + "_" + variables(0) + "_" + variables(1)
+
+  climofiles = new((2*dim_MOD), string)
+  do ii = 0, dim_MOD - 1 
+;      print("ii = " + ii)
+;      print("dim_MOD = " + dim_MOD)
+;      print("dimsizes(climofiles) = " + dimsizes(climofiles))
+      climofiles(ii) = interface_get_inpaths(ii) + "/" \
+           + interface_get_infile(variables(0), field_types(0), ii)
+      climofiles(dim_MOD+ii) = interface_get_inpaths(ii) + "/" \
+           + interface_get_infile(variables(1), field_types(0), ii)
+  end do
+
+  outfile = output_dir + plot_file + "." + file_type
+
+  ESMValMD(outfile, alltags, caption, id, (/variables(0),variables(1)/), models@name, climofiles, diag_script, contrib_authors)
 
   info_output("gv " + output_dir + plot_file + "." + file_type, verbosity, 1)
   delete([/plot,pan,y/])

@@ -30,7 +30,11 @@ def make_watermark(filepath, folder="same", type="default"):
         wm = wm_folder + "wm_esmvaltool_logo.png"
 
     # Retrieve width and height of image to be watermarked
-    wdth = int(os.popen('identify -format "%w\n" ' + filepath).read())
+    try:
+        wdth = int(os.popen('identify -format "%w\n" ' + filepath).read())
+    except (ValueError):
+        return
+
     hght = int(os.popen('identify -format "%h\n" ' + filepath).read())
 
     # Computer angle for diagonal

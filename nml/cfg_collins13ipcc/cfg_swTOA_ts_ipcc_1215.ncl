@@ -14,6 +14,7 @@ diag_script_info@yaxis = "(Wm~S~-2~N~)"
 diag_script_info@ymin = -3
 diag_script_info@ymax = 6
 diag_script_info@model_nr = False
+diag_script_info@figure_nr = "12.15"
 
 diag_script_info@diagscript = "ts_line_collins_ipcc_ch12"
 

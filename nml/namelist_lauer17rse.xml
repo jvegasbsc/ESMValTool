@@ -43,7 +43,7 @@ This namelist is part of the ESMValTool
     <max_data_blocksize type="integer">        500         </max_data_blocksize>
     <verbosity  type="integer">                  1         </verbosity>
     <exit_on_warning  type="boolean">        False         </exit_on_warning>
-    <output_file_type>                          ps         </output_file_type>
+    <output_file_type>                         png         </output_file_type>
     <force_calc type="boolean">              False         </force_calc>
     <force_gradecalc type="boolean">         False         </force_gradecalc>
     <force_taylorcalc type="boolean">        False         </force_taylorcalc>
@@ -1072,7 +1072,7 @@ This namelist is part of the ESMValTool
     <field_type>           T3M                          </field_type>
     <diag_script_cfg_dir>  ./nml/cfg_lauer17rse/        </diag_script_cfg_dir>
     <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1980 2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
-    <tags> R_atmos, R_land, R_seaIce, R_ocean, R_aerosol, R_atmosChem, T_ghg, T_bgchem, T_phys, T_atmDyn, T_clouds, T_seaIce, T_bgphys , T_aerosols  </tags>
+    <tags> D_gleckler08jgr, R_atmos, R_land, R_seaIce, R_ocean, R_aerosol, R_atmosChem, T_ghg, T_bgchem, T_phys, T_atmDyn, T_clouds, T_seaIce, T_bgphys , T_aerosols  </tags>
     <diag_script cfg="cfg_perfmetrics_grading_collect.ncl">    perfmetrics_grading_collect.ncl         </diag_script>
     </diag>
 
@@ -1098,6 +1098,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA">         xco2     </variable>
     <variable only="ESA">        xco2Stderr     </variable>
     <field_type>          T2Ms                  </field_type>
+    <tags> R_atmos, T_ghg, T_carbon </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model> CMIP5_ETHZ BNU-ESM      Amon esmHistorical r1i1p1  2009 2014 @{MODELPATH}/ETHZ_CMIP5 </model>
@@ -1119,6 +1120,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA"> ts               </variable>
     <variable only="ESA"> tsStderr              </variable>
     <field_type>          T2Ms                  </field_type>
+    <tags> R_ocean, R_atmos, T_phys </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1992 2010  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1184,6 +1186,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA"> sm                </variable>
     <variable only="ESA"> smStderr               </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_land, T_phys </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           Lmon  historical   r1i1p1  1988 2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1225,6 +1228,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA"> clt               </variable>
     <variable only="ESA"> cltStderr              </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_atmos, T_clouds </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1982 2014  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1268,8 +1272,8 @@ This namelist is part of the ESMValTool
     <model>  CMIP5_ETHZ  MRI-CGCM3           Amon  historical   r1i1p1  1982 2014  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  NorESM1-M           Amon  historical   r1i1p1  1982 2014  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  NorESM1-ME          Amon  historical   r1i1p1  1982 2014  @{MODELPATH}/ETHZ_CMIP5/ </model>
-    <model id="ESA"> OBS ESACCI-CLOUD        sat    AVHRR-fv2.0         1982 2014  @{OBSPATH}/Tier2/ESACCI-CLOUD </model>
      <model>         OBS PATMOS              sat    1                   1982 2014  @{OBSPATH}/Tier2/PATMOS       </model>
+    <model id="ESA"> OBS ESACCI-CLOUD        sat    AVHRR-fv2.0         1982 2014  @{OBSPATH}/Tier2/ESACCI-CLOUD </model>
     </diag>
 
     <diag>
@@ -1289,6 +1293,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA"> toz               </variable>
     <variable only="ESA"> tozStderr              </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_atmos, R_atmosChem, T_chem </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ CESM1-WACCM    Amon historical r2i1p1 1997 2010 @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1307,6 +1312,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA"> od550aer          </variable>
     <variable only="ESA"> od550aerStderr         </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_aerosol, T_aerosols </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           aero  historical   r1i1p1  2003 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1339,6 +1345,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESA"> od870aer          </variable>
     <variable only="ESA"> od870aerStderr         </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_aerosol, T_aerosols </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1361,6 +1368,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>    ./variable_defs/       </variable_def_dir>
     <variable ref_model="ERA"> tas               </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_atmos, T_phys </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_taylor_esa.ncl"> clouds_taylor.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1980 1982  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1423,6 +1431,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir> ./variable_defs/ </variable_def_dir>
     <variable ref_model="ESACCI-SST"> ts </variable>
     <field_type> T2Ms </field_type>
+    <tags> R_ocean, T_phys </tags>
     <diag_script cfg="./nml/cfg_lauer17rse/cfg_sst_ESACCI_fig3.py"> sst_ESACCI.py </diag_script>
     <launcher_arguments> [('execute_as_shell', False)] </launcher_arguments>
     <model> CMIP5_ETHZ  MPI-ESM-P      Amon  historical  r1i1p1  1992  2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -1439,6 +1448,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir> ./variable_defs/ </variable_def_dir>
     <variable ref_model="ESACCI-SST"> tos </variable>
     <field_type> T2Ms </field_type>
+    <tags> R_ocean, T_phys </tags>
     <diag_script cfg="./nml/cfg_lauer17rse/cfg_sst_ESACCI_fig4.py"> sst_ESACCI.py </diag_script>
     <launcher_arguments> [('execute_as_shell', False)] </launcher_arguments>
     <model> OBS         ESACCI-SST     sat   L4-GHRSST-SSTdepth-OSTIA-GLOB   1992  2005  @{OBSPATH}/Tier2/ESACCI-SST/ </model>
@@ -1461,6 +1471,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>                 ./variable_defs/            </variable_def_dir>
     <variable>                          sic                        </variable>
     <field_type>                        T2Ms                       </field_type>
+    <tags> R_seaIce, T_seaIce </tags>
     <diag_script_cfg_dir>              ./nml/cfg_lauer17rse/       </diag_script_cfg_dir>
     <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_tsline.ncl       </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0       OImon  historical  r1i1p1  1960  2020  @{MODELPATH}/ETHZ_CMIP5/   </model>
@@ -1613,6 +1624,7 @@ This namelist is part of the ESMValTool
     <description> NH sic contour plots (observations) </description>
     <variable_def_dir>                 ./variable_defs/            </variable_def_dir>
     <variable>                          sic                        </variable>
+    <tags> R_seaIce, T_seaIce </tags>
     <field_type>                        T2Ms                       </field_type>
     <diag_script_cfg_dir>              ./nml/cfg_lauer17rse/       </diag_script_cfg_dir>
     <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_polcon.ncl       </diag_script>
@@ -1640,6 +1652,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>                 ./variable_defs/            </variable_def_dir>
     <variable>                          sic                        </variable>
     <field_type>                        T2Ms                       </field_type>
+    <tags> R_seaIce, T_seaIce </tags>
     <diag_script_cfg_dir>              ./nml/cfg_lauer17rse/       </diag_script_cfg_dir>
     <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_polcon_diff.ncl  </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0       OImon  historical  r1i1p1  1960  2020  @{MODELPATH}/ETHZ_CMIP5/   </model>
@@ -1782,6 +1795,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>                 ./variable_defs/            </variable_def_dir>
     <variable>                          sic                        </variable>
     <field_type>                        T2Ms                       </field_type>
+    <tags> R_seaIce, T_seaIce </tags>
     <diag_script_cfg_dir>              ./nml/cfg_lauer17rse/       </diag_script_cfg_dir>
     <diag_script cfg="cfg_SeaIce_SH.ncl">  SeaIce_polcon_diff.ncl  </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0       OImon  historical  r1i1p1  1960  2020  @{MODELPATH}/ETHZ_CMIP5/   </model>
@@ -1929,6 +1943,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>    ./variable_defs/  </variable_def_dir>
     <variable>            clt               </variable>
     <field_type>          T2Ms              </field_type>
+    <tags> R_atmos, T_clouds </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds.ncl"> clouds.ncl </diag_script>
     <model>  OBS         ESACCI-CLOUD        sat    AVHRR-fv2.0         1982 2014  @{OBSPATH}/Tier2/ESACCI-CLOUD </model>
@@ -1939,6 +1954,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>    ./variable_defs/  </variable_def_dir>
     <variable>            cltStderr         </variable>
     <field_type>          T2Ms              </field_type>
+    <tags> R_atmos, T_clouds </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_err.ncl"> clouds.ncl </diag_script>
     <model>  OBS         ESACCI-CLOUD        sat    AVHRR-fv2.0         1982 2014  @{OBSPATH}/Tier2/ESACCI-CLOUD </model>
@@ -1950,6 +1966,7 @@ This namelist is part of the ESMValTool
     <variable>            clt                   </variable>
     <variable only="ESA"> cltStderr             </variable>
     <field_type>          T2Ms                  </field_type>
+    <tags> R_atmos, T_clouds </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_ipcc.ncl"> clouds_ipcc.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1982 2014  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2010,6 +2027,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>    ./variable_defs/       </variable_def_dir>
     <variable>            clt                    </variable>
     <field_type>          T2Ms                   </field_type>
+    <tags> R_atmos, T_clouds </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
     <diag_script cfg="cfg_clouds_interannual_esa.ncl"> clouds_interannual.ncl </diag_script>
     <model>  CMIP5_ETHZ  ACCESS1-0           Amon  historical   r1i1p1  1982 2014  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2073,6 +2091,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ESACCI-SOILMOISTURE" MIP="Lmon">   sm         </variable>
     <variable exclude="ESACCI-SOILMOISTURE" MIP="Amon">     pr         </variable>
     <field_type>                                          T2Ms         </field_type>
+    <tags> R_atmos, R_land, T_phys </tags>
     <diag_script cfg="./nml/cfg_lauer17rse/cfg_sm_ESACCI.py"> sm_ESACCI.py </diag_script>
     <launcher_arguments> [('execute_as_shell', False)]                 </launcher_arguments>
     <model> CMIP5_ETHZ  CNRM-CM5      MIP_VAR_DEF  historical  r1i1p1  1988  2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2089,6 +2108,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir> ./variable_defs/ </variable_def_dir>
     <variable ref_model="ESACCI-LANDCOVER"> shrubNtreeFrac </variable>
     <field_type> T2Ms </field_type>
+    <tags> R_land, T_phys </tags>
     <diag_script cfg="./nml/cfg_lauer17rse/cfg_lc_ESACCI.py"> lc_ESACCI.py </diag_script>
     <launcher_arguments> [('execute_as_shell', False)] </launcher_arguments>
     <model> CMIP5_ETHZ  MPI-ESM-MR    Lmon  historical  r1i1p1  2000  2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2105,6 +2125,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir> ./variable_defs/ </variable_def_dir>
     <variable ref_model="ESACCI-LANDCOVER"> grassNcropFrac </variable>
     <field_type> T2Ms </field_type>
+    <tags> R_land, T_phys </tags>
     <diag_script cfg="./nml/cfg_lauer17rse/cfg_lc_ESACCI.py"> lc_ESACCI.py </diag_script>
     <launcher_arguments> [('execute_as_shell', False)] </launcher_arguments>
     <model> CMIP5_ETHZ  MPI-ESM-MR    Lmon  historical  r1i1p1  2000  2005  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2121,6 +2142,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>     ./variable_defs/             </variable_def_dir>
     <variable ref_model="ESACCI-AEROSOL">  od550aer     </variable>
     <field_type>           T2Ms                         </field_type>
+    <tags> R_aerosol, T_aerosols </tags>
     <diag_script_cfg_dir>  ./nml/cfg_lauer17rse/        </diag_script_cfg_dir>
     <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0       aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  GFDL-CM3            aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2136,6 +2158,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>     ./variable_defs/                </variable_def_dir>
     <variable ref_model="ESACCI-AEROSOL">  abs550aer       </variable>
     <field_type>           T2Ms                            </field_type>
+    <tags> R_aerosol, T_aerosols </tags>
     <diag_script_cfg_dir>  ./nml/cfg_lauer17rse/           </diag_script_cfg_dir>
     <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0       aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  GFDL-CM3            aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2151,6 +2174,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>     ./variable_defs/               </variable_def_dir>
     <variable ref_model="ESACCI-AEROSOL">  od550lt1aer    </variable>
     <field_type>           T2Ms                           </field_type>
+    <tags> R_aerosol, T_aerosols </tags>
     <diag_script_cfg_dir>  ./nml/cfg_lauer17rse/   </diag_script_cfg_dir>
     <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0       aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  GFDL-CM3            aero  historical   r1i1p1  1997 2011  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2171,6 +2195,7 @@ This namelist is part of the ESMValTool
     <variable_def_dir>    ./variable_defs/                </variable_def_dir>
     <variable>            od550aer                        </variable>
     <field_type>          T2Ms                            </field_type>
+    <tags> R_aerosol, T_aerosols </tags>
     <diag_script_cfg_dir> ./nml/cfg_lauer17rse/           </diag_script_cfg_dir>
     <model>  OBS         ESACCI-AEROSOL      sat          SU-v4.21      2003 2011  @{OBSPATH}/Tier2/ESACCI-AEROSOL  </model>
     <model>  OBS         MODIS               sat          L3-C6         2003 2011  @{OBSPATH}/Tier2/MODIS-L3-C6     </model>
@@ -2187,6 +2212,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>          ./variable_defs/ </variable_def_dir>
    <variable>                    toz            </variable>
    <field_type>                  T2Ms           </field_type>
+    <tags> R_atmos, R_atmosChem, T_chem </tags>
    <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
    <diag_script cfg="cfg_eyring13jgr_fig02.ncl"> eyring13jgr_fig02.ncl </diag_script>
    <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r2i1p1 1960 2010 @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2212,6 +2238,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>                ./variable_defs/       </variable_def_dir>
    <variable>                                tro3prof       </variable>
    <field_type>                                  T2Mz       </field_type>
+   <tags> R_atmos, R_atmosChem, T_chem </tags>
    <diag_script_cfg_dir>              ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
    <diag_script cfg="cfg_esacci_vpline.ncl"> vpline.ncl     </diag_script>
    <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r2i1p1 2007 2008 @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2236,6 +2263,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>          ./variable_defs/ </variable_def_dir>
    <variable>                    toz            </variable>
    <field_type>                  T2Ms           </field_type>
+   <tags> R_atmos, R_atmosChem, T_chem </tags>
    <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
    <diag_script cfg="cfg_eyring13jgr_fig01.ncl"> eyring13jgr_fig01.ncl </diag_script>
    <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r2i1p1 1997 2010 @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2254,6 +2282,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>          ./variable_defs/ </variable_def_dir>
    <variable>                    toz            </variable>
    <field_type>                  T2Ms           </field_type>
+   <tags> R_atmos, R_atmosChem, T_chem </tags>
    <diag_script_cfg_dir> ./nml/cfg_lauer17rse/  </diag_script_cfg_dir>
    <diag_script cfg="cfg_eyring13jgr_fig01_NIWA.ncl"> eyring13jgr_fig01.ncl </diag_script>
    <model> CMIP5_ETHZ CESM1-WACCM    Amon historical r2i1p1 1997 2010 @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -2277,6 +2306,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>                     ./variable_defs/     </variable_def_dir>
    <variable>                                         xco2     </variable>
    <field_type>                                       T2Ms     </field_type>
+   <tags> R_atmos, T_carbon, T_ghg </tags>
    <diag_script_cfg_dir>                 ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
    <diag_script cfg="cfg_carbon_line_h.ncl">    tsline.ncl </diag_script>
    <diag_script cfg="cfg_carbon_line_6030.ncl"> tsline.ncl </diag_script>
@@ -2305,6 +2335,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>     ./variable_defs/     </variable_def_dir>
    <variable>                         xco2     </variable>
    <field_type>                       T2Ms     </field_type>
+   <tags> R_atmos, T_carbon, T_ghg </tags>
    <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
    <diag_script cfg="cfg_eyring13jgr_fig04.ncl"> eyring13jgr_fig04.ncl </diag_script>
    <model> CMIP5_ETHZ BNU-ESM      Amon esmHistorical r1i1p1  2003 2008 @{MODELPATH}ETHZ_CMIP5 </model>
@@ -2325,6 +2356,7 @@ This namelist is part of the ESMValTool
    <variable_def_dir>     ./variable_defs/     </variable_def_dir>
    <variable>                         xco2     </variable>
    <field_type>                       T2Ms     </field_type>
+   <tags> R_atmos, T_carbon, T_ghg </tags>
    <diag_script_cfg_dir> ./nml/cfg_lauer17rse/ </diag_script_cfg_dir>
    <diag_script cfg="cfg_eyring13jgr_fig04.ncl"> eyring13jgr_fig04.ncl </diag_script>
    <model> CMIP5_ETHZ BNU-ESM      Amon esmHistorical r1i1p1  2009 2014 @{MODELPATH}ETHZ_CMIP5 </model>

@@ -207,7 +207,9 @@ begin
         if (diag_script_info@sort) then
             pid = sort_alphabetically(data_all&models, \
                                       ind(data_all&models.eq."Mean-model".or. \
-                                          data_all&models.eq."Median-model"), \
+                                          data_all&models.eq."Median-model".or. \
+                                          data_all&models.eq."multi-model-mean".or. \
+                                          data_all&models.eq."multi-model-median"), \
                                       "begin")
             if (dimsizes(dimsizes(data_all)).eq.3) then
                 tmp = data_all(:, pid, :)

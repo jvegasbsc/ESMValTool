@@ -251,7 +251,7 @@ begin
 end
 
 undef("precip_domain")
-procedure precip_domain(storage_vault [1] : logical,
+function precip_domain(storage_vault [1] : logical,
                      di [1] : logical,
                      plot_settings [1] : logical,
                      storage_name [1] : string,
@@ -455,4 +455,6 @@ begin
         end if
     info_output(">>>>>>>> Leaving precip_domain", verbosity, 6)
     end do  ; curr_page = 0, total_no_of_pages - 1
+
+    return( [/figures_per_page,model_panel_placement/] )
 end

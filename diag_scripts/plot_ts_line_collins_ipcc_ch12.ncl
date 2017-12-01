@@ -282,14 +282,14 @@ begin
     alltags = array_append_record(tags,\
            (/"DM_glob", "PT_times", "ST_mean", "ST_stddev", "ST_anomaly"/), 0)
     string1 = "Time series of global annual mean  " + variable_info@long_name +\
-              " anomalies (relative to " + models@start_year(0)+ "-" + \
-              models@end_year(0) + ") from CMIP5 concentration drive " + \
+              " anomalies (relative to " + diag_script_info@begin_ref_year + "-" + \
+              diag_script_info@end_ref_year + ") from CMIP5 concentration drive " + \
               "experiments. Projections are shown for each RCP for the " + \
               "multi-model mean (solid lines) and the 5 to 95% range " + \
-              "(+-1.64 standar deviation) across the distribution of " + \
+              "(+-1.64 standard deviation) across the distribution of " + \
               "individual models (shading). "
     if (nperiods .gt. 1) then
-        string2 = "Discontinuities at 2100 are due to different numbers of" + \
+        string2 = "Discontinuities at 2100 are due to different numbers of " + \
 		  "models performing the extension runs beyond the 21st " + \
 		  "century and have no physical meaning. Only one ensemble " + \
 		  "member is used from each model and numbers in the " + \
