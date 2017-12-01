@@ -7,7 +7,7 @@
 ;;#############################################################################
 ;; Description
 ;;    Lagged correlation of precipitation anomalies with respect to an area
-;;    avearged region in the Indian Ocean
+;;    averaged region in the Indian Ocean
 ;;
 ;; Required diag_script_info attributes (diagnostics specific)
 ;;                  fca: start frequency to compute Lancoz weights
@@ -385,7 +385,7 @@ begin
     diag_script_base = basename(diag_script)
     output_dir = get_output_dir(plot_dir, diag_script_base)
     caption = "Lagged correlation of precipitation anomalies with respect to " \
-              + "an area avearged region in the Indian Ocean"
+              + "an area averaged region in the Indian Ocean"
     alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "PT_geo"/), 0)
     id = diag_script + "_latlon_" + variables(0)
     aux_filename_info = di@season + "-rp-timelat-rp-timelon"

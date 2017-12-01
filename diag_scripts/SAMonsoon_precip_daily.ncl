@@ -385,9 +385,9 @@ begin
         if (any(idx_mod .eq. plot_settings@idx_ref)) then
             continue
         end if
-        caption = "Contour plot of variable "  + variables(0) \
-                  + " over given season (" + di@season + ") average " \
-                  + "of standard deviation across indicated years band pass filtered."
+        caption = "Average of standard deviation of variable "  \
+                  + variables(0) + ", band pass filtered (" + filter_period \
+                  + " daily rainfall) across indicated years."
         alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
         climofiles = new(2, string)
         climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
@@ -405,9 +405,9 @@ begin
 
         ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
 
-        caption = "Contour plot of variable "  + variables(0) \
-                  + " over given season (" + di@season + ") average " \
-                  + "of normalized standard deviation across indicated years band pass filtered."
+        caption = "Average of normalized standard deviation of variable "  \
+                  + variables(0) + ", band pass filtered (" + filter_period \
+                  + " daily rainfall) across indicated years."
         alltags = array_append_record(tags, (/"DM_trop", "ST_stddev", "PT_geo"/), 0)
         id = diag_script + "_stddev_norm_" + variables(0)
         aux_filename_info = di@season + "-stddev_norm"
@@ -444,9 +444,10 @@ begin
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
 
-    caption = "Contour plot of variable "  + variables(0) \
-              + " over given season (" + di@season + ") average " \
-              + "of standard deviation across indicated years band pass filtered."
+    caption = "Average of standard deviation of variable "  \
+                  + variables(0) + ", band pass filtered (" + filter_period \
+                  + " daily rainfall) across indicated years over given season (" \
+                  + di@season + ")."
 
     id = diag_script + "_stddev_panel_" + variables(0)
 
@@ -512,9 +513,10 @@ begin
                res)
 
     ;; Attach Metadata to plot
-    caption = "Contour plot of variable "  + variables(0) \
-              + " over given season (" + di@season + ") average " \
-              + "of normalized standard deviation across indicated years band pass filtered."
+    caption = "Average of normalized standard deviation of variable "  \
+                  + variables(0) + ", band pass filtered (" + filter_period \
+                  + " daily rainfall) across indicated years over given season (" \
+                  + di@season + ")."
 
     id = diag_script + "_stddev_norm_panel_" + variables(0)
 

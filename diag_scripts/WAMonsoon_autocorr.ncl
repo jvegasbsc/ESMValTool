@@ -519,7 +519,8 @@ begin
         if (any(idx_mod .eq. plot_settings@idx_ref)) then
             continue
         end if
-        caption = " 1-day autocorrelation of intraseasonal anomalies."
+        caption = filter + " " + variable_info@long_name + "autocorrelation over the " \
+                  + di@season + " season."
         alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "PT_geo"/), 0)
         climofiles = new(2, string)
         climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
@@ -555,7 +556,8 @@ begin
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "PT_geo"/), 0)
 
-    caption = "Standard deviation of the filtered field over the " + di@season + " season."
+    caption = "Standard deviation of 1-day autocorr of " + filter + " " + variable_info@long_name \
+             + " over the " + di@season + " season."
 
     id = diag_script + "_corr_" + variables(0)
 

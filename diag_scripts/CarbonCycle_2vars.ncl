@@ -256,7 +256,7 @@ begin
            (/"PT_scatter", "ST_mean"/), 0)
     caption = "Scatterplot for " + variables(0) + " and " + \
               variables(1) + " over the period " + start_year + \
-              "-" + end_year
+              "-" + end_year + ", similar to Anav etal., 2013, Fig. 12."
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name) * dimsizes(variables), string)
     do n_var = 0, dimsizes(variables) - 1
