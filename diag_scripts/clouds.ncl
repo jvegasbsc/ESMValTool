@@ -677,8 +677,8 @@ begin
             end if
         end if
 
-        data1@res_gsnLeftStringFontHeightF  = min((/0.02, 0.015 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
-        data1@res_gsnRightStringFontHeightF = min((/0.02, 0.015 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+        data1@res_gsnLeftStringFontHeightF  = max((/0.015, 0.015 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+        data1@res_gsnRightStringFontHeightF = max((/0.015, 0.015 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
 
         ; ###########################################
         ; # create the plot                         #
@@ -793,12 +793,12 @@ begin
         pres@gsnPanelFigureStrings        = models@name(plotind)    ; print model name on
                                                                ; each panel
     end if
-    pres@gsnPanelFigureStringsFontHeightF = min((/0.01, 0.008 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
-    pres@lbLabelFontHeightF               = min((/0.02, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+    pres@gsnPanelFigureStringsFontHeightF = max((/0.008, 0.008 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+    pres@lbLabelFontHeightF               = max((/0.01, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
     pres@lbAutoManage                     = False
     pres@lbTopMarginF                     = 0.1
     pres@lbTitleOn                        = True
-    pres@lbTitleFontHeightF               = min((/0.02, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+    pres@lbTitleFontHeightF               = max((/0.01, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
     pres@lbTitlePosition                  = "Bottom"
     pres@lbTitleString                    = data1@long_name + " (" + data1@units + ")"
     pres@lbPerimOn                        = False     ; draw line around label
@@ -943,8 +943,8 @@ begin
             ; # plot ressources                         #
              ; ###########################################
 
-            diff@res_gsnLeftStringFontHeightF  = min((/0.02, 0.02 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
-            diff@res_gsnRightStringFontHeightF = min((/0.02, 0.02 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+            diff@res_gsnLeftStringFontHeightF  = max((/0.01, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+            diff@res_gsnRightStringFontHeightF = max((/0.01, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
 
             diff@res_tiMainOn      = False
 
