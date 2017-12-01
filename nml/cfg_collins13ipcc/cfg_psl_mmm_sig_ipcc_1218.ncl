@@ -20,6 +20,7 @@ diag_script_info@label = (/"RCP2.6 - DJF","RCP4.5 - DJF","RCP8.5 - DJF", "RCP2.6
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.18"
   
 ;enable to output to netCDF; either use "default" or give a full file name
 diag_script_info@ncdf = "psl_mmm_sig_ipcc_1218.nc" 

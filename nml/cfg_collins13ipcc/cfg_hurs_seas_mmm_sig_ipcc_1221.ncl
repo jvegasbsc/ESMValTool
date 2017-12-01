@@ -20,7 +20,8 @@ diag_script_info@label = (/"2046-2065 - DJF", "2081-2100 - DJF", "2046-2065 - JJ
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
-  
+diag_script_info@figure_nr = "12.21"
+
 ;enable to output to netCDF; either use "default" or give a full file name
 diag_script_info@ncdf = "hurs_mmm_sig_ipcc_1221_seasonalclim.nc" 
 diag_script_info@diagscript = "map_diff_mmm_stippandhatch_ipcc12"

@@ -255,7 +255,9 @@ begin
 
         ; -------------------------------------------------------------------------------
         ; add meta data to plot (for reporting)
-        caption = "Mean " + variables(0) + " from " + models@name(mID) + "."
+        caption = "Mean " + variables(0) + " from " + models@name(mID) + \
+            " averaged over the " + get_start_year(mID) + "-" + \
+            get_end_year(mID) + " time-period."
         id = diag_script + "_" + variables(0)
         alltags = array_append_record(ttags, "ST_mean", 0)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
@@ -278,7 +280,12 @@ begin
 
             ; -------------------------------------------------------------------------------
             ; add meta data to plot (for reporting)
-            caption = variables(0) + " " + models@name(mID) + " - " + models@name(refID) + "."
+            caption = "Mean " + variables(0) + " difference " + \
+                models@name(mID) + " - " + models@name(refID) + \
+                " averaged over the " + \
+                get_start_year(mID) + "-" + get_end_year(mID) + " and " + \
+                get_start_year(refID) + "-" + get_end_year(refID) + \
+                " time-periods, respectively."
             id = diag_script + "_" + variables(0)
             alltags = array_append_record(ttags, "ST_diff", 0)
             idx = (/mID, refID/)

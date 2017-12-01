@@ -457,7 +457,7 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ CCSM4           MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-BGC       MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-CAM5      MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
-        <model> CMIP5_ETHZ CESM1-CAM5-1-FV MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ CESM1-CAM5-1-FV2 MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-FASTCHEM  MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CESM1-WACCM     MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
         <model> CMIP5_ETHZ CMCC-CESM       MIP_VAR_DEF historical r1i1p1 1980 1999 @{MODELPATH}/ETHZ_CMIP5 </model>
