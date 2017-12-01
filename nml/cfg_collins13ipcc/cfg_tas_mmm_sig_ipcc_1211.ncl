@@ -16,6 +16,7 @@ diag_script_info@max_hori     =    3
 diag_script_info@title = "Annual mean surface air temperature change"
 diag_script_info@label = (/"RCP2.6: 2046-2065", "RCP2.6: 2081-2100", "RCP2.6: 2181-2200", "RCP4.5: 2046-2065", "RCP4.5: 2081-2100", "RCP4.5: 2181-2200", "RCP6.0: 2046-2065", "RCP6.0: 2081-2100", "RCP6.0: 2181-2200", "RCP8.5: 2046-2065", "RCP8.5: 2081-2100", "RCP8.5: 2181-2200"/)
 diag_script_info@units = (/"(~F35~J~F~C)"/)
+diag_script_info@figure_nr = "12.11"
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
 diag_script_info@sig = True

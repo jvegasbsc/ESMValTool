@@ -20,6 +20,7 @@ diag_script_info@units = "(mm)"
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.23"
 
   
 ;enable to output to netCDF; either use "default" or give a full file name

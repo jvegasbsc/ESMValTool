@@ -17,6 +17,7 @@ diag_script_info@label = (/"RCP2.6", "RCP4.5", "RCP6.0", "RCP8.5"/)
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.25"
 
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"

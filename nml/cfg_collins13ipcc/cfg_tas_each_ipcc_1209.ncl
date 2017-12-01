@@ -11,6 +11,7 @@ diag_script_info@max_hori     =    5 ; 5 is good for all models
 diag_script_info@title = "Annual mean surface air temperature change (RCP4.5: 2081-2100)"
 diag_script_info@time_avg = "annualclim"
 diag_script_info@experiment = "rcp45"
+diag_script_info@figure_nr = "12.09"
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
 

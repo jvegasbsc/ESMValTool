@@ -18,6 +18,7 @@ diag_script_info@max_hori     =    3
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.12"
 
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
