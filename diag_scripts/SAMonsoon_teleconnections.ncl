@@ -448,8 +448,8 @@ begin
         if (any(idx_mod .eq. plot_settings@idx_ref)) then
             continue
         end if
-        caption = "Contour plot with the correlation between precipitaion over "\
-                  + "India and SST in the Nino 3.4 area"
+        caption = "Contour plot with the correlation between precipitation "\
+                  + "and SST in the Nino 3.4 area"
         alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "ST_diff", "PT_geo"/), 0)
         climofiles = new(3, string)
         climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
@@ -482,8 +482,8 @@ begin
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "PT_geo"/), 0)
 
-    caption = "Contour plot with the correlation between precipitaion over "\
-                  + "India and SST in the Nino 3.4 area"
+    caption = "Contour plot with the correlation between precipitation "\
+                  + "and SST in the Nino 3.4 area"
 
     id = diag_script + "_mean_" + variables(0)
 
@@ -548,8 +548,8 @@ begin
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "ST_diff", "PT_geo"/), 0)
 
-    caption = "Difference of the correlation between precipitaion over "\
-                  + "India and SST in the Nino 3.4 area"
+    caption = "Difference of the correlation between precipitation "\
+                  + "and SST in the Nino 3.4 area"
 
     id = diag_script + "_mean_diff" + variables(0)
 

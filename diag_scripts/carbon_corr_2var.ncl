@@ -420,7 +420,8 @@ begin
 
   caption = "Correlations between the interannual variability of global " \
             +"co2flux (nbp+fgco2) and tropical temperature for the individual " \
-            +"CMIP5 models using esmHistorical simulations, and for observations."
+            +"CMIP5 models using esmHistorical simulations, and for observations, "\
+            +"similar to Wenzel et al., JGR, 2014, fig. 3/4."
 
   id = diag_script + "_" + variables(0) + "_" + variables(1)
 

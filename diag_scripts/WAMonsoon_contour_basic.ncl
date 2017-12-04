@@ -310,7 +310,7 @@ begin
         if (any(idx_mod .eq. plot_settings@idx_ref)) then
             continue
         end if
-        caption = "Geographivcal distribution of variable " + variables(0) + \
+        caption = "Geographical distribution of variable " + variables(0) + \
                   ", averaged over the " + di@season + " season."
         alltags = array_append_record(tags, (/"DM_reg", "ST_clim", "PT_geo"/), 0)
         climofiles = new(2, string)

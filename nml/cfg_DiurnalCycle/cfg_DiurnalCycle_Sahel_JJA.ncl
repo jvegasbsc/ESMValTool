@@ -8,8 +8,8 @@ diag_script_info@styleset = "CMIP5"
 diag_script_info@latrange = (/ 12, 23/)      
 diag_script_info@lonrange = (/ -10, 10/)      
 ;diag_script_info@colors = (/"blue","orange","green","purple","black"/)    
-diag_script_info@dashes = (/0,0,0,0,0/)
-diag_script_info@thicks = (/2,2,2,2,4/)    
+;diag_script_info@dashes = (/0,0,0,0,0/)
+;diag_script_info@thicks = (/2,2,2,2,4/)    
 
 diag_script_info@multi_model_mean = "y"
 diag_script_info@supporting_gridlines = "y"

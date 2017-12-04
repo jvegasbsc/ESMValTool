@@ -1,5 +1,5 @@
 ;;#############################################################################
-;; ANNUAL CYCLE PLOTS FOR SEA ICE AREA AND EXTENT
+;; TIMESERIES PLOTS FOR SEA ICE AREA AND EXTENT
 ;;#############################################################################
 ;; Author: Daniel Senftleben (DLR, Germany)
 ;; ESMVal project
@@ -454,17 +454,17 @@ begin
         plot_fname = wks_ext@fullname
         alltags = array_append_record(tags, (/"DM_polar", "PT_seas", "ST_mean", "ST_stddev"/), 0)
         caption = "Timeseries of sea ice extent."
-        id = "#idSeaIceTslineExtent"
+        if (diag_script_info@fill_pole_hole) then
+            caption = caption + " Polar hole in observations was filled assuming 100% sea ice concentration."
+        end if
+        id = "#idSeaIceTslineArea"
         contrib_authors = (/"A_gott_kl", "A_hueb_mi", "A_eval_ma", "A_brae_me", "A_senf_da"/)
         ESMValMD(plot_fname, alltags, caption, id, var0, models@name, climofiles, diag_script, contrib_authors)
         delete([/plot_fname, alltags, caption, id/])
         plot_fname = wks_area@fullname
         alltags = array_append_record(tags, (/"DM_polar", "PT_seas", "ST_mean", "ST_stddev"/), 0)
         caption = "Timeseries of sea ice area."
-        id = "#idSeaIceTslineArea"
-        ESMValMD(plot_fname, alltags, caption, id, var0, models@name, climofiles, diag_script, contrib_authors)
-        delete([/plot_fname, alltags, caption, id/])
-    
+
         info_output(" gs " + wks_ext@fullname + " &", verbosity, 1)
         info_output(" gs " + wks_area@fullname + " &", verbosity, 1)
 

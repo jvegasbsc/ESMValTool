@@ -32,6 +32,7 @@ This namelist is part of the ESMValTool
     <exit_on_warning  type="boolean">          False  </exit_on_warning>
     <read_from_vault type="boolean">           False  </read_from_vault>
     <output_file_type>                           png  </output_file_type>
+    <tags>                                             P_embrace      </tags>
 </GLOBAL>
 
 <MODELS>       
@@ -47,6 +48,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ceres">                                        rsds  </variable>
     <field_type>                                                        T2Is  </field_type>
     <diag_script_cfg_dir>                             ./nml/cfg_DiurnalCycle/  </diag_script_cfg_dir>
+    <tags>                                                    R_atmos, T_phys  </tags> 
 
     <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl </diag_script>
     <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl </diag_script>
@@ -90,6 +92,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ceres">                                        rlds  </variable>
     <field_type>                                                        T2Is  </field_type>
     <diag_script_cfg_dir>                             ./nml/cfg_DiurnalCycle/ </diag_script_cfg_dir>
+    <tags>                                                    R_atmos, T_phys </tags>
 
     <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl  </diag_script>
     <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl  </diag_script>
@@ -133,6 +136,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ceres">                                      rsdscs  </variable>
     <field_type>                                                        T2Is  </field_type>
     <diag_script_cfg_dir>                             ./nml/cfg_DiurnalCycle/ </diag_script_cfg_dir>
+    <tags>                                                    R_atmos, T_phys </tags>
 
     <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl  </diag_script>
     <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl  </diag_script>
@@ -177,6 +181,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ceres">                                     rldscs   </variable>
     <field_type>                                                     T2Is     </field_type>
     <diag_script_cfg_dir>                            ./nml/cfg_DiurnalCycle/  </diag_script_cfg_dir>
+    <tags>                                                    R_atmos, T_phys </tags>
 
     <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl  </diag_script>
     <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl  </diag_script>
@@ -220,6 +225,7 @@ This namelist is part of the ESMValTool
      <variable ref_model="ceres">                                        rsus  </variable>
      <field_type>                                                        T2Is  </field_type>
      <diag_script_cfg_dir>                             ./nml/cfg_DiurnalCycle/ </diag_script_cfg_dir>
+     <tags>                                                    R_atmos, T_phys </tags>
 
      <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl  </diag_script>
      <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl  </diag_script>
@@ -263,6 +269,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ceres">                                      rsuscs  </variable>
     <field_type>                                                        T2Is  </field_type>
     <diag_script_cfg_dir>                             ./nml/cfg_DiurnalCycle/ </diag_script_cfg_dir>
+     <tags>                                                    R_atmos, T_phys </tags>
 
     <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl  </diag_script>
     <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl  </diag_script>
@@ -306,6 +313,7 @@ This namelist is part of the ESMValTool
     <variable ref_model="ceres">                                        rlus  </variable>
     <field_type>                                                        T2Is  </field_type>
     <diag_script_cfg_dir>                             ./nml/cfg_DiurnalCycle/ </diag_script_cfg_dir>
+     <tags>                                                    R_atmos, T_phys </tags>
 
     <diag_script cfg="cfg_DiurnalCycle_Sahel_DJF.ncl">  DiurnalCycle_box.ncl  </diag_script>
     <diag_script cfg="cfg_DiurnalCycle_WestAf_DJF.ncl"> DiurnalCycle_box.ncl  </diag_script>

@@ -349,7 +349,7 @@ begin
 
 ;;# add tags
     alltags = array_append_record(tags, \
-           (/"DM_glob", "PT_geo", "ST_clim"/), 0)
+           (/"DM_global", "PT_geo", "ST_clim"/), 0)
     caption = "Surface change in " + variable_info@long_name + " in " + \
               models@start_year(idx_rcp)+ "-" + models@end_year(idx_rcp) + \
               " displayed as anomalies with respect to " + \

@@ -18,7 +18,7 @@ diag_script_info@datapath = getenv("ESMValTool_OBSPATH") + "/Tier2/"+\
 diag_script_info@scatter_log = True
 
 ; Legend outside the plot
-diag_script_info@legend_outside = True
+diag_script_info@legend_outside = False
 
 ; Lat-lon limits for aerosol_stations_map
 diag_script_info@minlon = -30

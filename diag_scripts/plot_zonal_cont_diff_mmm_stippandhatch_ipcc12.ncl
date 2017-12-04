@@ -453,7 +453,7 @@ begin
 
 ;;# add tags
     alltags = array_append_record(tags, \
-           (/"DM_glob", "PT_zonal", "ST_clim"/), 0)
+           (/"DM_global", "PT_zonal", "ST_clim"/), 0)
     caption = "CMIP5 multi-model changes in annual mean zonal mean " + \
                variable_info@long_name + \
                " relative to " + models@start_year(0) + "-" +  \
