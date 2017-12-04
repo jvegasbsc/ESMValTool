@@ -453,14 +453,20 @@ begin
         end if
         plot_fname = wks_ext@fullname
         alltags = array_append_record(tags, (/"DM_polar", "PT_seas", "ST_mean", "ST_stddev"/), 0)
-        caption = "Timeseries of sea ice extent. TODO: Problem with OBS* classes: for OBS* classes, interface_get_infile already returns path + file! Reason yet unknown."
+        caption = "Timeseries of sea ice extent."
+        if (diag_script_info@fill_pole_hole) then
+            caption = caption + " Polar hole in observations was filled assuming 100% sea ice concentration."
+        end if
         id = "#idSeaIceTslineExtent"
         contrib_authors = (/"A_gott_kl", "A_hueb_mi", "A_eval_ma", "A_brae_me", "A_senf_da"/)
         ESMValMD(plot_fname, alltags, caption, id, var0, models@name, climofiles, diag_script, contrib_authors)
         delete([/plot_fname, alltags, caption, id/])
         plot_fname = wks_area@fullname
         alltags = array_append_record(tags, (/"DM_polar", "PT_seas", "ST_mean", "ST_stddev"/), 0)
-        caption = "Timeseries of sea ice area. TODO: Problem with OBS* classes: for OBS* classes, interface_get_infile already returns path + file! Reason yet unknown."
+        caption = "Timeseries of sea ice area."
+        if (diag_script_info@fill_pole_hole) then
+            caption = caption + " Polar hole in observations was filled assuming 100% sea ice concentration."
+        end if
         id = "#idSeaIceTslineArea"
         ESMValMD(plot_fname, alltags, caption, id, var0, models@name, climofiles, diag_script, contrib_authors)
         delete([/plot_fname, alltags, caption, id/])
