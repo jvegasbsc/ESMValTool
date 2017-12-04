@@ -1,5 +1,5 @@
 ;;#############################################################################
-;; ANNUAL CYCLE PLOTS FOR SEA ICE AREA AND EXTENT
+;; TIMESERIES PLOTS FOR SEA ICE AREA AND EXTENT
 ;;#############################################################################
 ;; Author: Daniel Senftleben (DLR, Germany)
 ;; ESMVal project
