@@ -231,7 +231,6 @@ This namelist is part of the ESMValTool
 
     <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_tsline.ncl       </diag_script>
     <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_ancyc.ncl        </diag_script>
-    <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_polcon.ncl       </diag_script>
     <diag_script cfg="cfg_SeaIce_NH.ncl">  SeaIce_polcon_diff.ncl  </diag_script>
 </diag>
 
@@ -251,7 +250,6 @@ This namelist is part of the ESMValTool
 
     <diag_script cfg="cfg_SeaIce_SH.ncl">  SeaIce_tsline.ncl       </diag_script>
     <diag_script cfg="cfg_SeaIce_SH.ncl">  SeaIce_ancyc.ncl        </diag_script>
-    <diag_script cfg="cfg_SeaIce_SH.ncl">  SeaIce_polcon.ncl       </diag_script>
     <diag_script cfg="cfg_SeaIce_SH.ncl">  SeaIce_polcon_diff.ncl  </diag_script>
 </diag>
 </DIAGNOSTICS>
