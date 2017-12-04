@@ -43,6 +43,19 @@ def info(string, verbosity, required_verbosity):
         print("PY  info: " + str(string))
 
 
+def warning(string, verbosity, required_verbosity, exit_on_warning=False):
+    """ @brief Print a warning string to standard out and exit if necessary
+        @param string the warning message to print
+        @param verbosity the requested verbosity level
+        @param required_verbosity level required to print something
+    """
+    if (exit_on_warning is True):
+        raise RuntimeError("EXIT ON WARNING: " + str(string))
+    else:
+        if (verbosity >= required_verbosity):
+            print("PY  warning: " + str(string))
+
+
 def error(string):
     """ @brief Print an info string to standard error and exit execution
         @param string the info message to print

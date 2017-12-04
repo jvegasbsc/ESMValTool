@@ -42,9 +42,9 @@ The plots will be done based on a collection of individual namelists. The follow
 
 * Figure 9.35: Maximum entropy power spectra of surface air temperature averaged over the NINO3 region for the CMIP5 models and. The vertical lines correspond to periods of two and seven years.
 
-* Figure 9.36: ENSO metrics for pre-industrial control simulations in CMIP3 and CMIP5. (a) and (b): SST anomaly standard deviation (deg C) in Nino 3 and Nino 4, respectively, (c) precipitation response (standard deviation, mm/day) in Nino4. 
+* Figure 9.36: ENSO metrics for pre-industrial control simulations in CMIP3 and CMIP5. (a) and (b): SST anomaly standard deviation (deg C) in Nino 3 and Nino 4, respectively, (c) precipitation response (standard deviation, mm/day) in Nino4.
 
-* Figure 9.42: (b) Equilibrium climate sensitivity (ECS) against transient climate response (TCR).
+* Figure 9.42: (a) Equilibrium climate sensitivity (ECS) against the global mean surface temperature of CMIP5 models, both for the period 1961–1990 (larger symbols, cf. Figure 9.8, Table 9.5) and for the pre-industrial control runs (smaller symbols). (b) Equilibrium climate sensitivity (ECS) against transient climate response (TCR).
 
 * Figure 9.45: The carbon cycle-climate feedback (gamma\ :sub:`LT`\) versus the short-term sensitivity of atmospheric CO\ :sub:`2`\  to interannual temperature variability (gamma\ :sub:`IAV`\) in the tropics for CMIP5 models. The red line shows the best fit line across the CMIP5 simulations and the vertical dashed lines show the observed range of gamma\ :sub:`IAV`\. (b) Probability distribution function (PDF) for gamma\ :sub:`LT`\. The solid line is derived after applying the interannual variability (IAV) constraint to the models while the dashed line is the prior PDF derived purely from the models before applying the IAV constraint.
 
@@ -90,6 +90,8 @@ Diagnostics are stored in diag_scripts/
 * ipcc-fig-9-31.ncl (fig. 9.31: Two leading Empirical Orthogonal Functions (EOFs) of the observed outgoing longwave radiation (OLR).)
 
 * ipcc-fig-9-36.ncl (fig. 9.36: (Anomaly) standard deviation averaged over Nino 3 and Nino 4 regions.)
+
+* ipcc_fig_9_42_a.py (fig: 9.42a: GMSAT vs. ECS)
 
 * perfmetrics_grading.ncl (fig. 9.7: Performance metrics for essential climate parameters)
 
@@ -141,6 +143,7 @@ Variables
 * sic (ocean, monthly mean, longitude, latitude, time)
 * ta (atmos, monthly mean, longitude, latitude, level, time)
 * tas (atmos, monthly mean, longitude, latitude, time)
+* tas-degC (atmos, monthly mean, longitude, latitude, time)
 * toz (atmos, monthly mean, longitude, latitude, time)
 * tro3 (atmos, monthly mean, longitude, latitude, level, time)
 * ua (atmos, monthly mean, longitude, latitude, level, time)
@@ -244,12 +247,12 @@ Example plots
 .. figure:: /namelists/figures/ipccar5_ch9/fig-9-26.png
    :width: 60%
 
-   Similar to Flato et al. (2013), Fig. 9.26.
+   ResemblingFlato et al. (2013), Fig. 9.26.
 
 .. figure:: /namelists/figures/ipccar5_ch9/fig-9-27.png
    :width: 60%
 
-   Similar to Flato et al. (2013), Fig. 9.27.
+   Resembling Flato et al. (2013), Fig. 9.27.
 
 .. raw:: latex
 
@@ -258,7 +261,7 @@ Example plots
 .. figure:: /namelists/figures/ipccar5_ch9/fig7_ipccar5_ch9.png
    :width: 60%
 
-   Similar to Flato et al. (2013), Fig. 9.28.
+   Resembling Flato et al. (2013), Fig. 9.28.
 
 .. figure:: /namelists/figures/ipccar5_ch9/fig8_ipccar5_ch9.png
    :width: 60%
@@ -268,12 +271,12 @@ Example plots
 .. figure:: /namelists/figures/ipccar5_ch9/fig-9-30.png
    :width: 80%
 
-   Similar to Flato et al. (2013), Fig. 9.30.
+   Resembling Flato et al. (2013), Fig. 9.30.
 
 .. figure:: /namelists/figures/ipccar5_ch9/fig-9-31.png
    :width: 60%
 
-   Similar to Flato et al. (2013), Fig. 9.31.
+   Resembling Flato et al. (2013), Fig. 9.31.
 
 .. figure:: /namelists/figures/ipccar5_ch9/fig10_ipccar5_ch9.png
    :width: 60%
@@ -289,6 +292,11 @@ Example plots
    :width: 60%
 
    Resembling Flato et al. (2013), Fig. 9.36.
+
+.. figure:: ../../source/namelists/figures/ipccar5_ch9/fig-9-42a.png
+   :width: 50%
+
+   Resembling Flato et al. (2013), Fig. 9.42a.
 
 .. figure:: /namelists/figures/ecs_tcr/TCR.png
    :width: 50%
