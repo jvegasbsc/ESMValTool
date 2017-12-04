@@ -280,7 +280,7 @@ begin
     frame(wks)
 
     alltags = array_append_record(tags,\
-           (/"DM_glob", "PT_times", "ST_mean", "ST_stddev", "ST_anomaly"/), 0)
+           (/"DM_global", "PT_times", "ST_mean", "ST_stddev", "ST_anomaly"/), 0)
     string1 = "Time series of global annual mean  " + variable_info@long_name +\
               " anomalies (relative to " + diag_script_info@begin_ref_year + "-" + \
               diag_script_info@end_ref_year + ") from CMIP5 concentration drive " + \

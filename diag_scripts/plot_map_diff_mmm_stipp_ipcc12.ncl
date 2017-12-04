@@ -515,7 +515,7 @@ begin
 
 ;;# add tags
     alltags = array_append_record(tags, \
-           (/"DM_glob", "PT_geo", "ST_clim"/), 0)
+           (/"DM_global", "PT_geo", "ST_clim"/), 0)
     if (diag_script_info@diagscript .eq. \
         "calc_map_diff_scaleT_mmm_stipp_ipcc12") then
         string1 = variable_info@long_name + \

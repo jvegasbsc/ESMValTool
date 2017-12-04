@@ -390,7 +390,7 @@ begin
             tmp_mmm(:dim_MOD-2,:) = model_arr
             tmp_mmm(dim_MOD-1,:) = mmm
             mmm_ind = dim_MOD - 1
-            tmpm = array_append_record(models@name, "Multimodel mean", 0)
+            tmpm = array_append_record(models@name, "multi-model-mean", 0)
             
             delete([/model_arr,models@name/])
             model_arr = tmp_mmm
