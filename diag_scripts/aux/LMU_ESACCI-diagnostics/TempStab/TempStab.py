@@ -19,7 +19,7 @@ from scipy.ndimage.filters import uniform_filter1d
 import statsmodels.api as sm
 from models import LinearTrend, SineSeason3  # , SineSeasonk, SineSeason1
 #import matplotlib.pyplot as plt
-#from bfast import BFAST
+from bfast import BFAST
 
 ####
 # Additional functions
@@ -105,6 +105,7 @@ class TempStab(object):
         self.__numdate_orig__ = self.numdate.copy()
         self.__identified_gaps__ = []
         self.__min_time_step__ = None
+        self.__temp_fac__ = 1.
 
         # constants:
         # numeric tolerance for shift
@@ -121,12 +122,14 @@ class TempStab(object):
         self.__periods_method__ = kwargs.get('periods_method', "autocorr")
         # TODO smoothing filter size is a hard question
         self.smoothing = kwargs.get('smoothing4periods', 3)
+        self.temporal_res = kwargs.get('temporal_resolution', 'daily')
         self.__detrend_bool__ = kwargs.get('detrend', False)
         self.__deseason_bool__ = kwargs.get('deseason', False)
 
         self.__run__ = kwargs.get('run', False)
 
         # Set methods, conversion and integritiy checks
+        self.__set_temp_fac__()
         self.__set_break_model__()
         self.__set_season_model__()
         self.__set_time__()
@@ -151,6 +154,42 @@ class TempStab(object):
         set the annual frequency of numerical dates for finding gaps
         """
         self.frequency = frequency
+        
+    def __set_temp_fac__(self):
+        """
+        set the temporal resolution factor
+        """
+        
+        options = {"daily" : self.__daily_res__,
+                   "monthly" : self.__monthly_res__,
+                   "yearly" : self.__yearly_res__,
+#                   "nhrly" : self.__nhrly_res__() # not implemented properly
+                   }
+        options[self.temporal_res]()
+        
+    def __daily_res__(self):
+        """
+        set the temporal resolution factor for daily data
+        """
+        self.__temp_fac__ = 1.
+        
+    def __nhrly_res__(self, n):
+        """
+        set the temporal resolution factor for n-hourly data
+        """
+        self.__temp_fac__ = 1./24.*n
+        
+    def __monthly_res__(self):
+        """
+        set the temporal resolution factor for monthly data
+        """
+        self.__temp_fac__ = 365.2425/12.
+        
+    def __yearly_res__(self):
+        """
+        set the temporal resolution factor for yearly data
+        """
+        self.__temp_fac__ = 365.2425
 
 #    def set_smoothing4periods(self, smoothing_window):
 #        """
@@ -162,8 +201,8 @@ class TempStab(object):
         """
         checks the integrity of the input
         """
-#        assert self.break_method is not None, \
-#            'Method for breakpoint estimation needs to be provided'
+        assert self.break_method is not None, \
+            'Method for breakpoint estimation needs to be provided'
         assert len(self.dates) == len(self.array), \
             'Timeseries and data need to have the same dimension'
         assert isinstance(self.dates[0], datetime.datetime), \
@@ -212,6 +251,10 @@ class TempStab(object):
             self.__periods_fft_optim__()
         else:
             assert False, "Method for determining periods undefined!"
+            
+        # correct for temporal resolution
+
+        self.periods = [p*self.__temp_fac__ for p in self.periods]
             
         self.__trend_removed__ = None
         self.prep = self.array.copy()
@@ -361,7 +404,7 @@ class TempStab(object):
         # loc_prep = uniform_filter1d(loc_prep, size=self.smoothing)
 
         # setting best guess and bounds for seasons
-        amplitudes = list(np.repeat((loc_prep.max()-loc_prep.min()),
+        amplitudes = list(np.repeat((loc_prep.max()-loc_prep.min())/2.,
                                     len(self.periods)))
         freqs = [2*np.pi/p for p in self.periods]
         guess = amplitudes + freqs + list(np.repeat(1., len(self.periods)))
@@ -369,7 +412,7 @@ class TempStab(object):
         ubound = list(np.repeat(np.inf, len(self.periods))) + \
             [f+10**(-16) for f in freqs] + \
             list(np.repeat(np.inf, len(self.periods)))
-        lbound = list(np.repeat(-np.inf, len(self.periods))) + \
+        lbound = list(np.repeat(0., len(self.periods))) + \
             [f-10**(-16)  for f in freqs] + \
             list(np.repeat(-np.inf, len(self.periods)))
             
@@ -379,8 +422,6 @@ class TempStab(object):
                                           loc_prep,
                                           guess,
                                           bounds=(lbound, ubound))
-
-        print(params)
 
         # updating periods
         self.periods = [2*np.pi/p for p in
@@ -425,6 +466,16 @@ class TempStab(object):
         # returns an array of indices with breakpoints
         self.breakpoints = np.sort(self.__calc_breakpoints__(self.array,
                                                              **kwargs))
+        
+        # if first element seems like breakpoint, delete it
+        self.breakpoints=self.breakpoints[np.logical_not(self.breakpoints==1)]
+        
+        # if two breakpoints follow each other, delte first
+        while np.any(np.diff(self.breakpoints) == 1):
+            self.breakpoints = self.breakpoints[np.logical_not(
+                    np.append((np.diff(self.breakpoints)==1)
+                    ,False))]
+            
 
         if len(self.breakpoints) > 0:
             # estimate linear trend parameters for
@@ -446,17 +497,20 @@ class TempStab(object):
 #                plt.show()
 #                assert False
             else:
-                self.homogenized = None
+                self.homogenized = self.array
         else:
             self.trend = None
             self.homogenized = self.array
 
         # perform final trend estimation
-        L = LinearTrend(self.numdate, self.homogenized)  # TODO uncertatinties???
-        L.fit()  # should store also significance information if possible
+        L_orig = LinearTrend(self.numdate, self.__orig__)  # TODO uncertatinties???
+        L_orig.fit()  # should store also significance information if possible
+        L_res = LinearTrend(self.numdate, self.homogenized)  # TODO uncertatinties???
+        L_res.fit()  # should store also significance information if possible
 
         res = {}
-        res.update({'trend' : {'slope' : L.param[0], 'offset' : L.param[1]}})
+        res.update({'homogenized_trend' : {'slope' : L_res.param[0], 'offset' : L_res.param[1]}})
+        res.update({'original_trend' : {'slope' : L_orig.param[0], 'offset' : L_orig.param[1]}})
         res.update({'yn' : self.homogenized})
         res.update({'yorg' : self.array})
         res.update({'yraw' : self.__orig__})
@@ -576,6 +630,7 @@ class TempStab(object):
 #        print(np.median(r),np.median(r),np.median(r)-np.median(r))
         return r
     
+    
     def __remove_resid_offset__(self, x, trends):
         """
         remove offset of residual levels
@@ -605,6 +660,7 @@ class TempStab(object):
 #        print(np.median(r),np.median(r),np.median(r)-np.median(r))
         return r
 
+
     def __fill_gaps__(self):
         """
         fill data gaps if existing
@@ -630,12 +686,14 @@ class TempStab(object):
         else:
             pass
 
+
     def __linear__(self):
         """
         produces linear filler without noise
         """
         self.filler = self.filler * 0. + np.mean(self.prep[np.logical_not(
             self.__identified_gaps__)])
+
 
     def __gap_season__(self, time, array):
         """
@@ -646,6 +704,7 @@ class TempStab(object):
                                  f=self.frequency)
         season.fit()
         self.filler = season.eval_func(self.numdate)
+
 
     def __gap_trend__(self, time, array):
         """
@@ -673,28 +732,36 @@ class TempStab(object):
             self.filler[this_gap] = \
                 lint.eval_func(self.numdate[this_gap])
 
+
     def __identify_gaps__(self):
         """
         identify data gaps in self.array
         """
-        self.__min_time_step__ = self.__get_min_timestep__()
         self.__set_up_new_ts__()
         self.__fill_with_na__()
         self.__calculate_na_indices__()
         self.__identified_gaps__ = self.__calculate_na_indices__()
 
+
+    def __get_mean_timestep__(self):
+        """
+        calculates the minimum timestep
+        """
+        return (np.diff(self.numdate)).mean()
+    
     def __get_min_timestep__(self):
         """
         calculates the minimum timestep
         """
         return (np.diff(self.numdate)).min()
 
+
     def __set_up_new_ts__(self):
         """
-        set a new ts based on the minimum timestep
+        set a new ts based on the minimum timestep if necessary
         """
         num = np.abs((self.numdate.max() - self.numdate.min()) /
-                     self.__min_time_step__) + 1
+                     self.__get_mean_timestep__()) + 1
         new_dates = np.linspace(self.numdate.min(),
                                 self.numdate.max(),
                                 num=np.ceil(num))
@@ -703,6 +770,21 @@ class TempStab(object):
             self.numdate = new_dates
         else:
             self.numdate = new_dates[::-1]
+            
+        if np.all(np.isclose(self.numdate, self.__numdate_orig__)):
+            self.numdate = self.__numdate_orig__
+        else:
+            num = np.abs((self.numdate.max() - self.numdate.min()) /
+                         self.__get_min_timestep__()) + 1
+            new_dates = np.linspace(self.numdate.min(),
+                                    self.numdate.max(),
+                                    num=np.ceil(num))
+    
+            if self.numdate[0] == min(self.numdate):
+                self.numdate = new_dates
+            else:
+                self.numdate = new_dates[::-1]
+
 
     def __fill_with_na__(self):
         """
@@ -713,6 +795,7 @@ class TempStab(object):
         new_array[keep] = self.prep[keep]
         self.prep = new_array
 
+
     def __calculate_na_indices__(self):
         """
         get a boolean array as indices for nan values
@@ -722,6 +805,7 @@ class TempStab(object):
             print("gaps identified: " + str(sum(gaps)))
         return gaps
 
+
     def __calc_breakpoints__(self, x, **kwargs):
         """
         calculating breakpoints based on set function self.Break
@@ -730,6 +814,7 @@ class TempStab(object):
                                      start=self.dates[0],
                                      frequency=self.periods,
                                      **kwargs)
+
 
     def __set_break_model__(self):
         """
@@ -750,6 +835,7 @@ class TempStab(object):
         else:
             assert False, 'ERROR: Unknown breakpoint method'
 
+
     def __break_none__(self, x, **kwargs):
         """
         no breakpoint analysis
@@ -759,13 +845,16 @@ class TempStab(object):
         """
         return np.array([])
 
+
     def __break_wang__(self, x, **kwargs):
         assert False, \
             "Breakpoint method " + self.break_method + " not implemented yet!"
 
+
     def __break_dummy__(self, x, **kwargs):
         assert False, \
             "Breakpoint method " + self.break_method + " not implemented yet!"
+
 
     def __break_bfast__(self, x, **kwargs):
         """
@@ -782,7 +871,6 @@ class TempStab(object):
             frequency of number of samples per year
             e.g. 23 for 16-daily data = 365./16.
 
-
         TODO: reasonable additional parameters!!!
 
         Returns
@@ -790,25 +878,26 @@ class TempStab(object):
         res : ndarray
             array with indices of breakpoint occurence
         """
-        assert False, \
-            "Breakpoint method " + self.break_method + " not working yet!"
+#        assert False, \
+#            "Breakpoint method " + self.break_method + " not working yet!"
             
-#        B = BFAST()
-#        B.run(x, **kwargs)
-#        # return detected breakpoints from last itteration
-#        #print B.results[0]['output'][-1]['ciVt']  
-#        # this contains the confidence of the breakpoint estimation
-#        res = B.results[0]['output'][-1]['bpVt']
-#        
-#        try:  # capture that no breakpoints are detected
-#            n = len(res)
-#            del n
-#        except:
-#            if res == 0:
-#                res = []
-#            else:
-#                assert False, 'CASE not covered yet'
-#        return np.asarray(res).astype('int')
+        B = BFAST()
+        B.run(x, **kwargs)
+        # return detected breakpoints from last itteration
+        #print B.results[0]['output'][-1]['ciVt']  
+        # this contains the confidence of the breakpoint estimation
+        res = B.results[0]['output'][-1]['bpVt']
+        
+        try:  # capture that no breakpoints are detected
+            n = len(res)
+            del n
+        except:
+            if res == 0:
+                res = []
+            else:
+                assert False, 'CASE not covered yet'
+        return np.asarray(res).astype('int')
+
 
     def __break_olssum__(self, x, **kwargs):
         # threshold for change detected        
@@ -836,6 +925,7 @@ class TempStab(object):
                       "for calculating breaking points." +\
                       " Flipping does not produce right order.")
         return(r)
+        
         
     def __get_breakpoints_spline__(self, x, y):
         # estimate breakpoints using splines
@@ -891,7 +981,6 @@ class TempStab(object):
                 
         # resetting preprocessing
         self.prep = self.array.copy()
-        self.frequency = 365.2425
         self.periods = np.array([1])
         self.__trend_removed__ = None
         self.__season_removed__ = None
