@@ -15,6 +15,7 @@ diag_script_info@label = (/ "RCP8.5: 2081-2100"/)
 diag_script_info@units = (/"(~F35~J~F~C)"/)
 diag_script_info@plotmask = "ocean"
 diag_script_info@sig = False
+diag_script_info@figure_nr = "12.13"
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
 

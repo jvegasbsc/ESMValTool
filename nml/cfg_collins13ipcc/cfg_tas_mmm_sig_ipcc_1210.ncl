@@ -16,6 +16,7 @@ diag_script_info@title = "Temperature scaled by global T (~F35~J~F~C per ~F35~J~
 diag_script_info@label = (/"2081-2100", "2181-2200"/)
 diag_script_info@units = (/"(~F35~J~F~C per ~F35~J~F~C)"/)
 diag_script_info@sig = True
+diag_script_info@figure_nr = "12.10"
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
   

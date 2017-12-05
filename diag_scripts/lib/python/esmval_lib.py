@@ -2,6 +2,8 @@
 
 """
 
+from collections import OrderedDict
+from netCDF4 import Dataset
 import ConfigParser
 import os
 import pdb
@@ -9,7 +11,7 @@ import sys
 import projects
 import numpy as np
 
-from netCDF4 import Dataset
+from auxiliary import info, warning
 
 
 class ESMValProject(object):
@@ -25,9 +27,14 @@ class ESMValProject(object):
             project information like provided by the launcher
         """
         self.project_info = project_info
+        self.global_conf = self.get_global_conf()
         self.firstime = True
         self.oldvar = ""
 #        self.version = os.environ['0_ESMValTool_version']
+        self.curr_diag = self.get_curr_diag()
+        self.tags = self.get_all_tags()
+        self.verbosity = self.get_verbosity()
+        self.exit_on_warning = self.get_exit_on_warning()
 
     def _get_path_with_sep(self, p):
         """ ensure that a pathname has the path separator at the end """
@@ -52,15 +59,6 @@ class ESMValProject(object):
             means = np.zeros(12)
             for month in xrange(12):
                 means[month] = np.mean(data[month::12, :, :])
-        elif (dim_index == 'annual'):
-            new_shape = data.shape
-            new_shape = list(new_shape)
-            new_shape[0] = 12
-            means = np.zeros((new_shape))
-            for month in xrange(12):
-                for lat in xrange(means.shape[1]):
-                    for lon in xrange(means.shape[2]):
-                        means[month, lat, lon] = np.mean(data[month::12, lat, lon])
         elif (dim_index == 'annual'):
             new_shape = data.shape
             new_shape = list(new_shape)
@@ -97,6 +95,31 @@ class ESMValProject(object):
                 print("PY  ERROR: This error is caused by " + model)
                 print("PY  ERROR: Stopping the script and exiting")
                 sys.exit()
+
+    def compare_models(self, model1, model2, variable):
+        """
+        Arguments
+            model1   : Dictionary of first model
+            model2   : Dictionary of second model
+            variable : Variable for which the data may be missing
+
+        Return value
+            None
+
+        Description
+            Compares two dictionaries of models (key = name of model), if model
+            is missing output error message.
+
+        Modification history
+            20171121-A_schl_ma: written
+        """
+
+        missing_models = [model for model in model1 if model not in model2]
+        for model in missing_models:
+            warning("Model '{0}' does not contain ".format(model) + \
+                    "'{0}' data of all needed experiments. ".format(variable) + \
+                    "Please check your namelist", self.verbosity, 0,
+                    self.exit_on_warning)
 
     def ensure_directory(self, path):
         """ Checks if a given directory exists and creates it if necessary. """
@@ -150,6 +173,99 @@ class ESMValProject(object):
         """ Finds the nearest value in an array. """
         return np.abs(array - value).argmin()
 
+    def get_all_clim_models(self, variables=None):
+        """
+        Arguments
+            variables : List which specifies which models should be returned
+
+        Return value
+            Ordered Dictionary containing paths and information of all desired
+            models of the current diagnostic (sorted by appearance in namelist)
+
+        Description
+            Analyzes the current diagnostics and returns all models with the
+            desired variables.
+
+        Modification history
+            20171117-A_schl_ma: written
+        """
+
+        # Get current diagnostic and its attributes
+        curr_diag = self.get_curr_diag()
+        valid_vars = curr_diag.get_variables()
+        field_types = curr_diag.get_field_types()
+        mips = curr_diag.get_var_attr_mip()
+        exps = curr_diag.get_var_attr_exp()
+
+        # Check if arguments are valid
+        vars = []
+        if (variables is None):
+            vars = valid_vars
+        else:
+            if (isinstance(variables, basestring)):
+                variables = [variables]
+            try:
+                for var in variables:
+                    if (var in valid_vars):
+                        vars.append(var)
+                    else:
+                        warning("get_all_clim_models: invalid variable " + \
+                                "('{0}') given".format(var), self.verbosity, 0,
+                                self.exit_on_warning)
+            except:
+                raise TypeError("Invalid input: no iterable object given")
+        if (not vars):
+            warning("get_all_clim_models: no valid variables given",
+                    self.verbosity, 0, self.exit_on_warning)
+            return OrderedDict()
+
+        # Iterate over desired variables and models
+        models_dic = OrderedDict()
+        for var_index in xrange(len(vars)):
+
+            # Get variable information
+            field_type = field_types[var_index]
+            var = vars[var_index]
+            mip = mips[var_index]
+            exp = exps[var_index]
+
+            # Iterate over all available models
+            for model in self.project_info["MODELS"]:
+                model_entries = model.split_entries()
+
+                # Get filepath
+                curr_proj = getattr(projects, model_entries[0])()
+                model_name = curr_proj.get_model_name(model)
+                model_path = curr_proj.get_cf_fullpath(self.project_info,
+                                                       model, field_type,
+                                                       var, mip, exp)
+
+                # Get model information
+                model_info = curr_proj.get_model_sections(model)
+                model_info.update({"var": var})
+                models_dic.update({model_path: model_info})
+
+        return models_dic
+
+    def get_all_tags(self):
+        """
+        Arguments
+            None
+
+        Return value
+            All tags
+
+        Descrption
+            Returns all tags of the current namelist and diagnostic.
+
+        Modification history
+            20171129-A_schl_ma: written
+        """
+
+        tags = [tag.strip() for tag in self.global_conf["tags"]]
+
+        return tags
+
     def get_area_coordinates(self, modelconfig, experiment, area):
         """Returns the coordinates (lat/lon) of the area of interest. """
         config_file = self.get_configfile()
@@ -185,7 +301,7 @@ class ESMValProject(object):
         return lat_min, lat_max, lon_min, lon_max
 
     def get_clim_dir(self):
-        return self._get_path_with_sep(self.project_info['GLOBAL']['climo_dir'])
+        return self._get_path_with_sep(self.global_conf['climo_dir'])
 
     def get_clim_model_filenames(self, variable=None, monthly=True):
         """
@@ -267,6 +383,80 @@ class ESMValProject(object):
         del model_filenames[obs]
         return obs, obs_file, model_filenames
 
+    def get_config_option(self, config_parser, section, option, default_value,
+                          return_type=None):
+        """
+        Arguments
+            config_parser : Reference to the ConfigParser member
+            section       : Section in the configuration file
+            option        : Option in the configuration file
+            default_value : Default option if value is missing in the file
+            return_type   : Type of the return value (None, bool, int or float)
+
+        Return value
+            Desired value of the option
+
+        Description
+            Checks if the specified option is included in the configuration
+            file and returns the value if possible. If not, return the default
+            value.
+
+        Modification history
+            20171124-A_schl_ma: written
+        """
+
+        if (not config_parser.has_section(section)):
+            warning("Configuration file does not contain section " + \
+                    "'{0}'. Using default value ".format(section) + \
+                    "'{0}' for option '{1}'".format(default_value, option),
+                    self.verbosity, 0, self.exit_on_warning)
+            return default_value
+        if (not config_parser.has_option(section, option)):
+            warning("Configuration file does not contain option " + \
+                    "'{0}' in section '{1}'. ".format(option, section) + \
+                    "Using default value '{0}'".format(default_value),
+                    self.verbosity, 0, self.exit_on_warning)
+            return default_value
+        if (return_type == None):
+            return_type = type(default_value)
+        if (return_type == bool):
+            return config_parser.getboolean(section, option)
+        elif (return_type == int):
+            return config_parser.getint(section, option)
+        elif (return_type == float):
+            return config_parser.getfloat(section, option)
+        else:
+            return config_parser.get(section, option)
+
+    def get_config_options(self, config_parser, section, options):
+        """
+        Arguments
+            config_parser  : Reference to the ConfigParser member
+            section        : Section in the configuration file
+            options        : Dictionary containing the desired options and
+                             default values
+
+        Return value
+            Dictionary with the desired options
+
+        Description
+            Checks if the specified options are included in the configuration
+            file and returns the values if possible. If not, return the default
+            values.
+
+        Modification history
+            20171124-A_schl_ma: written
+        """
+
+        vals = {}
+        for option in options:
+            default_value = options[option]
+            vals.update({option: self.get_config_option(config_parser,
+                                                        section,
+                                                        option,
+                                                        default_value)})
+        return vals
+
     def get_configfile(self):
         """ returns the cfg file full location """
         currDiag = self.project_info['RUNTIME']['currDiag']
@@ -278,6 +468,23 @@ class ESMValProject(object):
         configfile_fullname = os.path.basename(self.get_configfile())
         configfile_name = os.path.splitext(configfile_fullname)[0]
         return configfile_name
+
+    def get_curr_diag(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Current diagnostic instance
+
+        Descrption
+            Returns the current diagnostic.
+
+        Modification history
+            20171116-A_schl_ma: written
+        """
+
+        return self.project_info["RUNTIME"]["currDiag"]
 
     def get_currVars(self):
         """ returns the diagnostic variables """
@@ -291,17 +498,53 @@ class ESMValProject(object):
         diag_script_name = os.path.splitext(currDiag.diag_script)[0]
         return diag_script_name
 
+    def get_exit_on_warning(self):
+        """
+        Arguments
+            None
+
+        Return value
+            exit_on_warning boolean
+
+        Description
+            Returns exit_on_warning boolean from the global configuration of
+            the namelist.
+
+        Modification history
+            20171128-A_schl_ma: written
+        """
+
+        return self.global_conf["exit_on_warning"]
+
     def get_field_type(self):
         """ returns the first (and often only) field type """
         currDiag = self.project_info['RUNTIME']['currDiag']
         field_type = currDiag.get_field_types()[0]
         return field_type
 
+    def get_global_conf(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Dictionary containing the global configuration of the namelist
+
+        Description
+            Returns dictionary with the global configuration settings of the
+            namelist.
+
+        Modification history
+            20171128-A_schl_ma: written
+        """
+
+        return self.project_info["GLOBAL"]
+
     def get_graphic_format(self):
         """
         returns plotting directory path of project
         """
-        return self.project_info['GLOBAL']['output_file_type']
+        return self.global_conf['output_file_type']
 
     def get_model_data(self, modelconfig, experiment, area,
                        datakey, datafile, extend=''):
@@ -477,13 +720,20 @@ class ESMValProject(object):
                 pass
         return model_id
 
-    def get_model_plot_style(self, model):
+    def get_model_plot_style(self, model, file="default"):
         """ Returns the style in which to plot the model:
         color (rgb), dashes and linewidth
         Check TropicalVariability.py for an example on the use of dashes."""
-        # First we check that the style file for python is in place
 
-        style_file = './diag_scripts/lib/python/style.cfg'
+        # Default path and file
+        default_path = "./diag_scripts/lib/python/styles/"
+        default_file = "default.style"
+
+        # First we check that the style file for python is in place
+        if (file == "default"):
+            style_file = default_path + default_file
+        else:
+            style_file = default_path + file
         if os.path.isfile(style_file):
             styleconfig = ConfigParser.ConfigParser()
             styleconfig.read(style_file)
@@ -535,17 +785,78 @@ class ESMValProject(object):
             dashes = [7, 4, 1, 1, 5, 1]
         else:
             dashes = []
-            print("PY  warning: You should specify more dashes in function")
-            print("PY  warning: get_model_plot_style, located in file")
-            print("PY  warning: " + os.getcwd())
+            warning("You should specify more dashes in fucntion" + \
+                    "'get_model_plot_style', located in file " + \
+                    os.getcwd(), self.verbosity, 0, exit_on_warning)
 
         return color, dashes, width
+
+    def get_model_style(self, model, file="default"):
+        """
+        Arguments
+            model : Name of the model
+            file  : Name of the file in which the styles are defined
+                    (Located in ./diag_scripts/lib/python/styles)
+
+        Return value
+            Dictionary containing style information for the given model
+
+        Description
+            Retrieves the style information for the given model from the given
+            file and returns it as a dictionary.
+
+        Modification history
+            20171127-A_schl_ma: written
+        """
+
+        # Default path
+        default_path = "./diag_scripts/lib/python/styles/"
+        default_file = "cmip5.style"
+
+        # Check if file is valid
+        if (file == "default"):
+            style_file = default_path + default_file
+        else:
+            style_file = default_path + file
+        if os.path.isfile(style_file):
+            styleconfig = ConfigParser.ConfigParser()
+            styleconfig.read(style_file)
+        else:
+            raise IOError("Invalid input: could not open style file " + \
+                          "'{0}'".format(style_file))
+
+        # Check if file has entry for unknown model
+        default_model = "default"
+        options = ["color", "dash", "thick", "mark", "avgstd", "facecolor"]
+        if (styleconfig.has_section(default_model)):
+            for option in options:
+                if (not styleconfig.has_option(default_model, option)):
+                    raise IOError("Style file '{0}' ".format(style_file) + \
+                                  "does not contain '{0}' ".format(option) + \
+                                  "default information for unknown models")
+        else:
+            raise IOError("Style file '{0}' does not ".format(style_file) + \
+                          "contain default information for unknown models")
+
+        # Get model information
+        style = {}
+        for option in options:
+            if (styleconfig.has_option(model, option)):
+                style.update({option: styleconfig.get(model, option)})
+            else:
+                warning("No style information '{0}' ".format(option) + \
+                        "found for model '{1}', ".format(model) + \
+                        "using default value for unknown models",
+                        self.verbosity, 0, self.exit_on_warning)
+                style.update({option: styleconfig.get(default_model, option)})
+
+        return style
 
     def get_plot_dir(self):
         """
         returns plotting directory path of project
         """
-        return self._get_path_with_sep(self.project_info['GLOBAL']['plot_dir'])
+        return self._get_path_with_sep(self.global_conf['plot_dir'])
 
     def get_plot_output_filename(self,
                                  diag_name='',
@@ -710,11 +1021,11 @@ class ESMValProject(object):
 
     def get_verbosity(self):
         """ returns verbosity from namelist """
-        return self.project_info['GLOBAL']['verbosity']
+        return self.global_conf['verbosity']
 
     def get_work_dir(self):
         """ returns the work directory """
-        return self._get_path_with_sep(self.project_info['GLOBAL']['wrk_dir'])
+        return self._get_path_with_sep(self.global_conf['wrk_dir'])
 
     def mask_unwanted_values(self, array, low=None, high=None):
         """ Returns the given array masked with values outside the limits.
@@ -728,9 +1039,9 @@ class ESMValProject(object):
         elif (high is not None):
             out_array = np.ma.masked_greater(array, high)
         elif (low is None and high is None):
-            print("PY  ERROR: You should specify at least one of the limits")
-            print("PY  ERROR: low/high when using function:")
-            print("PY  ERROR: 'mask_unwanted_values'")
+            warning("You should specify at least one of the limits " + \
+                    "low/high when using function 'mask_unwanted_values'",
+                    self.verbosity, 0, self.exit_on_warning)
             out_array = array
         return out_array
 
@@ -775,6 +1086,42 @@ class ESMValProject(object):
                             del tmp_dir, tmp_files
 
         return res
+
+    def get_write_netcdf(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Boolean which decides if netCDF files should be written
+
+        Description
+            Return write_netcdf boolean from the global configuration of
+            the namelist.
+
+        Modification history
+            20171129-A_schl_ma: written
+        """
+
+        return self.global_conf["write_netcdf"]
+
+    def get_write_plots(self):
+        """
+        Arguments
+            None
+
+        Return value
+            Boolean which decides if plots should be plotted
+
+        Description
+            Return write_plot boolean from the global configuration of
+            the namelist.
+
+        Modification history
+            20171124-A_schl_ma: written
+        """
+
+        return self.global_conf["write_plots"]
 
     # ##################################################################
     # write info for call to "write_references" (NCL) to temporary file,

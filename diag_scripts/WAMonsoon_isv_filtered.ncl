@@ -500,7 +500,8 @@ begin
         if (idx_mod .eq. plot_settings@idx_ref) then
             continue
         end if
-        caption = "Standard deviation of the filtered field over the " + di@season + " season."
+        caption = "Standard deviation of the " + filter + " " + variable_info@long_name \
+                + " over the " + di@season + " season."
         alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
         climofiles = new(2, string)
         climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
@@ -534,8 +535,9 @@ begin
             if (any(idx_mod .eq. plot_settings@idx_ref)) then
                 continue
             end if
-            caption = "Normalized standard deviation of the filtered field over the " \
-                       + di@season + " season."
+            caption = "Normalized standard deviation of " + filter + " " \
+                      + variable_info@long_name + " (normalized) over the " \
+                      + di@season + " season."
             alltags = array_append_record(tags, (/"DM_trop", "ST_stddev", "PT_geo"/), 0)
             id = diag_script + "_stddev_norm_" + variables(0)
             aux_filename_info = di@season + "-stddev_norm"
@@ -577,7 +579,8 @@ begin
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
 
-    caption = "Standard deviation of the filtered field over the " + di@season + " season."
+    caption = "Standard deviation of " + filter + " " + variable_info@long_name \
+               + " for " + di@season + " season."
 
     id = diag_script + "_stddev_" + variables(0)
 
@@ -643,7 +646,8 @@ begin
         ;; Attach Metadata to plot
         alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
 
-        caption = "Normalized standard deviation of the filtered field over the " \
+        caption = "Normalized standard deviation of " + filter + " "  \
+                   + variable_info@long_name + "over the " \
                        + di@season + " season."
 
         id = diag_script + "_stddev_norm" + variables(0)

@@ -20,6 +20,7 @@ diag_script_info@grid = "1x1"
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.12"
 ;enable to output to netCDF; either use "default" or give a full file name
 diag_script_info@ncdf = "thetao_zonal_ipcc_1212.nc"
 diag_script_info@diagscript = "zonal_cont_diff_mmm_stippandhatch_ipcc12"

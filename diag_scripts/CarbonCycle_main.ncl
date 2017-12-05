@@ -466,7 +466,7 @@ begin
                (/"PT_seas", "ST_mean"/), 0)
         caption = "Seasonal Cycle plot for " + variables(0) + \
                   " over the period " + start_year + \
-                  "-" + end_year
+                  "-" + end_year + ", similar to Anav etal., 2013, Fig. 9."
         id = diag_script + "_" + base_name
         isize = dim_MOD_org * dimsizes(variables)
         if (isatt(diag_script_info, "obsfile")) then
@@ -544,7 +544,7 @@ begin
                (/"PT_errorbar", "ST_stddev", "ST_mean"/), 0)
         caption = "Errorbar plot for " + variables(0) + \
                   " over the period " + start_year + \
-                  "-" + end_year + ". Similar to Anav 2013 fig 6."
+                  "-" + end_year + ", similar to Anav etal., 2013, Fig. 6."
         id = diag_script + "_" + base_name
 
         isize = dim_MOD_org * dimsizes(variables)
@@ -627,7 +627,7 @@ begin
                (/"PT_scatter", "ST_mean"/), 0)
         caption = "Scatterplot for " + variables(0) + \
                   " over the period " + start_year + \
-                  "-" + end_year + ". Like Anav 2013 Fig 17."
+                  "-" + end_year + ", similar to Anav etal., 2013, Fig. 17."
         id = diag_script + "_" + base_name
 
         isize = dim_MOD_org * dimsizes(variables)
@@ -811,7 +811,7 @@ begin
                    (/"ST_mean"/), 0)
             tagstr = " "
         end if
-        caption = "Time series of " + variables(0) + tagstr + "."
+        caption = "Time series of " + variables(0) + tagstr + ", similar to Anav etal., 2013, Fig. ." 
         id = diag_script + "_" + base_name
 
         isize = dim_MOD_org * dimsizes(variables)

@@ -396,14 +396,16 @@ begin
             +"sensitivity of co2flux to interannual temperature variability in " \
             +"the tropics (30°S-30°N). The red line shows the linear best fit " \
             +"of the regression together with the prediction error (orange shading)" \
-            +" and the gray shading shows the observed range."
+            +" and the gray shading shows the observed range, "\
+            +"similar to Wenzel et al., JGR, 2014, fig. 5."
 
   outfile = output_dir + plot_file + ".000001." + file_type
 
   ESMValMD(outfile, alltags, caption, id, (/variables(0),variables(1)/), models@name, climofiles, diag_script, contrib_authors)
 
   caption = "Probability Density Functions for the pure CMIP5 ensemble (black " \
-           +"dashed) and after applying the observed constraint to the models (red solid)"
+           +"dashed) and after applying the observed constraint to the models (red solid), "\
+            +"similar to Wenzel et al., JGR, 2014, fig. 5."
 
   outfile = output_dir + plot_file + ".000002." + file_type
 

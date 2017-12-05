@@ -220,6 +220,8 @@ begin
             timeh = cd_calendar(A0&time, 0)
             hour_tmp = timeh(0:nHR - 1, 3)
             min_tmp = timeh(0:nHR - 1, 4)
+            start_year = min(tointeger(timeh(:,0)))
+            end_year = max(tointeger(timeh(:,0)))
 
             n = -1
             do nh = 0, nHR - 1
@@ -468,7 +470,8 @@ begin
     alltags = array_append_record(tags, "DM_reg", 0)
     alltags := array_append_record(alltags,\
            (/"PT_diurn", "PT_geo", "ST_mean", "ST_corr"/), 0)
-    caption = di@season + " - phase" + plot_settings@part_of_header
+    caption = di@season + " - phase" + plot_settings@part_of_header \
+             + " for the years " + start_year + " to " + end_year
     id = diag_script + "_" + base_name + "-phase"
 
     figures_per_page = page_models[0]
@@ -530,8 +533,9 @@ begin
           aux_title_info, -1)
     alltags = array_append_record(tags, "DM_reg", 0)
     alltags := array_append_record(alltags,\
-           (/"PT_diurn", "PT_geo", "ST_mean", "ST_corr"/), 0)
-    caption = di@season + " - var" + plot_settings@part_of_header
+           (/"PT_diurn", "PT_geo", "ST_other"/), 0)
+    caption = di@season + " - var" + plot_settings@part_of_header \
+             + " for the years " + start_year + " to " + end_year
     id = diag_script + "_" + base_name + "-var"
 
     figures_per_page = page_models[0]

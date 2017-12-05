@@ -19,6 +19,7 @@ diag_script_info@base_cn             = True
 diag_script_info@base_cnLevelSpacing = 10.
 diag_script_info@base_cnMinLevel     = -40
 diag_script_info@base_cnMaxLevel     = 40
+diag_script_info@figure_nr = "12.19"
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
 diag_script_info@sig = True

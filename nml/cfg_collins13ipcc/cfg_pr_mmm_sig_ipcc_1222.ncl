@@ -23,6 +23,7 @@ diag_script_info@units = (/"(%)"/)
 diag_script_info@sig = True
 diag_script_info@not_sig = True
 diag_script_info@model_nr = True
+diag_script_info@figure_nr = "12.22"
   
 ;enable to output to netCDF; either use "default" or give a full file name
 diag_script_info@ncdf = "pr_mmm_sig_ipcc_1222_seasonalclim.nc" 
