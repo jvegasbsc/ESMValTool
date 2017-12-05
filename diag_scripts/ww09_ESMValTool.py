@@ -191,10 +191,10 @@ def main(project_info):
 
     ESMValMD("both",
              oname,
-             ",".join(['DM_global', 'PT_bar', ','.join(modeltags), ','.join(vartags)]),
+             ['DM_global', 'PT_bar'] + modeltags + vartags,
              'Cloud Regime Error Metric (CREM) following Williams and Webb (2009, Clim. Dyn.).',
-             ['#ID_ww09_crem'],
-             ",".join(climofiles), "ww09_ESMValTool.py", "A_will_ke")
+             '#ID_ww09_crem',
+             ','.join(climofiles), 'ww09_ESMValTool.py', 'A_will_ke')
 
     print("Wrote " + oname)
 
