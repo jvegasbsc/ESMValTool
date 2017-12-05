@@ -521,7 +521,7 @@ begin
              "ST_clim", "ST_var"/), 0)
     caption =  "Scatterplot for multiyear average " + variables(0) + \
                " in x axis, its linear trend in y axis, and MVI" + \
-               + ", similar to Anav etal., 2013, Fig. 1 bottom."
+               ", similar to Anav et al., 2013, Fig. 1 bottom."
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name) * dimsizes(variables), string)
     do n_var = 0, dimsizes(variables) - 1

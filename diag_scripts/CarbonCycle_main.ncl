@@ -22,6 +22,8 @@
 ;;    evolution_plot: time evolution of a variable comparing obs to
 ;;                    multi-model mean; requires ref_model in nml,
 ;;                    and at least one model, one obs
+;;    fignum: Reference to figure in Anav paper for evolution plot. "1 top"
+;;            as default 
 ;;    evolution_plot_ref_model: reference model for evolution_plot
 ;;    evolution_plot_anomaly: makes evolution_plot an anomaly plot
 ;;    evolution_plot_ignore: Models to ignore, obs are excluded automatically
@@ -466,7 +468,7 @@ begin
                (/"PT_seas", "ST_mean"/), 0)
         caption = "Seasonal Cycle plot for " + variables(0) + \
                   " over the period " + start_year + \
-                  "-" + end_year + ", similar to Anav etal., 2013, Fig. 9."
+                  "-" + end_year + ", similar to Anav et al., 2013, Fig. 9."
         id = diag_script + "_" + base_name
         isize = dim_MOD_org * dimsizes(variables)
         if (isatt(diag_script_info, "obsfile")) then
@@ -544,7 +546,7 @@ begin
                (/"PT_errorbar", "ST_stddev", "ST_mean"/), 0)
         caption = "Errorbar plot for " + variables(0) + \
                   " over the period " + start_year + \
-                  "-" + end_year + ", similar to Anav etal., 2013, Fig. 6."
+                  "-" + end_year + ", similar to Anav et al., 2013, Fig. 6."
         id = diag_script + "_" + base_name
 
         isize = dim_MOD_org * dimsizes(variables)
@@ -627,7 +629,7 @@ begin
                (/"PT_scatter", "ST_mean"/), 0)
         caption = "Scatterplot for " + variables(0) + \
                   " over the period " + start_year + \
-                  "-" + end_year + ", similar to Anav etal., 2013, Fig. 17."
+                  "-" + end_year + ", similar to Anav et al., 2013, Fig. 17."
         id = diag_script + "_" + base_name
 
         isize = dim_MOD_org * dimsizes(variables)
@@ -811,7 +813,13 @@ begin
                    (/"ST_mean"/), 0)
             tagstr = " "
         end if
-        caption = "Time series of " + variables(0) + tagstr + ", similar to Anav etal., 2013, Fig. ." 
+        if isatt(diag_script_info, "fignum") then
+            fignum = diag_script_info@fignum
+        else
+            fignum = "1 top"
+        end if
+        caption = "Time series of " + variables(0) + tagstr + \
+                  ", similar to Anav et al., 2013, Fig." + fignum
         id = diag_script + "_" + base_name
 
         isize = dim_MOD_org * dimsizes(variables)
