@@ -545,7 +545,7 @@ begin
           interface_get_figure_filename(diag_script_base, var0, field_type0, \ 
           plot_settings@aux_filename_info, -1)
     alltags = array_append_record(tags, (/"PT_diurn", "DM_reg"/), 0)
-    caption = "Mean Diurnal Cycle for " + variables(0) 
+    caption = "Mean Diurnal Cycle for " + variables(0) + " (similar to IPCC AR5 fig. 9.30)."
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name) * dimsizes(variables), string)
     do imod = 0, dimsizes(models@name) - 1

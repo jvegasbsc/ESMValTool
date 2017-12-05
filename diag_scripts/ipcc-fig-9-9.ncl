@@ -5,7 +5,7 @@
 ;;#############################################################################
 ;;
 ;; Description
-;;    Compute decadal trends in tropical prw and TLT. Like IPCC ch. 9 fig 9.6
+;;    Compute decadal trends in tropical prw and TLT. Like IPCC ch. 9 fig 9.9
 ;;
 ;; Required diag_script_info attributes (diagnostics specific)
 ;;     diag_script_info@region: Region to be averaged over
