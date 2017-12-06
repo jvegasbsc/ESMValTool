@@ -13,21 +13,41 @@ The ESMValTool has the following software requirements (note that specific diagn
 
   *The required Python packages can be installed with the following commands:*
 
-  conda install basemap
+  1) install anaconda (2-5.0.1):
 
-  conda install --channel https://conda.anaconda.org/Clyde_Fare scientificpython
+     a) download anaconda from https://repo.continuum.io/archive/Anaconda2-5.0.1-Linux-x86_64.sh
+     b) chmod 755 Anaconda2-5.0.1-Linux-x86_64.sh
+     c) Anaconda2-5.0.1-Linux-x86_64.sh
 
-  conda install hdf4
+  2) conda install basemap
 
-  conda install netcdf4
+  3) conda install netcdf4
 
-  conda install --channel https://conda.anaconda.org/auto cdo
+  4) install geoval (0.1.15):
 
-  pip install geoval
+     a) git clone https://github.com/pygeo/geoval.git
+     b) cd geoval
+     c) python setup.py build
+     d) python setup.py install
+     e) create symbolic link for geoval-lib in anaconda directory, e.g.
+        ln -s /home/username/geoval/build/lib.linux-x86_64-2.7/geoval /home/username/anaconda2/lib/.
 
-  conda install -c scitools cartopy
+  5) install python cdo
 
-  conda install -c scitools iris
+     a) conda config - -add channels conda-forge
+     b) conda install cdo
+     c) conda install python-cdo
+
+  6) it might be needed to replace the cdo executable with more stable version if the version installed in step 5) crashes (e.g. Python diagnostics of namelist "ESA CCI" (section :numref:`nml_esacci`)).
+
+     a) go to https://code.mpimet.mpg.de/projects/cdo/ and download executable or source code and compile your own executable
+     b) copy the new cdo executable to your anaconda bin directory, e.g. /home/username/anaconda2/bin/
+
+  7) conda install cartopy
+
+  8) conda install gdal
+
+  9) conda update - -all
 
   .. attention:: It is strongly recommended to use the Python distribution Anaconda (https://www.continuum.io/), as it allows the user to install additional Python libraries and extensions in a simple way and without modifying the installed Python distribution (i.e., without root permissions). The installation instructions for the additional Python packages listed above are given for Anaconda.
 
