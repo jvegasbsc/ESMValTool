@@ -620,6 +620,8 @@ begin
                 mkres = True
                 mkres@gsMarkerIndex = 6
                 mkres@gsMarkerColor = color_p(iexp)
+                mkres@gsMarkerSizeF = 0.03
+                mkres@gsMarkerThicknessF = 2.0
 
                 p_chem(iexp, ichem) = gsn_add_polymarker(wks, plot(ipan), \
                     chem_trend(iexp, 0, ichem), chem_trend(iexp, 1, ichem), mkres)
@@ -630,6 +632,8 @@ begin
             do inochem = 0, dimsizes(list_nochem_mod) - 1
                 mkres@gsMarkerIndex = 7
                 mkres@gsMarkerColor = color_p(iexp)
+                mkres@gsMarkerSizeF = 0.03
+                mkres@gsMarkerThicknessF = 2.0
                 p_nochem(iexp, inochem) = gsn_add_polymarker(wks, plot(ipan), \
                     nochem_trend(iexp, 0, inochem), nochem_trend(iexp, 1, inochem), mkres)
             end do

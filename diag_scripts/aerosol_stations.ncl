@@ -373,7 +373,7 @@ begin
         caption = "Scatter plot of " + variables(0) + ", model: " + models@name(mID) \
                    + " compared with " + diag_script_info@network + " stations."
         id = diag_script + "_scatter_" + variables(0) 
-        alltags = (/"ST_clim", "PT_scatter", "DM_reg"/)
+        alltags = array_append_record(tags,(/"ST_clim", "PT_scatter", "DM_reg"/),0)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
         do stID = 0, dimsizes(obser_model_pts&station) - 1
             modelsname_mod := array_append_record(models@name(mID), \
@@ -495,7 +495,7 @@ begin
         caption = "Geographical distribution of " + variables(0) + ", model: " + models@name(mID) \
                    + " compared with " + diag_script_info@network + " stations."
         id = diag_script + "_map_" + variables(0) 
-        alltags = (/"ST_clim", "PT_geo", "DM_global"/)
+        alltags = array_append_record(tags,(/"ST_clim", "PT_geo", "DM_global"/),0)
         contrib_authors = (/"A_righ_ma", "A_kais_ch"/)
         do stID = 0, dimsizes(obser_model_pts&station) - 1
             modelsname_mod := array_append_record(models@name(mID), \

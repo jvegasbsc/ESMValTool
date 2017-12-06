@@ -42,7 +42,7 @@ This namelist is part of the ESMValTool
   <verbosity  type="integer">               1          </verbosity>
   <exit_on_warning  type="boolean">       True         </exit_on_warning>
   <output_file_type>                      png          </output_file_type>
-  <show_debuginfo type="boolean">         True         </show_debuginfo>
+  <show_debuginfo type="boolean">         False        </show_debuginfo>
   <write_plots type="boolean">            True         </write_plots>
   <write_netcdf type="boolean">           True         </write_netcdf>
   <read_from_vault type="boolean">        False         </read_from_vault>

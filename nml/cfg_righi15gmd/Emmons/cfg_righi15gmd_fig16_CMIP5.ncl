@@ -9,6 +9,7 @@ diag_script_info = True
 path = getenv("ESMValTool_OBSPATH") + "/Tier2/Emmons/"
 diag_script_info@obsfiles = (/\
     path + "*_T0M_tro3_*.nc"/)
+;;    path + "OBS_Emmons_campaign_TOTE*tro3*.nc"/)
 delete(path)
 
 ;; ############################################################################
@@ -98,7 +99,7 @@ diag_script_info@styleset = "CMIP5"  ; see diag_scripts/lib/ncl/style.ncl
     ;; for available styles, Default: "DEFAULT"
 ;diag_script_info@colors = (/"black"/)  ; The following entries override ...
 ;diag_script_info@dashes = (/"0"/)  ; ... styleset settings
-diag_script_info@thicks = (/2, 1, 1, 1, 1, 1, 1/) * 6.
+;diag_script_info@thicks = (/2, 1, 1, 1, 1, 1, 1/) * 6.
 ;diag_script_info@annots = (/"data"/)
 ;diag_script_info@avgstd = (/"0"/)
 diag_script_info@font = 21  ; overrides default font
