@@ -512,8 +512,8 @@ begin
        allmodelnames = array_append_record(models@name, (/"multi-model-mean"/), 0)
    end if
 
-   caption = "Vertical profiles of variable " + variables(0) \
-         + " with given latitude and month."
+   caption = "Vertical profile of variable " + variables(0) \
+         + " for given latitude and month."
 
    id = diag_script + "_" + variables(0)
 

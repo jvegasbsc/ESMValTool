@@ -34,8 +34,10 @@ path = getenv("ESMValTool_OBSPATH") + "/Tier2/GCP/"
 ;; Currently only one file will be read in
 if variables(0).eq."NBP" then
     diag_script_info@ref_varname = "nbp"
+    diag_script_info@fignum = "5"
 else
     diag_script_info@ref_varname = "fgco2"
+    diag_script_info@fignum = "13"
 end if
 diag_script_info@obsfile = path + \
        "OBS_GCP_reanaly_1_T0M_" + \

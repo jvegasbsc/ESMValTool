@@ -387,7 +387,7 @@ begin
 
         plot_settings@type = "mean"
         plot_settings@part_of_header = " of " + variable_info@long_name
-        multipanel(storage_vault,\
+        page_models = multipanel(storage_vault,\
                    di,\
                    plot_settings,\
                    var_name,\
@@ -398,18 +398,9 @@ begin
         ;; Attach metadata to plots
         alltags = array_append_record(tags,\
            (/"DM_global", "PT_geo", "ST_mean", "ST_clim"/), 0)
-        figures_per_page = get_figures_per_page(dim_MOD,\
-                                            max_figures_pp,\
-                                            min_figures_pp)
-        pages = dimsizes(figures_per_page)
-        do curr_page = 0, dimsizes(pages) - 1
-            if (pages .gt. 1) then
-                page_no = "-page" + sprinti("%i", curr_page)
-            else
-                page_no = ""
-            end if
+
             type_specifier = ""
-            aux_title_info = di@season + "-" + var_name + type_specifier + page_no
+            aux_title_info = di@season + "-" + var_name + type_specifier
             outfile = get_output_dir(plot_dir, diag_script_base) + \
                      interface_get_figure_filename(diag_script_base,\
                                                         var0,\
@@ -418,31 +409,55 @@ begin
                                                         -1)
 
             caption = di@season + "-mean of Evapotranspiration for observation" +\
-                      " and models" + page_no
+                      " and models"
 
-            id = diag_script + "_" + base_name + "_" + di@season + "_mean" + page_no
-            if curr_page.eq.0 then
-                mod_inds = (/0, figures_per_page(0)-1/)
-            else
-                mod_inds = (/cumsum(figures_per_page(curr_page-1), 0), \
-                                       cumsum(figures_per_page(curr_page), 0)-1/)
-            end if
-            mod_tags = models@name(mod_inds(0):mod_inds(1))
-            climofiles = new(mod_inds(1)-mod_inds(0), "string")
-            do imod = mod_inds(0), mod_inds(1) - 1
-                climofiles(imod) = \
-                        interface_get_inpaths(imod) + "/" + \
-                        interface_get_infile(variables(0), field_types(0), imod)
+            id = diag_script + "_" + base_name + "_" + di@season + "_mean"
+
+        figures_per_page = page_models[0]
+        model_panel_placement = page_models[1]
+        delete(page_models)
+
+        if (dimsizes(figures_per_page).gt.1) then
+
+            curr_idx=0
+
+            do ipage=0,dimsizes(figures_per_page)-1
+
+                climofiles = new(figures_per_page(ipage),string)
+                modelsname = new(figures_per_page(ipage),string)
+                do ifig = 0, figures_per_page(ipage)-1
+                   imod = model_panel_placement(curr_idx)
+                   climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+                   modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+                   curr_idx=curr_idx+1
+                end do
+
+                output_file_path = outfile + "-page" + ipage + "." + output_file_type
+
+                ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+                delete([/climofiles,modelsname/])
+
             end do
 
-            ESMValMD(outfile + "." + output_file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
-            delete([/caption, id, climofiles, outfile/])
-        end do
-        delete(alltags)
+        else
+
+            climofiles = new(dimsizes(models@name), string)
+            do imod = 0, dimsizes(models@name) - 1
+                    climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+            end do
+
+            output_file_path = outfile + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        end if
 
         plot_settings@type = "diff"
         plot_settings@part_of_header = " of Evapotranspiration"
-        multipanel(storage_vault,\
+        page_models = multipanel(storage_vault,\
                    di,\
                    plot_settings,\
                    var_name,\
@@ -454,48 +469,62 @@ begin
         ;; Attach metadata to plots
         alltags = array_append_record(tags,\
            (/"DM_global", "PT_geo", "ST_mean", "ST_diff", "ST_clim"/), 0)
-        figures_per_page = get_figures_per_page(dim_MOD,\
-                                            max_figures_pp,\
-                                            min_figures_pp)
-        pages = dimsizes(figures_per_page)
-        do curr_page = 0, dimsizes(pages) - 1
-            if (pages .gt. 1) then
-                page_no = "-page" + sprinti("%i", curr_page)
-            else
-                page_no = ""
-            end if
-            type_specifier = "_diff"
-            aux_title_info = di@season + "-" + var_name + type_specifier + page_no
-            outfile = get_output_dir(plot_dir, diag_script_base) + \
-                     interface_get_figure_filename(diag_script_base,\
-                                                        var0,\
-                                                        field_type0,\
-                                                        aux_title_info,\
-                                                        -1)
 
-            caption = di@season + "-mean of Evapotranspiration. Difference" +\
-                      " between observation and models" + page_no
+        type_specifier = "_diff"
+        aux_title_info = di@season + "-" + var_name + type_specifier
+        outfile = get_output_dir(plot_dir, diag_script_base) + \
+                 interface_get_figure_filename(diag_script_base,\
+                                                    var0,\
+                                                    field_type0,\
+                                                    aux_title_info,\
+                                                    -1)
 
-            id = diag_script + "_" + base_name + "_" + di@season + "_diff" + page_no
+        caption = di@season + "-mean of Evapotranspiration. Difference" +\
+                  " between observation and models"
 
-            if curr_page.eq.0 then
-                mod_inds = (/0, figures_per_page(0)-1/)
-            else
-                mod_inds = (/cumsum(figures_per_page(curr_page-1), 0), \
-                                       cumsum(figures_per_page(curr_page), 0)-1/)
-            end if
-            mod_tags = models@name(mod_inds(0):mod_inds(1))
-            climofiles = new(mod_inds(1)-mod_inds(0), "string")
-            do imod = mod_inds(0), mod_inds(1) - 1
-                climofiles(imod) = \
-                        interface_get_inpaths(imod) + "/" + \
-                        interface_get_infile(variables(0), field_types(0), imod)
+        id = diag_script + "_" + base_name + "_" + di@season + "_diff"
+
+        figures_per_page = page_models[0]
+        model_panel_placement = page_models[1]
+        delete(page_models)
+
+        if (dimsizes(figures_per_page).gt.1) then
+
+            curr_idx=0
+
+            do ipage=0,dimsizes(figures_per_page)-1
+
+                climofiles = new(figures_per_page(ipage),string)
+                modelsname = new(figures_per_page(ipage),string)
+                do ifig = 0, figures_per_page(ipage)-1
+                   imod = model_panel_placement(curr_idx)
+                   climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+                   modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+                   curr_idx=curr_idx+1
+                end do
+
+                output_file_path = outfile + "-page" + ipage + "." + output_file_type
+
+                ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+                delete([/climofiles,modelsname/])
+
             end do
 
-            ESMValMD(outfile + "." + output_file_type, alltags, caption, id, variables, mod_tags, climofiles, diag_script, contrib_authors)
-            delete([/caption, id, climofiles, outfile, mod_inds, mod_tags/])
-        end do
-        delete(alltags)
+        else
+
+            climofiles = new(dimsizes(models@name), string)
+            do imod = 0, dimsizes(models@name) - 1
+                    climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(0), field_types(0), imod)
+            end do
+
+            output_file_path = outfile + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+        end if
 
     end do
 

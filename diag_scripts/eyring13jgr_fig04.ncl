@@ -340,9 +340,18 @@ begin
 
         allmodelnames = models@name(idx_mod)
 
-        caption = "Climatological mean annual mean of " + variables(0) \
-              + " averaged between " + y1(idx_mod) + " and " + y2(idx_mod) \
-              + ", similar to Eyring et al., JGR, 2013, fig. 4."
+; A_laue_ax+
+        if (subtract_global_mean) then
+            caption = "Deviation of " + variables(0) + " from global annual mean" \
+                  + " (averaged between " + y1(idx_mod) + " and " + y2(idx_mod) + ")"
+        else
+; A_laue_ax-
+            caption = "Climatological annual mean of " + variables(0) \
+                  + " averaged between " + y1(idx_mod) + " and " + y2(idx_mod) \
+                  + ", similar to Eyring et al., JGR, 2013, fig. 4."
+; A_laue_ax+
+        end if
+; A_laue_ax-
 
         id = diag_script + "_" + variables(0)
 
@@ -716,9 +725,18 @@ begin
 
     allmodelnames = array_append_record(models@name, (/"multi-model-mean"/), 0)
 
-    caption = "Multi-model climatological mean annual mean of " + variables(0) \
-          + " averaged between " + models@start_year(0) + " and " + models@end_year(0) \
-          + ", similar to Eyring et al., JGR, 2013, fig. 4."
+; A_laue_ax+
+    if (subtract_global_mean) then
+        caption = "Deviation of " + variables(0) + " from global annual mean" \
+              + " (averaged between " + models@start_year(0) + " and " + models@end_year(0) + ")"
+    else
+; A_laue_ax-
+        caption = "Multi-model climatological annual mean of " + variables(0) \
+              + " averaged between " + models@start_year(0) + " and " + models@end_year(0) \
+              + ", similar to Eyring et al., JGR, 2013, fig. 4."
+; A_laue_ax+
+    end if
+; A_laue_ax-
 
     id = diag_script + "_" + variables(0)
 

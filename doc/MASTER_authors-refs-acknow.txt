@@ -1,4 +1,4 @@
-# Full list of authors and references for the currently implemented 
+# Full list of authors and references for the currently implemented
 # diagnostics. Authors, diagnostics, observations and projects references
 # are identified by the tags "A", "D", "E" and "P", respectively.
 #
@@ -7,7 +7,7 @@
 # "R" = CMIP6 realm, "T" = theme
 # "DM" = domain, "PT" = plot type, "ST" = statistics
 #
-# Add new entries alphabetically (for authors) or at the end of the 
+# Add new entries alphabetically (for authors) or at the end of the
 # respective lists. Do not change the current entries!
 #
 # These tags are used by the write_references.ncl function to automatically
@@ -59,7 +59,7 @@ A_mell_fe = Mello, Felipe (INPE, Brazil)
 A_mohi_da = Dalvi, Mohit (MetOffice, UK - mohit.dalvi 'at' metoffice.gov.uk)
 A_muel_bn = Mueller, Benjamin (LMU, Germany)
 A_niku_gr = Nikulin, Grigory (SMHI, Sweden - grigory.nikulin 'at' smhi.se)
-A_nobr_pa = Nobre, Paulo (INPE, Brazil) 
+A_nobr_pa = Nobre, Paulo (INPE, Brazil)
 A_oliv_ar = Oliveira, Arildo (INPE, Brazil)
 A_phil_ad = Phillips, Adam (NCAR, USA - asphilli 'at' ucar.edu)
 A_pugh_th = Pugh, Thomas (KIT, Germany - thomas.pugh 'at' kit.edu)
@@ -68,6 +68,7 @@ A_rett_ri = Rettinger, Ricarda (DLR, Germany - ricarda.rettinger 'at' dlr.de)
 A_ring_ma = Ringer, Mark (MetOffice, UK - mark.ringer 'at' metoffice.gov.uk)
 A_rio_ca  = Rio, Catherine (IPSL, France - catherine.rio 'at' lmd.jussieu.fr)
 A_roeh_ro = Roehrig, Romain (MeteoFr, France - romain.roehrig 'at' meteo.fr)
+A_schl_ma = Schlund, Manuel (DLR, Germany - manuel.schlund 'at' dlr.de)
 A_sedl_ja = Sedlacek, Jan (ETH Zurich, jan.sedlacek 'at' env.ethz.ch)
 A_senf_da = Senftleben, Daniel (DLR, Germany - daniel.senftleben 'at' dlr.de)
 A_somm_ph = Sommer, Philipp (Univ. of Hamburg, Germany - 'at')
@@ -109,7 +110,7 @@ A_enri_cl = Enright, Clare (UEA, UK - c.enright 'at' uea.ac.uk)
 A_halu_al = Haluszczynski, Alexander (DLR, Germany - alexander.haluszczynski 'at' dlr.de)
 A_herm_mi = Herman, Michael (New Mexico Tech, USA - mherman 'at' nmt.edu)
 A_hueb_mi = Huebner, Michael (DLR, Germany - michael.huebner 'at' dlr.de)
-A_john_ma = Johnston, Marston (SMHI, Sweden - shejo284 'at' gmail.com) 
+A_john_ma = Johnston, Marston (SMHI, Sweden - shejo284 'at' gmail.com)
 A_klin_ca = Klinger, Carolin (DLR, Germany - carolin.klinger 'at' physik.uni-muenchen.de)
 A_kola_mi = Kolax, Michael ('at')
 A_neal_ri = Neale, Richard (NCAR, US - rneale 'at' ucar.edu)
@@ -259,7 +260,7 @@ T_bgphys = biogeophysics
 T_carbon = carbon cycle
 T_chem = chemistry
 T_clouds = clouds
-T_EC = emergent constraint
+T_ec = emergent constraint
 T_ghg = greenhouse gases
 T_monsoon = monsoons
 T_phys = physics

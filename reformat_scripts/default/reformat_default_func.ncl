@@ -22,6 +22,7 @@
 ;;    function reformat_coord
 ;;    procedure add_irregulargrid_info
 ;;    procedure add_lmask_info
+;;    procedure add_lice_info
 ;;    procedure add_omask_info
 ;;    procedure add_porosity_info
 ;;    procedure add_depth_info
@@ -1598,6 +1599,106 @@ begin
             info_output("  Adding sftlf to OUTFILE", verbosity, 1)
         else
             info_output("Dimensionality of sftlf not consistent with " + \
+                        "dimensionality of " + VAR + ", skipping", \
+                        verbosity, 2)
+        end if
+    end if
+
+    leave_msg(scriptname, funcname, 4)
+
+end
+
+;;######################################################################
+undef("add_lice_info")
+procedure add_lice_info(var:numeric)
+;;
+;; Arguments
+;;
+;; Description
+;;    Add land ice area information to the output.
+;;
+;; Caveats
+;;
+;; References
+;;
+;; Modification history
+;;    20171102-A_bock_ls: written.
+;;
+local funcname, scriptname, verbosity, lexist, ff, vname, altdname, maskl, \
+    tmp, w, mdims, msize
+begin
+
+    funcname = "add_lice_info"
+    scriptname = "reformat_scripts/default/reformat_default_func.ncl"
+    verbosity = stringtointeger(getenv("ESMValTool_verbosity"))
+    enter_msg(scriptname, funcname, 4)
+
+    ;; Variable dimensions (must be consistent with sftgif dimensions)
+    vdims = getvardims(var)
+    vsize = dimsizes(var)
+    vrank = dimsizes(vsize)
+
+    lexist = False
+    if (isfilepresent_esmval(LICEFILE)) then
+        ff = addfile(LICEFILE, "r")
+        if (isfilevar(ff, "sftgif")) then
+            lexist = True
+            vname = "sftgif"
+        else
+            altdname = find_alt_names("sftgif")
+            do ii = 0, dimsizes(altdname) - 1
+                if (isfilevar(ff, altdname(ii))) then
+                    lexist = True
+                    vname = altdname(ii)
+                    break
+                end if
+            end do
+            delete(altdname)
+        end if
+    else
+        info_output("  No LICEFILE found (" + LICEFILE + ")", verbosity, 1)
+    end if
+
+    if (lexist) then
+        maskl = ff->$vname$
+
+        ;; Reformat variable
+        apply_fixes(maskl, "sftgif", "")
+        check_units(maskl, "sftgif")
+        tmp = var_attrib(maskl, "sftgif")
+        delete(maskl)
+        maskl = tmp
+        delete(tmp)
+        tmp = reformat_coord(maskl)
+        delete(maskl)
+        maskl = tmp
+        delete(tmp)
+
+        ;; Check latitude/longitude consistency
+        lwrite = True
+        mdims = getvardims(maskl)
+        msize = dimsizes(maskl)
+        mrank = dimsizes(msize)
+        if (mdims(mrank - 2).ne.vdims(vrank - 2) .or. \
+            msize(mrank - 2).ne.vsize(vrank - 2)) then
+            lwrite = False
+        end if
+        if (mdims(mrank - 1).ne.vdims(vrank - 1) .or. \
+            msize(mrank - 1).ne.vsize(vrank - 1)) then
+            lwrite = False
+        end if
+
+        ;; Write output
+        if (lwrite) then
+            w = addfile(OUTFILE, "w")
+            setfileoption(w, "DefineMode", True)
+            filevardef(w, "sftgif", typeof(maskl), mdims)
+            filevarattdef(w, "sftgif", maskl)
+            setfileoption(w, "DefineMode", False)
+            w->sftgif = (/maskl/)
+            info_output("  Adding sftgif to OUTFILE", verbosity, 1)
+        else
+            info_output("Dimensionality of sftgif not consistent with " + \
                         "dimensionality of " + VAR + ", skipping", \
                         verbosity, 2)
         end if

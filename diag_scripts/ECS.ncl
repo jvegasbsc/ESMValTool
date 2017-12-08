@@ -5,18 +5,18 @@
 ;;#############################################################################
 ;;
 ;; Description
-;;    Flatens a 2D/3D array into a 1D time-series and calculates ECS  
+;;    Flatens a 2D/3D array into a 1D time-series and calculates ECS
 ;;    following Andrews et al. (2012).
-;;    After doing a linear fit on the piControl runs (variables = tas/rtmt) 
+;;    After doing a linear fit on the piControl runs (variables = tas/rtmt)
 ;;    it is substracted from the corresponding abr4xCO2 experiment.
-;;    The result is plotted and a netcdf file is generated where the ECS value  
+;;    The result is plotted and a netcdf file is generated where the ECS value
 ;;    of every model is listed.
 ;;
 ;; Required diag_script_info attributes (diagnostics specific)
 ;;    none
-;;    
+;;
 ;; Optional diag_script_info attributes (diagnostic specific)
-;;    ts_minlat, ts_maxlat, ts_minlon, ts_maxlon: possible to define extent 
+;;    ts_minlat, ts_maxlat, ts_minlon, ts_maxlon: possible to define extent
 ;;    default is global: (-90, 90, 0, 360)
 ;;
 ;; Required variable_info attributes (variable specific)
@@ -93,7 +93,7 @@ begin
     else
         maxlon = 360
     end if
- 
+
 end
 
 
@@ -119,16 +119,16 @@ begin
     do imod = 0, dim_MOD - 1
 
         ;; Read data
-        data_rtmt = read_data(imod, var1, field_type1)           
+        data_rtmt = read_data(imod, var1, field_type1)
         d_rtmt = extract_data(imod, data_rtmt, -1, 0, 0)
 
-        data_tas = read_data(imod, var0, field_type0)           
-        d_tas = extract_data(imod, data_tas, -1, 0, 0) 
+        data_tas = read_data(imod, var0, field_type0)
+        d_tas = extract_data(imod, data_tas, -1, 0, 0)
 
         ;; Calculate time average
         d_rtmt_yrl = time_operations(d_rtmt, -1, -1, "average", "yearly", True)
         d_tas_yrl = time_operations(d_tas, -1, -1, "average", "yearly", True)
-        
+
         ;; Calculate area average
         d_rtmt_yrl_area = area_operations(d_rtmt_yrl, minlat, \
                           maxlat, \
@@ -156,7 +156,7 @@ begin
         ;; Write model to model array
         rtmt_arr(imod, :) = d_rtmt_yrl_area
         tas_arr(imod, :) = d_tas_yrl_area
- 
+
         delete(d_rtmt_yrl_area)
         delete(d_tas_yrl_area)
         delete(d_tas_yrl)
@@ -166,17 +166,17 @@ begin
         delete(data_rtmt)
         delete(data_tas)
         delete(period)
-             
+
     end do
     delete(imod)
 
     ;; get Modelnames
     modelnames = project_style(diag_script_info, "annots")
-    
+
     ;; Create substrings to get index of models
     ind_4xCO2 = str_match_ind(modelnames, "abrupt4xCO2")
     ind_piCon = str_match_ind(modelnames, "piControl")
- 
+
     ;; regression of piControl (tas/ rtmt)
     piCon_tas  = new((/dimsizes(ind_piCon), ntime/), float)
     piCon_rtmt = new((/dimsizes(ind_piCon), ntime/), float)
@@ -206,17 +206,17 @@ begin
 
         piCon_tas(n, :) = reg_tas
         piCon_rtmt(n, :) = reg_rtmt
-    
+
         delete(tas_var)
         delete(tas_nm)
         delete(rtmt_var)
-        delete(rtmt_nm) 
+        delete(rtmt_nm)
         delete(var_tas)
         delete(var_rtmt)
         delete(reg_tas)
         delete(reg_rtmt)
         delete(years_ind)
-        
+
     end do
     delete(n)
 
@@ -225,7 +225,7 @@ begin
     piCon_tas!1 = "time"
     piCon_tas&time = ispan(0, ntime-1, 1)
     piCon_tas&model = str_match(modelnames, "piControl")
-  
+
     piCon_rtmt!0 = "model"
     piCon_rtmt!1 = "time"
     piCon_rtmt&time = ispan(0, ntime-1, 1)
@@ -241,24 +241,24 @@ begin
     abr4xCO2_rtmt = new((/dimsizes(ind_4xCO2), ntime/), float)
 
     do n = 0, dimsizes(ind_4xCO2) -1
-       
+
        ;; select only the abr4xCO2 - Experiment
        tas_var = tas_arr(ind_4xCO2(n), :)
        tas_nm  = dimsizes(tas_var)
 
        rtmt_var = rtmt_arr(ind_4xCO2(n), :)
        rtmt_nm  = dimsizes(rtmt_var)
-       
+
        ;; Control if rtmt and tas have same number of years
        if (rtmt_nm - tas_nm .ne. 0) then
            error_msg( "f", diag_script, "", \
                       "time steps of tas and rtmt differ")
        end if
-       
+
        ;; extract years
        abr4xCO2_rtmt(n, :) = rtmt_var
        abr4xCO2_tas(n, :) = tas_var
-  
+
        delete(rtmt_var)
        delete(rtmt_nm)
        delete(tas_var)
@@ -276,7 +276,7 @@ begin
     abr4xCO2_tas!1 = "time"
     abr4xCO2_tas&time = ispan(0, ntime-1, 1)
     abr4xCO2_tas&model = str_match(modelnames, "abrupt4xCO2")
-    
+
     if (dimsizes(abr4xCO2_rtmt&model) .ne. dimsizes(piCon_rtmt&model)) then
         error_msg("f", diag_script, "", \
                   "different Models in use!")
@@ -289,7 +289,7 @@ begin
     ;; Substract piControl from abrupt4xCO2
     subs_rtmt = abr4xCO2_rtmt - piCon_rtmt
     subs_tas  = abr4xCO2_tas  - piCon_tas
-     
+
     ;; Defining Dimensions and Coordinates
     subs_rtmt!0 = "model"
     subs_rtmt!1 = "time"
@@ -329,7 +329,7 @@ climofiles = new(2, string)
 
 alltags = array_append_record(tags, (/"PT_scatter", "DM_global"/), 0)
 id = diag_script + "_ECS"
-contrib_authors = (/"A_rett_ri", "A_laue_ax"/) 
+contrib_authors = (/"A_rett_ri", "A_laue_ax"/)
 ; -------------------------------------------------------------------------------
 
 do n = 0, dimsizes(subs_tas&model) -1
@@ -341,7 +341,7 @@ do n = 0, dimsizes(subs_tas&model) -1
     data = new((/2, dimsizes(subs_tas&time) + 1/), typeof(subs_tas))
     fillval = (/(/-10/)/)
     data (0, :) = array_append_record(tofloat(fillval),subs_rtmt(n, :), 0)
-    
+
     ;; regress rtmt/tas and append to data
     rc     = regline_stats(subs_tas(n, :), subs_rtmt(n, :))
     YAx    = rc@yintercept
@@ -350,7 +350,7 @@ do n = 0, dimsizes(subs_tas&model) -1
     regr!0 = "time"
     YAx@_FillValue = regr@_FillValue
     data (1, :) = array_append_record(tofloat(YAx), regr, 0)
-     
+
     ;; Add 0 to Delta T
     deltaT = array_append_record(tofloat(0), subs_tas(n, :), 0)
 
@@ -363,7 +363,7 @@ do n = 0, dimsizes(subs_tas&model) -1
     res@gsnDraw           = False                    ; don't draw
     res@gsnFrame          = False                    ; don't advance frame
     res@xyMarkLineModes   = (/"Markers", "Lines"/)   ; choose which have markers
-    res@xyMarkers         =  9                       ; choose type of marker  
+    res@xyMarkers         =  9                       ; choose type of marker
     res@xyMarkerColor     = (/"blue", "black"/)      ; Marker color
     res@xyMarkerSizeF     = 0.01                     ; Marker size (default 0.01)
     res@tiMainString      = model_name
@@ -371,7 +371,7 @@ do n = 0, dimsizes(subs_tas&model) -1
 
     res@tiYAxisString     = "N" + " [" + rtmt_arr@units + "]"
     res@tiXAxisString     = "Delta"+" T [" + tas_arr@units + "]"
-  
+
     res@gsnYRefLine       = 0                        ; create horizontal line
     res@gsnYRefLineColor  = "black"
     res@gsnYRefLineDashPattern = 1
@@ -383,11 +383,11 @@ do n = 0, dimsizes(subs_tas&model) -1
 
     plot = gsn_csm_xy (wks, deltaT, data, res)
 
-    txres                 = True                            
+    txres                 = True
     txres@txFontHeightF   = 0.018                       ; Set the font height
 
     label = " r = -" + decimalPlaces(rc@r, 2, True) + \
-            "~C~ Y-Intercept = " + \ 
+            "~C~ Y-Intercept = " + \
             decimalPlaces(rc@yintercept, 2, True) +\
             "    ECS = " + \
             decimalPlaces((rc@yintercept/(2 *(-rc))), 2, True)
@@ -395,12 +395,17 @@ do n = 0, dimsizes(subs_tas&model) -1
 
     draw(plot)
     frame(wks)
- 
+
     info_output(" gv " + wks@fullname + " &", verbosity, 1)
 
     ; -------------------------------------------------------------------------------
     ; add meta data to plot (for reporting)
-    caption = "Equilibrium climate sensitivity for model " + model_name + "."
+    caption = "Linear regression for ECS calculation: "\
+            + "Relationship between the change in net top-of-atmosphere " \
+            + "radiative flux (N) and global-mean surface-air-" \
+            + "temperature change (Delta T) after an instantaneous " \
+            + "quadrupling of CO2 for model " + model_name \
+            + ". Similar to Andrews et al. 2012, fig. 1."
     climofiles(0) = interface_get_inpaths(n) + "/" \
         + interface_get_infile(variables(0), field_types(0), n)
     climofiles(1) = interface_get_inpaths(n) + "/" \
@@ -410,7 +415,7 @@ do n = 0, dimsizes(subs_tas&model) -1
              model_name, climofiles, diag_script, contrib_authors)
     ; -------------------------------------------------------------------------------
 
-    ;; Write Strings for Table 
+    ;; Write Strings for Table
     mod_names(n) = tochar(model_name)
     rtmt_regression(n) = rc@yintercept
     alpha_net(n) = rc
@@ -431,9 +436,9 @@ end do
 
     ;; Export Data to .nc
     out_d = out_path + "ECS.nc"
-    output_nc = ECS_2    
+    output_nc = ECS_2
     output_nc!0 =  "model"
-    output_nc&model =   mod_names 
+    output_nc&model =   mod_names
     output_nc@var = "ecs"
     output_nc@ncdf = out_path
     output_nc@diag_script = diag_script
@@ -447,7 +452,7 @@ end do
     delete(out_d)
     delete(output_nc)
     delete(Fill_Val)
-    
+
    ;; References
    write_references(diag_script, "A_rett_ri", "A_laue_ax", "D_0001", \
                      "", "P_crescendo")

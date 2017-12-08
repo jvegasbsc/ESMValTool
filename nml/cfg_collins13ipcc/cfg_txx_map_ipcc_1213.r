@@ -15,6 +15,7 @@ diag_script_info[["label"]]<-c("RCP8.5: 2081-2100")
 diag_script_info[["units"]]<-c("(~F35~J~F~C)")
 diag_script_info[["plotmask"]]<-c("ocean")
 diag_script_info[["sig"]]<-False
+diag_script_info[["figure_nr"]]<-"12.13"
 
 ## enable to output to netCDF; either use "default" or give a full file name
 diag_script_info[["ncdf"]]<-"txx_mmm_sig_ipcc_1213.nc"

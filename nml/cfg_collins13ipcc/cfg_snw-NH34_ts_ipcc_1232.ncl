@@ -18,6 +18,7 @@ diag_script_info@ts_maxlon = (/360/)
 diag_script_info@begin_ref_year = 1986
 diag_script_info@end_ref_year = 2005
 diag_script_info@months = (/"3", "4"/)
+diag_script_info@figure_nr = "12.32"
 
 diag_script_info@ymin = -0.4
 diag_script_info@ymax = 0.3

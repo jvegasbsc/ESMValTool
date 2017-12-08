@@ -309,7 +309,9 @@ begin
 
     alltags = array_append_record(tags,\
            (/"PT_zonal", "DM_reg", "ST_mean"/), 0)
-    caption = "Mean for variable " + variables(0)
+    caption = "Zonal mean for variable " + variables(0) + " of lon: ["\
+             + di@lonrange(0) + ", " + di@lonrange(1) + "] averaged over " \
+             + di@season + " season."
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name), string)
     do imod = 0, dimsizes(models@name) - 1

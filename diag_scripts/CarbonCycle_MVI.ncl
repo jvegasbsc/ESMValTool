@@ -520,8 +520,8 @@ begin
            (/"PT_scatter", "PT_zonal", "ST_mean", "ST_trend", \
              "ST_clim", "ST_var"/), 0)
     caption =  "Scatterplot for multiyear average " + variables(0) + \
-               " in x axis, its linear trend in y axis, and MVI." + \
-               " Like Anav et al. Fig 1 bottom"
+               " in x axis, its linear trend in y axis, and MVI" + \
+               ", similar to Anav et al., 2013, Fig. 1 bottom."
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name) * dimsizes(variables), string)
     do n_var = 0, dimsizes(variables) - 1

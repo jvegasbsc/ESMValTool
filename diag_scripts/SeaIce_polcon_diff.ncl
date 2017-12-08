@@ -425,7 +425,7 @@ begin
     ;; Reporting
     alltags = array_append_record(tags, (/"DM_polar", "PT_polar", \
                                           "ST_mean"/), 0)
-    caption = "Polar-stereographic contour map of difference in sea ice concentration between " + model_string + " and " + diag_script_info@ref_model  + ". TODO: Problem with OBS* classes - climofile not passed correctly. for OBS* classes, interface_get_infile already returns path + file! Reason yet unknown."
+    caption = "Polar-stereographic contour map of difference in sea ice concentration between " + model_string + " and " + diag_script_info@ref_model  + "."
     if (npages.eq.1 .or. MMM) then  ; only 1 file: no sequence number added
         plot_fname = wks@fullname
         id = "#idSeaIcePolcon"

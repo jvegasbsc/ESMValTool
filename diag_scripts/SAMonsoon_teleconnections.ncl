@@ -448,8 +448,8 @@ begin
         if (any(idx_mod .eq. plot_settings@idx_ref)) then
             continue
         end if
-        caption = "Contour plot with the correlation between precipitaion over "\
-                  + "India and SST in the Nino 3.4 area"
+        caption = "Contour plot with the correlation between precipitation "\
+                  + "and SST in the Nino 3.4 area"
         alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "ST_diff", "PT_geo"/), 0)
         climofiles = new(3, string)
         climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
@@ -477,21 +477,15 @@ begin
     ;; Multipanel plots
     plot_settings@type = "mean"
     plot_settings@part_of_header = " precip-Nino3.4 SST teleconnection, mean plots"
-    multipanel(storage_vault, di, plot_settings, "mean", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "mean", debuginfo, valid_statistics, res)
 
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "PT_geo"/), 0)
 
-    caption = "Contour plot with the correlation between precipitaion over "\
-                  + "India and SST in the Nino 3.4 area"
+    caption = "Contour plot with the correlation between precipitation "\
+                  + "and SST in the Nino 3.4 area"
 
     id = diag_script + "_mean_" + variables(0)
-
-    climofiles = new(dimsizes(models@name), string)
-    do imod = 0, dimsizes(models@name) - 1
-            climofiles(imod) = interface_get_inpaths(imod) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), imod)
-    end do
 
     diag_script_base = basename(diag_script)
     output_dir = get_output_dir(plot_dir, diag_script_base)
@@ -500,22 +494,62 @@ begin
                                                     var0 + var1,\
                                                     field_type0 + field_type1,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + "." + output_file_type
 
-    ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+        delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = output_dir + output_filename + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
+
 
     delete([/alltags, caption, id, imod/])
 
 
     plot_settings@type = "diff"
     plot_settings@part_of_header = " precip-Nino3.4 SST teleconnection, diff plots"
-    multipanel(storage_vault, di, plot_settings, "mean", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "mean", debuginfo, valid_statistics, res)
 
     ;; Attach Metadata to plot
     alltags = array_append_record(tags, (/"DM_reg", "ST_corr", "ST_diff", "PT_geo"/), 0)
 
-    caption = "Difference of the correlation between precipitaion over "\
-                  + "India and SST in the Nino 3.4 area"
+    caption = "Difference of the correlation between precipitation "\
+                  + "and SST in the Nino 3.4 area"
 
     id = diag_script + "_mean_diff" + variables(0)
 
@@ -526,9 +560,48 @@ begin
                                                     var0 + var1,\
                                                     field_type0 + field_type1,\
                                                     aux_title_info, -1)
-    output_file_path = output_dir + output_filename + "." + output_file_type
 
-    ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+        delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = output_dir + output_filename + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
 
     delete([/alltags, caption, id, climofiles/])
 

@@ -42,24 +42,32 @@ if (any(variables(0).eq.(/"tas-degC", "pr-mmday"/))) then
     diag_script_info@evolution_plot = True
     diag_script_info@evolution_plot_anomaly = True
     diag_script_info@evolution_plot_volcanoes = True
+    if variables(0).eq."tas-degC" then
+        diag_script_info@fignum = "1 top"
+    else 
+        diag_script_info@fignum = "2 top"
+    end if
 end if
 if (variables(0).eq."tos") then
     diag_script_info@evolution_plot_ref_model = "HadISST"
     diag_script_info@evolution_plot = True
     diag_script_info@evolution_plot_anomaly = True
     diag_script_info@evolution_plot_volcanoes = True
+    diag_script_info@fignum = "3 top"
 end if
 if (any(variables(0).eq.(/"NBP", "FGCO2"/))) then
     diag_script_info@evolution_plot = True
-    diag_script_info@evolution_plot_volcanoes = False
+    diag_script_info@evolution_plot_volcanoes = True
     diag_script_info@evolution_plot_ref_model = "GCP"
     diag_script_info@obsname = "GCP"
     path = getenv("ESMValTool_OBSPATH") + "/Tier2/GCP/"
     ;; Currently only one file will be read in
     if variables(0).eq."NBP" then
         diag_script_info@ref_varname = "nbp"
+        diag_script_info@fignum = "5"
     else
         diag_script_info@ref_varname = "fgco2"
+        diag_script_info@fignum = "13"
     end if
     diag_script_info@obsfile = path + \
        "OBS_GCP_reanaly_1_T0M_" + \

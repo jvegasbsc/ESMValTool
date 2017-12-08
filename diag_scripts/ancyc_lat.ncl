@@ -309,7 +309,10 @@ begin
 
         alltags = array_append_record(tags, (/"DM_global", "ST_mean", "ST_clim", "PT_seas", "PT_zonal"/), 0)
 
-        caption = "Annual cycle of zonal mean of variable " + variables(0)
+        caption = "Annual cycle of zonal mean of variable " + variables(0) + \
+            " for the time period " + y1(idx_mod) + "-" + y2(idx_mod) + \
+            ". The value on the top-right corner shows the global " + \
+            "area-weighted average."
 
         id = diag_script + "_" + base_name
 

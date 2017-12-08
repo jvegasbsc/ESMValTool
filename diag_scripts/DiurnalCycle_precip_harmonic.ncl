@@ -220,6 +220,8 @@ begin
             timeh = cd_calendar(A0&time, 0)
             hour_tmp = timeh(0:nHR - 1, 3)
             min_tmp = timeh(0:nHR - 1, 4)
+            start_year = min(tointeger(timeh(:,0)))
+            end_year = max(tointeger(timeh(:,0)))
 
             n = -1
             do nh = 0, nHR - 1
@@ -381,7 +383,7 @@ begin
     plot_settings@type = "mean"
     plot_settings@part_of_header = " of the 1st harmonic of the mean diurnal cycle of " + variable_info@long_name
     plot_settings@prefix_to_header = ""
-    multipanel(storage_vault, di, plot_settings, "amplitude", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "amplitude", debuginfo, valid_statistics, res)
 
     ;; Attach Metadata to plot
     ;; base_name + climofiles are the same for all plots
@@ -408,7 +410,49 @@ begin
     caption = di@season + " - amplitude" + plot_settings@part_of_header
     id = diag_script + "_" + base_name + "-amplitude"
 
-    ESMValMD(plot_outfile + "." + output_file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage)*dimsizes(variables),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               do n_var = 0, dimsizes(variables) - 1
+                   climofiles(i_fig * dimsizes(variables) + n_var) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(nvar), field_types(0), imod)
+               end do
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+            output_file_path = plot_outfile + "-page" + ipage + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+            delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = plot_outfile + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
 
     delete([/alltags, caption, id/])
 
@@ -416,7 +460,7 @@ begin
     plot_settings@type = "mean"
     plot_settings@part_of_header = " of the 1st harmonic of the mean diurnal cycle of " + variable_info@long_name
     plot_settings@lb_units = "hour"
-    multipanel(storage_vault, di, plot_settings, "phase", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "phase", debuginfo, valid_statistics, res)
 
    ;; aux_title_info original line 1505 monsoon_panels.ncl, assuming no pages etc
     aux_title_info = di@season + "-phase"
@@ -426,10 +470,53 @@ begin
     alltags = array_append_record(tags, "DM_reg", 0)
     alltags := array_append_record(alltags,\
            (/"PT_diurn", "PT_geo", "ST_mean", "ST_corr"/), 0)
-    caption = di@season + " - phase" + plot_settings@part_of_header
+    caption = di@season + " - phase" + plot_settings@part_of_header \
+             + " for the years " + start_year + " to " + end_year
     id = diag_script + "_" + base_name + "-phase"
 
-    ESMValMD(plot_outfile + "." + output_file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage)*dimsizes(variables),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               do n_var = 0, dimsizes(variables) - 1
+                   climofiles(i_fig * dimsizes(variables) + n_var) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(nvar), field_types(0), imod)
+               end do
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+            output_file_path = plot_outfile + "-page" + ipage + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+            delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = plot_outfile + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
 
     delete([/alltags, caption, id/])
 
@@ -437,7 +524,7 @@ begin
     plot_settings@prefix_to_header = " "
     plot_settings@part_of_header = " of the 1st harmonic of the mean diurnal cycle of " + variable_info@long_name
     plot_settings@lb_units = "%"
-    multipanel(storage_vault, di, plot_settings, "var", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "var", debuginfo, valid_statistics, res)
 
    ;; aux_title_info original line 1505 monsoon_panels.ncl, assuming no pages etc
     aux_title_info = di@season + "-var"
@@ -446,11 +533,54 @@ begin
           aux_title_info, -1)
     alltags = array_append_record(tags, "DM_reg", 0)
     alltags := array_append_record(alltags,\
-           (/"PT_diurn", "PT_geo", "ST_mean", "ST_corr"/), 0)
-    caption = di@season + " - var" + plot_settings@part_of_header
+           (/"PT_diurn", "PT_geo", "ST_other"/), 0)
+    caption = di@season + " - var" + plot_settings@part_of_header \
+             + " for the years " + start_year + " to " + end_year
     id = diag_script + "_" + base_name + "-var"
 
-    ESMValMD(plot_outfile + "." + output_file_type, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    figures_per_page = page_models[0]
+    model_panel_placement = page_models[1]
+    delete(page_models)
+
+    if (dimsizes(figures_per_page).gt.1) then
+
+        curr_idx=0
+
+        do ipage=0,dimsizes(figures_per_page)-1
+
+            climofiles = new(figures_per_page(ipage)*dimsizes(variables),string)
+            modelsname = new(figures_per_page(ipage),string)
+            do ifig = 0, figures_per_page(ipage)-1
+               imod = model_panel_placement(curr_idx)
+               do n_var = 0, dimsizes(variables) - 1
+                   climofiles(i_fig * dimsizes(variables) + n_var) = interface_get_inpaths(imod) + "/" + \
+                         interface_get_infile(variables(nvar), field_types(0), imod)
+               end do
+               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+               curr_idx=curr_idx+1
+            end do
+
+            output_file_path = plot_outfile + "-page" + ipage + "." + output_file_type
+
+            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+
+            delete([/climofiles,modelsname/])
+
+        end do
+
+    else
+
+        climofiles = new(dimsizes(models@name), string)
+        do imod = 0, dimsizes(models@name) - 1
+                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), imod)
+        end do
+
+        output_file_path = plot_outfile + "." + output_file_type
+
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+
+    end if
 
     delete([/alltags, caption, id, climofiles/])
 

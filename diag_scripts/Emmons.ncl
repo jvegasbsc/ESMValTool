@@ -647,6 +647,9 @@ begin
         info_output(" Wrote " + outfile, verbosity, 1)
 
 
+
+        create_legend_lines(leg@annots, leg, name_string_leg, "lines")
+
         ;; Attach Metadata to plot
         xml_name = getenv("ESMValTool_xml_name")
         suffix = get_file_suffix(xml_name, 0)
@@ -670,12 +673,31 @@ begin
         modnames = array_append_record(models@name, camp_loc, 0)
         contrib_authors = "A_gott_kl"
 
-        ESMValMD(outfile, alltags, caption, id, variables, modnames, climofiles, diag_script, contrib_authors)
+        if(dimsizes(files2use) .gt. 1) then
+
+            outputfile = str_split(outfile, ".")
+
+            do ifile = 1, dimsizes(files2use)
+
+                if(ifile .lt. 10) then
+                    ofile = outputfile(0) + ".00000" + ifile + "." + outputfile(1) 
+                else
+                    ofile = outputfile(0) + ".0000" + ifile + "." + outputfile(1)
+                end if
+
+                ESMValMD(ofile, alltags, caption, id, variables, modnames, climofiles, diag_script, contrib_authors)
+
+            end do
+
+        else
+
+            ESMValMD(outfile, alltags, caption, id, variables, modnames, climofiles, diag_script, contrib_authors)
+ 
+        end if
 
         delete([/alltags, caption, id, climofiles/])
-        delete(files2use)
 
-        create_legend_lines(leg@annots, leg, name_string_leg, "lines")
+        delete(files2use)
 
     else  ; no matching obs files
 

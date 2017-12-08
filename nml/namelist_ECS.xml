@@ -6,7 +6,7 @@ namelist_ECS.xml
 
 Description
 Namelist to calculate the Equilibrium Climate Sensitivity (ECS) using
-abrupt4xCO2 and piControl runs for the variables rtmt and tas. 
+abrupt4xCO2 and piControl runs for the variables rtmt and tas.
 
 Authors
 Ricarda Rettinger
@@ -16,7 +16,7 @@ DLR ESMVal
 CRESCENDO
 
 Reference
-Andrews et al., 2012, Forcing, feedbacks and climate sensitivity in CMIP5 
+Andrews et al., 2012, Forcing, feedbacks and climate sensitivity in CMIP5
 coupled atmosphere-ocean climate models, Geophysical Research Letters, 39.
 DOI: 10.1029/2012GL051607
 
@@ -36,7 +36,7 @@ This namelist is part of the ESMValTool
     <max_data_blocksize type="integer">        500         </max_data_blocksize>
     <verbosity  type="integer">                  1         </verbosity>
     <exit_on_warning  type="boolean">        False         </exit_on_warning>
-    <output_file_type>                          ps         </output_file_type>
+    <output_file_type>                         png         </output_file_type>
     <force_calc type="boolean">              False         </force_calc>
     <force_gradecalc type="boolean">         False         </force_gradecalc>
     <force_taylorcalc type="boolean">        False         </force_taylorcalc>
@@ -50,7 +50,7 @@ This namelist is part of the ESMValTool
 <!-- PLEASE INDICATE THE APPROPRIATE YEARS (150 PER EXPERIMENT)            -->
 <!-- THE TIME STEPS OF THE EXPERIMENTS CAN VARY                            -->
 <!-- ##################################################################### -->
- 
+
 </MODELS>
 
 
@@ -61,7 +61,7 @@ This namelist is part of the ESMValTool
 <diag>
    <description>         tas                 </description>
    <variable_def_dir>    ./variable_defs/              </variable_def_dir>
-   <variable>            tas                      </variable>   
+   <variable>            tas                      </variable>
    <variable>            rtmt                      </variable>
    <field_type>          T2Ms                          </field_type>
    <diag_script_cfg_dir> ./nml/cfg_ECS/  </diag_script_cfg_dir>
@@ -90,7 +90,7 @@ This namelist is part of the ESMValTool
 <!--     <model>  CMIP5_ETHZ  CESM1-WACCM        Amon  historical   r1i1p1  1970 1999  @{MODELPATH}/ETHZ_CMIP5/ </model> -->
 <!--     <model>  CMIP5_ETHZ  CMCC-CESM          Amon  historical   r1i1p1  1970 1999  @{MODELPATH}/ETHZ_CMIP5/ </model> -->
 <!--     <model>  CMIP5_ETHZ  CMCC-CMS           Amon  historical   r1i1p1  1970 1999  @{MODELPATH}/ETHZ_CMIP5/ </model> -->
- 
+
     <model>  CMIP5_ETHZ  CNRM-CM5           Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  CNRM-CM5           Amon  piControl     r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  CSIRO-Mk3-6-0      Amon  abrupt4xCO2   r1i1p1  0001 0150  @{MODELPATH}/ETHZ_CMIP5/ </model>
@@ -117,7 +117,7 @@ This namelist is part of the ESMValTool
 <!--     <model>  CMIP5_ETHZ  HadGEM2-AO         Amon  historical   r1i1p1  1970 1999  @{MODELPATH}/ETHZ_CMIP5/ </model> -->
 <!--     <model>  CMIP5_ETHZ  HadGEM2-CC         Amon  historical   r1i1p1  1970 1999  @{MODELPATH}/ETHZ_CMIP5/ </model> -->
 <!--     <model>  CMIP5_ETHZ  HadGEM2-ES         Amon  historical   r1i1p1  1970 1999  @{MODELPATH}/ETHZ_CMIP5/ </model> -->
-   
+
     <model>  CMIP5_ETHZ  inmcm4             Amon  abrupt4xCO2   r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  inmcm4             Amon  piControl     r1i1p1  2090 2239  @{MODELPATH}/ETHZ_CMIP5/ </model>
     <model>  CMIP5_ETHZ  IPSL-CM5A-LR       Amon  abrupt4xCO2   r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>

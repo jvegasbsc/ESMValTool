@@ -15,6 +15,7 @@ diag_script_info@max_hori     =    1
 diag_script_info@title = "Annual mean top of atmosphere radiation change (RCP4.5: 2081-2100)"
 diag_script_info@label = (/"a) net flux TOA"/)
 diag_script_info@units = (/"(W m~S~-2~N~)"/)
+diag_script_info@figure_nr = "12.16a"
 ;; a default colormap, e.g., WhiteBlueGreenYellowRed, rainbow
 ;diag_script_info@colormap = "WhiteBlueGreenYellowRed"
   

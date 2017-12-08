@@ -1,28 +1,28 @@
 ;;#############################################################################
-;; CALCULATES TCR (Transient climate response) 
+;; CALCULATES TCR (Transient climate response)
 ;; Author: Ricarda Rettinger (DLR, Germany)
 ;; CRESCENDO project
 ;;#############################################################################
 ;;
 ;; Description
-;;    To produce IPCC AR5 figure 9.42b (Flato et al., 2013) the Equilibrium Climate 
+;;    To produce IPCC AR5 figure 9.42b (Flato et al., 2013) the Equilibrium Climate
 ;;    Sensitivity (ECS) is plotted against the Transcient Climate Response (TCR).
 ;;    Therefore, run ./diag_scripts/ECS.ncl before using this script.
 ;;    For TCR the 1pctCO2 experiment is used and it is calculated
-;;    taking the difference between the start of the experiment and a 20-year 
+;;    taking the difference between the start of the experiment and a 20-year
 ;;    period centred on the time of CO2 doubling.
 ;;
 ;; References
-;;    Flato et al. (2013). Evaluation of Climate Models. In: Climate Change 2013: 
-;;    The Physical Science Basis. Contribution of Working Group I to the Fifth 
-;;    Assessment Report of the Intergovernmental Panel on Climate Change. Climate 
+;;    Flato et al. (2013). Evaluation of Climate Models. In: Climate Change 2013:
+;;    The Physical Science Basis. Contribution of Working Group I to the Fifth
+;;    Assessment Report of the Intergovernmental Panel on Climate Change. Climate
 ;;    Change 2013, 5, 741-866.
 ;;
 ;; Required variable_info attributes (variable specific)
 ;;    none
 ;;
 ;; Required diag_script_info attributes (diagnostics specific)
-;;   none    
+;;   none
 ;;
 ;; Optional diag_script_info attributes (diagnostic specific)
 ;;   calcmm:     - False (default) : do not calculate multimodel mean
@@ -126,7 +126,7 @@ begin
     TCR = new((/dim_MOD/),"float")
 
     ;; Extract model corresponding data without MMM!
-    do imod = 0, dim_MOD - i 
+    do imod = 0, dim_MOD - i
         var_tas = extract_data_extended(imod, var0, data_tas, -1, 0, 0)
 
         if (models@experiment(0) .eq. "historical") then
@@ -145,7 +145,7 @@ begin
             TCR@standard_name = "TCR"
             delete(avg_tas_mon)
             delete(TCR_i)
-        end if 
+        end if
         delete(avg_area)
         delete(var_tas)
     end do
@@ -181,10 +181,10 @@ begin
 
     if (isfilepresent_esmval(ecsfile)) then
         info_output("Read in: " + ecsfile, verbosity, 1)
-        ecs_tmp = addfile(ecsfile, "r")  
-        ecs_att = ecs_tmp->ecs ;; get ecs values 
+        ecs_tmp = addfile(ecsfile, "r")
+        ecs_att = ecs_tmp->ecs ;; get ecs values
         ecs_tmp_model = tostring(ecs_tmp->model) ; get modelnames
- 
+
     else
         error_msg("f", diag_script, "", "file with precalculated ECS data (" + \
             ecsfile + ") not found. Please run ./diag_scripts/ECS.ncl.")
@@ -198,7 +198,7 @@ begin
     ECS@_FillValue = ecs_att@_FillValue
     ECS@units = ecs_att@units
     ECS@standard_name = ecs_att@standard_name
-  
+
     exit_flag = False
     wECS_idx = new((/dim_MOD/),float)
     wECS_idx@_FillValue = ecs_att@_FillValue
@@ -260,10 +260,10 @@ begin
     end if
 
     ;; Define workstation
-    if (models@experiment(0) .eq. "historical") then 
-        outfile = outputdir + "Figure_9.42a" 
+    if (models@experiment(0) .eq. "historical") then
+        outfile = outputdir + "Figure_9.42a"
     else
-        outfile = outputdir + "Figure_9.42b"         
+        outfile = outputdir + "Figure_9.42b"
     end if
     wks = gsn_open_wks(file_type, outfile)
     wks@legendfile = outfile + "_legend"
@@ -376,10 +376,13 @@ begin
 
     alltags = array_append_record(tags, (/"PT_scatter", "DM_global"/), 0)
     id = diag_script + "_TCR"
-    contrib_authors = (/"A_rett_ri", "A_laue_ax"/) 
+    contrib_authors = (/"A_rett_ri", "A_laue_ax"/)
 
-    caption = "Equilibrium climate sensitivity (ECS) vs. transient climate response" \
-              + " (TCR)."
+    caption = "Equilibrium climate sensitivity against transient climate " \
+            + "response (TCR). The ECS and TCR information are based on " \
+            + "Andrews et al. (2012) and Forster et al. (2013) and updated " \
+            + "from the CMIP5 archive. Similar to Flato et al. 2013, fig. " \
+            + "9.42b"
 
     idx = 0
     do i = 0, dim_MOD - 1

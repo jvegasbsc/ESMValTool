@@ -1,0 +1,85 @@
+<namelist>
+<include href="./config_private.xml"/>
+<namelist_summary>
+###############################################################################
+namelist_righi15gmd_Emmons.xml
+
+Description
+This namelist produces figures 16, 17, 19, S15, S16, S17, S18, S19 of 
+Righi et al. (2015)
+
+Author
+Klaus-Dirk Gottschaldt (DLR, Germany - klaus-dirk.gottschaldt@dlr.de)
+
+Contributor(s)
+n/a
+
+Project
+DLR ESMVal
+
+References
+Righi et al., Geosci. Model Dev., 8, 733-768 10.5194/gmd-8-733-2015 (2015)
+
+This namelist is part of the ESMValTool
+###############################################################################
+</namelist_summary>
+
+<GLOBAL>
+    <write_plots type="boolean">           True      </write_plots>
+    <write_netcdf type="boolean">          True      </write_netcdf>
+    <force_processing type="boolean">     False      </force_processing>
+    <wrk_dir type="path">               @{WORKPATH}  </wrk_dir>
+    <plot_dir type="path">              @{PLOTPATH}  </plot_dir>
+    <climo_dir type="path">             @{CLIMOPATH} </climo_dir>
+    <write_plot_vars type="boolean">       True      </write_plot_vars>
+    <max_data_filesize type="integer">      100      </max_data_filesize>
+    <max_data_blocksize type="integer">     500      </max_data_blocksize>
+    <verbosity  type="integer">               1      </verbosity>
+    <exit_on_warning  type="boolean">     False      </exit_on_warning>
+    <output_file_type>                      png      </output_file_type>
+    <tags>                    P_esmval, D_righi15gmd </tags>
+</GLOBAL>
+
+<MODELS>
+    <model> CMIP5_ETHZ bcc-csm1-1     Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ bcc-csm1-1-m   Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ BNU-ESM        Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ CanESM2        Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ CCSM4          Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ CNRM-CM5       Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ CSIRO-Mk3-6-0  Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ FGOALS-g2      Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ FIO-ESM        Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ GFDL-CM3       Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ GFDL-ESM2G     Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ GFDL-ESM2M     Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ GISS-E2-H      Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ GISS-E2-R      Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ IPSL-CM5A-LR   Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ IPSL-CM5A-MR   Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ IPSL-CM5B-LR   Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MIROC4h        Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MIROC5         Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MIROC-ESM      Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MIROC-ESM-CHEM Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MPI-ESM-LR     Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MPI-ESM-MR     Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+    <model> CMIP5_ETHZ MRI-ESM1       Amon historical r1i1p1   1980 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
+</MODELS>
+
+<DIAGNOSTICS>
+    <diag>
+        <description> Emmons profiles: fig 16 of Righi et al., 2014 </description>
+        <variable_def_dir> ./variable_defs/ </variable_def_dir>
+        <variable> tro3 </variable>
+        <field_type> T3M </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_righi15gmd/Emmons/ </diag_script_cfg_dir>
+
+        <diag_script cfg="cfg_righi15gmd_fig16_CMIP5.ncl"> Emmons.ncl </diag_script>
+        
+        <tags> R_atmosChem, T_ghg, T_chem </tags>
+    </diag>
+
+</DIAGNOSTICS>
+
+</namelist>
