@@ -1,5 +1,5 @@
 #!/bin/bash
-cmd="/pf/b/b309070/util/translate2ESGF/translate2ESGF.py"
+cmd="$HOME/util/translate2ESGF/translate2ESGF.py"
 for i in namelist*Diur*xml
 do
     echo $i
