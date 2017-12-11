@@ -44,7 +44,7 @@ This namelist is part of the ESMValTool
 <DIAGNOSTICS>
     
     <diag>
-        <description>  															Doing dataset analysis. (Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <description>  															Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
         <variable>			   					                     VAR                                    </variable>
         <field_type>                      								T2Ms                                      </field_type>
