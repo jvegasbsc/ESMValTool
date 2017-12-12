@@ -1,5 +1,5 @@
 import os
-import subprocess
+import shutil
 from netCDF4 import Dataset
 from diagnostic import BasicDiagnostics
 
@@ -8,8 +8,6 @@ class DUMMYDiagnostic(BasicDiagnostics):
     """
     class to implement DUMMY diagnostics,
     like e.g. global means, global differences, RMSD etc.
-
-    TODO implement testing for this diagnostic
 
     """
 
@@ -44,71 +42,85 @@ class DUMMYDiagnostic(BasicDiagnostics):
         super(DUMMYDiagnostic, self).write_data()
 
     def _load_model_data(self):
-        """ load albedo model data """
-
-        edited = False
-
-        newfile = self._mod_file + ".T85built.nc"
-        newfile = newfile.split("/")
-        newdir = (self._work_dir if self._work_dir[-1] ==
-                  os.sep else self._work_dir + os.sep) + "AUX_Files_DUM_ESACCI"
-        newfile = newdir + os.sep + newfile[-1]
+        """ load model data """
 
         mod_info = Dataset(self._mod_file)
-        lat = mod_info.dimensions['lat'].size
-        lon = mod_info.dimensions['lon'].size
+        try:
+            lat = mod_info.dimensions['lat'].size
+            lon = mod_info.dimensions['lon'].size
+        except:  # regridding required in any case
+            lat = -1
+            lon = -1
         mod_info.close()
 
-        if not ((lat == 128 and lon == 256) or
-                (lat == 96 and lon == 192) or
-                (lat == 18 and lon == 36) or
-                (lat == 6 and lon == 12)):  # TODO add diffs
+        if not (lat == self.reso["lat"] and lon == self.reso["lon"]):
+
+            grid = self.resoLUT[str(self.reso["lat"]) + "-" +
+                                str(self.reso["lon"])]
+
+            newfile = self._mod_file + "." + grid + "built.nc"
+            newfile = newfile.split("/")
+            newdir = (self._work_dir if self._work_dir[-1] ==
+                      os.sep else self._work_dir + os.sep) +\
+                "AUX_Files_DUMMY"
+            newfile = newdir + os.sep + newfile[-1]
 
             if not os.path.exists(newfile):
                 tempfile = self._aggregate_resolution(
-                    self._mod_file, "T85", remove=False)
-                subprocess.call(["mkdir", newdir])
-                subprocess.call(['cp', tempfile, newfile])
+                    self._mod_file, grid, remove=False)
+                if not os.path.exists(newdir):
+                    os.makedirs(newdir)
+                shutil.copy2(tempfile, newfile)
                 os.remove(tempfile)
 
-            self._mod_file_E = newfile
-            edited = True
+            self._mod_file = newfile
 
         # load data
-        self._mod_data = self._load_cmip_generic(
-            self._mod_file_E if edited else self._mod_file,
-            self._project_info['RUNTIME']['currDiag'].get_variables()[0])
+        proj_var = self._project_info['RUNTIME']['currDiag'].get_variables()[0]
+        self._mod_data = self._load_cmip_generic(self._mod_file, proj_var)
 
     def _load_observation_data(self):
         """ load obs data """
-        newfile = self._ref_file + ".T85built.nc"
-        newfile = newfile.split("/")
-        newdir = (self._work_dir if self._work_dir[-1] ==
-                  os.sep else self._work_dir + os.sep) + "AUX_Files_DUM_ESACCI"
-        newfile = newdir + os.sep + newfile[-1]
 
         mod_info = Dataset(self._ref_file)
-        lat = mod_info.dimensions['lat'].size
-        lon = mod_info.dimensions['lon'].size
+        try:
+            lat = mod_info.dimensions['lat'].size
+            lon = mod_info.dimensions['lon'].size
+        except:  # regridding required in any case
+            lat = -1
+            lon = -1
         mod_info.close()
 
-        if not ((lat == 128 and lon == 256) or
-                (lat == 96 and lon == 192) or
-                (lat == 18 and lon == 36) or
-                (lat == 6 and lon == 12)):  # TODO add diffs
+        reso = {"lat": lat, "lon": lon}
+
+        if str(lat) + "-" + str(lon) not in self.resoLUT.keys():
+
+            grid = self.resoLUT[str(self.reso["lat"]) + "-" +
+                                str(self.reso["lon"])]
+
+            newfile = self._ref_file + "." + grid + "built.nc"
+            newfile = newfile.split("/")
+            newdir = (self._work_dir if self._work_dir[-1] ==
+                      os.sep else self._work_dir + os.sep) +\
+                "AUX_Files_DUMMY"
+            newfile = newdir + os.sep + newfile[-1]
+
             if not os.path.exists(newfile):
                 tempfile = self._aggregate_resolution(
-                    self._ref_file, "T85", remove=False)
-                subprocess.call(["mkdir", newdir])
-                subprocess.call(['cp', tempfile, newfile])
+                    self._ref_file, grid, remove=False)
+                if not os.path.exists(newdir):
+                    os.makedirs(newdir)
+                shutil.copy2(tempfile, newfile)
                 os.remove(tempfile)
 
             self._ref_file = newfile
 
-        if self._project_info['RUNTIME']['currDiag'].get_variables()[0] == \
-                self._vartype:
-            self._ref_data = self._load_cci_generic(
-                self._ref_file, self._project_info['RUNTIME']['currDiag'].
-                get_variables()[0])
+            reso = self.reso
+
+        self.reso = reso
+
+        proj_var = self._project_info['RUNTIME']['currDiag'].get_variables()[0]
+        if proj_var == "DUMMY":
+            self._ref_data = self._load_cci_generic(self._ref_file, proj_var)
         else:
             assert False, 'Not supported yet'
