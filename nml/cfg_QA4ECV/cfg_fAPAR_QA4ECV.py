@@ -1,7 +1,7 @@
 # This is a config file for QA4ECV and CMIP5 data diagnostics
 
 # generell flags
-regionalization = True
+regionalization = not True
 shape = "climes"
 shapeNames = 2 #column of the name values 
 #start_year = 1988
@@ -27,21 +27,21 @@ C=np.matrix([[15,15,20],
 albedocmap = mpl.colors.ListedColormap(C/255.0)
 
 # flags for basic diagnostics
-globmeants = True
+globmeants = not True
 mima_globmeants=[0,1]
 cmap_globmeants='Greens' #'YlGn_r'
 mima_ts=[0,1]
 mima_mts=mima_ts
-portrait = True
-globmeandiff = True
-globmeandiff_p = True
+portrait = not True
+globmeandiff = not True
+globmeandiff_p = not True
 mima_globmeandiff=[-1,1]
 mima_globmeandiff_r=[-1,1]
-trend = True
-anomalytrend = True
-trend_p = True
-climatologies = True
-hovmoeller = True
+trend = not True
+anomalytrend = not True
+trend_p = not True
+climatologies = not True
+hovmoeller = not True
 mima_hov = [0, 1]
 mima_hovdiff = [-0.5, 0.5]
 

@@ -18,7 +18,6 @@ class HiddenPrints:
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
         
-
 class fAPARDiagnostic(BasicDiagnostics):
     """
     class to implement albedo diagnostics, like e.g. global means, global differences, RMSD etc.
@@ -177,12 +176,12 @@ class fAPARDiagnostic(BasicDiagnostics):
             
             if timearray is not None:
                 try:
-                    with HiddenPrints():
-                        TSA = TS(timearray, array, breakpoint_method="olssum",
-                                 deseason=True, max_num_periods=3,
-                                 periods_method="autocorr",
-                                 temporal_resolution = "monthly")
-                        RES = TSA.analysis(homogenize=True)
+#                    with HiddenPrints():
+                    TSA = TS(timearray, array, breakpoint_method="CUSUMADJ",
+                             deseason=True, max_num_periods=3,
+                             periods_method="autocorr",
+                             temporal_resolution = "monthly")
+                    RES = TSA.analysis(homogenize=True)
                 except:
                     count += 1
             else:
@@ -311,183 +310,3 @@ class fAPARDiagnostic(BasicDiagnostics):
                  '#ID' + 'TSA' + self.var,
                  ",".join(self._infiles))
         
-        
-        
-######################### unused
-    def _preprocess_observations(self, infile, mod, var,check_f = None,force=False):
-        """
-        preprocess observations to adapt to temporal and spatial resolution needed
-        Parameters:
-        -----------
-        
-        infile : string with path to file
-        mod : model data; the prepocessing should mirror its specifications
-        var : name of the variable within the file
-        check_f : alternativeley check this folder and write infile.built.nc
-        """
-        
-        #choose timestep and resolution 
-        #TODO get this from mod_data or proj_info
-        if self._field_type in ["T2Ms", "T3M"]:
-            timestep="monthly"
-        else:
-            assert False, "unnkown field_type"
-            
-        resolution="T63"
-        
-        ofile=infile+'.built.nc'
-        
-        if (os.path.isfile(infile) or os.path.isfile(ofile)) and not force:
-            data = self._load_cci_generic(ofile if os.path.isfile(ofile) else infile,var)
-            return data
-        elif (os.path.isfile(infile) or os.path.isfile(ofile)) and force:
-            
-            #adjust timestep
-            thisfile = self._aggregate_timestep(ofile if os.path.isfile(ofile) else infile,timestep)
-            
-            #adjust resolution
-            thisfile = self._aggregate_resolution(thisfile,resolution)
-            
-            subprocess.call(['cp',thisfile,ofile])
-            
-            os.remove(thisfile)
-            
-            data = self._load_cci_generic(ofile,var)
-            return data
-            
-        elif not check_f is None:
-            file_list, list_length = self._get_files_in_directory(check_f,'*/*/*/*.nc',False)
-            
-            #choose necessary files
-            def loc_timestamp_split(str):
-                return str.split('/')[-1].split('-')[0]
-                
-            file_timestamps = np.asarray(map(int,map(loc_timestamp_split,file_list)))
-            ys=file_timestamps/10000000000
-            low_date = min(ys)
-            high_date = max(ys)
-            
-            curyear=low_date
-                       
-            file_list_agg=[]
-            
-            while not curyear == (high_date + 1):
-                
-                use = np.array(np.where(np.all([file_timestamps/10000000000 == curyear],0)))
-                use=use[0][(np.argsort(file_timestamps[use[0]]))]
-                file_list_cur=np.array(file_list)[use].tolist()
-                
-                if len(file_list_cur)>0:
-                    #concatenate files
-                    thisfile = self._aggregate_obs_from_files(file_list_cur)
-                    
-                    #adjust mask
-                    thisfile = self._apply_sst_flags(thisfile)
-                
-                    #adjust timestep
-                    thisfile = self._aggregate_timestep(thisfile,timestep)
-                    
-                    #adjust resolution
-                    thisfile = self._aggregate_resolution(thisfile,resolution)
-                    
-                    #add to new file list
-                    file_list_agg.append(thisfile)
-                
-                curyear = curyear + 1
-                
-                print(file_list_agg)
-
-            thisfile = self._aggregate_obs_from_files(file_list_agg)
-            
-            [os.remove(tf) for tf in file_list_agg]
-
-            subprocess.call(['cp',thisfile,ofile])
-            
-            os.remove(thisfile)
-            
-            data = self._load_cci_generic(ofile,var)
-            return data
-            
-        else:
-            print infile
-            assert False, "cannot find any files!" 
-            
-    def _apply_sst_flags(self,infile,remove=True):
-        """ apply flag to file """
-        """ currenty only monthly """
-        cdo=Cdo()
-        oname=self._work_dir + os.sep + "temp" + os.sep + tempfile.NamedTemporaryFile().name.split('/')[-1]
-        tmpname1=self._work_dir + os.sep + "temp" + os.sep + tempfile.NamedTemporaryFile().name.split('/')[-1]
-        tmpname2=self._work_dir + os.sep + "temp" + os.sep + tempfile.NamedTemporaryFile().name.split('/')[-1]
-        tmpname4=self._work_dir + os.sep + "temp" + os.sep + tempfile.NamedTemporaryFile().name.split('/')[-1] #only if only sm is wanted
-        cdo.selname("mask",input=infile,output=tmpname1,options='-L -f nc4 -b F32')
-        cdo.selname("analysed_sst",input=infile,output=tmpname4,options='-L -f nc4 -b F32') #only if only sm is wanted
-        cdo.setvrange(1,1,input=tmpname1,output=tmpname2,options='-L -f nc4 -b F32')
-        os.remove(tmpname1)
-        cdo.div(input=tmpname4 + " " + tmpname2,output=oname,options='-L -f nc4 -b F32') #only if only sm is wanted
-        #cdo.div(input=infile + " " + tmpname3,output=oname,options='-L -f nc4 -b F32')
-        os.remove(tmpname2)
-        os.remove(tmpname4) #only if only sm is wanted
-        
-        if remove:
-            os.remove(infile)
-                
-            
-        return oname
-        
-###TODO CURRENTLY UNUSED
-
-    def download_observations(self, year, force=True):
-        """
-        download observations and update local mirror with recent data
-
-        The data is currently downloaded from the ICDC (http://icdc.zmaw.de/1.html)
-        This requires a special account. An alternative approach would
-        be to download the data directly from the SM CCI project
-        and/or the CCI data protal
-
-        TODO implement download from CCI or data portal
-        """
-        if not os.path.exists(self.raw_reference_directory):
-            os.makedirs(self.raw_reference_directory)
-
-        odir = self.raw_reference_directory + os.sep + year + os.sep
-        if os.path.exists(odir):
-            if force == False:
-                print('No data download as data already available: ' + year)
-                return
-
-        if not os.path.exists(odir):
-            os.makedirs(odir)
-        else:  # empty directory
-            os.system('rm -rf ' + odir + '*.nc')
-
-        # download data via scp
-        # if on the server, create only links, otherwise download using scp
-        if os.path.exists(self.remote_dir):
-            print('Linking data only as on server!')
-            cmd = "ln -s " + self.remote_dir + year + '/*.nc' + ' ' + odir
-            os.system(cmd)
-        else:
-            assert False, "not working yet with subprocess"
-            cmd = self.user + '@' + self.server + ':' + self.remote_dir + year + '/*.nc' + ' ' + odir
-            subprocess.call(["scp", "-r", cmd], shell=True)
-
-    def update_observation(self, year, force=False):
-        """
-        download and update observations for a particular year
-
-        Parameters
-        ----------
-        year : str
-            year to process
-        force : bool
-            specifies if processing should be done in any case (true) or if
-            the data is available, no processing will be made (false)
-        """
-        ofile_root = self.reference_preproc_directory + os.sep + 'CCI_SM_' + year
-
-        self.download_observations(year, force=force)
-        self.preprocess_observations(year, ofile_root, force=force)
-
-

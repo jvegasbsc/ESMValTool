@@ -49,8 +49,7 @@ This namelist is part of the ESMValTool
         <field_type>                      								T2Ms                                      </field_type>
         <diag_script cfg="./nml/cfg_QA4ECV/cfg_fAPAR_QA4ECV.py">   	fAPAR_QA4ECV.py                    				</diag_script>
         <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
-
-		  <model> OBS        GlobAlbedo				sat				fAPAR-online 		 2002 2005  @{OBSPATH}  </model> 
+ 
 		  <model> OBS        QA4ECV				   ECV				avh-geo-res050 	 2002 2005  @{OBSPATH}  </model>
 		  <model> CMIP5 		GFDL-CM3 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>
 		  <model> CMIP5 		MPI-ESM-MR 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>

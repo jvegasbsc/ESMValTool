@@ -18,8 +18,8 @@ import scipy.optimize as optimize
 from scipy.ndimage.filters import uniform_filter1d
 import statsmodels.api as sm
 from models import LinearTrend, SineSeason3  # , SineSeasonk, SineSeason1
-#import matplotlib.pyplot as plt
-from bfast import BFAST
+import matplotlib.pyplot as plt
+#from bfast import BFAST # not working with rpy2
 
 ####
 # Additional functions
@@ -826,8 +826,10 @@ class TempStab(object):
             self.__chosen_break__ = self.__break_none__
         elif self.break_method == 'olssum':
             self.__chosen_break__ = self.__break_olssum__
-        elif self.break_method == 'bfast':
-            self.__chosen_break__ = self.__break_bfast__
+        elif self.break_method == 'CUSUMADJ':
+            self.__chosen_break__ = self.__break_CUSUMADJ__
+#        elif self.break_method == 'bfast':
+#            self.__chosen_break__ = self.__break_bfast__
         elif self.break_method == 'dummy':
             self.__chosen_break__ = self.__break_dummy__
         elif self.break_method == 'wang':
@@ -856,47 +858,47 @@ class TempStab(object):
             "Breakpoint method " + self.break_method + " not implemented yet!"
 
 
-    def __break_bfast__(self, x, **kwargs):
-        """
-        calculate breakpoints in time using the BFAST method
-        Parameters
-        ----------
-        x : ndarray
-            data array
-
-        arguments in kwargs
-        start : datetime
-            start of timeseries
-        frequency : int
-            frequency of number of samples per year
-            e.g. 23 for 16-daily data = 365./16.
-
-        TODO: reasonable additional parameters!!!
-
-        Returns
-        -------
-        res : ndarray
-            array with indices of breakpoint occurence
-        """
-#        assert False, \
-#            "Breakpoint method " + self.break_method + " not working yet!"
-            
-        B = BFAST()
-        B.run(x, **kwargs)
-        # return detected breakpoints from last itteration
-        #print B.results[0]['output'][-1]['ciVt']  
-        # this contains the confidence of the breakpoint estimation
-        res = B.results[0]['output'][-1]['bpVt']
-        
-        try:  # capture that no breakpoints are detected
-            n = len(res)
-            del n
-        except:
-            if res == 0:
-                res = []
-            else:
-                assert False, 'CASE not covered yet'
-        return np.asarray(res).astype('int')
+#    def __break_bfast__(self, x, **kwargs):
+#        """
+#        calculate breakpoints in time using the BFAST method
+#        Parameters
+#        ----------
+#        x : ndarray
+#            data array
+#
+#        arguments in kwargs
+#        start : datetime
+#            start of timeseries
+#        frequency : int
+#            frequency of number of samples per year
+#            e.g. 23 for 16-daily data = 365./16.
+#
+#        TODO: reasonable additional parameters!!!
+#
+#        Returns
+#        -------
+#        res : ndarray
+#            array with indices of breakpoint occurence
+#        """
+##        assert False, \
+##            "Breakpoint method " + self.break_method + " not working yet!"
+#            
+#        B = BFAST()
+#        B.run(x, **kwargs)
+#        # return detected breakpoints from last itteration
+#        #print B.results[0]['output'][-1]['ciVt']  
+#        # this contains the confidence of the breakpoint estimation
+#        res = B.results[0]['output'][-1]['bpVt']
+#        
+#        try:  # capture that no breakpoints are detected
+#            n = len(res)
+#            del n
+#        except:
+#            if res == 0:
+#                res = []
+#            else:
+#                assert False, 'CASE not covered yet'
+#        return np.asarray(res).astype('int')
 
 
     def __break_olssum__(self, x, **kwargs):
@@ -926,6 +928,21 @@ class TempStab(object):
                       " Flipping does not produce right order.")
         return(r)
         
+        
+    def __break_CUSUMADJ__(self,x,**kwargs):
+        # doi: 10.1016/j.jhydrol.2014.12.002
+        
+        m = len(x)/2
+             
+        csx = x.cumsum()
+        
+        CUSMADJ=[]
+        
+        for j in np.arange(len(x)):
+            CUSMADJ.append(csx[j] - j/float(m) * csx[m])
+            
+        print('###########################################################')
+        plt.plot(CUSMADJ)
         
     def __get_breakpoints_spline__(self, x, y):
         # estimate breakpoints using splines
