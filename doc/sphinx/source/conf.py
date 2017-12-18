@@ -26,7 +26,6 @@ sys.path.insert(0, os.path.abspath('../../../interface_scripts'))
 
 
 
-
 # not the best way to set the pathes, but working for autodoc ...
 
 
@@ -66,14 +65,14 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ESMValTool'
-copyright = u'2015, Veronika Eyring, Axel Lauer, Mattia Righi, Martin Evaldsson et al.'
+copyright = u'2008-2017, Veronika Eyring, Axel Lauer, Mattia Righi, Bjoern Broetz et al.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '1.1.0'
+version = '1.1.0dev'
 # The full version, including alpha/beta/rc tags.
 release = '1.1.0'
 
@@ -139,7 +138,7 @@ html_theme = 'default'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = 'figures/ESMValTool-logo-mini.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -205,7 +204,7 @@ htmlhelp_basename = 'ESMValTooldoc'
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+'papersize': 'a4paper',
 
 # The font size ('10pt', '11pt' or '12pt').
 #'pointsize': '10pt',
@@ -231,12 +230,12 @@ latex_elements = {
      \fi}
      \begin{titlepage}
      \begin{center}
-     \includegraphics[width=\textwidth]{../../source/figures/ESMValTool-logo.pdf}\par
+     \sphinxincludegraphics[width=\textwidth]{ESMValTool-logo.pdf}\par
      \vspace{2cm}
      {\Huge \bf \sffamily User's and Developer's Guide \par}
      \vspace{1cm}
      {\Large \sffamily \MONTH ~ \the\year \par}
-     \vspace{12cm}
+     \vspace{14cm}
      Deutsches Zentrum f\"ur Luft- und Raumfahrt (DLR), Institut f\"ur Physik der Atmosph\"are, Oberpfaffenhofen, Germany \par
      \vspace{0.5cm}
      http://www.esmvaltool.org/ \par
@@ -254,12 +253,12 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'ESMValTool_Users_Guide.tex', u'ESMValTool User\'s and Developer\'s Guide',
-   u'Veronika Eyring, Axel Lauer, Mattia Righi, Martin Evaldsson et al.', 'manual'),
+   u'Veronika Eyring, Axel Lauer, Mattia Righi, Bjoern Broetz et al.', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = 'figures/ESMValTool-logo.pdf'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -320,9 +319,9 @@ latex_toplevel_sectioning = "part"
 
 # Bibliographic Dublin Core info.
 epub_title = u'ESMValTool'
-epub_author = u'Veronika Eyring, Axel Lauer, Mattia Righi, Martin Evaldsson et al.'
-epub_publisher = u'Veronika Eyring, Axel Lauer, Mattia Righi, Martin Evaldsson et al.'
-epub_copyright = u'2015, Veronika Eyring, Axel Lauer, Mattia Righi, Martin Evaldsson et al.'
+epub_author = u'Veronika Eyring, Axel Lauer, Mattia Righi, Bjoern Broetz et al.'
+epub_publisher = u'Veronika Eyring, Axel Lauer, Mattia Righi, Bjoern Broetz et al.'
+epub_copyright = u'2008-2017, Veronika Eyring, Axel Lauer, Mattia Righi, Bjoern Broetz et al.'
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = u'ESMValTool'
@@ -386,6 +385,7 @@ epub_exclude_files = ['search.html']
 #epub_use_index = True
 
 numfig = True
+numfig_format = {'figure': 'Figure %s', 'table': 'Table %s', 'code-block': 'Listing %s', 'section': '%s'}
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
