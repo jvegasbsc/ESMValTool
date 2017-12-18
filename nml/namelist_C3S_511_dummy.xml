@@ -2,7 +2,7 @@
 <include href="./config_private_BM_local.xml"/>
 <namelist_summary>
 ###############################################################################
-namelist_Square4ECV_dummy.xml
+namelist_C3S_511_dummy.xml
 
 Description
 
@@ -11,7 +11,7 @@ Benjamin Mueller (LMU, Germany - b.mueller@iggf.geo.uni-muenchen.de)
 Birgit Hassler 
 
 Project
-Square4ECV
+C3S_511
 
 References
 
@@ -48,7 +48,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
         <variable>			   					                     VAR                                    </variable>
         <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_QA4ECV/cfg_VAR_Square4ECV.py">   	VAR_Square4ECV.py                    				</diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
         <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
     </diag>
 
@@ -58,7 +58,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
         <variable>			   					                     VAR                                    </variable>
         <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_QA4ECV/cfg_VAR_Square4ECV.py">   	VAR_Square4ECV.py                    				</diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
         <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
     </diag>    
     
@@ -67,7 +67,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
         <variable>			   					                     VAR                                    </variable>
         <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_QA4ECV/cfg_VAR_Square4ECV.py">   	VAR_Square4ECV.py                    				</diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
         <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
     </diag>
     
@@ -77,7 +77,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
         <variable>			   					                     VAR                                    </variable>
         <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_QA4ECV/cfg_VAR_Square4ECV.py">   	VAR_Square4ECV.py                    				</diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
         <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
     </diag>
 
