@@ -122,11 +122,6 @@ begin
 
     ;; Basename of diag_script
     diag_script_base = basename(diag_script)
-    
-    ;; Basename of nml
-    xml_name = getenv("ESMValTool_xml_name")
-    suffix = get_file_suffix(xml_name, 0)
-    base_name = str_sub_str(xml_name, suffix, "")
 
     ;; Basename of nml
     xml_name = getenv("ESMValTool_xml_name")

@@ -57,13 +57,12 @@ coverage.xml
 # Jupyter Notebook
 .ipynb_checkpoints
 
+*.tmp
+*.orig
 /c
 /tests/data/**
 /test_bash.sh
 /python_test_out.txt
-doc/sphinx/build
-*.xml~
-*.png
 
 # Editor Backup
 *~
@@ -75,5 +74,5 @@ interface_data/*
 # Build folder
 doc/sphinx/source/diag_scripts/**
 doc/sphinx/source/plot_scripts/**
+doc/sphinx/build
 
-*.xml

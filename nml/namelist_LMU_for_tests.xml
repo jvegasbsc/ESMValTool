@@ -122,32 +122,6 @@ This namelist is part of the ESMValTool
         <model> CMIP5 MPI-ESM-MR Lmon historical r1i1p1 2005 2005 @{MODELPATH} </model>
         <model> OBS ESACCI-FIRE sat L4-BA-MERIS-fv4.1 2005 2005 @{OBSPATH} </model>
     </diag>
-    
-    <diag>
-        <description>  															Doing QA4ECV fAPAR analysis. 		</description>
-        <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
-        <variable ref_model="GlobAlbedo">			   					fAPAR                                    </variable>
-        <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_QA4ECV/cfg_fAPAR_QA4ECV.py">   	fAPAR_QA4ECV.py                    				</diag_script>
-        <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
-
-		  <model> OBS        GlobAlbedo				sat				fAPAR-online 		 2002 2005  @{OBSPATH}  </model>
-		  <model> CMIP5 		GFDL-CM3 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>
-		  <model> CMIP5 		MPI-ESM-MR 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>
-    </diag>
-    
-    <diag>
-        <description>  															Doing QA4ECV albedo analysis. 		</description>
-        <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
-        <variable ref_model="GlobAlbedo">			   					alb                                    </variable>
-        <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_QA4ECV/cfg_alb_QA4ECV.py">   	alb_QA4ECV.py                    				</diag_script>
-        <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
-    
-    	  <model> CMIP5 		MRI-ESM1 				Amon 	  historical 			r1i1p1 1998 2005  @{MODELPATH} </model>
-  		  <model> CMIP5 		NorESM1-M 				Amon 	  historical 			r1i1p1 1998 2005  @{MODELPATH} </model>
-		  <model> OBS        GlobAlbedo				sat				white-online 		 1998 2005  @{OBSPATH}  </model>
-    </diag>
 
 </DIAGNOSTICS>
 

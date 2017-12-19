@@ -52,6 +52,7 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
         """
         super(SoilMoistureDiagnostic, self).run_diagnostic()
 
+        self._specific_diag()
 
     def _specific_diag(self):
         """

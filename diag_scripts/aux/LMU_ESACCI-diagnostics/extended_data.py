@@ -3,11 +3,13 @@
 import numpy as np
 import shapefile as shp
 import os
-#import netCDF4
+import netCDF4
 from geoval.core.netcdf import NetCDFHandler
 
 from geoval.core.data import GeoData
-#import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import collections
 
 # TODO correct _set_cell_area
@@ -49,8 +51,7 @@ class GeoData(GeoData):
 
         if (self.lat is None) or (self.lon is None):
             self._log_warning(
-                'WARNING: cell area can not be calculated ' + \
-                '(missing coordinates)!')
+                "WARNING: cell area can not be calculated (missing coordinates)!")
             if self.ndim == 2:
                 self.cell_area = np.ones(self.data.shape)
             elif self.ndim == 3:
@@ -574,81 +575,11 @@ class GeoData(GeoData):
             File.F.variables[varname].coordinates = "longitude latitude"
 
         File.close()
-        
-    def get_zonal_mean(self, return_object=True, lat=True):
-        """
-        calculate zonal mean statistics of the data for each timestep
-        returns zonal statistics [time,ny]
-
-        uses area weighting of data
-        gives exact same results as function 'zonmean' in cdo's
-
-        Parameters
-        ----------
-        return_object : bool
-            if True, then returns a Data object
-
-        Returns
-        -------
-        r : ndarray, Data
-            array with zonal statistics
-        """
-
-        # TODO implement check if latitudes in y-axis direction are all the
-        # same! Otherwise the routine does not make sense
-
-        if self.cell_area is None:
-            self._log_warning(
-                'WARNING: no cell area given, zonal means are based on ' +\
-                'equal weighting!')
-            w = np.ones(self.data.shape)
-        else:
-            w = self._get_weighting_matrix()
-
-        #/// weight data
-        dat = self.data * w
-
-        #/// calculate zonal mean
-        if dat.ndim == 2:
-            r = dat.sum(axis=1) / w.sum(axis=1)  # zonal mean
-            # we assume the data as time on lat/lon preprocessed
-        elif dat.ndim == 3:
-            nt, ny, nx = dat.shape
-            if lat:
-                r = np.ones((nt, ny)) * np.nan
-                W = np.ones((nt, ny)) * np.nan
-            else:
-                r = np.ones((nt, nx)) * np.nan
-                W = np.ones((nt, nx)) * np.nan
-
-            for i in xrange(nt):
-                # weighted sum, normalized by valid data why ???
-                if lat:
-                    axis = 1
-                else:
-                    axis = 0
-                r[i] = dat[i, :, :].sum(axis=axis) / w[i, :, :].sum(axis=axis)
-                W[i] = w[i, :, :].sum(axis=axis)
-            r = np.ma.array(r, mask=W == 0.)
-
-        else:
-            print dat.shape
-            raise ValueError('Unsupported geometry')
-
-        if return_object:
-            res = self.copy()
-            res.label = self.label + ' zonal mean'
-            res.data = r.T  # [lat,time]
-            res.lat = self.lat[:, 0]  # latitudes as a vector
-        else:
-            res = r
-        return res
 
     GeoData._set_cell_area=C_set_cell_area
     GeoData.get_regions=get_regions
     GeoData.get_shape_statistics=get_shape_statistics
     GeoData._save_netcdf=_save_netcdf
-    GeoData.get_zonal_mean=get_zonal_mean
 
 
 
