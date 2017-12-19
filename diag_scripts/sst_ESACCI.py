@@ -43,6 +43,13 @@ from sst_diagnostic import SeaSurfaceTemperatureDiagnostic
 
 
 def main(project_info):
+    """
+    Parameters
+    ----------
+    project_info : dict
+        Dictionary with project details
+    """
+    import projects
     print(">>>>>>>> sst_ESACCI.py is running! <<<<<<<<<<<<")
 
 # A_laue_ax+
@@ -77,7 +84,6 @@ def main(project_info):
 
             # only models are read
             for inc in range(len(project_info['MODELS'])):
-
                 model = project_info['MODELS'][inc]
 
                 # only for non-reference models
@@ -93,7 +99,6 @@ def main(project_info):
 
                     # copy old data to provide data that is needed again
                     D_old = copy(Diag)
-
                     # initialize diagnostic
                     Diag = SeaSurfaceTemperatureDiagnostic()
                     # provide project_info to diagnostic

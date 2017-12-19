@@ -27,7 +27,7 @@ class Test(unittest.TestCase):
 
     def test_model_get_line(self):
         from interface_scripts.model import Model
-        M = Model('modelname', 'diagname', 'abc')
+        M = Model('modelname', 'diagname', False)
         self.assertEqual(M.get_model_line(), 'modelname')
 
 if __name__ == "__main__":

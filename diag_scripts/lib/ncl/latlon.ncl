@@ -658,7 +658,7 @@ begin
     end if
 
     if (region.eq."Northern Hemisphere") then
-        region_array = (/20., 90., 0., 360./)
+        region_array = (/0., 90., 0., 360./)
         region_array@name = "NH"
         region_array@DM_tag = "DM_nh"
         leave_msg(scriptname, funcname, 10)
@@ -666,7 +666,7 @@ begin
     end if
 
     if (region.eq."Southern Hemisphere") then
-        region_array = (/-90., -20., 0., 360./)
+        region_array = (/-90., 0., 0., 360./)
         region_array@name = "SH"
         region_array@DM_tag = "DM_sh"
         leave_msg(scriptname, funcname, 10)
@@ -725,10 +725,10 @@ function make_latlon2D(var[1]:string,
                        field:numeric)
 ;;
 ;; Arguments:
-;;    var             = name of the variable
-;;    index           = see interface_scripts/data_handling.ncl
-;;    data_pointer    = see interface_scripts/data_handling.ncl
-;;    field           = a numeric array of rank 3 (time, lon, lat) or
+;;    var             name of the variable
+;;    index           see interface_scripts/data_handling.ncl
+;;    data_pointer    see interface_scripts/data_handling.ncl
+;;    field           a numeric array of rank 3 (time, lon, lat) or
 ;;                      rank 4 (time, [p]lev, lon, lat)
 ;;
 ;; Return value:
@@ -821,13 +821,14 @@ function cdo_remapdis(var[1]:string,
                       opt[1]:string)
 ;;
 ;; Arguments:
-;;    var          = name of the variable
-;;    field        = a numeric array of rank 2 (lon, lat) or
+;;    var          name of the variable
+;;    field        a numeric array of rank 2 (lon, lat) or
 ;;                   rank 3 (time, lon, lat), higher ranks not tested yet
 ;;    index        = index of current model in data_pointer
 ;;    data_pointer = see interface_scripts/data_handling.ncl
 ;;    dst_grid     = path to file containing destination grid information
-;;    opt          = unused
+;;    opt          = filename to save regridded field in
+;;                   start with diag_script name to be unambigious
 ;;
 ;; Return value:
 ;;    The field regridded to the destination grid specified in dst_grid
@@ -840,22 +841,42 @@ function cdo_remapdis(var[1]:string,
 ;;    Climate Data Operators (CDO) package must be installed on the system
 ;;
 ;; Modification history:
+;;    20170317-A_gier_be: added filestorage support
 ;;    20170120-A_senf_da: written.
 ;;
 local regfile_in_tmp, regfile_out_tmp, lat, lon, gAtt, field_out, quote
 begin
 
+    funcname = "cdo_remapdis"
+    scriptname = "diag_scripts/lib/ncl/latlon.ncl"
+    verbosity = stringtointeger(getenv("ESMValTool_verbosity"))
+    enter_msg(scriptname, funcname, 10)
+
     ;; Necessary files
     if (.not.isfilepresent(wrk_dir + "/CDO/")) then
         system("mkdir -p " + wrk_dir + "/CDO/")
     end if
-    regfile_in_tmp  = wrk_dir + "/CDO/regrid_in.nc"   ; temporary -
-    regfile_out_tmp = wrk_dir + "/CDO/regrid_out.nc"  ; regrid-files
-    if (isfilepresent(regfile_in_tmp)) then
-        system("rm " + regfile_in_tmp)
-    end if
-    if (isfilepresent(regfile_out_tmp)) then
-        system("rm " + regfile_out_tmp)
+    if opt.eq."" then
+        regfile_in_tmp  = wrk_dir + "/CDO/regrid_in.nc"   ; temporary -
+        regfile_out_tmp = wrk_dir + "/CDO/regrid_out.nc"  ; regrid-files
+        if (isfilepresent(regfile_in_tmp)) then
+            system("rm " + regfile_in_tmp)
+        end if
+        if (isfilepresent(regfile_out_tmp)) then
+            system("rm " + regfile_out_tmp)
+        end if
+    else
+        regfile_in_tmp = wrk_dir + "/CDO/regrid_in.nc"    ; in can stay same
+        regfile_out_tmp = wrk_dir + "/CDO/" + opt + ".nc"
+        if (isfilepresent(regfile_in_tmp)) then
+            system("rm " + regfile_in_tmp)
+        end if
+        if (isfilepresent(regfile_out_tmp)) then
+            error_msg("f", "latlon.ncl", funcname, \
+                      "File " + regfile_out_tmp + " already exists," + \
+                      " delete it or improve diag_script")
+           ;; system("rm " + regfile_out_tmp)
+        end if
     end if
     
     ;; Attach coordinate information to array and file

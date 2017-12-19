@@ -33,7 +33,7 @@
 ;;    none
 ;;
 ;; Modification history
-;;    20170620-A_laue_ax: Added tags for reporting
+;;    20170620-A_laue_ax: added tags for reporting
 ;;    20160901-A_laue_ax: added regridding option 1 deg x 1 deg
 ;;    20151027-A_laue_ax: moved call to 'write_references' to the beginning
 ;;                        of the code
@@ -80,7 +80,7 @@ begin
     ; define diagnostic specific tags
     ; ###############################
 
-    diag_tags = (/"PT_geo", "DM_global"/)
+    diag_tags = (/"PT_geo", "DM_global", "ST_clim", "ST_var"/)
 
     ; ###########################################
     ; # references                              #
@@ -300,8 +300,12 @@ begin
 
             ; Do not process data if already processed
 
-            if (isfilepresent(regr_path) .and. \
-                getenv("ESMValTool_force_calc").eq."False") then
+            force = getenv("ESMValTool_force_calc")
+            if (ismissing(force)) then
+                force = "False"
+            end if
+
+            if (isfilepresent(regr_path) .and. force.eq."False") then
 
                 info_output("Reading in file = " + regr_path, verbosity, 1)
                 var_hreg = ncdf_read(regr_path, var0)
@@ -563,7 +567,9 @@ begin
                 end do
             end if
 
-            ESMValMD(maps@outfile, alltags, caption, id, variables(0), models@name(imod), climofiles)
+            contrib_authors = "A_laue_ax"
+
+            ESMValMD(maps@outfile, alltags, caption, id, variables(0), models@name(imod), climofiles, diag_script, contrib_authors)
 
             delete([/alltags, caption, id, climofiles/])
 
@@ -615,7 +621,7 @@ begin
 
         alltags = array_append_record(tags, diag_tags, 0)
         caption = "Interannual variability of variable " + variables(0) + "."
-        id = diag_script + "_all_models"
+        id = diag_script + "_" + variables(0) + "_all_models"
 
         if (flag_mean) then
             nm = dim_MOD - 1
@@ -629,7 +635,9 @@ begin
                 interface_get_infile(variables(0), field_types(0), ii)
         end do
 
-        ESMValMD(outfile, alltags, caption, id, variables(0), models@name, climofiles)
+        contrib_authors = "A_laue_ax"
+
+        ESMValMD(outfile, alltags, caption, id, variables(0), models@name, climofiles, diag_script, contrib_authors)
 
         delete([/alltags, caption, id, climofiles/])
 

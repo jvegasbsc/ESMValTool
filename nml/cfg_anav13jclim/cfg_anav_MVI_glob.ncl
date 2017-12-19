@@ -19,3 +19,6 @@ end if
 if (variables(0).eq."NBP") then
     diag_script_info@ref_model = "JMA-TRANSCOM"
 end if
+if (variables(0).eq."tos") then
+    diag_script_info@ref_model = "HadISST"
+end if

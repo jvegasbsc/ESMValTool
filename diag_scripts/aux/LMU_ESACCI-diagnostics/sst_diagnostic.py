@@ -2,6 +2,8 @@ import os
 import shutil
 import csv
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from geoval.core.mapping import SingleMap
 from netCDF4 import Dataset
@@ -32,6 +34,10 @@ class SeaSurfaceTemperatureDiagnostic(BasicDiagnostics):
         self.output_type = 'png'
         # default ouput file type
         self._changed = False
+
+        # additional meta data
+        self.authors = "A_muel_bn"
+        self.diagname = "sst_diagnostic.py"
 
     def run_diagnostic(self):
         """
@@ -117,7 +123,7 @@ class SeaSurfaceTemperatureDiagnostic(BasicDiagnostics):
                  'different percentile levels for ' + self.refname + ' and ' +
                  self.modname + ' ' + self._vartype + ' data.',
                  '#ID' + 'devcorrperctab' + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _percentile_comparison(self, plist=np.arange(0.0, 1.01, 0.05),
                                plots=True):
@@ -209,7 +215,7 @@ class SeaSurfaceTemperatureDiagnostic(BasicDiagnostics):
                  self.refname + ' and ' + self.modname + ' data. ' +
                  'The spatial correlation (r) is noted in the title.',
                  '#ID' + 'perc' + str(int(p * 100)).zfill(3) + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _plot_percentile_correlation(self, p, r):
         """
@@ -248,7 +254,7 @@ class SeaSurfaceTemperatureDiagnostic(BasicDiagnostics):
                  'different percentile levels for ' + self.refname + ' and ' +
                  self.modname + ' ' + self._vartype + ' data.',
                  '#ID' + 'devcorrperc' + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _load_model_data(self):
         """ load model data """

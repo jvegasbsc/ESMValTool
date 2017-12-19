@@ -1,6 +1,8 @@
 import os
 import shutil
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 from geoval.core.mapping import SingleMap
@@ -30,6 +32,10 @@ class LandCoverDiagnostic(BasicDiagnostics):
         self.output_type = 'png'  # default ouput file type
         self._changed = False
 
+        # additional meta data
+        self.authors = "A_muel_bn"
+        self.diagname = "lc_diagnostic.py"
+
     def run_diagnostic(self):
         """
         running the diagnostics
@@ -40,7 +46,7 @@ class LandCoverDiagnostic(BasicDiagnostics):
 
         super(LandCoverDiagnostic, self).run_diagnostic()
 
-    def _specific_diag(self):
+    def _specific_diag(self, single_years=True):
         """
         Diagnostic management
         """
@@ -207,7 +213,7 @@ class LandCoverDiagnostic(BasicDiagnostics):
                  ') for clarification of regional difference severity.',
                  '#ID' + 'diff' + year + "/" + str(self.cfg.std_factor) +
                  "std" + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _load_model_data(self):
         """ load model data """

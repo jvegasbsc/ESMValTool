@@ -12,6 +12,9 @@ of Wenzel et al. (2014)
 Author
 Sabrina Wenzel (DLR, Germany - sabrina.wenzel@dlr.de)
 
+Contributor(s)
+n/a
+
 Project
 EMBRACE
 
@@ -357,7 +360,7 @@ This namelist is part of the ESMValTool
 
   <diag_script cfg="cfg_carbon_G_LT.ncl"> carbon_constraint.ncl </diag_script>
     
-    <tags> R_land, R_atmos, R_ocean, T_carbon, T_chem, T_ghg, T_phys, T_EC </tags>
+    <tags> R_land, R_atmos, R_ocean, T_carbon, T_chem, T_ghg, T_phys, T_ec </tags>
 </diag>
 
 </DIAGNOSTICS>

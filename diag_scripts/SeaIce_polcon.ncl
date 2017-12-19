@@ -342,7 +342,7 @@ begin
     ;; Reporting
     alltags = array_append_record(tags, (/"DM_polar", "PT_polar", \
                                           "ST_mean"/), 0)
-    caption = "Polar-stereographic contour map of sea ice concentration. TODO: Problem with OBS* classes - climofile not passed correctly. for OBS* classes, interface_get_infile already returns path + file! Reason yet unknown."
+    caption = "Polar-stereographic contour map of sea ice concentration."
     num_pages = ceil( dimsizes(plots) / (tofloat(nvert*nhori)) ) ; = # of files
     if (num_pages.eq.1) then  ; only 1 file: no sequence number added
         plot_fname = wks@fullname
@@ -358,8 +358,9 @@ begin
                     interface_get_infile(var0, field_type0, imod), 0 )
             end do
         end if
+        contrib_authors = (/"A_gott_kl", "A_senf_da"/)
         ESMValMD(plot_fname, alltags, caption, id, var0, \
-                 models@name, climofiles)
+                 models@name, climofiles, diag_script, contrib_authors)
     else  ; Multiple files, each with its own sequence number
         ; Split wks@fullname to later add number sequence before '.png'
         plotname_split = str_split(wks@fullname, ".")
@@ -392,8 +393,9 @@ begin
                                              ind_models_shown(imod)), 0 )
                 end do
             end if
+            contrib_authors = (/"A_gott_kl", "A_senf_da"/) 
             ESMValMD(plot_fname, alltags, caption, id, var0, \
-                     models@name(ind_models_shown), climofiles)
+                     models@name(ind_models_shown), climofiles, diag_script, contrib_authors)
             delete([/seq_num, plot_fname, id, ind_models_shown, climofiles/])
         end do
     end if

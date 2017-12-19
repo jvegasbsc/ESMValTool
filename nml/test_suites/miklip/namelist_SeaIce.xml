@@ -39,7 +39,7 @@ This namelist is part of the ESMValTool
 </GLOBAL>
 
 <MODELS>
-    <model>  CMIP5             HadISST     OImon  historical  ice     1999  2004  /pf/b/b309056/ClimValDiagTool/obs/HadISST/  </model> 
+    <model>  CMIP5             HadISST     OImon  historical  ice     1999  2004  @{OBSPATH}/ClimValDiagTool/obs/HadISST/  </model> 
 
     <model>  MiKlip_baseline0  MPI-ESM-LR  OImon  historical  r1i1p1  seaIce  1999  2005  /gpfs_750/projects/CMIP5/data/cmip5/output1/MPI-M/  </model>
 
@@ -57,7 +57,7 @@ This namelist is part of the ESMValTool
     <diag_script cfg="cfg_SeaIce_NH.ncl">       SeaIce_ancyc.ncl          </diag_script>
     <diag_script cfg="cfg_SeaIce_NH.ncl">       SeaIce_polcon.ncl         </diag_script>
     <diag_script cfg="cfg_SeaIce_NH.ncl">       SeaIce_polcon_diff.ncl    </diag_script>
-    <model>  CMIP5_gridfile  NSIDC       OImon  historical  NH      2000  2004  /pf/b/b309056/ClimValDiagTool/obs/NSIDC/ /pf/b/b309056/ClimValDiagTool/obs/NSIDC/sic_OImon_NSIDC_historical_NH_197810_201112.nc  </model>
+    <model>  CMIP5_gridfile  NSIDC       OImon  historical  NH      2000  2004  @{OBSPATH}/ClimValDiagTool/obs/NSIDC/ @{OBSPATH}/ClimValDiagTool/obs/NSIDC/sic_OImon_NSIDC_historical_NH_197810_201112.nc  </model>
 </diag>
 
 <diag>
@@ -70,7 +70,7 @@ This namelist is part of the ESMValTool
     <diag_script cfg="cfg_SeaIce_SH.ncl">       SeaIce_ancyc.ncl          </diag_script>
     <diag_script cfg="cfg_SeaIce_SH.ncl">       SeaIce_polcon.ncl         </diag_script>
     <diag_script cfg="cfg_SeaIce_SH.ncl">       SeaIce_polcon_diff.ncl    </diag_script>
-    <model>  CMIP5_gridfile  NSIDC       OImon  historical  SH      2000  2004  /pf/b/b309056/ClimValDiagTool/obs/NSIDC/ /pf/b/b309056/ClimValDiagTool/obs/NSIDC/sic_OImon_NSIDC_historical_SH_197810_201112.nc  </model>
+    <model>  CMIP5_gridfile  NSIDC       OImon  historical  SH      2000  2004  @{OBSPATH}/ClimValDiagTool/obs/NSIDC/ @{OBSPATH}/ClimValDiagTool/obs/NSIDC/sic_OImon_NSIDC_historical_SH_197810_201112.nc  </model>
 </diag>
 
 </DIAGNOSTICS>

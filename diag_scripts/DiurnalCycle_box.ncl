@@ -79,8 +79,11 @@ begin
     ;;-----------------------
     ; References Information
     ;;-----------------------
+
+    contrib_authors = "A_rio_ca"
+
     write_references(diag_script,            \  ; script name
-                     "A_rio_ca",             \  ; authors
+                     contrib_authors,        \  ; authors
                      "",                     \  ; contributors
                      "",                     \  ; diag_references
                      "",                     \  ; obs_references
@@ -515,8 +518,9 @@ begin
           plot_settings@aux_filename_info, -1)
     
     alltags = array_append_record(tags,\
-           (/"PT_diurn", "DM_region"/), 0)
-    caption = "Mean Diurnal Cycle for " + variables(0) 
+           (/"PT_diurn", "DM_reg", "ST_var"/), 0)
+    caption = "Mean Diurnal Cycle for " + variables(0) + " over " + di@box \
+               + "  in " + season + " season." 
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name) * dimsizes(variables), string)
     do imod = 0, dimsizes(models@name) - 1
@@ -524,8 +528,9 @@ begin
             interface_get_inpaths(imod) + "/" + \
             interface_get_infile(variables(0), field_types(0), imod)
     end do
+    allmodelnames = array_append_record(models@name, (/"multi-model-mean"/), 0)
 
-    ESMValMD(plot_outfile, alltags, caption, id, variables, models@name, climofiles)
+    ESMValMD(plot_outfile + "." + output_file_type, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
 
     delete([/alltags, caption, id, climofiles/])
 

@@ -43,6 +43,7 @@ load "./diag_scripts/lib/ncl/latlon.ncl"
 load "./diag_scripts/lib/ncl/statistics.ncl"
 load "./diag_scripts/aux/SAMonsoon/SAMonsoon.ncl"
 load "./diag_scripts/lib/ncl/meta_data.ncl"
+load "./diag_scripts/lib/ncl/watermark.ncl"
 
 load "./plot_scripts/ncl/scatterplot.ncl"
 
@@ -85,6 +86,13 @@ begin
     if(ismissing(file_type)) then
         file_type = "ps"
     end if
+
+    ;; Check watermark
+    watermark = getenv("ESMValTool_watermark")
+    if(ismissing(watermark)) then
+        watermark = "False"
+    end if
+    print(watermark)
 
     ;; Check required diag_script_info attributes
     req_atts = (/"region"/)
@@ -248,7 +256,7 @@ begin
            (/"PT_scatter", "ST_mean"/), 0)
     caption = "Scatterplot for " + variables(0) + " and " + \
               variables(1) + " over the period " + start_year + \
-              "-" + end_year
+              "-" + end_year + ", similar to Anav et al., 2013, Fig. 12."
     id = diag_script + "_" + base_name
     climofiles = new(dimsizes(models@name) * dimsizes(variables), string)
     do n_var = 0, dimsizes(variables) - 1
@@ -258,9 +266,10 @@ begin
                         interface_get_infile(variables(n_var), field_types(n_var), imod)
         end do
     end do
+    contrib_authors = (/"A_anav_al", "A_wenz_sa", "A_righ_ma"/)
 
-    ESMValMD(plot@outfile, alltags, caption, id, variables, models@name, climofiles)
-
+    ESMValMD(plot@outfile, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+    
     delete([/alltags, caption, id, climofiles/])
 
     

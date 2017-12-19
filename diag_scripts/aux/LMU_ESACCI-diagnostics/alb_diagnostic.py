@@ -485,4 +485,3 @@ class AlbedoDiagnostic(BasicDiagnostics):
         self.download_observations(year, force=force)
         self.preprocess_observations(year, ofile_root, force=force)
 
-

@@ -64,6 +64,9 @@ begin
     ;; Mask file for land variables (regular grids)
     LMASKFILE = getenv("ESMValTool_lmaskfile_path")
 
+    ;; Mask file for land variables (regular grids)
+    LICEFILE = getenv("ESMValTool_licefile_path")
+
     ;; Mask file for ocean variables (irregular grids)
     OMASKFILE = getenv("ESMValTool_omaskfile_path")
 
@@ -137,6 +140,12 @@ begin
     ;; Add land-mask information
     if (isStrSubset(INFILE, "Lmon")) then
         add_lmask_info(VARPROC)
+    end if
+
+    ;; Add land-ice information
+    if (isStrSubset(INFILE, "LImon")) then
+        add_lmask_info(VARPROC)
+        add_lice_info(VARPROC)
     end if
 
     ;; Add ocean-mask information

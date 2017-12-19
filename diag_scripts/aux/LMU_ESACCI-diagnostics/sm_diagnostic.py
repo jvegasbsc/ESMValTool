@@ -2,6 +2,8 @@ import os
 import csv
 import shutil
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 from geoval.core.mapping import SingleMap
@@ -39,6 +41,10 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
 #        self.reference_preproc_directory = './cci_sm/preprocessed'
 #        self.targetgrid = kwargs.pop('targetgrid', 't63grid')
 #        self._projected_files = []
+
+        # additional meta data
+        self.authors = "A_muel_bn"
+        self.diagname = "sm_diagnostic.py"
 
     def run_diagnostic(self):
         """
@@ -143,7 +149,7 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
                  'different percentile levels for ' + self.refname + ' and ' +
                  self.modname + ' ' + self._vartype + ' data.',
                  '#ID' + 'devcorrperctab' + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _percentile_comparison(self, plist=np.arange(0.0, 1.01, 0.05)):
         """
@@ -238,7 +244,7 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
                  self.refname + ' and ' + self.modname + ' data. ' +
                  'The spatial correlation (r) is noted in the title.',
                  '#ID' + 'perc' + str(int(p * 100)).zfill(3) + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _plot_percentile_correlation(self, p, r):
         """
@@ -277,7 +283,7 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
                  'different percentile levels for ' + self.refname + ' and ' +
                  self.modname + ' ' + self._vartype + ' data.',
                  '#ID' + 'devcorrperc' + self.var,
-                 ','.join(self._infiles))
+                 ','.join(self._infiles), self.diagname, self.authors)
 
     def _anomaly_correlation(self):
         """
@@ -382,8 +388,8 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
                  'values and bottom row shows p-values, accordingly. The ' +
                  'p-values higher than 1.0 are not shown separately.',
                  '#ID' + 'ACorr' + self.var + 'pr',
-                 ','.join([f for f in self._allfiles if "Shapefiles" not in f])
-                 )
+                 ','.join([f for f in self._allfiles if "Shapefiles" not in f]),
+                 self.diagname, self.authors)
 
     def _load_model_data(self):
         """ load soil moisture model data """
@@ -425,7 +431,8 @@ class SoilMoistureDiagnostic(BasicDiagnostics):
                 self._mod_file, self._project_info['RUNTIME']['currDiag'].
                 get_variables()[0])
 
-        if self.cfg.anomaly:
+        if "anomaly" in self.cfg.__dict__.keys() and self.cfg.anomaly:
+        # A_laue_ax   if self.cfg.anomaly:
 
             self._mod_pr_file = orig_mod_file
             self._mod_pr_file = self._mod_pr_file.split("/")

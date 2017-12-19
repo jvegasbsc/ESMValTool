@@ -6,6 +6,7 @@ import numpy as np
 import os
 import pdb
 # import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 #import matplotlib.dates as mdates
@@ -77,6 +78,10 @@ class Diagnostic(object):
 
         self._basetags = []
         self._infiles = []
+
+        # additional meta data
+        self.authors = "A_muel_bn"
+        self.diagname = "diagnostic.py"
 
     def _get_output_rootname(self):
         """
@@ -852,7 +857,7 @@ class BasicDiagnostics(Diagnostic):
                      ' of the time series between ' + self.modname +
                      ' and ' + self.refname + ' ' + self._vartype + '.'),
                  '#ID' + 'gmd' + self.var,
-                 ",".join(self._infiles))
+                 ",".join(self._infiles), self.diagname, self.authors)
 
         # and
 
@@ -998,7 +1003,7 @@ class BasicDiagnostics(Diagnostic):
                          'absolute values (left) and relative to the ' +
                          self.refname + ' data set (right).'),
                      '#ID' + '4plot' + self.var,
-                     ",".join(self._infiles))
+                     ",".join(self._infiles), self.diagname, self.authors)
 
     def _p_stat(self, D, ts):
         """ produce table """
@@ -1085,8 +1090,8 @@ class BasicDiagnostics(Diagnostic):
                      '. All statistics are based on time dependent ' +
                      'counts and not normalized.'),
                  '#ID' + 'stattab' + self.var,
-                 (self._mod_file if name in self._mod_file else self._ref_file)
-                 )
+                 (self._mod_file if name in self._mod_file else self._ref_file),
+                 self.diagname, self.authors)
 
     def _write_climatologies_statistic(self, name):
         """ writing portrait statistic as csv """
@@ -1112,8 +1117,8 @@ class BasicDiagnostics(Diagnostic):
                      self._vartype + '. All statistics are based on ' +
                      'time dependent counts and not normalized.'),
                  '#ID' + 'climstattab' + self.var,
-                 (self._mod_file if name in self._mod_file else self._ref_file)
-                 )
+                 (self._mod_file if name in self._mod_file else self._ref_file),
+                 self.diagname, self.authors)
 
     def _plot_climatologies(self, month):
         """ plotting 4plots for climatologies/months """
@@ -1290,7 +1295,7 @@ class BasicDiagnostics(Diagnostic):
                      'for ' + self.modname +
                      ' and ' + self.refname + ' ' + self._vartype + '.'),
                  '#ID' + 'TimeS' + self.var,
-                 ",".join(self._infiles))
+                 ",".join(self._infiles), self.diagname, self.authors)
 
         if self.cfg.regionalization:
             unit2 = math.ceil(np.sqrt(len(self._regions)))  # 2
@@ -1418,7 +1423,7 @@ class BasicDiagnostics(Diagnostic):
                          self.modname + ' and ' + self.refname + ' ' +
                          self._vartype + '.'),
                      '#ID' + 'TimeSreg' + self.var,
-                     ",".join(self._infiles))
+                     ",".join(self._infiles), self.diagname, self.authors)
 
     def _global_mean_timeseries(self, name):
         """ calculating mean of TS """
@@ -1485,8 +1490,8 @@ class BasicDiagnostics(Diagnostic):
                  str('Temporal mean of the ' + name + ' ' +
                      self._vartype + ' data set.'),
                  '#ID' + 'gmt' + self.var,
-                 (self._mod_file if name in self._mod_file else self._ref_file)
-                 )
+                 (self._mod_file if name in self._mod_file else self._ref_file),
+                 self.diagname, self.authors)
 
     def _plot_hovmoeller_like(self):
         """
@@ -1521,7 +1526,7 @@ class BasicDiagnostics(Diagnostic):
                      'difference of the ' + self.modname + ' and ' +
                      self.refname + ' ' + self._vartype + ' data sets.'),
                  '#ID' + 'hov' + self.var,
-                 ",".join(self._infiles))
+                 ",".join(self._infiles), self.diagname, self.authors)
 
         l_type = "lon"
         CliDiff.settype(l_type)
@@ -1549,7 +1554,7 @@ class BasicDiagnostics(Diagnostic):
                      'difference of the ' + self.modname + ' and ' +
                      self.refname + ' ' + self._vartype + ' data sets.'),
                  '#ID' + 'hov' + self.var,
-                 ",".join(self._infiles))
+                 ",".join(self._infiles), self.diagname, self.authors)
 
     def _calc_spatial_correlation(self, X, Y):
         """
@@ -1725,7 +1730,7 @@ class BasicDiagnostics(Diagnostic):
                      ' (left). The right panel describes ' +
                      'the pattern of corresponding p-values.'),
                  '#ID' + 'Tcorr' + self.var,
-                 ",".join(self._infiles))
+                 ",".join(self._infiles), self.diagname, self.authors)
 
     def _plot_trend_maps(self, S, P, name):
         """
@@ -1823,7 +1828,7 @@ class BasicDiagnostics(Diagnostic):
                          "separately."),
                      '#ID' + 'trend' + self.var,
                      (self._mod_file if name in self._mod_file
-                      else self._ref_file))
+                      else self._ref_file), self.diagname, self.authors)
 
         else:
             f = plt.figure(figsize=(10, 6))
@@ -1916,7 +1921,7 @@ class BasicDiagnostics(Diagnostic):
                          "smaller than 0.05."),
                      '#ID' + 'trend' + self.var,
                      (self._mod_file if name in self._mod_file
-                      else self._ref_file))
+                      else self._ref_file), self.diagname, self.authors)
 
     def _write_shape_statistics(self, data, diag, name):
         """
@@ -1947,8 +1952,8 @@ class BasicDiagnostics(Diagnostic):
                      '. All statistics are based on time dependent ' +
                      'counts and not normalized.'),
                  '#ID' + 'stattabreg' + self.var,
-                 (self._mod_file if name in self._mod_file else self._ref_file)
-                 )
+                 (self._mod_file if name in self._mod_file else self._ref_file),
+                 self.diagname, self.authors)
 
     def _get_files_in_directory(self, directory, pattern, asstring=True):
         """ returns list and number of files with pattern in directory """
@@ -2010,9 +2015,9 @@ class BasicDiagnostics(Diagnostic):
         if self.overview:
 
             if '_stat_m_data' in self.__dict__.keys() and \
-                    '_stat_r_data' in self.__dict__.keys():
-                    # and \
-                    # self.cfg.regionalization:
+                    '_stat_r_data' in self.__dict__.keys() \
+                     and \
+                     self.cfg.regionalization:
 
                 rootname = self._plot_dir + os.sep + \
                     self._vartype.replace(" ", "_") + '_' + \
@@ -2146,7 +2151,7 @@ class BasicDiagnostics(Diagnostic):
                                  'regions. The multiple models are: ' +
                                  ", ".join(labels) + '.'),
                              '#ID' + 'regov' + self.var,
-                             ",".join(infiles))
+                             ",".join(infiles), self.diagname, self.authors)
 
     def _month_i2str(self, number):
         m = [

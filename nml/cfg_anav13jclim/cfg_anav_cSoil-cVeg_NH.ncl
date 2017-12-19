@@ -1,7 +1,7 @@
 diag_script_info = True
 
 ;; Define region for the spatial average
-diag_script_info@region = "Northern Hemisphere"
+diag_script_info@region = "NH extratropics"
 
 ;; Plot legend in a separate file
 diag_script_info@legend_outside = False

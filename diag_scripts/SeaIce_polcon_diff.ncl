@@ -425,7 +425,7 @@ begin
     ;; Reporting
     alltags = array_append_record(tags, (/"DM_polar", "PT_polar", \
                                           "ST_mean"/), 0)
-    caption = "Polar-stereographic contour map of difference in sea ice concentration between " + model_string + " and " + diag_script_info@ref_model  + ". TODO: Problem with OBS* classes - climofile not passed correctly. for OBS* classes, interface_get_infile already returns path + file! Reason yet unknown."
+    caption = "Polar-stereographic contour map of difference in sea ice concentration between " + model_string + " and " + diag_script_info@ref_model  + "."
     if (npages.eq.1 .or. MMM) then  ; only 1 file: no sequence number added
         plot_fname = wks@fullname
         id = "#idSeaIcePolcon"
@@ -440,8 +440,9 @@ begin
                     interface_get_infile(var0, field_type0, imod), 0 )
             end do
         end if
+        contrib_authors = (/"A_gott_kl", "A_senf_da"/)
         ESMValMD(plot_fname, alltags, caption, id, var0, \
-                 models@name, climofiles)
+                 models@name, climofiles, diag_script, contrib_authors)
     else  ; Multiple files, each with its own sequence number
         ; Split wks@fullname to later add number sequence before '.png'
         plotname_split = str_split(wks@fullname, ".")
@@ -475,8 +476,9 @@ begin
                     "/" + interface_get_infile(var0, field_type0, \
                     ind_models_shown_exclref(imod)), 0 )
             end do
+            contrib_authors = (/"A_gott_kl", "A_senf_da"/)
             ESMValMD(plot_fname, alltags, caption, id, var0, \
-                     models@name(ind_models_shown), climofiles)
+                     models@name(ind_models_shown), climofiles, diag_script, contrib_authors)
             delete([/ seq_num, plot_fname, id, ind_models_shown, \
                       ind_models_shown_exclref, climofiles /])
         end do

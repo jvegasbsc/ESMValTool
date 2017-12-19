@@ -20,8 +20,9 @@ class METAdata(object):
         self.__avail__ = ["xml", "meta", "both"]
         # http://www.sno.phy.queensu.ca/~phil/exiftool/exiftool_pod.html;
         # relevant r/w formats
-        self.__meta_formats__ = ["jpg", "jpeg", "png", "eps", "mp4",
-                                 "tiff", "pdf", "ps"]
+        #self.__meta_formats__ = ["jpg", "jpeg", "png", "eps", "mp4",
+        #                         "tiff", "pdf", "ps"]
+        self.__meta_formats__ = ["png"]
         self.__exif_maintag__ = "Exif.Image.ImageDescription"
         # self.__dtype__=dtype
         self.set_type(dtype)
@@ -46,7 +47,7 @@ class METAdata(object):
                 ", ".join(self.avail) + "]!"
         # check if exif is available
         try:
-            from gi.repository import GExiv2 as EXIV
+            from PIL import Image, PngImagePlugin
         except:
             self.__dtype__ = 'xml'
 
@@ -93,10 +94,11 @@ class METAdata(object):
 
     def __write_meta__(self):
 
-        from gi.repository import GExiv2 as EXIV
+        from PIL import Image, PngImagePlugin
 
         if not self.__modfile__.split(".")[-1] in self.__meta_formats__:
-            print("Warning! This is not an acceptable " +
+            print("Warning! ." + self.__modfile__.split(".")[-1] +
+                  " is not an acceptable " +
                   "meta data file format! Instead, XML-file for meta data " +
                   "will be produced!")
             self.__dtype__ = "xml"
@@ -105,14 +107,16 @@ class METAdata(object):
 
         if len(self.__data_dict__.keys()) == 1:
 
-            metadata = EXIV.Metadata(self.__modfile__)
+            meta = PngImagePlugin.PngInfo()
+
+            image = Image.open(self.__modfile__)
 
             tags = self.__build_pretty_xml__(pretty=False)
             self.tags = self.__build_pretty_xml__(pretty=True)
 
-            metadata.set_tag_string(self.__exif_maintag__, tags)
+            meta.add_itxt(self.__exif_maintag__, tags, zip=True)
 
-            metadata.save_file()
+            image.save(self.__modfile__, "png", pnginfo=meta)
 
         elif len(self.__data_dict__.keys()) == 0:
             print("No meta data to be written!")
@@ -195,6 +199,8 @@ class METAdata(object):
                 elif isinstance(act_dict[branch], list):
                     XMLT.SubElement(curr_root, branch).text = "|".join(
                         act_dict[branch])
+                elif act_dict[branch] is None:
+                    XMLT.SubElement(curr_root, branch).text = ""
                 else:
                     print(act_dict[branch])
                     assert False, "This data type is not implemented yet: " + \
@@ -243,17 +249,22 @@ class METAdata(object):
 
     def __read_meta__(self):
 
-        from gi.repository import GExiv2 as EXIV
+        from PIL import Image, PngImagePlugin
+        from PIL.ExifTags import TAGS
 
-        metadata = EXIV.Metadata(self.__modfile__)
-        root = XMLT.fromstring(metadata.get(self.__exif_maintag__))
-        if len(root.getchildren()) == 0:
-            assert False, "Object " + root.tag + " is misformed!"
-        val = {}
-        [val.update(self.__xml_to_dict__(branch))
-         for branch in root.getchildren()]
-        self.__data_dict__ = {root.tag: val}
-        return self.__data_dict__
+        image = Image.open(self.__modfile__)
+        info = image.info
+        if self.__exif_maintag__ in info.keys():
+            root = XMLT.fromstring(info[self.__exif_maintag__])
+            if len(root.getchildren()) == 0:
+                assert False, "Object " + root.tag + " is misformed!"
+            val = {}
+            [val.update(self.__xml_to_dict__(branch))
+             for branch in root.getchildren()]
+            self.__data_dict__ = {root.tag: val}
+            return self.__data_dict__
+        else:
+            return None
 
     def __xml_to_dict__(self, branch):
 

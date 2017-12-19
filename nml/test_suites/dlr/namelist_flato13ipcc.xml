@@ -6,21 +6,24 @@ namelist_flato13ipcc.xml
 
 Description
 Reproducing selected figures from IPCC AR5, chap. 9 (Flato et al., 2013):
-Figs. 9.2a/b/c, 9.3, 9.4, 9.5, 9,7, 9.8, 9.10, 9.24a, 9.28, 9.29, 9.30, 9.31,
-9.32, 9.35, 9.36, 9.45b
+Figs. 9.2a/b/c, 9.3, 9.4, 9.5, 9.6, 9,7, 9.8, 9.9, 9.10, 9.24a, 9.26, 9.27,
+9.28, 9.29, 9.30, 9.31, 9.32, 9.35, 9.36, 9.42, 9.45b
 
 Authors
 Axel Lauer (DLR, Germany - axel.lauer@dlr.de)
 Veronika Eyring (DLR, Germany - veronika.eyring@dlr.de)
- 
+
 Contributors
 Lisa Bock, DLR (Fig. 9.8)
 Irene Cionni, ENEA, namelist_eyring13jgr.xml (Fig. 9.10)
+Bettina Gier, DLR, Germany (Figs. 9.6, 9.9, 9.26, 9.27)
 Ricard Levine, UK Met Office, namelist_SAMonsoon.xml (Fig. 9.32)
+Ricarda Rettinger, DLR, Germany, namelist_ECS.xml (Fig. 9.42b)
 Mattia Righi, DLR, namelist_perfmetrics_CMIP5.xml (Fig. 9.7),
     namelist_aerosol_CMIP5.xml (Figs. 9.28, 9.29)
+Manuel Schlund, DLR, namelist_ipcc_fig9-42a.xml (Fig. 9.42a)
 Daniel Senftleben, DLR, namelist_SeaIce.xml (Fig. 9.24)
-Sabrina Welzel, DLR, namelist_wenzel14jgr.xml (Fig. 9.45)
+Sabrina Welzel, DLR, namelist_wenzel14jgr.xml (Fig. 9.45b)
 
 Projects
 CRESCENDO
@@ -29,12 +32,12 @@ ESA CCI CMUG
 ESMVal
 
 Reference
-Flato, G. et al., Evaluation of climate models, in: Climate Change 2013: the 
-Physical Science Basis, contribution of Working Group I to the Fifth Assessment 
-Report of the Intergovernmental Panel on Climate Change, edited by: Stocker, T. F.,
-Qin, D., Plattner, G.-K., Tignor, M., Allen, S. K., Boschung, J., Nauels, A., Xia,
-Y., Bex, V., and Midgley, P. M., Cambridge University Press, Cambridge, UK and
-New York, NY, USA (2013)
+Flato, G. et al., Evaluation of climate models, in: Climate Change 2013: the
+Physical Science Basis, contribution of Working Group I to the Fifth Assessment
+Report of the Intergovernmental Panel on Climate Change, edited by: Stocker,
+T. F., Qin, D., Plattner, G.-K., Tignor, M., Allen, S. K., Boschung, J.,
+Nauels, A., Xia, Y., Bex, V., and Midgley, P. M., Cambridge University Press,
+Cambridge, UK and New York, NY, USA (2013)
 
 This namelist is part of the ESMValTool
 ###############################################################################
@@ -69,7 +72,7 @@ This namelist is part of the ESMValTool
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
 <!-- * similar to figs. 9.2 a/b/c                                          * -->
 <!-- * =================================================================== * -->
-<!-- * Multi model mean, multi model mean bias, and mean absolute error    * --> 
+<!-- * Multi model mean, multi model mean bias, and mean absolute error    * -->
 <!-- * (geographical distributions).                                       * -->
 <!-- *********************************************************************** -->
 
@@ -112,7 +115,7 @@ This namelist is part of the ESMValTool
 <!-- * similar to figs. 9.4                                                * -->
 <!-- * =================================================================== * -->
 <!-- * Multi model mean, multi model mean bias, mean absolute error, and   * -->
-<!-- * mean relative error (geographical ditributions)                     * --> 
+<!-- * mean relative error (geographical ditributions)                     * -->
 <!-- * ******************************************************************* * -->
 
     <diag>
@@ -182,6 +185,92 @@ This namelist is part of the ESMValTool
         <diag_script cfg="cfg_clouds_ipcc.ncl"> clouds_ipcc.ncl </diag_script>
     </diag>
 
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.6                                                 * -->
+<!-- * =================================================================== * -->
+<!-- * Centred pattern correlations between models and observations for    * -->
+<!-- * the annual mean climatology over the period 1980-1999.              * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description> Pattern cor - tas </description>
+	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
+	<variable MIP="Amon" ref_model="ERA-Interim"> tas </variable>
+	<field_type>          T2Ms                     </field_type>
+	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> R_atmos, T_phys </tags>
+
+        <model> CMIP5_ETHZ CanESM2         MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR    MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MIROC5          MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR      MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ NorESM1-M       MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <model id="ERA-Interim"> OBS ERA-Interim reanaly 1 1980 1982 @{OBSPATH}/Tier3/ERA-Interim </model>
+        <model id="NCEP">        OBS NCEP        reanaly 1 1980 1982 @{OBSPATH}/Tier2/NCEP        </model>
+
+        <diag_script cfg="cfg_ipcc-fig-9-6.ncl"> ipcc-fig-9-6.ncl </diag_script>
+    </diag>
+
+    <diag>
+        <description> Pattern cor - rlut </description>
+	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
+	<variable MIP="Amon" ref_model="CERES-EBAF"> rlut </variable>
+	<field_type>          T2Ms                     </field_type>
+	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> R_atmos, T_phys </tags>
+
+        <model> CMIP5_ETHZ CanESM2          MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR     MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MIROC5           MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR       MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ NorESM1-M        MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <model id="CERES-EBAF"> obs4mips CERES-EBAF L3B Ed2-7 2003 2011 @{OBSPATH}/Tier1 </model>
+
+        <diag_script cfg="cfg_ipcc-fig-9-6.ncl"> ipcc-fig-9-6.ncl </diag_script>
+    </diag>
+
+
+    <diag>
+        <description> Pattern cor - pr </description>
+	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
+	<variable MIP="Amon" ref_model="GPCP"> pr      </variable>
+	<field_type>          T2Ms                     </field_type>
+	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> R_atmos, T_phys </tags>
+
+        <model> CMIP5_ETHZ CanESM2          MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR     MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MIROC5           MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR       MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ NorESM1-M        MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <model id="GPCP"> obs4mips GPCP-SG L3          v2.2 1980 1982 @{OBSPATH}/Tier1      </model>
+        <model id="CMAP"> OBS      CMAP    mergedanaly 1    1980 1982 @{OBSPATH}/Tier2/CMAP </model>
+
+        <diag_script cfg="cfg_ipcc-fig-9-6.ncl"> ipcc-fig-9-6.ncl </diag_script>
+    </diag>
+
+    <diag>
+        <description> Pattern cor - rlut </description>
+	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
+	<variable MIP="Amon" ref_model="CERES-EBAF"> SW_CRE </variable>
+	<field_type>          T2Ms                     </field_type>
+	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> R_atmos, T_phys </tags>
+
+        <model> CMIP5_ETHZ CanESM2          MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR     MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MIROC5           MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR       MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ NorESM1-M        MIP_VAR_DEF historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <model id="CERES-EBAF"> obs4mips CERES-EBAF L3B Ed2-7 2003 2005 @{OBSPATH}/Tier1 </model>
+
+        <diag_script cfg="cfg_ipcc-fig-9-6.ncl"> ipcc-fig-9-6.ncl </diag_script>
+    </diag>
 
 <!-- *********************************************************************** -->
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
@@ -222,6 +311,48 @@ This namelist is part of the ESMValTool
 
 <!-- *********************************************************************** -->
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.9                                                 * -->
+<!-- * =================================================================== * -->
+<!-- * Scatter plot of decadal trends in tropical precipitable water as a  * -->
+<!-- * function of trends in lower tropospheric temperature (TLT) over the * -->
+<!-- * world's ocean. Extension using RCP 4.5 instead of RCP8.5 as used in * -->
+<!-- * the IPCC figure.                                                    * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+    <description> Preprocessing for prw from RSS </description>
+    <variable_def_dir>    ./variable_defs/      </variable_def_dir>
+    <variable> prw                              </variable>
+    <field_type>          T2Ms                  </field_type>
+    <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/   </diag_script_cfg_dir>
+    <diag_script cfg="cfg_dummy.py"> dummy_python.py </diag_script>
+    <launcher_arguments>    [('execute_as_shell', False)]  </launcher_arguments>
+    <model> OBS     RSS       reanaly 1  1988 1992 @{OBSPATH}/Tier2/RSS </model>
+    </diag>
+
+    <diag>
+        <description> TLT vs prw trend                 </description>
+	<variable_def_dir>    ./variable_defs/         </variable_def_dir>
+	<variable>            TLT                      </variable>
+        <variable exclude="UAH"> prw                   </variable>
+	<field_type>          T2Ms                     </field_type>
+	<diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> R_atmos, T_phys </tags>
+
+        <model> CMIP5_ETHZ CanESM2        Amon historical r1i1p1 1988 1992 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ CSIRO-Mk3-6-0  Amon historical r1i1p1 1988 1992 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR   Amon historical r1i1p1 1988 1992 @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR     Amon historical r1i1p1 1988 1992 @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <model> OBS            ERA-Interim reanaly 1          1988 1992 @{OBSPATH}/Tier3/ERA-Interim </model>
+        <model id = "UAH"> OBS UAH         reanaly v3_3       1988 1992 @{OBSPATH}/Tier2/UAH         </model>
+        <model> OBS            RSS         reanaly 1          1988 1992 @{OBSPATH}/Tier2/RSS         </model>
+
+        <diag_script cfg="cfg_ipcc-fig-9-9.ncl"> ipcc-fig-9-9.ncl </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
 <!-- * similar to fig. 9.10                                                * -->
 <!-- * =================================================================== * -->
 <!-- * Time series of total column ozone                                   * -->
@@ -238,7 +369,7 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ MPI-ESM-LR     Amon historical r1i1p1 1960 2005 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> OBS NIWA reanaly 1 1980 2010 @{OBSPATH}/Tier3/NIWA/ </model>
         <diag_script cfg="cfg_eyring13jgr_fig02.ncl"> eyring13jgr_fig02.ncl </diag_script>
-  </diag> 
+  </diag>
 
 
 <!-- *********************************************************************** -->
@@ -310,6 +441,78 @@ This namelist is part of the ESMValTool
 
 <!-- *********************************************************************** -->
 <!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.26                                                * -->
+<!-- * =================================================================== * -->
+<!-- * Ensemble-mean global ocean carbon uptake (top) and global land      * -->
+<!-- * carbon uptake (bottom) in the CMIP5 ESMs for the historical period  * -->
+<!-- * 1901-2005                                                           * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description>         global evolution plot FGCO2   </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Omon"> FGCO2                         </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <diag_script cfg="cfg_ipcc_fig_9_26.ncl">  CarbonCycle_main.ncl      </diag_script>
+    </diag>
+
+    <diag>
+        <description>         Global evolution plot NBP     </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Lmon"> NBP                           </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1901 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+
+        <diag_script cfg="cfg_ipcc_fig_9_26.ncl"> CarbonCycle_main.ncl  </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.27                                                * -->
+<!-- * =================================================================== * -->
+<!-- * Simulation of global mean (a) atmosphere-ocean CO2 fluxes (fgCO2)   * -->
+<!-- * and (b) net atmosphere-land CO2 fluxes (NBP), by ESMs for the       * -->
+<!-- * period 1986-2005                                                    * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description>         Errorbar plot FGCO2           </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Omon"> FGCO2                         </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> OBS          JMA-TRANSCOM                   reanaly      1        1986 2005   @{OBSPATH}/Tier3/JMA-TRANSCOM </model>
+
+        <diag_script cfg="cfg_ipcc_fig_9_27.ncl">  CarbonCycle_main.ncl      </diag_script>
+    </diag>
+
+    <diag>
+        <description>         Errorbar plot NBP             </description>
+        <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+        <variable MIP="Lmon"> NBP                           </variable>
+        <field_type>          T2Ms                          </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/           </diag_script_cfg_dir>
+
+        <model> CMIP5_ETHZ   MPI-ESM-LR       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> CMIP5_ETHZ   NorESM1-ME       MIP_VAR_DEF   historical   r1i1p1   1986 2005   @{MODELPATH}/ETHZ_CMIP5 </model>
+        <model> OBS          JMA-TRANSCOM                   reanaly      1        1986 2005   @{OBSPATH}/Tier3/JMA-TRANSCOM </model>
+
+        <diag_script cfg="cfg_ipcc_fig_9_27.ncl"> CarbonCycle_main.ncl  </diag_script>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
 <!-- * similar to fig. 9.28                                                * -->
 <!-- * =================================================================== * -->
 <!-- * Multi-year average aerosol optical depth (AOD) in comparison with   * -->
@@ -368,7 +571,7 @@ This namelist is part of the ESMValTool
 <!-- * =================================================================== * -->
 <!-- * Composite diurnal cycle of precipitation averaged over              * -->
 <!-- * land / ocean for different latitude bands at local time and season  * -->
-<!-- * (June–July–August (JJA), December–January–February (DJF),           * -->
+<!-- * (June-July-August (JJA), December-January-February (DJF),           * -->
 <!-- * or their sum).                                                      * -->
 <!-- *********************************************************************** -->
 
@@ -382,10 +585,10 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ CNRM-CM5     3hr amip r1i1p1 2004 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> CMIP5_ETHZ HadGEM2-A    3hr amip r1i1p1 2004 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> CMIP5_ETHZ IPSL-CM5A-LR 3hr amip r1i1p1 2004 2004 @{MODELPATH}/ETHZ_CMIP5/ </model>
-        <diag_script cfg="cfg_DiurnalCycle_25N-70N_land_JJA.ncl">      DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_25N-70N_ocean_JJA.ncl">     DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_25S-25N_land_JJA+DJF.ncl">  DiurnalCycle_box.ncl </diag_script>
-        <diag_script cfg="cfg_DiurnalCycle_25S-25N_ocean_JJA+DJF.ncl"> DiurnalCycle_box.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25N-70N_land_JJA.ncl">      ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25N-70N_ocean_JJA.ncl">     ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25S-25N_land_JJA+DJF.ncl">  ipcc-fig-9-30.ncl </diag_script>
+        <diag_script cfg="cfg_ipcc-fig-9-30_25S-25N_ocean_JJA+DJF.ncl"> ipcc-fig-9-30.ncl </diag_script>
     </diag>
 
 <!-- *********************************************************************** -->
@@ -441,7 +644,7 @@ This namelist is part of the ESMValTool
      * similar to fig. 9.35                                                *
      * =================================================================== *
      * Maximum entropy power spectra of surface air temperature averaged   *
-     * over the NINO3 region (5°N to 5°S, 150°W to 90°W)                   *
+     * over the NINO3 region (5N to 5S, 150W to 90W)                       *
      *********************************************************************** -->
 
     <diag>
@@ -462,7 +665,7 @@ This namelist is part of the ESMValTool
 <!-- * ==================================================================== * -->
 <!-- * ENSO metrics: SST anomaly standard deviation (K) and precipitation   * -->
 <!-- * response (standard deviation, mm/day) in Nino3 and Nino4 regions     * -->
-<!-- *                                                                      * --> 
+<!-- *                                                                      * -->
 <!-- * Notes: (1) using historical experiments instead of piControl used in * -->
 <!-- *            IPCC chap. 9                                              * -->
 <!-- *        (2) using ts (Amon) instead of tos (Omon) because some of the * -->
@@ -493,6 +696,85 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ NorESM1-M      Amon historical r1i1p1 1980 1982 @{MODELPATH}/ETHZ_CMIP5/ </model>
         <model> OBS CMAP mergedanaly 1 1980 1982 @{OBSPATH}/Tier2/CMAP </model>
         <diag_script cfg="cfg_ipcc-fig-9-36.ncl"> ipcc-fig-9-36.ncl </diag_script>
+    </diag>
+
+<!-- ********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                            * -->
+<!-- * similar to fig. 9.42a                                              * -->
+<!-- * ================================================================== * -->
+<!-- * Equilibrium climate sensitivity (ECS) vs. global mean surface      * -->
+<!-- * temperature (GMSAT)                                                * -->
+<!-- * Contribution by Manuel Schlund, DLR                                * -->
+<!-- ********************************************************************** -->
+
+    <diag>
+        <description> ECS vs GMSAT (fig 9.42a)    </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas-degC            </variable>
+        <variable>            tas                 </variable>
+        <variable>            rtmt                </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ipcc_ch9/ </diag_script_cfg_dir>
+        <tags> D_andrews12, R_atmos </tags>
+
+        <diag_script cfg="cfg_ipcc_fig_9_42a.conf"> ipcc_fig_9_42a.py </diag_script>
+
+        <!-- GMSAT calculation -->
+        <model>  CMIP5_ETHZ  CanESM2       Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR  Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR    Amon  historical  r1i1p1  1961 1990  @{MODELPATH}/ETHZ_CMIP5/ </model>
+
+        <!-- ECS calculation -->
+        <model>  CMIP5_ETHZ  CanESM2       Amon  abrupt4xCO2  r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  CanESM2       Amon  piControl    r1i1p1  2015 2164  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR  Amon  abrupt4xCO2  r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  IPSL-CM5A-LR  Amon  piControl    r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR    Amon  abrupt4xCO2  r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model>  CMIP5_ETHZ  MPI-ESM-LR    Amon  piControl    r1i1p1  1850 1999  @{MODELPATH}/ETHZ_CMIP5/ </model>
+    </diag>
+
+<!-- *********************************************************************** -->
+<!-- * Flato et al. (2013) - IPCC AR5, chap. 9                             * -->
+<!-- * similar to fig. 9.42b                                               * -->
+<!-- * =================================================================== * -->
+<!-- * Equilibrium climate sensitivity (ECS) vs. transient climate         * -->
+<!-- * response (TCR)                                                      * -->
+<!-- * Contribution by Ricarda Rettinger, DLR, namelist_ECS.xml            * -->
+<!-- *                                                                     * -->
+<!-- * Notes:                                                              * -->
+<!-- * (1) IT IS IMPORTANT TO KEEP THE MODELS IN ALPHABETICAL ORDER!       * -->
+<!-- * (2) PLEASE INDICATE THE APPROPRIATE YEARS (150 PER EXPERIMENT)      * -->
+<!-- * (3) THE TIME STEPS OF THE EXPERIMENTS CAN VARY                      * -->
+<!-- *********************************************************************** -->
+
+    <diag>
+        <description> ECS (needed as input for ECS vs TCR) </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>
+        <variable>            rtmt                </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_ECS/      </diag_script_cfg_dir>
+        <tags>                R_atmos             </tags>
+        <model> CMIP5_ETHZ CanESM2      Amon abrupt4xCO2 r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ CanESM2      Amon piControl   r1i1p1 2015 2164 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR Amon abrupt4xCO2 r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR Amon piControl   r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR   Amon abrupt4xCO2 r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR   Amon piControl   r1i1p1 1850 1999 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <diag_script cfg="cfg_ECS_anomaly.ncl"> ECS.ncl </diag_script>
+    </diag>
+
+    <diag>
+        <description> ECS vs TCR (fig 9.42b)      </description>
+        <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+        <variable>            tas                 </variable>
+        <field_type>          T2Ms                </field_type>
+        <diag_script_cfg_dir> ./nml/cfg_TCR/      </diag_script_cfg_dir>
+        <tags>                R_atmos             </tags>
+        <model> CMIP5_ETHZ CanESM2      Amon 1pctCO2 r1i1p1 1850 1929 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ IPSL-CM5A-LR Amon 1pctCO2 r1i1p1 1850 1929 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <model> CMIP5_ETHZ MPI-ESM-LR   Amon 1pctCO2 r1i1p1 1850 1929 @{MODELPATH}/ETHZ_CMIP5/ </model>
+        <diag_script cfg="cfg_TCR.ncl"> TCR.ncl        </diag_script>
     </diag>
 
 <!-- *********************************************************************** -->
@@ -547,7 +829,7 @@ This namelist is part of the ESMValTool
     <diag>
         <description> Dummy diagnostic to preprocess NBP for carbon_constraint.ncl </description>
         <variable_def_dir>    ./variable_defs/  </variable_def_dir>
-        <variable >           NBP               </variable>
+        <variable>            NBP               </variable>
         <field_type>          T2Ms              </field_type>
         <diag_script_cfg_dir> ./nml/cfg_carbon/ </diag_script_cfg_dir>
         <diag_script cfg="cfg_carbon_G_LT_testing.ncl"> carbon_dummy.ncl </diag_script>

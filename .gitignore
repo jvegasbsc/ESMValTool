@@ -1,9 +1,8 @@
-
 c
 *.pyc
 *.orig
 *.tmp
-config_private_BM_local.xml
+config_private.xml
 curr_trace_indent.txt
 ncl.interface
 
@@ -24,7 +23,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -65,3 +64,16 @@ coverage.xml
 doc/sphinx/build
 *.xml~
 *.png
+
+# Editor Backup
+*~
+
+# Temporary folders
+work/*
+interface_data/*
+
+# Build folder
+doc/sphinx/source/diag_scripts/**
+doc/sphinx/source/plot_scripts/**
+
+*.xml
