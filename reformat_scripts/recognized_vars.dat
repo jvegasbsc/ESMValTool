@@ -247,6 +247,9 @@ alt_name =
 std_name = alb
 alt_name =
 
+std_name=fAPAR
+alt_name =fapar
+
 std_name = baresoilFrac
 alt_name = 
 
@@ -261,4 +264,3 @@ alt_name =
 
 std_name = clisccp
 alt_name = 
-
