@@ -1,117 +1,368 @@
+# -*- coding: utf-8 -*-
+
 """
-;;#############################################################################
-;; Dummy Diagnostics
-;; Author: Benjamin Mueller (LMU Munich, GER)
-;;#############################################################################
-;; Description
-;;    A Dummy py-routine
-;;
-;; Required diag_script_info attributes (diagnostics specific)
-;;    none
-;;
-;; Optional diag_script_info attributes (diagnostic specific)
-;;    none
-;;
-;; Required variable_info attributes (variable specific)
-;;    none
-;;
-;; Optional variable_info attributes (variable specific)
-;;    none
-;;
-;; Caveats
-;;
-;; Modification history
-;;
-;;#############################################################################
+###############################################################################
+DUMMY_VAR_PROJECT.py
+Author: Birgit Hassler (DLR, Germany)
+C3S_511 service
+###############################################################################
+
+Description
+    Test file for basic diagnostics for a single ESC.
+
+Required diag_script_info attributes (diagnostics specific)
+    [ecs_plots]
+        plot : Switch to plot the linear regression needed for the ECS
+               calculation
+    [netcdf]
+        filename  : Name of the output file
+        overwrite : Overwrite existing files
+
+Optional diag_script_info attributes (diagnostic specific)
+    [main_plot]
+        fontsize : Fonzsize used in the plot
+        xmin     : Left boundary of the plot
+        xmax     : Right boundary of the plot
+        ymin     : Lower boundary of the plot
+        ymax     : Upper boundary of the plot
+    [ecs_plots]
+        fontsize : Fontsize used in the plot
+        xmin     : Left boundary of the plot
+        xmax     : Right boundary of the plot
+        ymin     : Lower boundary of the plot
+        ymax     : Upper boundary of the plot
+
+Required variable_info attributes (variable specific)
+    none
+
+Required variable attributes (defined in namelist)
+    none
+
+Caveats
+
+Modification history
+    20180125-A_hass_bg: written
+
+###############################################################################
 """
 
-# Basic Python packages
-import sys
-from copy import copy
 
-# Add subfolder of the diagnostics to the path
-sys.path.append('./diag_scripts/aux/LMU_ESACCI-diagnostics/')
-
+# ESMValTool python packages
+from auxiliary import info, warning, error
 from esmval_lib import ESMValProject
+from ESMValMD import ESMValMD
+from grid_operations import GridOperations
 
-# Import full diagnostic routine
-from dummy_diagnostic import DUMMYDiagnostic # <==HERE!!!
+# NetCDF4
+from netCDF4 import Dataset
+
+# Basic python packages
+from collections import OrderedDict
+from datetime import datetime
+from scipy import stats
+import ConfigParser
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+import sys
+from mpl_toolkits.basemap import Basemap
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
 
 
 def main(project_info):
-    print('>>>>>>>> DUMMY_VAR_PROJECT.py is running! <<<<<<<<<<<<') # <==HERE!!!
+	"""
+	Arguments
+		project_info : Dictionary containing project information
 
-# A_laue_ax+
-    E = ESMValProject(project_info)
+	Description
+		This is the main routine of the diagnostic.
+	"""
 
-    verbosity = E.get_verbosity()
-    diag_script = E.get_diag_script_name()
+	###########################################################################
+	# Variables and experiments needed for this diagnostic
+	###########################################################################
 
-#    E.write_references(diag_script,              # diag script name
-#                       ["A_muel_bn"],            # authors
-#                       [""],                     # contributors
-#                       [""],                     # diag_references
-#                       ["E_qa4ecv_albedo"],      # obs_references
-#                       ["P_qa4ecv"],             # proj_references
-#                       project_info,
-#                       verbosity,
-#                       False)
-# A_laue_ax-
+	TOZ = "toz"
 
-    Diag = None
+	VARIABLES = [(TOZ)]
 
-    for v in range(len(project_info['RUNTIME']['currDiag'].get_variables())):
 
-        # read variable
-        variable = project_info['RUNTIME']['currDiag'].get_variables()[v]
+    ###########################################################################
+    # Get namelist information
+    ###########################################################################
 
-        if variable in ["var"]: # <==HERE!!!
+    # Create instance of ESMValProject wrapper
+	E = ESMValProject(project_info)
 
-            model_filelist = ESMValProject(
-                project_info).get_clim_model_filenames(variable=variable)
+    # Get information
+	global_conf = E.get_global_conf()
+	diag_name = E.get_diag_script_name()
+	vars = E.get_currVars()
+	config_file = E.get_configfile()
+	work_dir = E.get_work_dir()
+	plot_dir = E.get_plot_dir()
+	plot_file_type = E.get_graphic_format()
+	write_plots = E.get_write_plots()
+	verbosity = E.get_verbosity()
+	exit_on_warning = E.get_exit_on_warning()
+	if (plot_file_type not in plt.gcf().canvas.get_supported_filetypes()):
+		warning("Selected file type for plots is not supported",
+                verbosity, 0, exit_on_warning)
+		plot_file_type = "ps"
 
-            # only models are read
-            for inc in range(len(project_info['MODELS'])):
+    # Check if all needed varibles are present
+	for var in VARIABLES:
+		if (var not in vars):
+			error("no data for variable '{0}' available, ".format(var) + \
+                  "please check your namelist")
 
-                model = project_info['MODELS'][inc]
+    # Write references:
+	E.write_references(diag_name,                # diagnostic script name
+						["A_hass_bg"],           # authors
+						[""],                    # contributors
+						["D_0002"],              # diagnostic
+						[""],                    # observations
+						["P_square4ECVs"],       # project
+						project_info,
+						verbosity,
+						False)
 
-                # only for non-reference models
+	# Read configuration file
+	modelconfig = ConfigParser.ConfigParser()
+	modelconfig.read(config_file)
 
-                Mod_L1 = model.model_line.split()[1]
-                Ref_L1 = \
-                    project_info['RUNTIME']['currDiag'].variables[v].ref_model
+    # Get all models (in our case the observations)
+	models = E.get_all_clim_models([var for var in VARIABLES])
+	print(models)
+	
+	###########################################################################
+    # Collect data of the models
+    ###########################################################################
 
-                if not Mod_L1 == Ref_L1:
+	info("", verbosity, 1)
+	info("Starting calculation", verbosity, 1)
+	info("", verbosity, 1)
 
-                    model_filename = model_filelist[Mod_L1]
-                    reference_filename = model_filelist[Ref_L1]
+	#tco_data = OrderedDict((exp, OrderedDict()) for exp in VARIABLES[TOZ])
+	units = OrderedDict()
+	climo_files = []
 
-                    # copy old data to provide data that is needed again
-                    D_old = copy(Diag)
+    # Try to get necessary model information
+	for model_path in models:
+		E.add_to_filelist(model_path)
+		climo_files.append(model_path)
+		model_info = models[model_path]
 
-                    # initialize diagnostic
-                    Diag = DUMMYDiagnostic()  # <==HERE!!!
+        # Try to get necessary model information
+		model_var = None
+		model_name = None
+		model_exp = None
+		try:
+			model_var = model_info["var"]
+			model_name = model_info["name"]
+		except KeyError:
+			warning("Could not retrieve all desired model information of " +
+                    "model {0}".format(model_info), verbosity, 0,
+                    exit_on_warning)
+			continue
 
-                    # provide project_info to diagnostic
-                    Diag.set_info(project_info, model, variable,
-                                  reference_filename, model_filename,
-                                  project_info['RUNTIME']['currDiag'].
-                                  diag_script_cfg)
-                    # reuse region info
-                    if D_old is not None:
-                        if "_regions" in D_old.__dict__.keys():
-                            Diag._regions = D_old._regions
-                    del(D_old)
-                    # load the data
-                    Diag.load_data()
-                    # run the diagnostics defined by the import
-                    Diag.run_diagnostic()
-                    # write the results to the specific folder
-                    Diag.write_data(project_info['GLOBAL']['write_plots'])
+		# Skip unnecesseary calculations
+		grid_op = GridOperations(model_path, model_var, global_conf)
+		info("Retrieving '{0}' from model '{1}' [{2}]".format(model_var,
+                                                         model_name,
+														 model_exp),
+			 verbosity, 1)
+		units.update({model_var: grid_op.get_var_units()})
+		
+		# Get netCDF latitudes and longitudes
+		#print(model_path)
+		netCDF_data = Dataset(model_path, 'r')
+		#print netCDF_data.variables['lat']
+		
+		lats = netCDF_data.variables['lat'][:]
+		lons = netCDF_data.variables['lon'][:]
+		data = netCDF_data.variables['toz'][:]
+		#lons_idx = np.where(lons > 180)
+		lons[lons > 180] =  lons[lons > 180] - 360.
+		lons_adj = np.concatenate((lons[180:],lons[:180]), axis = 0)
+		#print(lats)
+		#print(lons_adj)
+		#print(data.shape)
 
-        if len(model_filelist) > 2:
-            print("   Overview for " + str(len(model_filelist)) + " models.")
-            Diag.write_overview(project_info['GLOBAL']['write_plots'])
+        # mean
+		if (model_var == TOZ):
+			tco_mean = grid_op.average(spatial_axis="all", period="annual",
+									   spatial_weighting=True, region="global")
 
-    print('>>>>>>>> ENDED SUCESSFULLY!! <<<<<<<<<<<<')
-    print('')
+			#tco_grid_mean = grid_op.average(period="total",
+			#						        spatial_weighting=True, region="global")
+			tco_grid_mean = np.mean(data, axis=0)
+			#print(tco_grid_mean.shape)
+			tco_grid_mean_adj = np.concatenate((tco_grid_mean[:,180:],tco_grid_mean[:,:180]), axis = 1)
+			#print(tco_grid_mean_adj.shape)
+			tco_grid_std = np.std(data, axis=0)
+			tco_grid_std_adj = np.concatenate((tco_grid_std[:,180:],tco_grid_std[:,:180]), axis = 1)
+
+			tco_grid_num = sum(~np.isnan(data))
+			tco_grid_num_adj = np.concatenate((tco_grid_num[:,180:],tco_grid_num[:,:180]), axis = 1)
+			print(tco_grid_num.shape)
+			
+    # Empty line
+	info("", verbosity, 1)
+
+	# Matplotlib instance
+	fig, axes = plt.subplots()
+
+	# Plot line data
+	#----------------------
+	if (write_plots):
+		info("Create global mean TCO plot '{0}'".format(plot_dir),
+             verbosity, 1)
+	
+        # Get values from configuration file
+		main_plot_section = "main_plot"
+		cfg_options = {"filename": "tco_mean", "fontsize": 18.0,
+                       "xmin": 260.0, "xmax": 280.0,
+                       "ymin": 1995.0, "ymax": 2012.0}
+		cfg = E.get_config_options(modelconfig, main_plot_section, cfg_options)
+
+		# Line plot
+		years = []
+		for i in range(2010 - 1997 + 1):
+			years.append(1997 + i)
+		
+		#print(years)
+		
+		axes.plot(years, tco_mean,
+                  linestyle = "solid", linewidth = 5, color = "red")
+		
+		
+        # Save line plot
+		filename = cfg["filename"] + "." + plot_file_type
+		fig.savefig(plot_dir + filename, 
+                    bbox_inches="tight", orientation="landscape")
+		plt.close("all")
+		
+		# Plot map (mean)
+		#-----------------------------------
+		#-- create figure and axes instances
+		dpi = 100
+		fig = plt.figure(figsize=(1100/dpi, 1100/dpi), dpi=dpi)
+		ax  = fig.add_axes([0.1,0.1,0.8,0.9])
+
+		#-- create map
+		map = Basemap(projection='cyl',llcrnrlat= -90.,urcrnrlat= 90.,\
+              resolution='c',  llcrnrlon=-180.,urcrnrlon=180.)
+		
+		#-- draw coastlines, state and country boundaries, edge of map
+		map.drawcoastlines()
+		#map.drawstates()
+		#map.drawcountries()
+
+		#-- create and draw meridians and parallels grid lines
+		map.drawparallels(np.arange( -90., 90.,30.),labels=[1,0,0,0],fontsize=10)
+		map.drawmeridians(np.arange(-180.,180.,30.),labels=[0,0,0,1],fontsize=10)
+		
+		#-- plot the contours on the map
+		#print(lons.shape)
+		#print(lats.shape)
+		#print(np.transpose(tco_grid_mean).shape)
+		cnplot = plt.contourf(lons_adj, lats, tco_grid_mean_adj, cmap=cm.jet)
+
+		#-- add plot title
+		plt.title('Mean TCO')
+
+		divider = make_axes_locatable(ax)
+		cax = divider.append_axes("right", size="3%", pad=0.05)
+		# Make a colorbar for the ContourSet returned by the contourf call.
+		cbar = plt.colorbar(cnplot, cax=cax)
+		cbar.ax.set_ylabel('TCO [DU]')
+
+		# Save map
+		filename = "TCO_mean_map" + "." + plot_file_type
+		plt.savefig(plot_dir + filename, bbox_inches="tight", dpi=dpi)
+		plt.close("all")
+
+		
+		# Plot map (std)
+		#-----------------------------------
+		#-- create figure and axes instances
+		dpi = 100
+		fig = plt.figure(figsize=(1100/dpi, 1100/dpi), dpi=dpi)
+		ax  = fig.add_axes([0.1,0.1,0.8,0.9])
+
+		#-- create map
+		map = Basemap(projection='cyl',llcrnrlat= -90.,urcrnrlat= 90.,\
+              resolution='c',  llcrnrlon=-180.,urcrnrlon=180.)
+		
+		#-- draw coastlines, state and country boundaries, edge of map
+		map.drawcoastlines()
+		#map.drawstates()
+		#map.drawcountries()
+
+		#-- create and draw meridians and parallels grid lines
+		map.drawparallels(np.arange( -90., 90.,30.),labels=[1,0,0,0],fontsize=10)
+		map.drawmeridians(np.arange(-180.,180.,30.),labels=[0,0,0,1],fontsize=10)
+		
+		#-- plot the contours on the map
+		cnplot = plt.contourf(lons_adj, lats, tco_grid_std_adj, cmap=cm.jet)
+
+		#-- add plot title
+		plt.title('Standard deviation of TCO')
+
+		divider = make_axes_locatable(ax)
+		cax = divider.append_axes("right", size="3%", pad=0.05)
+		# Make a colorbar for the ContourSet returned by the contourf call.
+		cbar = plt.colorbar(cnplot, cax=cax)
+		cbar.ax.set_ylabel('TCO [DU]')
+
+		
+		# Save map
+		filename = "TCO_std_map" + "." + plot_file_type
+		plt.savefig(plot_dir + filename, bbox_inches="tight", dpi=dpi)
+		plt.close("all")
+
+
+		# Plot map (num)
+		#-----------------------------------
+		#-- create figure and axes instances
+		dpi = 100
+		fig = plt.figure(figsize=(1100/dpi, 1100/dpi), dpi=dpi)
+		ax  = fig.add_axes([0.1,0.1,0.8,0.9])
+
+		#-- create map
+		map = Basemap(projection='cyl',llcrnrlat= -90.,urcrnrlat= 90.,\
+              resolution='c',  llcrnrlon=-180.,urcrnrlon=180.)
+		
+		#-- draw coastlines, state and country boundaries, edge of map
+		map.drawcoastlines()
+		#map.drawstates()
+		#map.drawcountries()
+
+		#-- create and draw meridians and parallels grid lines
+		map.drawparallels(np.arange( -90., 90.,30.),labels=[1,0,0,0],fontsize=10)
+		map.drawmeridians(np.arange(-180.,180.,30.),labels=[0,0,0,1],fontsize=10)
+		
+		#-- plot the contours on the map
+		cnplot = plt.contourf(lons_adj, lats, tco_grid_num_adj, cmap=cm.jet)
+
+		#-- add plot title
+		plt.title('Number of available data points')
+
+		divider = make_axes_locatable(ax)
+		cax = divider.append_axes("right", size="3%", pad=0.05)
+		# Make a colorbar for the ContourSet returned by the contourf call.
+		cbar = plt.colorbar(cnplot, cax=cax)
+		cbar.ax.set_ylabel('number')
+
+		
+		# Save map
+		filename = "TCO_num_map" + "." + plot_file_type
+		plt.savefig(plot_dir + filename, bbox_inches="tight", dpi=dpi)
+		plt.close("all")
+		
+	print("test successful")

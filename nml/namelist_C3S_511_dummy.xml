@@ -1,5 +1,5 @@
 <namelist>
-<include href="./config_private_BM_local.xml"/>
+<include href="./config_private_BH_local.xml"/>
 <namelist_summary>
 ###############################################################################
 namelist_C3S_511_dummy.xml
@@ -24,8 +24,8 @@ This namelist is part of the ESMValTool
   <write_netcdf type="boolean">       True                      </write_netcdf>
   <force_processing type="boolean">   False                     </force_processing>
   <wrk_dir type="path">               @{WORKPATH}               </wrk_dir>
-  <plot_dir type="path">              @{PLOTPATH}/dev/  			 </plot_dir>
-  <climo_dir type="path">             @{CLIMOPATH}       		 </climo_dir>
+  <plot_dir type="path">              @{PLOTPATH}/dev/  		</plot_dir>
+  <climo_dir type="path">             @{CLIMOPATH}       		</climo_dir>
   <write_plot_vars type="boolean">    True                      </write_plot_vars>
   <max_data_filesize type="integer">  100                       </max_data_filesize>
   <max_data_blocksize type="integer"> 500                       </max_data_blocksize>
@@ -33,7 +33,7 @@ This namelist is part of the ESMValTool
   <verbosity  type="integer">         1                         </verbosity>
   <debuginfo type="boolean">          False                     </debuginfo>
   <exit_on_warning  type="boolean">   True                      </exit_on_warning>
-  <tags>										  Testing_Namelist			 </tags>
+  <tags>							  Testing_Namelist			</tags>
 </GLOBAL>
 
 
@@ -44,42 +44,49 @@ This namelist is part of the ESMValTool
 <DIAGNOSTICS>
     
     <diag>
-        <description>  															Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
-        <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
-        <variable>			   					                     VAR                                    </variable>
-        <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
-        <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ESACCI-OZONE">			   			toz                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_toz_C3S_511.py">   	DUMMY_VAR_PROJECT_Ben.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_atmos, T_ghg, T_chem 					  </tags>
+	
+		<!-- <model>  CMIP5_ETHZ  GFDL-CM3            Amon  historical   r1i1p1  1997 2010  @{MODELPATH}ETHZ_CMIP5/  </model> -->
+		<model>  OBS         ESACCI-OZONE        sat          L3            1997 2010  @{OBSPATH}Tier2/ESACCI-OZONE    </model>
+		<!-- <model>  OBS         NIWA                reanaly      1             1997 2010  @{OBSPATH}/Tier3/NIWA            </model> -->
     </diag>
 
-	 <diag>
-	     <!-- optional -->
-        <description>  															Cross comparison with ensemble. 		</description>
-        <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
-        <variable>			   					                     VAR                                    </variable>
-        <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
-        <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
+<!--	
+	<diag>
+	     # optional 
+        <description>  											Cross comparison with ensemble. 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   					                VAR                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
     </diag>    
     
     <diag>
-        <description>  															Producing maturity matrices and GCOS. 		</description>
-        <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
-        <variable>			   					                     VAR                                    </variable>
-        <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
-        <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
+        <description>  											Producing maturity matrices and GCOS. 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   					                VAR                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
     </diag>
     
 
     <diag>
-        <description>  															Producing assessment report. 		</description>
-        <variable_def_dir>                								./variable_defs/      							</variable_def_dir>
-        <variable>			   					                     VAR                                    </variable>
-        <field_type>                      								T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	VAR_C3S_511.py                    				</diag_script>
-        <launcher_arguments>               								[('execute_as_shell', False)]             </launcher_arguments>
+        <description>  											Producing assessment report. 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   					                VAR                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
     </diag>
+-->
 
 </DIAGNOSTICS>
 

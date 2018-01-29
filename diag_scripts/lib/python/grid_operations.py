@@ -648,3 +648,20 @@ class GridOperations(object):
         return self.var_nc.units
 
     ###########################################################################
+	
+	def get_lats(self):
+		"""
+		Arguments
+			None
+
+		Return value
+			array of latitudes from the netCDF file
+
+		Description
+			Returns the array of latitudes from the netCDF file.
+
+		Modification history
+			20180125-A_hass_bg: written
+		"""
+	
+		return self.lat

@@ -40,6 +40,7 @@ A_gier_be = Gier, Bettina (DLR, Germany)
 A_gott_kl = Gottschaldt, Klaus-Dirk (DLR, Germany - klaus-dirk.gottschaldt 'at' dlr.de)
 A_hage_st = Hagemann, Stefan (MPI-M, Germany, stefan.hagemann 'at' mpimet.mpg.de)
 A_hann_ul = Hansson, Ulf (SMHI, Sweden - 'at')
+A_hass_bg = Hassler, Birgit (DLR, Germany - birgit.hassler 'at' dlr.de)
 A_hemp_ni = Hempelmann, Nils (IPSL, France - nils.hempelmann 'at' ipsl.jussieu.fr)
 A_hutj_ro = Hutjes, Ronald (Univ. of Wageningen, NL - ronald.hutjes 'at' wur.nl)
 A_juck_ma = Juckes, Martin (BADC, UK - martin.juckes 'at' stfc.ac.uk)
@@ -239,6 +240,7 @@ P_dlrveu2 = DLR project VEU2
 P_embrace = EU FP7 project EMBRACE
 P_esmval = DLR project ESMVal
 P_qa4ecv = QA4ECV
+P_square4ECVs = C3S_511 service
 
 ### CMIP6 REALMS (for reporting) #####################################
 
