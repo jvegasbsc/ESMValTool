@@ -48,7 +48,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable ref_model="ESACCI-OZONE">			   			toz                                       </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_toz_C3S_511.py">   	DUMMY_VAR_PROJECT_Ben.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_atmos, T_ghg, T_chem 					  </tags>
 	

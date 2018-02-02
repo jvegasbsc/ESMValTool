@@ -191,7 +191,7 @@ def main(project_info):
 		lons_adj = np.concatenate((lons[180:],lons[:180]), axis = 0)
 		#print(lats)
 		#print(lons_adj)
-		#print(data.shape)
+		print(data.shape)
 
         # mean
 		if (model_var == TOZ):
@@ -206,9 +206,20 @@ def main(project_info):
 			#print(tco_grid_mean_adj.shape)
 			tco_grid_std = np.std(data, axis=0)
 			tco_grid_std_adj = np.concatenate((tco_grid_std[:,180:],tco_grid_std[:,:180]), axis = 1)
-
-			tco_grid_num = sum(~np.isnan(data))
-			tco_grid_num_adj = np.concatenate((tco_grid_num[:,180:],tco_grid_num[:,:180]), axis = 1)
+			
+			tco_grid_num = np.zeros((len(lats), len(lons)))
+			for lat_idx in range(0, len(lats)):
+				for lon_idx in range(0,len(lons)):	
+					for time_idx in range(0, 168):
+						if np.count_nonzero(data[time_idx, lat_idx, lon_idx]):
+							tco_grid_num[lat_idx, lon_idx] += 1
+					#tco_grid_num[lat_idx, lon_idx] = sum(np.count_nonzero(data[:, lat_idx, lon_idx]))/(14.*12.)    # 14*12 is the number of available datapoints, 14 yrs, 12mths
+					#print(tco_grid_num[lat_idx, lon_idx])
+			
+			tco_grid_num_perc = (tco_grid_num * 100.)/(14.*12.)
+			tco_grid_num_adj = np.concatenate((tco_grid_num_perc[:,180:],tco_grid_num_perc[:,:180]), axis = 1)
+			print(np.max(tco_grid_num_adj))
+			print(np.min(tco_grid_num_adj))
 			print(tco_grid_num.shape)
 			
     # Empty line
@@ -239,6 +250,9 @@ def main(project_info):
 		
 		axes.plot(years, tco_mean,
                   linestyle = "solid", linewidth = 5, color = "red")
+		plt.ylabel('TCO [DU]')
+		plt.xlabel('Years')
+		plt.title('Global annual mean TCO')
 		
 		
         # Save line plot
@@ -351,18 +365,40 @@ def main(project_info):
 		cnplot = plt.contourf(lons_adj, lats, tco_grid_num_adj, cmap=cm.jet)
 
 		#-- add plot title
-		plt.title('Number of available data points')
+		plt.title('Percent of available data points')
 
 		divider = make_axes_locatable(ax)
 		cax = divider.append_axes("right", size="3%", pad=0.05)
 		# Make a colorbar for the ContourSet returned by the contourf call.
 		cbar = plt.colorbar(cnplot, cax=cax)
-		cbar.ax.set_ylabel('number')
-
+		cbar.ax.set_ylabel('Percent')
 		
 		# Save map
 		filename = "TCO_num_map" + "." + plot_file_type
 		plt.savefig(plot_dir + filename, bbox_inches="tight", dpi=dpi)
 		plt.close("all")
+		
+		
+		# Plot histogram
+		#-----------------------------------
+		# the histogram of the data
+		bins = np.linspace(150, 550, 80)
+		
+		one_d_array = data.reshape(-2)
+		print(one_d_array.shape)
+		plt.hist(one_d_array, bins, facecolor='g', alpha=0.75)
+
+		plt.xlabel('TCO [DU]')
+		plt.ylabel('Number of values')
+		plt.title('Histogram of value occurrences')
+		plt.axis([100, 550, 0, 800000])
+		plt.grid(True)
+		
+		# Save histogram
+		filename = "TCO_hist" + "." + plot_file_type
+		plt.savefig(plot_dir + filename, bbox_inches="tight", dpi=dpi)
+		plt.close("all")
+
+		
 		
 	print("test successful")
