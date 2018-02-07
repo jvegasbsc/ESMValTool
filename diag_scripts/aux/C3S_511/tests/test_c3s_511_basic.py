@@ -69,3 +69,11 @@ class TestDiagnosticSkeleton:
     def test_prepare_report(self):
         with pytest.warns(UserWarning):
             a = self.S.__prepare_report__()
+
+class TestBasicDiagnostic:
+    def setup(self):
+        self.S = Basic_Diagnostic()
+
+    def test_init(self):
+        self.S.__init__()
+        assert "data" in self.S
