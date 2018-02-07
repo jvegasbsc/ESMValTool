@@ -7,7 +7,7 @@ from c3s_511_basic import Diagnostic_skeleton, Basic_Diagnostic
 
 class TestDiagnosticSkeleton:
     def setup(self):
-        assert False
+        pass
     def test_init(self):
         assert False
     def test_read_data(self):
@@ -28,11 +28,3 @@ class TestDiagnosticSkeleton:
         assert False
     def test_do_prepare_report(self):
         assert False
-
-
-class TestDiagnosticSkeleton:
-    def setup(self):
-        assert False
-    def test_init(self):
-        assert False
-
