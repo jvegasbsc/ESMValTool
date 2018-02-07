@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)),'..'))
-from c3s_511_basic import Diagnostic_skeleton, Basic_Diagnostic
+from c3s_511_basic import __Diagnostic_skeleton__, Basic_Diagnostic
 
 class TestDiagnosticSkeleton:
     def setup(self):
