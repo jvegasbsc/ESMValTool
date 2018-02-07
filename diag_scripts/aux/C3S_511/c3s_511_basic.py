@@ -5,8 +5,8 @@ Basic implementation for diagnostics into ESMValTool
 import iris
 import os
 import sys
-sys.path.insert(0, os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),'lib'))
+[sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),dir)) for dir in ["lib"]]
 import c3s_511_util as utils
 
 # All packages checked
@@ -148,7 +148,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
         
-        self.__config__=utils.__getInfoFromFile__()
+        self.__config__ = utils.__getInfoFromFile__()
         
     def set_info(self, E, model, var, ref_file, mod_file, cfg):
         """
