@@ -1,82 +1,69 @@
-"""
-call like:
-    python extract.py FOLDER
-to check if imagefiles in FOLDER has metadata tag.
-use python extract.py FOLDER -c 
-to check for tags
+import sys  # WBD
+import os   #WBD
+sys.path.append("../../../diag_scripts/lib/python/")   #WBD
+from METAdata import METAdata
+import csv
+path_out = "../../../work/reports/sphinx/source"
 
-"""
-from PIL import Image
-from PIL import PngImagePlugin
-from PIL.ExifTags import TAGS, GPSTAGS
-import argparse
-import os
-from os.path import join, getsize
-import xml.etree.ElementTree as ET
-
-
-
-parser = argparse.ArgumentParser(description='Extract Metadata')
-parser.add_argument('indir', metavar='INDIR', type=str, nargs=1,
-                                    help='indir containing files with metadata')
-parser.add_argument('-c','--check', action='store_true',
-                            help='activate checking for tags; default is deactive')
+def do_report(plot_list, report_title):
+    """
+    - plot_list    is a list of *full path* files (PNG, ...)
+    - report_title is a string documenting the type of diagnostic 
+    """
+    
+    # Create the output directory
+    # THIS IS TO BE DONE WITH FUNCTION ensure_directory
+    # WILL HAVE TO BE CHANGED DUE TO SPHINX
+    if not (os.path.exists(path_out)):
+      os.makedirs(path_out)    
 
 
-args = parser.parse_args()
-indir= args.indir[0]
-checkTags = args.check
+    output_file = "report_" + report_title.split()[0].lower() + ".rst"  
+    file = open(path_out + "/" + output_file, "w") 
 
-tags ={ 
-'namelist_': 'Namelist',
-'P_': 'Projects',
-'R_': 'CMIP6 Realms',
-'T_': 'Themes',
-'DM_': 'Domain',
-'PT_': 'Plot Type',
-'ST_': 'Statistics',
-'D_': 'References',
-'V_': 'Variables',
-'A_': 'Author/Contributor List',
-'M_': 'Models'}
+    my_title ="DIAGNOSTICS OF " + report_title
+    file.write(my_title + "\n")
+    file.write("=" * len(my_title) + "\n\n")
+    
+    for f in plot_list:
+        MD = METAdata()
+        
+        caption = MD.read(f).get_dict()['ESMValTool']['caption']
+    
+        file.write(".. figure:: " + "../../../../diag_scripts/aux/C3S_511/" + f + "\n" 
+                 "   :align:   center"   + "\n" 
+                 "   :width:   95%" + "\n" 
+                 "   " + caption[0] + "\n"
+                  )
+    file.close() 
 
-if checkTags:
-    print("{0}".format(",".join([v for k, v in tags.iteritems()])))
-    print("{0}".format(",".join([item for item in tags])))
-    print("{0}".format("|".join([item[0] for item in tags])))
+    # Go to the directory and create PDF
 
-list_info = []
-for root, dirs, files in os.walk(indir):
-    for f in files:
-        image = Image.open("{0}/{1}".format(root,f))
-        info = image.info
-        for tag, value in info.items():
-            if 'replace' not in dir(value):
-                continue
-            try:
-                key = TAGS.get(tag, tag)
-                if checkTags:
-                    tmp = []
-                    for k, v in tags.iteritems():
-                        if "|{0}".format(k) in value.replace(' ', '') or ">{0}".format(k) in value.replace(' ', ''):
-                            #print("Contains tag for {0}".format(v))
-                            tmp.append(str(1))
-                        else:
-                            #print("Contains no tag for {0}".format(v))
-                            tmp.append(str(0))
-                    print("{1} for file: {0}".format(f, "|".join(tmp)))
-                else:
-                    print(f + ":" + key + " " + str(value).replace('\n', ' ').replace('\r', ' '))
-            except:
-                print(f + " NO KEY")
+#def do_smm_report(csv_expert, csv_definitions):
+#    """
+#    """
+csv_expert = "example_csvs/example_smm_expert.csv"
+with open(csv_expert, 'rb') as csvfile:
+    s = csv.reader(csvfile, delimiter = ",")
+    for row in s:
+      print(row)    
 
-        list_info.append([f, info]) 
+output_file = "smm_report.rst"
+
+file = open(path_out + "/" + output_file, "w")
+my_title ="SYSTEM MATURITY MATRIX"
+file.write(my_title + "\n")
+file.write("=" * len(my_title) + "\n")
+table_length = 40
+file.write("+" + ("-" * (table_length - 2)) + "+\n")
+file.write("|" + " " + "*Namelists*" + (" "  * (table_length - 2 - 1 - len("*Namelists*"))) + "|" + "\n")
+file.write("+" + ("-" * (table_length - 2)) + "+\n")
 
 
-file = open("../../../doc/sphinx/source/print_report2.rst","w") 
-file.write("DIAGNOSTIC\n")
-file.write("==========\n\n")
-file.write(".. centered:: |fig1|\n\n")
-file.write(".. |fig1| image:: " + indir + "/" + list_info[0][0]+"\n   :width: 45%")
-file.close() 
-#../../../doc/sphinx/source/skel_report.rst
+file.close()
+    
+
+plot_list = ["../../../diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_CMIP5_MRI-ESM1_historical_r1i1p1_regionalized_smean_ts.png" ,
+             "../../../diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_CMIP5_MRI-ESM1_historical_r1i1p1_4plots_gmd.png"]
+
+do_report(plot_list, "MEAN AND VARIABILITY")
