@@ -2,41 +2,9 @@
 Basic implementation for diagnostics into ESMValTool
 """
 # used modules
-import numpy as np
+import iris
 import os
-import pdb
-# import matplotlib
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-#import matplotlib.dates as mdates
-# from netCDF4 import Dataset
-
-# global installation
-from geoval.core.data import GeoData
-from geoval.core.mapping import SingleMap
-import extended_data
-import extended_mapping
-from easyhov import easyhov_diff
-from esmval_lib import ESMValProject
-from ESMValMD import ESMValMD
-# from GeoData_mapping import *
-
-# import ConfigParser
-import csv
-import imp
-import shapefile as shp
-import glob
-import math
-import tempfile
-import datetime
-# from dateutil.relativedelta import relativedelta
-# import subprocess
-# import fnmatch
-
-from scipy import stats
-from cdo import Cdo
+import lib.c3s_511_utils as utils
 
 # All packages checked
 
@@ -55,37 +23,43 @@ from cdo import Cdo
 # * force_processing
 
 
-class Diagnostic_skeleton(object):
+class __Diagnostic_skeleton__(object):
     """
     Basic class to implement any kind of diagnostic
     """
 
     def __init__(self, **kwargs):
-        super(Diagnostic_skeleton, self).__init__(**kwargs)
+        super(__Diagnostic_skeleton__, self).__init__(**kwargs)
         """
         Default values to experiment with the diagnostics
         """
-#        self._project_info = {}
-#        self._mod_type = 'model'
-#        self._ref_type = 'reference'
-#        self._plot_dir = '.' + os.sep
-#        self._work_dir = '.' + os.sep
-#
-#        self._vartype = 'some variable'  # default value as there must be one
-#        self.output_type = 'png'  # default ouput file type
-#        self.overview = False
-#        self._regions = None
-#        self._changed = False
+        
+        # config
+        self.__project_info__ = dict() # empty project info
+        self.__plot_dir__ = '.' + os.sep # default plot directory
+        self.__work_dir__ = '.' + os.sep # default work dir
+
+        self.__varname__ = 'var'  # default value
+        self.__output_type__ = 'png'  # default ouput file type
+        self.__regions__ = {"example":(10,20,-10,-20)} # default regions
+        
+        self.__verbosity_level__ = 0 # default information during runtime
+        self.__debug_info__ = "No debug info" # default debug information
+        self.__config__ = dict() # default configuration input
         
         
-
-        self.__basetags = []
-        self.__infiles = []
-
-        # additional meta data
-        self.authors = ["A_muel_bn", "A_hass_br", "tbd"]
+        # for metadata
+        self.__basetags__ = []
+        self.__infiles__ = []
+        self.authors = ["A_muel_bn", "A_hass_bg", "A_laue_ax", \
+                        "A_broe_bj","tbd"] #TODO fill in
         self.diagname = "c3s_511_basic.py"
 
+
+    def set_info(self):
+        
+        return
+    
 
     def read_data(self):
         
@@ -100,6 +74,9 @@ class Diagnostic_skeleton(object):
         self.__do_gcos__()
         self.__do_mean_var__()
         self.__do_trends__()
+        self.__do_extremes__()
+        self.__do_maturity_matrix__()
+        self.__do_gcos_requirements__()
         
     
     def __file_check__(self):
@@ -142,13 +119,24 @@ class Diagnostic_skeleton(object):
         return
     
     
+    def __do_gcos_requirements__(self):
+        
+        self.__prepare_report__()
+        
+        return
+    
+    
     def __prepare_report__(self):
+        
+        return
+    
+    def write_reports(self):
         
         return
 
 
 
-class Basic_Diagnostic(Diagnostic_skeleton):
+class Basic_Diagnostic(__Diagnostic_skeleton__):
     """
     class to implement basic diagnostics, like e.g. global means,
     global differences, RMSD etc.
@@ -157,3 +145,87 @@ class Basic_Diagnostic(Diagnostic_skeleton):
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
         
+        self.__config__=utils.__getInfoFromFile__()
+        
+    def set_info(self, E, model, var, ref_file, mod_file, cfg):
+        """
+        gather information for diagnostic
+        """
+        
+        #TODO: Repair based on E
+        
+#        setags = self._basetags + \
+#            [x.strip() for x in project_info.get('GLOBAL')['tags']]
+#
+#        self._basetags = self._basetags + [self.var]
+#
+#        if var == 'sm':
+#            self._vartype = 'soil moisture'
+#            self._ref_file = ref_file
+#        elif var == 'ts' or var == 'tos':
+#            self._vartype = 'sea surface temperature'
+#            self._ref_file = ref_file
+#        elif var == 'shrubNtreeFrac':
+#            self._vartype = 'shrub and tree'
+#            self._ref_file = ref_file
+#        elif var == 'baresoilFrac':
+#            self._vartype = 'bare soil'
+#            self._self.__config__=utils.__getInfoFromFile__()
+#
+#        self._project_info = project_info
+#
+## A_laue_ax+
+##        self._plot_dir=project_info.get('GLOBAL')['plot_dir']
+#        E = ESMValProject(project_info)
+#        plot_dir = E.get_plot_dir()
+#        diag_script = E.get_diag_script_name()
+#        plot_dir = plot_dir + os.sep + diag_script + os.sep
+#        E.ensure_directory(plot_dir)
+#        self._plot_dir = plot_dir
+#        self.E = E
+## A_laue_ax-
+#
+#        self._work_dir = project_info.get('GLOBAL')['wrk_dir']
+#        self._climo_dir = project_info.get('GLOBAL')['climo_dir']
+#        self._mod_line = model.split_entries()
+#        self._field_type = project_info['RUNTIME']['derived_field_type']
+#        self.var = var
+#                   ['currDiag'].variables]
+#        whichvar = [i for i, x in enumerate(allvars) if x][0]
+#        self._ref_type = project_info['RUNTIME']['currDiag']
+#        self._ref_type = self._ref_type.variables[whichvar].ref_model
+#        self._mod_type = project_info['RUNTIME']['project']
+#
+#        self.output_type = project_info['GLOBAL']['output_file_type']
+#
+#        self._baref_file = ref_file
+#
+#            if self.cfg.cmap_globmeants[-3:-1] == "_r":
+#                self.cfg.cmap_globmeants = self.cfg.cmap_globmeants[:-2]
+#            else:
+#                self.cfg.cmap_globmeants = self.cfg.cmap_globmeants + "_r"
+#
+#        elif var == 'grassNcropFrac':
+#            self._vartype = 'grass and crop'
+#            self._ref_file = ref_file
+#        elif var == 'alb':
+#            self._vartype = 'albedo'
+#            self._ref_file = ref_file
+#        elif var == 'fAPAR':
+#            self._vartype = 'fAPAR'
+#            self._ref_file = ref_file
+#        elif var == 'burntArea':
+#            self._vartype = 'burned area'
+#            self._ref_file = ref_file
+#        else:
+#            assert False, 'This variable is not implemented yet!'
+#
+#        self._mod_file = mod_file
+#
+#        self._get_output_rootname()
+#
+#        if self.cfg.regionalization:
+#            self._reg_file = "./diag_scripts/aux" + \
+#                "/LMU_ESACCI-diagnostics/Shapefiles" + \
+#                os.sep + self.cfg.shape
+#            self._load_regionalization_shape()
