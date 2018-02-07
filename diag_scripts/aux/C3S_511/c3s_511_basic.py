@@ -74,7 +74,6 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
         
         self.__do_overview__()
-        self.__do_gcos__()
         self.__do_mean_var__()
         self.__do_trends__()
         self.__do_extremes__()
@@ -148,7 +147,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
         
-        self.__config__ = utils.__getInfoFromFile__()
+#        self.__config__ = utils.__getInfoFromFile__("")
+        
+        self.data = iris.load_cube("/media/bmueller/Work/ESMVAL_res/work/climo/CMIP5/CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc")
         
     def set_info(self, E, model, var, ref_file, mod_file, cfg):
         """
