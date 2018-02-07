@@ -4,7 +4,10 @@ Basic implementation for diagnostics into ESMValTool
 # used modules
 import iris
 import os
-import lib.c3s_511_utils as utils
+import sys
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),'lib'))
+import c3s_511_util as utils
 
 # All packages checked
 
