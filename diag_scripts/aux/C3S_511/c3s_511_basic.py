@@ -8,6 +8,8 @@ import sys
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)),'lib'))
 import c3s_511_util as utils
+from customErrors import ImplementationError
+import warnings
 
 # All packages checked
 
@@ -24,7 +26,6 @@ import c3s_511_util as utils
 # * write_plot_vars
 
 # * force_processing
-
 
 class __Diagnostic_skeleton__(object):
     """
@@ -60,9 +61,9 @@ class __Diagnostic_skeleton__(object):
 
 
     def set_info(self):
-        
+        #raise ImplementationError("set_info","This method has to be implemented.")  
+        warnings.warn("Implementation Warning", UserWarning)
         return
-    
 
     def read_data(self):
         
@@ -74,7 +75,6 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
         
         self.__do_overview__()
-        self.__do_gcos__()
         self.__do_mean_var__()
         self.__do_trends__()
         self.__do_extremes__()
@@ -83,13 +83,14 @@ class __Diagnostic_skeleton__(object):
         
     
     def __file_check__(self):
-    
+        warnings.warn("Implementation Warning", UserWarning)
         return
     
     
     def __do_overview__(self):
         
         self.__prepare_report__()
+        warnings.warn("Implementation Warning", UserWarning)
         
         return
     
@@ -97,6 +98,7 @@ class __Diagnostic_skeleton__(object):
     def __do_mean_var__(self):
         
         self.__prepare_report__()
+        warnings.warn("Implementation Warning", UserWarning)
         
         return
     
@@ -104,6 +106,7 @@ class __Diagnostic_skeleton__(object):
     def __do_trends__(self):
         
         self.__prepare_report__()
+        warnings.warn("Implementation Warning", UserWarning)
         
         return
     
@@ -111,6 +114,7 @@ class __Diagnostic_skeleton__(object):
     def __do_extremes__(self):
         
         self.__prepare_report__()
+        warnings.warn("Implementation Warning", UserWarning)
         
         return
     
@@ -118,6 +122,7 @@ class __Diagnostic_skeleton__(object):
     def __do_maturity_matrix__(self):
         
         self.__prepare_report__()
+        warnings.warn("Implementation Warning", UserWarning)
         
         return
     
@@ -126,15 +131,18 @@ class __Diagnostic_skeleton__(object):
         
         self.__prepare_report__()
         
+        warnings.warn("Implementation Warning", UserWarning)
         return
     
     
     def __prepare_report__(self):
         
+        warnings.warn("Implementation Warning", UserWarning)
         return
     
     def write_reports(self):
         
+        warnings.warn("Implementation Warning", UserWarning)
         return
 
 

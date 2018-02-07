@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), '..'))
 from c3s_511_basic import __Diagnostic_skeleton__, Basic_Diagnostic
-
+import warnings
 
 class TestDiagnosticSkeleton:
     def setup(self):
@@ -26,29 +26,46 @@ class TestDiagnosticSkeleton:
         assert isinstance(self.S.authors, list)
         assert isinstance(self.S.diagname, str)
 
+    def test_set_info(self):
+        with pytest.warns(UserWarning):
+            self.S.set_info()
+
     def test_read_data(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.read_data()
 
     def test_run_diagnostic(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.run_diagnostic()
 
     def test_file_check(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.__file_check__()
 
     def test_do_overview(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.__do_overview__()
 
     def test_do_mean_var(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.__do_mean_var__()
 
     def test_do_trends(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.__do_trends__()
 
     def test_do_extremes(self):
-        assert False
+        with pytest.warns(UserWarning):
+            a = self.S.__do_extremes__()
 
-    def test_do_matureity_matrix(self):
-        assert False
+    def test_do_maturity_matrix(self):
+        with pytest.warns(UserWarning):
+            a = self.S.__do_maturity_matrix__()
 
-    def test_do_prepare_report(self):
-        assert False
+    def test_do_gcos_requirements(self):
+        with pytest.warns(UserWarning):
+            a = self.S.__do_gcos_requirements__()
+
+    def test_prepare_report(self):
+        with pytest.warns(UserWarning):
+            a = self.S.__prepare_report__()
