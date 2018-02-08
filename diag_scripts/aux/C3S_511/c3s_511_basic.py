@@ -159,6 +159,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         return
 
+    def read_data_mock(self):
+        datadir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/testdata")
+        self.data = iris.load_cube(
+            os.path.join(datadir, "test.nc"))
+
     def set_info(self, **kwargs):
         """
         gather information for diagnostic

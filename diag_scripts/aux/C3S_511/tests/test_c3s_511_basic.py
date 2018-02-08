@@ -109,3 +109,7 @@ class TestBasicDiagnostic:
     def test_read_data(self):
         self.S.read_data()
         assert isinstance(self.S.data, iris.cube.Cube)
+
+    def test_read_data_mock(self):
+        self.S.read_data_mock()
+        assert isinstance(self.S.data, iris.cube.Cube)
