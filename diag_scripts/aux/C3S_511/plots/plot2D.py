@@ -57,7 +57,7 @@ class Plot2D(object):
         if (self.cube.ndim != 2):
             raise TypeError("Invalid input: expected 2-dimensional iris cube")
         dir = os.path.dirname(file_path)
-        if (not os.path.isdir(dir):
+        if (not os.path.isdir(dir)):
             try:
                 os.makedirs(dir)
             except OSError:
