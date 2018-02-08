@@ -11,19 +11,19 @@ import matplotlib.gridspec as gridspec
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
-
-
-# Example dataset (simple 2D tas)
-LATLON = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_latlon.nc'
-LATTIME = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_lattime.nc'
-LONTIME = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_lontime.nc'
-latlon_cube = iris.load_cube(LATLON)
-lattime_cube = iris.load_cube(LATTIME)
-lontime_cube = iris.load_cube(LONTIME)
+#
+#
+## Example dataset (simple 2D tas)
+#LATLON = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_latlon.nc'
+#LATTIME = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_lattime.nc'
+#LONTIME = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_lontime.nc'
+#latlon_cube = iris.load_cube(LATLON)
+#lattime_cube = iris.load_cube(LATTIME)
+#lontime_cube = iris.load_cube(LONTIME)
 
 # User arguments (TODO: substitute with class attributes):
-PLOT_DIR = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511'
-PLOT_NAME = 'latlon.pdf'
+PLOT_DIR = "/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source"
+PLOT_NAME = 'latlon.png'
 
 
 class Plot2D(object):
@@ -169,4 +169,4 @@ class Plot2D(object):
         plt.savefig(os.path.join(PLOT_DIR, PLOT_NAME))
         plt.clf()
 
-Plot2D(latlon_cube, x_line_plot='top')
+#Plot2D(latlon_cube, x_line_plot='top')

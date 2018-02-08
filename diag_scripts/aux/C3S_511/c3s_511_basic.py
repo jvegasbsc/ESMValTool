@@ -6,10 +6,12 @@ import iris
 import os
 import sys
 [sys.path.insert(0, os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),dir)) for dir in ["lib"]]
+    os.path.dirname(os.path.abspath(__file__)),dir)) for dir in ["lib","plots"]]
 import c3s_511_util as utils
 from customErrors import *
 import warnings
+from get_metadata_to_rst import do_report as report
+from plot2D import Plot2D 
 
 # All packages checked
 
@@ -148,7 +150,9 @@ class __Diagnostic_skeleton__(object):
 
 
 class Basic_Diagnostic(__Diagnostic_skeleton__):
-    """
+    """    def write_reports(self):
+        
+        return
     class to implement basic diagnostics, like e.g. global means,
     global differences, RMSD etc.
     """
@@ -165,6 +169,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             self.data = iris.load_cube(os.join.path(datadir, "CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc"))
         else:
             raise PathError("Basic_Diagnostic.__init__", "Environment Variable EVT_DATASTORE is not set to valid path.")
+#        self.data = iris.load_cube("/media/bmueller/Work/ESMVAL_res/work/climo/CMIP5/CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc")
+#        self.slice = self.data.collapsed("time",iris.analysis.MEAN)
+        
+        #self.slice = iris.load_cube('/media/bmueller/Work/GIT/ESMValTool-private_base/diag_scripts/aux/C3S_511/plots/test_latlon.nc')
         
     def set_info(self, E, model, var, ref_file, mod_file, cfg):
         """
@@ -248,3 +256,17 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 #                "/LMU_ESACCI-diagnostics/Shapefiles" + \
 #                os.sep + self.cfg.shape
 #            self._load_regionalization_shape()
+
+
+    def __do_mean_var__(self):
+        
+        Plot2D(self.slice)
+        
+        return
+    
+
+    def write_reports(self):
+        
+        print report
+        report(["/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source/latlon.png"],"test")
+        return
