@@ -25,6 +25,7 @@ class TestDiagnosticSkeleton:
         assert isinstance(self.S.__infiles__, list)
         assert isinstance(self.S.authors, list)
         assert isinstance(self.S.diagname, str)
+        assert self.S.data is None
 
     def test_set_info(self):
         with pytest.warns(UserWarning):
@@ -76,4 +77,9 @@ class TestBasicDiagnostic:
 
     def test_init(self):
         self.S.__init__()
-        assert "data" in self.S
+        assert "data" in dir(self.S)
+
+    def test_read_data(self):
+        import iris
+        self.S.read_data()
+        assert isinstance(self.S.data, iris.cube.Cube)
