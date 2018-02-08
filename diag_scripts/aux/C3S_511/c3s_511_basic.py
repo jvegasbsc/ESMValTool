@@ -147,7 +147,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     # self.slice = iris.load_cube('/media/bmueller/Work/GIT/ESMValTool-private_base/diag_scripts/aux/C3S_511/plots/test_latlon.nc')
 
     def read_data(self):
-        self.__file_check__()
 
         datadir = os.getenv('EVT_DATASTORE')
         if datadir is None:

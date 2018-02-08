@@ -1,10 +1,40 @@
 import pytest
 import os
 import sys
+import iris
+
+# ESMValTool main.py environments
+
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '../../../../interface_scripts'))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '../../../lib/python'))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '../../../../diag_scripts'))
+
+from auxiliary import info, error, print_header, ncl_version_check
+## from climate import climate
+from optparse import OptionParser
+import datetime
+import projects
+# import pdb
+import reformat
+import xml.sax
+import xml_parsers
+
+# Define ESMValTool version
+version = "1.1.0"
+os.environ['0_ESMValTool_version'] = version
+
+# watermarks (None, default)
+os.environ['0_ESMValTool_watermark'] = "None"
+###
+
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), '..'))
 from c3s_511_basic import __Diagnostic_skeleton__, Basic_Diagnostic
 import warnings
+
 
 class TestDiagnosticSkeleton:
     def setup(self):
@@ -39,10 +69,6 @@ class TestDiagnosticSkeleton:
         with pytest.warns(UserWarning):
             a = self.S.run_diagnostic()
 
-    def test_file_check(self):
-        with pytest.warns(UserWarning):
-            a = self.S.__file_check__()
-
     def test_do_overview(self):
         with pytest.warns(UserWarning):
             a = self.S.__do_overview__()
@@ -71,6 +97,7 @@ class TestDiagnosticSkeleton:
         with pytest.warns(UserWarning):
             a = self.S.__prepare_report__()
 
+
 class TestBasicDiagnostic:
     def setup(self):
         self.S = Basic_Diagnostic()
@@ -80,6 +107,5 @@ class TestBasicDiagnostic:
         assert "data" in dir(self.S)
 
     def test_read_data(self):
-        import iris
         self.S.read_data()
         assert isinstance(self.S.data, iris.cube.Cube)
