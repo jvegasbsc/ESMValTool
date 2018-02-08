@@ -10,5 +10,5 @@ ESMValTool Report
    :maxdepth: 2
    :numbered:
 
-   mean
+   report
 
