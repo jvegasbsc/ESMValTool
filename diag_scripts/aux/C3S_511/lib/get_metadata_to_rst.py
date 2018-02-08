@@ -1,76 +1,104 @@
-import sys  # WBD
-import os   #WBD
+import sys
+import os
 import shutil
 
-#sys.path.append("../../../diag_scripts/lib/python/")   #WBD
+# TO DO: remove once this function is called within the ESMValTool
+#        (included automatically then)
 sys.path.append(os.path.abspath("./diag_scripts/lib/python"))
 sys.path.append(os.path.abspath("./diag_scripts"))
 
 from METAdata import METAdata
-import csv
-#path_out = "/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source"
+#import csv
+
+# TO DO: get work directory from ESMValTool namelist
 work_dir = "/athome/laue_ax/sphinx/out"
-path_out = work_dir + os.sep + "reporting"
-src_dir = path_out + os.sep + "source12345"
-bld_dir = path_out + os.sep + "build12345"
 
 def do_report(plot_list, report_title):
     """
-    - plot_list    is a list of *full path* files (PNG, ...)
-    - report_title is a string documenting the type of diagnostic 
+    - plot_list    is a list of plot file names  (.png, ...) including *full path*
+    - report_title is a string used as title for the report 
     """
-    
-    # Create the output directory
-    # THIS IS TO BE DONE WITH FUNCTION ensure_directory
-    # WILL HAVE TO BE CHANGED DUE TO SPHINX
-    if not (os.path.exists(path_out)):
-      os.makedirs(path_out)    
 
+    # define output and temporary directories for Sphinx (source, build);
+    # add process id to temporary directory names to allow for
+    # execution of multiple instances in parallel
+
+    pid = str(os.getpgid(0))
+
+    path_out = work_dir + os.sep + "reporting"    # the final pdf will be put here
+    src_dir = path_out + os.sep + "source_" + pid # Sphinx source code directory
+    bld_dir = path_out + os.sep + "build_" + pid  # Sphinx build directory
+
+    # create output and temporary directories
+    if not (os.path.exists(path_out)):
+      os.makedirs(path_out)
     if not (os.path.exists(src_dir)):
       os.makedirs(src_dir)    
     if not (os.path.exists(bld_dir)):
       os.makedirs(bld_dir)    
 
-#    output_file = "report_" + report_title.split()[0].lower() + ".rst"  
+    # define filename of Sphinx source code file (.rst format)
     output_file = src_dir + os.sep + "report.rst"  
     file = open(output_file, "w") 
 
-    my_title ="DIAGNOSTICS OF " + report_title
+    # title (headline)
+    my_title = report_title
     file.write(my_title + "\n")
     file.write("=" * len(my_title) + "\n\n")
     
+    MD = METAdata()
+
+    # add all plots in plot_list to Sphinx source code file;
+    # the figure captions are extracted from the exif file headers
+    # of the .png files (if present)
+
     for f in plot_list:
-#        MD = METAdata()
 
         filename = f.rpartition(os.sep)[-1]
         filepath = f.rpartition(os.sep)[0]
 
         shutil.copy(f, src_dir)
 
-        caption = "test"#MD.read(f).get_dict()['ESMValTool']['caption']
+        try:
+            caption = MD.read(f).get_dict()['ESMValTool']['caption']
+        except:
+            caption = ""
     
         file.write(".. figure:: " + filename + "\n" 
-#        file.write(".. figure:: " + "../../../../diag_scripts/aux/C3S_511/" + f + "\n" 
-                 "   :align:   center"   + "\n" 
+                 "   :align:   center" + "\n" 
                  "   :width:   95%" + "\n\n" 
                  "   " + caption[0] + "\n"
                   )
     file.close() 
 
-    # Go to the directory and create PDF
+    # copy Sphinx configuration and index file to temporary source directory
     shutil.copy("doc/reporting/source/conf.py", src_dir)
     shutil.copy("doc/reporting/source/index.rst", src_dir)
 
+    # set environment variables for Sphinx (source directory and build directory)
     os.environ['SOURCEDIR'] = src_dir
     os.environ['BUILDDIR'] = bld_dir
 
+    # run Sphinx to create a pdf
     os.chdir("doc/reporting")
-
     os.system("make latexpdf")
 
-    os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", path_out + os.sep + "report_" + report_title.split()[0].lower() + ".pdf")
+    # move pdf to the output directory and rename to report_xxx.pdf
+    pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + ".pdf"
+    os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
-    print("created reporting pdf!... or not.")
+    # clean up temporary directories
+    if os.path.exists(src_dir):
+         # remove if exists
+         shutil.rmtree(src_dir)
+    if os.path.exists(bld_dir):
+         # remove if exists
+         shutil.rmtree(bld_dir)
+
+    print("created " + pdfname + "!")
+
+
+# dummy code to test do_report
 
 flist = ["/athome/laue_ax/sphinx/ESMValTool-private/diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
 
