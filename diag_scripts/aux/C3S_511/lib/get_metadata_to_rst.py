@@ -1,9 +1,18 @@
 import sys  # WBD
 import os   #WBD
-sys.path.append("../../../diag_scripts/lib/python/")   #WBD
+import shutil
+
+#sys.path.append("../../../diag_scripts/lib/python/")   #WBD
+sys.path.append(os.path.abspath("./diag_scripts/lib/python"))
+sys.path.append(os.path.abspath("./diag_scripts"))
+
 from METAdata import METAdata
 import csv
-path_out = "/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source"
+#path_out = "/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source"
+work_dir = "/athome/laue_ax/sphinx/out"
+path_out = work_dir + os.sep + "reporting"
+src_dir = path_out + os.sep + "source12345"
+bld_dir = path_out + os.sep + "build12345"
 
 def do_report(plot_list, report_title):
     """
@@ -17,9 +26,14 @@ def do_report(plot_list, report_title):
     if not (os.path.exists(path_out)):
       os.makedirs(path_out)    
 
+    if not (os.path.exists(src_dir)):
+      os.makedirs(src_dir)    
+    if not (os.path.exists(bld_dir)):
+      os.makedirs(bld_dir)    
 
-    output_file = "report_" + report_title.split()[0].lower() + ".rst"  
-    file = open(path_out + "/" + output_file, "w") 
+#    output_file = "report_" + report_title.split()[0].lower() + ".rst"  
+    output_file = src_dir + os.sep + "report.rst"  
+    file = open(output_file, "w") 
 
     my_title ="DIAGNOSTICS OF " + report_title
     file.write(my_title + "\n")
@@ -27,17 +41,41 @@ def do_report(plot_list, report_title):
     
     for f in plot_list:
 #        MD = METAdata()
-        
+
+        filename = f.rpartition(os.sep)[-1]
+        filepath = f.rpartition(os.sep)[0]
+
+        shutil.copy(f, src_dir)
+
         caption = "test"#MD.read(f).get_dict()['ESMValTool']['caption']
     
-        file.write(".. figure:: " + "../../../../diag_scripts/aux/C3S_511/" + f + "\n" 
+        file.write(".. figure:: " + filename + "\n" 
+#        file.write(".. figure:: " + "../../../../diag_scripts/aux/C3S_511/" + f + "\n" 
                  "   :align:   center"   + "\n" 
-                 "   :width:   95%" + "\n" 
+                 "   :width:   95%" + "\n\n" 
                  "   " + caption[0] + "\n"
                   )
     file.close() 
 
     # Go to the directory and create PDF
+    shutil.copy("doc/reporting/source/conf.py", src_dir)
+    shutil.copy("doc/reporting/source/index.rst", src_dir)
+
+    os.environ['SOURCEDIR'] = src_dir
+    os.environ['BUILDDIR'] = bld_dir
+
+    os.chdir("doc/reporting")
+
+    os.system("make latexpdf")
+
+    os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", path_out + os.sep + "report_" + report_title.split()[0].lower() + ".pdf")
+
+    print("created reporting pdf!... or not.")
+
+flist = ["/athome/laue_ax/sphinx/ESMValTool-private/diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
+
+do_report(flist, "mean and variability test")
+
 
 #def do_smm_report(csv_expert, csv_definitions):
 #    """
