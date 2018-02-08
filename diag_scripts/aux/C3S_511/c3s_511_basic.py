@@ -9,10 +9,11 @@ import sys
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
 import c3s_511_util as utils
-from customErrors import *
+from customErrors import ConfigurationError, PathError, EmptyContentError
 import warnings
 from get_metadata_to_rst import do_report as report
 from plot2D import Plot2D
+from esmval_lib import ESMValProject
 
 
 # All packages checked
@@ -43,7 +44,7 @@ class __Diagnostic_skeleton__(object):
         """
 
         # config
-        self.__project_info__ = dict()  # empty project info
+        self.__project_info__ = None  # empty project info
         self.__plot_dir__ = '.' + os.sep  # default plot directory
         self.__work_dir__ = '.' + os.sep  # default work dir
 
@@ -64,13 +65,13 @@ class __Diagnostic_skeleton__(object):
 
         self.data = None
 
-    def set_info(self):
+    def set_info(self, **kwargs):
         # raise ImplementationError("set_info","This method has to be implemented.")
         warnings.warn("Implementation Warning", UserWarning)
         return
 
     def read_data(self):
-        self.__file_check__()
+        warnings.warn("Implementation Warning", UserWarning)
 
         return
 
@@ -81,10 +82,6 @@ class __Diagnostic_skeleton__(object):
         self.__do_extremes__()
         self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
-
-    def __file_check__(self):
-        warnings.warn("Implementation Warning", UserWarning)
-        return
 
     def __do_overview__(self):
         self.__prepare_report__()
@@ -144,7 +141,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         #        self.__config__ = utils.__getInfoFromFile__("")
 
-
     #        self.data = iris.load_cube("/media/bmueller/Work/ESMVAL_res/work/climo/CMIP5/CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc")
     #        self.slice = self.data.collapsed("time",iris.analysis.MEAN)
 
@@ -164,10 +160,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         return
 
-    def set_info(self, E, model, var, ref_file, mod_file, cfg):
+    def set_info(self, **kwargs):
         """
         gather information for diagnostic
         """
+        self.__project_info__ = kwargs.get('proj_info', None)
+        if not isinstance(self.__project_info__, ESMValProject):
+            raise EmptyContentError("proj_info", "Element is empty.")
+
+        print(self.__project_info__)
 
         # TODO: Repair based on E
 
@@ -249,12 +250,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
     def __do_mean_var__(self):
 
-        Plot2D(self.slice)
-
+        # Plot2D(self.slice)
         return
 
     def write_reports(self):
-
-        print report
-        report(["/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source/latlon.png"], "test")
+        #        print report
+        #        report(["/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source/latlon.png"],"test")
         return
