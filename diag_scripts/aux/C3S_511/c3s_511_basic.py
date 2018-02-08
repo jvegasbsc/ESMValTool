@@ -8,7 +8,7 @@ import sys
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)),dir)) for dir in ["lib"]]
 import c3s_511_util as utils
-from customErrors import ImplementationError
+from customErrors import *
 import warnings
 
 # All packages checked
@@ -157,8 +157,14 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         super(Basic_Diagnostic, self).__init__(**kwargs)
         
 #        self.__config__ = utils.__getInfoFromFile__("")
-        
-        self.data = iris.load_cube("/media/bmueller/Work/ESMVAL_res/work/climo/CMIP5/CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc")
+
+        datadir = os.getenv('EVT_DATASTORE')
+        if datadir is None:
+            raise ConfigurationError("Basic_Diagnostic.__init__", "Environment Variable EVT_DATASTORE is not set")
+        if os.path.isdir(datadir):
+            self.data = iris.load_cube(os.join.path(datadir, "CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc"))
+        else:
+            raise PathError("Basic_Diagnostic.__init__", "Environment Variable EVT_DATASTORE is not set to valid path.")
         
     def set_info(self, E, model, var, ref_file, mod_file, cfg):
         """
