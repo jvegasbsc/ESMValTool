@@ -1,5 +1,6 @@
 import sys  # WBD
 import os   #WBD
+import matplotlib.pyplot as plt
 sys.path.append("../../../diag_scripts/lib/python/")   #WBD
 from METAdata import METAdata
 import csv
@@ -42,12 +43,20 @@ def do_report(plot_list, report_title):
 #def do_smm_report(csv_expert, csv_definitions):
 #    """
 #    """
+colors = ["y", "r", "b", "g", "m", "c"]
 csv_expert = "example_csvs/example_smm_expert.csv"
+plt.figure(figsize = (10, 5))
+plt.axis('off')
 with open(csv_expert, 'rb') as csvfile:
     s = csv.reader(csvfile, delimiter = ",")
+    counter = 0
     for row in s:
-      print(row)    
-
+      [plt.text(10 * i, 10 - counter, row[i]) for i in range(len(row))]
+      counter += 1
+plt.xlim(0, 60)
+plt.ylim(5, 10)
+plt.tight_layout()
+plt.savefig("./tmp.png", dpi = 500)
 output_file = "smm_report.rst"
 
 file = open(path_out + "/" + output_file, "w")
