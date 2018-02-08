@@ -8,7 +8,7 @@ import sys
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)),dir)) for dir in ["lib","plots"]]
 import c3s_511_util as utils
-from customErrors import *
+from customErrors import ConfigurationError, PathError
 import warnings
 from get_metadata_to_rst import do_report as report
 from plot2D import Plot2D 
@@ -68,7 +68,7 @@ class __Diagnostic_skeleton__(object):
         return
 
     def read_data(self):
-        
+        warnings.warn("Implementation Warning", UserWarning)
         self.__file_check__()
         
         return
@@ -174,11 +174,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         #self.slice = iris.load_cube('/media/bmueller/Work/GIT/ESMValTool-private_base/diag_scripts/aux/C3S_511/plots/test_latlon.nc')
         
-    def set_info(self, E, model, var, ref_file, mod_file, cfg):
+    def set_info(self, E):
         """
         gather information for diagnostic
         """
-        
+        print(E)
         #TODO: Repair based on E
         
 #        setags = self._basetags + \
