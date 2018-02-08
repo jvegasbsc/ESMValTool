@@ -215,7 +215,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         missing_values.data = missing_values.data / \
             float(len(self.sp_data.coord("time").points))
             
-        Plot2D(missing_values)
+        
+        x=Plot2D(missing_values)
+        x.plot.show()
         
         self.__prepare_report__()
         warnings.warn("Implementation Warning", UserWarning)
