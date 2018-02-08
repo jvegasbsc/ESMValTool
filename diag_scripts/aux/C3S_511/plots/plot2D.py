@@ -2,28 +2,14 @@
 # -*- coding: utf-8 -*-
 
 
-import os
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
-
-
-# Example dataset (simple 2D tas)
-LATLON = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_latlon.nc'
-LATTIME = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_lattime.nc'
-LONTIME = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511/test_lontime.nc'
-latlon_cube = iris.load_cube(LATLON)
-lattime_cube = iris.load_cube(LATTIME)
-lontime_cube = iris.load_cube(LONTIME)
-
-# User arguments (TODO: substitute with class attributes):
-PLOT_DIR = '/home/schl_m8/ESMValTool/diag_scripts/aux/C3S_511'
-PLOT_NAME = 'latlon.pdf'
+import os
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 
 
 class Plot2D(object):
@@ -35,15 +21,18 @@ class Plot2D(object):
         method
     """
 
-    LATS = ['latitude']
-    LONS = ['longitude']
-    TIME = ['time']
-    SIDE = 5
+    # Class attributes
+    LATS = ['latitude']     # accepted lat names
+    LONS = ['longitude']    # accepted lon names
+    TIME = ['time']         # accepted time names
+    GRIDSPEC_LENGTH = 5     # size of the matplotlib gridspec
+    FILENAME = "test_plot.png"
 
-    def __init__(self, cube, **kwargs):
+    def __init__(self, cube, file_path, **kwargs):
         """
         Arguments
-            cube : iris cube
+            cube      : iris cube
+            file_path : path to the output file
 
             kwargs:
                 x_line_plot : Add line plot below averaging over x-axis
@@ -67,6 +56,14 @@ class Plot2D(object):
         self.cube = iris.util.squeeze(cube)
         if (self.cube.ndim != 2):
             raise TypeError("Invalid input: expected 2-dimensional iris cube")
+        dir = os.path.dirname(file_path)
+        if (not os.path.isdir(dir):
+            try:
+                os.makedirs(dir)
+            except OSError:
+                raise OSError("Invalid input: Cannot write to " +
+                              "{0}".format(dir))
+        self.file_path = file_path
 
         # Process kwargs
         self.xline = None
@@ -140,7 +137,8 @@ class Plot2D(object):
         """
 
         # Contour plot
-        G = gridspec.GridSpec(self.__class__.SIDE, self.__class__.SIDE)
+        G = gridspec.GridSpec(self.__class__.GRIDSPEC_LENGTH,
+                              self.__class__.GRIDSPEC_LENGTH)
         ax_main = plt.subplot(G[1:-1, 1:-1])
         qplt.contourf(self.cube)
 
@@ -166,7 +164,5 @@ class Plot2D(object):
                 if (kwargs['x_line_plot'] == 'top'):
                     plt.subplot(332)
 
-        plt.savefig(os.path.join(PLOT_DIR, PLOT_NAME))
+        plt.savefig(self.file_path)
         plt.clf()
-
-Plot2D(latlon_cube, x_line_plot='top')
