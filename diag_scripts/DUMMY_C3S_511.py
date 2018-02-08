@@ -64,7 +64,7 @@ def main(project_info):
 
     Diag = Basic_Diagnostic()
     
-    Diag.set_info(E,E,E,E,E,E)
+    Diag.set_info(proj_info=E)
     Diag.read_data()
     Diag.run_diagnostic()
     Diag.write_reports()

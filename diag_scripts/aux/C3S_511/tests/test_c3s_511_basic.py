@@ -1,10 +1,40 @@
 import pytest
 import os
 import sys
+import iris
+
+# ESMValTool main.py environments
+
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '../../../../interface_scripts'))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '../../../lib/python'))
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '../../../../diag_scripts'))
+
+from auxiliary import info, error, print_header, ncl_version_check
+## from climate import climate
+from optparse import OptionParser
+import datetime
+import projects
+# import pdb
+import reformat
+import xml.sax
+import xml_parsers
+
+# Define ESMValTool version
+version = "1.1.0"
+os.environ['0_ESMValTool_version'] = version
+
+# watermarks (None, default)
+os.environ['0_ESMValTool_watermark'] = "None"
+###
+
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), '..'))
 from c3s_511_basic import __Diagnostic_skeleton__, Basic_Diagnostic
 import warnings
+
 
 class TestDiagnosticSkeleton:
     def setup(self):
@@ -25,6 +55,7 @@ class TestDiagnosticSkeleton:
         assert isinstance(self.S.__infiles__, list)
         assert isinstance(self.S.authors, list)
         assert isinstance(self.S.diagname, str)
+        assert self.S.data is None
 
     def test_set_info(self):
         with pytest.warns(UserWarning):
@@ -37,10 +68,6 @@ class TestDiagnosticSkeleton:
     def test_run_diagnostic(self):
         with pytest.warns(UserWarning):
             a = self.S.run_diagnostic()
-
-    def test_file_check(self):
-        with pytest.warns(UserWarning):
-            a = self.S.__file_check__()
 
     def test_do_overview(self):
         with pytest.warns(UserWarning):
@@ -70,10 +97,19 @@ class TestDiagnosticSkeleton:
         with pytest.warns(UserWarning):
             a = self.S.__prepare_report__()
 
+
 class TestBasicDiagnostic:
     def setup(self):
         self.S = Basic_Diagnostic()
 
     def test_init(self):
         self.S.__init__()
-        assert "data" in self.S
+        assert "data" in dir(self.S)
+
+    def test_read_data(self):
+        self.S.read_data()
+        assert isinstance(self.S.data, iris.cube.Cube)
+
+    def test_read_data_mock(self):
+        self.S.read_data_mock()
+        assert isinstance(self.S.data, iris.cube.Cube)
