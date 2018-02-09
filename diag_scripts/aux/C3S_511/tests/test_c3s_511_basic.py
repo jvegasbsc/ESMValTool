@@ -52,3 +52,11 @@ class TestDiagnosticSkeleton:
 
     def test_do_prepare_report(self):
         assert False
+
+    def test_do_report(self):
+        flist = ["diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
+        testdict = {"resolution" : {"dx":"1 deg", "dy":"1 deg"}, "time":{"period":{"start":"2000-01-01", "end":"2000-12-31"}}, "attribute1":"none"}
+
+        do_report(flist, "figure list test")
+        do_report(testdict, "dictionary test")
+

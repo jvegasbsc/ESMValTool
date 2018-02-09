@@ -24,7 +24,7 @@ def do_report(report_data, report_title):
     # add process id to temporary directory names to allow for
     # execution of multiple instances in parallel
 
-    pid = "00000" #str(os.getpgid(0))
+    pid = str(os.getpgid(0))
 
     path_out = work_dir + os.sep + "reporting"    # the final pdf will be put here
     src_dir = path_out + os.sep + "source_" + pid # Sphinx source code directory
@@ -71,14 +71,14 @@ def do_report(report_data, report_title):
             else:
                 outfile.write("* " + key + ": " + report_data[key] + "\n")
 
-    elif instance(report_data, list):
+    elif isinstance(report_data, list):
         MD = METAdata()
 
         # add all plots in plot_list to Sphinx source code file;
         # the figure captions are extracted from the exif file headers
         # of the .png files (if present)
 
-        for f in plot_list:
+        for f in report_data:
 
             filename = f.rpartition(os.sep)[-1]
             filepath = f.rpartition(os.sep)[0]
@@ -90,11 +90,11 @@ def do_report(report_data, report_title):
             except:
                 caption = ""
     
-                outfile.write(".. figure:: " + filename + "\n" 
-                              "   :align:   center" + "\n" 
-                              "   :width:   95%" + "\n\n" 
-                              "   " + caption[0] + "\n"
-                             )
+            outfile.write(".. figure:: " + filename + "\n" 
+                          "   :align:   center" + "\n" 
+                          "   :width:   95%" + "\n\n" 
+                          "   " + caption[0] + "\n"
+                         )
 
     else:
         raise Exception
@@ -110,31 +110,33 @@ def do_report(report_data, report_title):
     os.environ['BUILDDIR'] = bld_dir
 
     # run Sphinx to create a pdf
+    oldpath = os.getcwd()
     os.chdir("doc/reporting")
     os.system("make latexpdf")
+    os.chdir(oldpath)
 
     # move pdf to the output directory and rename to report_xxx.pdf
     pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + ".pdf"
     os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
     # clean up temporary directories
-#    if os.path.exists(src_dir):
-#         # remove if exists
-#         shutil.rmtree(src_dir)
-#    if os.path.exists(bld_dir):
-#         # remove if exists
-#         shutil.rmtree(bld_dir)
+    if os.path.exists(src_dir):
+         # remove if exists
+         shutil.rmtree(src_dir)
+    if os.path.exists(bld_dir):
+         # remove if exists
+         shutil.rmtree(bld_dir)
 
     print("created " + pdfname + "!")
 
 
 # dummy code to test do_report
 
-flist = ["/athome/laue_ax/sphinx/ESMValTool-private/diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
-testdict = {"house" : {"item1":"1"}, "cat":{"Katze":{"cat3":"2", "xx":"yy"}}, "black":"schwarz"}
+flist = ["diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
+testdict = {"resolution" : {"dx":"1 deg", "dy":"1 deg"}, "time":{"period":{"start":"2000-01-01", "end":"2000-12-31"}}, "attribute1":"none"}
 
-#do_report(flist, "mean and variability test")
 do_report(testdict, "dictionary test")
+do_report(flist, "mean and variability test")
 
 
 #def do_smm_report(csv_expert, csv_definitions):
