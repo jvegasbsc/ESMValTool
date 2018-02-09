@@ -13,9 +13,10 @@ from METAdata import METAdata
 # TO DO: get work directory from ESMValTool namelist
 work_dir = "/athome/laue_ax/sphinx/out"
 
-def do_report(plot_list, report_title):
+def do_report(report_data, report_title):
     """
-    - plot_list    is a list of plot file names  (.png, ...) including *full path*
+    - report_data  is a list of plot file names  (.png, ...) including *full path*
+                   OR a dictionary containing strings
     - report_title is a string used as title for the report 
     """
 
@@ -23,7 +24,7 @@ def do_report(plot_list, report_title):
     # add process id to temporary directory names to allow for
     # execution of multiple instances in parallel
 
-    pid = str(os.getpgid(0))
+    pid = "00000" #str(os.getpgid(0))
 
     path_out = work_dir + os.sep + "reporting"    # the final pdf will be put here
     src_dir = path_out + os.sep + "source_" + pid # Sphinx source code directory
@@ -39,37 +40,66 @@ def do_report(plot_list, report_title):
 
     # define filename of Sphinx source code file (.rst format)
     output_file = src_dir + os.sep + "report.rst"  
-    file = open(output_file, "w") 
+    outfile = open(output_file, "w") 
 
     # title (headline)
     my_title = report_title
-    file.write(my_title + "\n")
-    file.write("=" * len(my_title) + "\n\n")
+    outfile.write(my_title + "\n")
+    outfile.write("=" * len(my_title) + "\n\n")
+
+    # if the input data are a dictionary, we create a bullet point list
+    # from all key value pairs
+
+    if isinstance(report_data, dict):
+
+    # if the input data are a list of filenames (plots), we simply put all
+    # figures with their corresponding caption read from the plot meta data
+    # into the report
+
+        for key in report_data:
+            if isinstance(report_data[key], dict):
+                outfile.write("* " + key + "\n\n")
+                for key2 in report_data[key]:
+                    if isinstance(report_data[key][key2], dict):
+                        outfile.write("  * " + key2 + "\n\n")
+                        for key3 in report_data[key][key2]:
+                            outfile.write("    * " + key3 + ": " + report_data[key][key2][key3] + "\n")
+                        outfile.write("\n")
+                    else:
+                        outfile.write("  * " + key2 + ": " + report_data[key][key2] + "\n")
+                outfile.write("\n")
+            else:
+                outfile.write("* " + key + ": " + report_data[key] + "\n")
+
+    elif instance(report_data, list):
+        MD = METAdata()
+
+        # add all plots in plot_list to Sphinx source code file;
+        # the figure captions are extracted from the exif file headers
+        # of the .png files (if present)
+
+        for f in plot_list:
+
+            filename = f.rpartition(os.sep)[-1]
+            filepath = f.rpartition(os.sep)[0]
+
+            shutil.copy(f, src_dir)
+
+            try:
+                caption = MD.read(f).get_dict()['ESMValTool']['caption']
+            except:
+                caption = ""
     
-    MD = METAdata()
+                outfile.write(".. figure:: " + filename + "\n" 
+                              "   :align:   center" + "\n" 
+                              "   :width:   95%" + "\n\n" 
+                              "   " + caption[0] + "\n"
+                             )
 
-    # add all plots in plot_list to Sphinx source code file;
-    # the figure captions are extracted from the exif file headers
-    # of the .png files (if present)
+    else:
+        raise Exception
 
-    for f in plot_list:
-
-        filename = f.rpartition(os.sep)[-1]
-        filepath = f.rpartition(os.sep)[0]
-
-        shutil.copy(f, src_dir)
-
-        try:
-            caption = MD.read(f).get_dict()['ESMValTool']['caption']
-        except:
-            caption = ""
-    
-        file.write(".. figure:: " + filename + "\n" 
-                 "   :align:   center" + "\n" 
-                 "   :width:   95%" + "\n\n" 
-                 "   " + caption[0] + "\n"
-                  )
-    file.close() 
+    outfile.close() 
 
     # copy Sphinx configuration and index file to temporary source directory
     shutil.copy("doc/reporting/source/conf.py", src_dir)
@@ -88,12 +118,12 @@ def do_report(plot_list, report_title):
     os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
     # clean up temporary directories
-    if os.path.exists(src_dir):
-         # remove if exists
-         shutil.rmtree(src_dir)
-    if os.path.exists(bld_dir):
-         # remove if exists
-         shutil.rmtree(bld_dir)
+#    if os.path.exists(src_dir):
+#         # remove if exists
+#         shutil.rmtree(src_dir)
+#    if os.path.exists(bld_dir):
+#         # remove if exists
+#         shutil.rmtree(bld_dir)
 
     print("created " + pdfname + "!")
 
@@ -101,8 +131,10 @@ def do_report(plot_list, report_title):
 # dummy code to test do_report
 
 flist = ["/athome/laue_ax/sphinx/ESMValTool-private/diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
+testdict = {"house" : {"item1":"1"}, "cat":{"Katze":{"cat3":"2", "xx":"yy"}}, "black":"schwarz"}
 
-do_report(flist, "mean and variability test")
+#do_report(flist, "mean and variability test")
+do_report(testdict, "dictionary test")
 
 
 #def do_smm_report(csv_expert, csv_definitions):
