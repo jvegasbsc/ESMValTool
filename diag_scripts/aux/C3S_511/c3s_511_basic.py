@@ -208,6 +208,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
     def __do_overview__(self):
         
+        list_of_plots=[]
+        
         missing_values = self.sp_data.copy()
         missing_values.data = np.ones_like(missing_values.data)
         
@@ -215,9 +217,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         missing_values.data = missing_values.data / \
             float(len(self.sp_data.coord("time").points))
             
-        
+        filename = self.__plot_dir__ + os.sep + "test_plot.png"
+        list_of_plots.append(filename)
         x=Plot2D(missing_values)
-        x.plot.show()
+        print(filename)
+        x.plot().savefig(filename)
         
         self.__prepare_report__()
         warnings.warn("Implementation Warning", UserWarning)
