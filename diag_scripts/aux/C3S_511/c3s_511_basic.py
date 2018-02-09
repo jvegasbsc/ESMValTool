@@ -6,6 +6,7 @@ import iris
 import os
 import sys
 import numpy as np
+import random, string
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
@@ -208,25 +209,41 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
     def __do_overview__(self):
         
-        missing_values = self.sp_data.copy()
-        missing_values.data = np.ones_like(missing_values.data)
+        # TODO all the other plots
         
+        list_of_plots=[]
+        
+        missing_values = self.sp_data.copy()
+        missing_values.data = np.ma.masked_array(missing_values.data,mask=np.isnan(missing_values.data))
+        missing_values.data = missing_values.data*0.+1.
         missing_values = missing_values.collapsed("time",iris.analysis.SUM)
         missing_values.data = missing_values.data / \
             float(len(self.sp_data.coord("time").points))
             
-        
+        filename = self.__plot_dir__ + os.sep + "perc_avail_plot.png"
+        list_of_plots.append(filename)
         x=Plot2D(missing_values)
-        x.plot.show()
+        x.plot().savefig(filename)
         
-        self.__prepare_report__()
-        warnings.warn("Implementation Warning", UserWarning)
+        self.__prepare_report__(plot_list=list_of_plots, filename="perc_avail_plot")
 
         return
-
-    def __do_mean_var__(self):
-
-        # Plot2D(self.slice)
+    
+    def __prepare_report__(self,**kwargs):
+        
+        # TODO specify sphinx structure
+        
+        plot_list = kwargs.get('plot_list', [])
+        if not isinstance(plot_list, list):
+            raise TypeError("plot_list", "Element is not a list.")
+            
+        rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)])
+            
+        filename = kwargs.get('filename', rand_str(10))
+        if not isinstance(filename, str):
+            raise TypeError("filename", "Element is not a string.")
+            
+        report(plot_list,filename)
         return
 
     def write_reports(self):
