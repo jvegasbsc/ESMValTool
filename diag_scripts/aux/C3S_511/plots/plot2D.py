@@ -2,14 +2,17 @@
 # -*- coding: utf-8 -*-
 
 
-import iris
-import iris.plot as iplt
-import iris.quickplot as qplt
 import os
+import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import mpl_toolkits.basemap as bm
+import iris
+import iris.plot as iplt
+import iris.quickplot as qplt
+import cf_units as units
 
 
 class Plot2D(object):
@@ -26,25 +29,23 @@ class Plot2D(object):
     LONS = ['longitude']    # accepted lon names
     TIME = ['time']         # accepted time names
     GRIDSPEC_LENGTH = 5     # size of the matplotlib gridspec
-    FILENAME = "test_plot.png"
+    MPLSTYLE = 'diag_scripts/aux/C3S_511/plots/default.mplstyle'
 
-    def __init__(self, cube, file_path, **kwargs):
+    def __init__(self, cube, **kwargs):
         """
         Arguments
-            cube      : iris cube
-            file_path : path to the output file
+            cube : iris cube
 
             kwargs:
-                x_line_plot : Add line plot below averaging over x-axis
-                              ('top', 'bottom', None)
-                y_line_plot : Add line plot on right averaging over y-axis
-                              ('left', 'right', None)
+                summary_plot : Add summary line plot (True, False)
 
                 TODO:
+                    optional summary placement
+                    check kwargs
                     swap x/y axis
 
         Description
-            Initializes the class and performs the actual plotting.
+            Initializes the class.
 
         Modification history
             20180207-A_schl_ma: written
@@ -56,28 +57,15 @@ class Plot2D(object):
         self.cube = iris.util.squeeze(cube)
         if (self.cube.ndim != 2):
             raise TypeError("Invalid input: expected 2-dimensional iris cube")
-        dir = os.path.dirname(file_path)
-        if (not os.path.isdir(dir)):
-            try:
-                os.makedirs(dir)
-            except OSError:
-                raise OSError("Invalid input: Cannot write to " +
-                              "{0}".format(dir))
-        self.file_path = file_path
 
         # Process kwargs
-        self.xline = None
-        try:
-            if (kwargs['x_line_plot'] is not None):
-                self.xline = kwargs['x_line_plot']
-        except KeyError:
-            pass
-        self.yline = None
-        try:
-            if (kwargs['y_line_plot'] is not None):
-                self.yline = kwargs['y_line_plot']
-        except KeyError:
-            pass
+        if ('summary_plot' in kwargs):
+            if (not isinstance(kwargs['summary_plot'], bool)):
+                raise TypeError("Invalid input: summary_plot should be " +
+                                "True or False")
+            self.summary_plot = kwargs['summary_plot']
+        else:
+            self.summary_plot = False
 
         # Get dimension names
         dim_names = [dim.standard_name for dim in self.cube.dim_coords]
@@ -102,32 +90,46 @@ class Plot2D(object):
 
         # Lat/lon plot
         if (self.lat_var is not None and self.lon_var is not None):
-            self.x = self.lon_var
-            self.y = self.lat_var
+            self.plot_type = 'latlon'
+            if (self.summary_plot):
+                self.summary_location = 'right'
+                self.colorbar = 'horizontal'
+            else:
+                self.colorbar = 'vertical'
 
         # Lat/time plot
         elif (self.lat_var is not None and self.time_var is not None):
-            self.x = self.time_var
-            self.y = self.lat_var
+            self.plot_type = 'lattime'
+            if (self.summary_plot):
+                self.summary_location = 'right'
+                self.colorbar = 'horizontal'
+            else:
+                self.colorbar = 'vertical'
 
         # Lon/time plot
-        elif (self.lat_var is not None and self.lon_var is not None):
-            self.x = self.lon_var
-            self.y = self.time_var
+        elif (self.lon_var is not None and self.time_var is not None):
+            self.plot_type = 'lontime'
+            if (self.summary_plot):
+                self.summary_location = 'bottom'
+            self.colorbar = 'vertical'
 
         # Default case
         else:
             raise TypeError("Invalid input: cube does not contain supported " +
                             "dimensions")
 
-        self.__plot()
+        # Setup matplotlib
+        plt.style.use(self.__class__.MPLSTYLE)
 
 ###############################################################################
 
-    def __plot(self):
+    def plot(self):
         """
         Arguments
             None
+
+        Returns
+            Matplotlib figure instance
 
         Description
             Actual plotting routine
@@ -136,33 +138,69 @@ class Plot2D(object):
             20180207-A_schl_ma: written
         """
 
-        # Contour plot
-        G = gridspec.GridSpec(self.__class__.GRIDSPEC_LENGTH,
-                              self.__class__.GRIDSPEC_LENGTH)
-        ax_main = plt.subplot(G[1:-1, 1:-1])
-        qplt.contourf(self.cube)
+        # Summary plot yes/no
+        if (not self.summary_plot):
+            G = gridspec.GridSpec(1, 1)
+        elif (self.summary_location == 'right'):
+            G = gridspec.GridSpec(2, 2, width_ratios=[4, 1],
+                                  height_ratios=[5, 1])
+        elif (self.summary_location == 'bottom'):
+            G = gridspec.GridSpec(2, 2, width_ratios=[5, 1],
+                                  height_ratios=[4, 1])
 
-        # If lat and lon, plot map
-        if (self.x == self.lon_var and self.y == self.lat_var):
-            plt.gca().coastlines()
-
-        # Line plots
-        if (self.xline == 'top'):
-            ax_xline = plt.subplot(G[0, 1:-1])
-        elif (self.xline == 'bottom'):
-            ax_xline = plt.subplo(G[-1, 1:-1])
-        elif (self.xline is None):
-            ax_xline = None
+        # Main plot
+        plt.subplot(G[0])
+        if (self.plot_type == 'latlon'):
+            x = self.cube.coord(self.lon_var).points
+            y = self.cube.coord(self.lat_var).points
+            z = self.cube.data
+            collapse = self.lon_var
+            line_plot_axes = 1
+            cb_axes = 2
+            m = bm.Basemap(projection='cyl', llcrnrlat=-90.0, urcrnrlat=90.0,
+                           llcrnrlon=0.0, urcrnrlon=360.0, lat_ts=20.0,
+                           resolution='c')
+            m.drawcoastlines()
+            x, y = m(*np.meshgrid(x, y))
+            ax_main = m.contourf(x, y, z)
         else:
-            raise ValueError("Invalid input: x_line_plot needs to be " + \
-                             "'top', 'bottom' or None")
+            if (self.plot_type == 'lattime'):
+                x = self.cube.coord(self.time_var).points
+                y = self.cube.coord(self.lat_var).points
+                z = self.cube.data.T
+                collapse = self.time_var
+                line_plot_axes = 1
+                cb_axes = 2
+            elif (self.plot_type == 'lontime'):
+                x = self.cube.coord(self.lon_var).points
+                y = self.cube.coord(self.time_var).points
+                z = self.cube.data
+                collapse = self.time_var
+                line_plot_axes = 2
+                cb_axes = 1
+            ax_main = plt.contourf(x, y, z)
 
-        # Kwargs
-        if False:
-            if (kwargs['x_line_plot'] is not None):
-                cube_line = cube.collapsed(lon, iris.analysis.MEAN)
-                if (kwargs['x_line_plot'] == 'top'):
-                    plt.subplot(332)
+        # Line plot
+        if (self.summary_plot):
+            ax_cb = plt.subplot(G[cb_axes])
+            cb = plt.colorbar(ax_main, cax=ax_cb, orientation=self.colorbar)
+            plt.subplot(G[line_plot_axes])
+            if (collapse == self.lat_var):
+                grid_areas = iris.analysis.cartography.area_weights(self.cube)
+            else:
+                grid_areas = None
+            cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
+                                            weights=grid_areas)
 
-        plt.savefig(self.file_path)
-        plt.clf()
+            if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
+                x = cube_line
+                y = cube_line.coord(self.lat_var)
+            else:
+                x = cube_line.coord(self.lon_var)
+                y = cube_line
+            ax_line = iplt.plot(x, y)
+        else:
+            cb = plt.colorbar(ax_main, orientation=self.colorbar)
+
+        plt.tight_layout()
+        return plt.gcf()
