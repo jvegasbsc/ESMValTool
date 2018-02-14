@@ -7,9 +7,10 @@ Created on Fri Feb 09 09:29:45 2018
 
 import csv
 import numpy as np
+from get_metadata_to_rst import do_report
 
 
-def create_esmeval_dict(esm_eval_csv, ecv_name):
+def create_esmeval_dict(esm_eval_csv, ecv_name, work_dir):
     """
     - esm_eval_csv    is a csv file containing the information about the ESM
                       evaluation assessment
@@ -32,6 +33,6 @@ def create_esmeval_dict(esm_eval_csv, ecv_name):
             for num_keys in range(len(my_list[0])):
                 esm_eval_dict[my_list[0][num_keys]] = result[num_entries][num_keys]
                 
-    do_report(esm_eval_dict,"ESM Evaluation")
+    do_report(esm_eval_dict,"ESM Evaluation", work_dir)
     
 #create_esmeval_dict("D:\project\ESM_Eval_list.csv", 'ozone')

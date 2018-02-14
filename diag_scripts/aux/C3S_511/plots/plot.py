@@ -14,7 +14,7 @@ import iris.plot as iplt
 import iris.quickplot as qplt
 
 
-MPLSTYLE = 'default.mplstyle'
+MPLSTYLE = os.path.dirname(os.path.realpath(__file__)) + os.sep + 'default.mplstyle'
 
 
 class PlotHist(object):

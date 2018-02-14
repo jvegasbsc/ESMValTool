@@ -50,7 +50,7 @@ def main(project_info):
     verbosity = E.get_verbosity()
     diag_script = E.get_diag_script_name()
 
-# TODO Enter QA4ECV references
+# TODO Enter C3S_511 references
 #    E.write_references(diag_script,              # diag script name
 #                       ["A_muel_bn"],            # authors
 #                       [""],                     # contributors
@@ -67,7 +67,6 @@ def main(project_info):
     Diag.set_info(proj_info=E)
     Diag.read_data()
     Diag.run_diagnostic()
-    Diag.write_reports()
 
    
     print('>>>>>>>> ENDED SUCESSFULLY!! <<<<<<<<<<<<')

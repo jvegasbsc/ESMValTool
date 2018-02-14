@@ -11,9 +11,9 @@ from METAdata import METAdata
 #import csv
 
 # TO DO: get work directory from ESMValTool namelist
-work_dir = "/athome/laue_ax/sphinx/out"
+#w ork_dir = "/athome/laue_ax/sphinx/out"
 
-def do_report(report_data, report_title):
+def do_report(report_data, report_title, work_dir):
     """
     - report_data  is a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
@@ -88,7 +88,9 @@ def do_report(report_data, report_title):
             try:
                 caption = MD.read(f).get_dict()['ESMValTool']['caption']
             except:
-                caption = ""
+                caption = ["Error: empty caption in " + filename]
+                
+            print(caption)
     
             outfile.write(".. figure:: " + filename + "\n" 
                           "   :align:   center" + "\n" 
@@ -132,11 +134,11 @@ def do_report(report_data, report_title):
 
 # dummy code to test do_report
 
-flist = ["diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
-testdict = {"resolution" : {"dx":"1 deg", "dy":"1 deg"}, "time":{"period":{"start":"2000-01-01", "end":"2000-12-31"}}, "attribute1":"none"}
-
-do_report(testdict, "dictionary test")
-do_report(flist, "mean and variability test")
+#flist = ["diag_scripts/aux/C3S_511/example_images/albedo_QA4ECV_all_models_regionalized_smean_ts.png"]
+#testdict = {"resolution" : {"dx":"1 deg", "dy":"1 deg"}, "time":{"period":{"start":"2000-01-01", "end":"2000-12-31"}}, "attribute1":"none"}
+#
+#do_report(testdict, "dictionary test")
+#do_report(flist, "mean and variability test")
 
 
 #def do_smm_report(csv_expert, csv_definitions):

@@ -14,10 +14,9 @@ import c3s_511_util as utils
 from customErrors import ConfigurationError, PathError, EmptyContentError
 import warnings
 from get_metadata_to_rst import do_report as report
-from plot2D import Plot2D
+from plot import Plot2D
 from esmval_lib import ESMValProject
-
-import inspect as INS
+from ESMValMD import ESMValMD
 
 
 # All packages checked
@@ -67,7 +66,7 @@ class __Diagnostic_skeleton__(object):
         
         self.authors = ["A_muel_bn", "A_hass_bg", "A_laue_ax",
                         "A_broe_bj", "tbd"]  # TODO fill in
-        self.diagname = "c3s_511_basic.py"
+        self.diagname = "c3s_511_skeleton.py"
 
         self.sp_data = None
 
@@ -130,9 +129,10 @@ class __Diagnostic_skeleton__(object):
         warnings.warn("Implementation Warning", UserWarning)
         return
 
-    def write_reports(self):
-        warnings.warn("Implementation Warning", UserWarning)
-        return
+#    def write_reports(self):
+#        #currently done with preparation
+#        warnings.warn("Implementation Warning", UserWarning)
+#        return
 
 
 class Basic_Diagnostic(__Diagnostic_skeleton__):
@@ -145,6 +145,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
+        
+        self.diagname = "c3s_511_basic.py"
 
         #        self.__config__ = utils.__getInfoFromFile__("")
 
@@ -188,16 +190,18 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__varname__ = self.__project_info__.get_currVars()  # default value
         if not len(self.__varname__)==1:
             raise EmptyContentError("self.__varname__", "Element is of wrong length.")
-        self.__output_type__ = 'png'  # default ouput file type
+        else:
+            self.__varname__ = self.__varname__[0]
+        self.__output_type__ = 'png'  # default ouput file type for the basic diagnostics
         self.__regions__ = {"example": (10, 20, -10, -20)}  # default regions
 
         self.__verbosity_level__ = self.__project_info__.get_verbosity() # default information during runtime
         self.__debug_info__ = "No debug info"  # default debug information
-        self.__config__ = self.__project_info__.get_configfile()  # default configuration input
-
+        self.__config__ = utils.__getInfoFromFile__(self.__project_info__.get_configfile())  # set configuration input
+        
         # for metadata
-        self.__basetags__ = self.__project_info__.get_all_tags()
-        file_info = self.__project_info__.get_all_clim_models(variables=self.__varname__[0])
+        self.__basetags__ = self.__project_info__.get_all_tags() + [self.__varname__]
+        file_info = self.__project_info__.get_all_clim_models(variables=self.__varname__)
         self.__infile__ = file_info.keys()
         if not len(self.__infile__)==1:
             raise EmptyContentError("self.__infile__", "Element is of wrong length.")
@@ -205,27 +209,92 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             self.__infile__ = self.__infile__[0]
             
         self.__inpath__ = file_info[self.__infile__]["dir"]
+        print(file_info[self.__infile__])
+        self.__time_period__ = "-".join([file_info[self.__infile__]["start_year"],file_info[self.__infile__]["end_year"]])
+        self.__dataset_id__ = [file_info[self.__infile__]["name"], file_info[self.__infile__]["case_name"], file_info[self.__infile__]["ensemble"], file_info[self.__infile__]["var"]]
+        
+        self.__basic_filename__ = "_".join(self.__dataset_id__ + [self.__time_period__])
         
         
     def __do_overview__(self):
+        
+        this_file = "overview"
         
         # TODO all the other plots
         
         list_of_plots=[]
         
-        missing_values = self.sp_data.copy()
-        missing_values.data = np.ma.masked_array(missing_values.data,mask=np.isnan(missing_values.data))
-        missing_values.data = missing_values.data*0.+1.
-        missing_values = missing_values.collapsed("time",iris.analysis.SUM)
-        missing_values.data = missing_values.data / \
+        # Lat lon plot of fractional available measurements
+        missing_values_2D = self.sp_data.copy()
+        missing_values_2D.data = np.ma.masked_array(missing_values_2D.data, mask=np.isnan(missing_values_2D.data))
+        missing_values_2D.data = missing_values_2D.data*0.+1.
+        missing_values_2D = missing_values_2D.collapsed("time", iris.analysis.SUM)
+        missing_values_2D.data = missing_values_2D.data / \
             float(len(self.sp_data.coord("time").points))
-            
-        filename = self.__plot_dir__ + os.sep + "perc_avail_plot.png"
+         
+        # plotting routine
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lat_lon" + "." + self.__output_type__
         list_of_plots.append(filename)
-        x=Plot2D(missing_values)
-        x.plot().savefig(filename)
+        x=Plot2D(missing_values_2D)
+        x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
         
-        self.__prepare_report__(plot_list=list_of_plots, filename="perc_avail_plot")
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_overview'],
+                 str('Overview on latitude/longitude availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'fravlalo' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        # Lat time plot of fractional available measurements
+        missing_values_Lati = self.sp_data.copy()
+        missing_values_Lati.data = np.ma.masked_array(missing_values_Lati.data, mask=np.isnan(missing_values_Lati.data))
+        missing_values_Lati.data = missing_values_Lati.data*0.+1.
+        missing_values_Lati = missing_values_Lati.collapsed("longitude", iris.analysis.SUM)
+        missing_values_Lati.data = missing_values_Lati.data / \
+            float(len(self.sp_data.coord("longitude").points))
+         
+        # plotting routine
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lat_time" + "." + self.__output_type__
+        list_of_plots.append(filename)
+        x=Plot2D(missing_values_Lati)
+        x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_overview'],
+                 str('Overview on latitude/time availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'fravlati' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        # Lon time plot of fractional available measurements
+        missing_values_Loti = self.sp_data.copy()
+        missing_values_Loti.data = np.ma.masked_array(missing_values_Loti.data, mask=np.isnan(missing_values_Loti.data))
+        missing_values_Loti.data = missing_values_Loti.data*0.+1.
+        missing_values_Loti = missing_values_Loti.collapsed("latitude", iris.analysis.SUM)
+        missing_values_Loti.data = missing_values_Loti.data / \
+            float(len(self.sp_data.coord("latitude").points))
+         
+        # plotting routine
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lon_time" + "." + self.__output_type__
+        list_of_plots.append(filename)
+        x=Plot2D(missing_values_Loti)
+        x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_overview'],
+                 str('Overview on longitude/time availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'fravloti' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        self.__prepare_report__(plot_list=list_of_plots, filename=this_file.upper())
+
 
         return
     
@@ -243,10 +312,5 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not isinstance(filename, str):
             raise TypeError("filename", "Element is not a string.")
             
-        report(plot_list,filename)
-        return
-
-    def write_reports(self):
-        #        print report
-        #        report(["/media/bmueller/Work/ESMVAL_res/work/reports/sphinx/source/latlon.png"],"test")
+        report(plot_list,filename,self.__work_dir__)
         return
