@@ -42,7 +42,7 @@ class PlotHist(object):
 
         # Check arguments
         if isinstance(data, iris.cube.Cube):
-            self.name = data.standard_name
+            self.name = [data.standard_name if data.standard_name is not None else data.attributes["comment"]][0]
             self.units = ' [' + str(data.units) + ']'
             self.data = np.ravel(data.data)
         elif isinstance(data, np.ndarray):
@@ -226,7 +226,7 @@ class Plot2D(object):
         self.cube = iris.util.squeeze(cube)
         if (self.cube.ndim != 2):
             raise TypeError("Invalid input: expected 2-dimensional iris cube")
-        self.name = cube.standard_name
+        self.name = [cube.standard_name if cube.standard_name is not None else cube.attributes["comment"]][0]
         self.units = ' [' + str(cube.units) + ']'
 
 

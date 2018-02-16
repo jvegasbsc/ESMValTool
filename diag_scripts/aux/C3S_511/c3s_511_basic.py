@@ -7,14 +7,20 @@ import os
 import sys
 import numpy as np
 import random, string
+import collections
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
 import c3s_511_util as utils
-from customErrors import ConfigurationError, PathError, EmptyContentError
+from customErrors import ImplementationError, ConfigurationError, PathError, EmptyContentError
 import warnings
 from get_metadata_to_rst import do_report as report
-from plot import Plot2D
+from get_metadata_to_rst import do_smm_table
+from get_metadata_to_rst import do_gcos_table
+from plot import Plot2D, PlotHist
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 
@@ -65,19 +71,18 @@ class __Diagnostic_skeleton__(object):
         self.report_dict = dict()
         
         self.authors = ["A_muel_bn", "A_hass_bg", "A_laue_ax",
-                        "A_broe_bj", "tbd"]  # TODO fill in
+                        "A_broe_bj", "A_mass_fr", "A_nico_nd",
+                        "A_schl_mn", "A_bock_ls"]  # TODO fill in
         self.diagname = "c3s_511_skeleton.py"
 
         self.sp_data = None
 
     def set_info(self, **kwargs):
-        # raise ImplementationError("set_info","This method has to be implemented.")
-        warnings.warn("Implementation Warning", UserWarning)
+        raise ImplementationError("set_info","This method has to be implemented.")
         return
 
     def read_data(self):
-        warnings.warn("Implementation Warning", UserWarning)
-
+        raise ImplementationError("read_data","This method has to be implemented.")
         return
 
     def run_diagnostic(self):
@@ -89,40 +94,33 @@ class __Diagnostic_skeleton__(object):
         self.__do_gcos_requirements__()
 
     def __do_overview__(self):
-        self.__prepare_report__()
-        warnings.warn("Implementation Warning", UserWarning)
-
+#        self.__prepare_report__()
+        raise ImplementationError("__do_overview__","This method has to be implemented.")
         return
 
     def __do_mean_var__(self):
-        
-        self.__prepare_report__()
+#        self.__prepare_report__()
         warnings.warn("Implementation Warning", UserWarning)
-
         return
 
     def __do_trends__(self):
-        self.__prepare_report__()
+#        self.__prepare_report__()
         warnings.warn("Implementation Warning", UserWarning)
-
         return
 
     def __do_extremes__(self):
-        self.__prepare_report__()
+#        self.__prepare_report__()
         warnings.warn("Implementation Warning", UserWarning)
-
         return
 
     def __do_maturity_matrix__(self):
-        self.__prepare_report__()
-        warnings.warn("Implementation Warning", UserWarning)
-
+#        self.__prepare_report__()
+        raise ImplementationError("__do_maturity_matrix__","This method has to be implemented.")
         return
 
     def __do_gcos_requirements__(self):
-        self.__prepare_report__()
-
-        warnings.warn("Implementation Warning", UserWarning)
+#        self.__prepare_report__()
+        raise ImplementationError("__do_gcos_requirements__","This method has to be implemented.")
         return
 
     def __prepare_report__(self):
@@ -145,36 +143,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
-        
         self.diagname = "c3s_511_basic.py"
 
-        #        self.__config__ = utils.__getInfoFromFile__("")
-
-    #        self.data = iris.load_cube("/media/bmueller/Work/ESMVAL_res/work/climo/CMIP5/CMIP5_Amon_historical_MPI-ESM-P_r1i1p1_T2Ms_ts_1991-2005.nc")
-    #        self.slice = self.data.collapsed("time",iris.analysis.MEAN)
-
-    # self.slice = iris.load_cube('/media/bmueller/Work/GIT/ESMValTool-private_base/diag_scripts/aux/C3S_511/plots/test_latlon.nc')
-
-    def read_data(self):
-
-        if os.path.isfile(self.__infile__):
-            self.sp_data = iris.load_cube(self.__infile__)
-        else:
-            self.read_data_mock()
-            
-            print("self.__infile__ was not found! Generic data used instead.")
-#            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
-            
-        return
-
-    def read_data_mock(self):
-        """
-        reads artificial data for testing uses
-        TODO: Remove after loading is tested.
-        """
-        datadir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/testdata")
-        self.sp_data = iris.load_cube(
-            os.path.join(datadir, "test.nc"))
 
     def set_info(self, **kwargs):
         """
@@ -209,11 +179,33 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             self.__infile__ = self.__infile__[0]
             
         self.__inpath__ = file_info[self.__infile__]["dir"]
-        print(file_info[self.__infile__])
         self.__time_period__ = "-".join([file_info[self.__infile__]["start_year"],file_info[self.__infile__]["end_year"]])
         self.__dataset_id__ = [file_info[self.__infile__]["name"], file_info[self.__infile__]["case_name"], file_info[self.__infile__]["ensemble"], file_info[self.__infile__]["var"]]
         
         self.__basic_filename__ = "_".join(self.__dataset_id__ + [self.__time_period__])
+
+
+    def read_data(self):
+
+        if os.path.isfile(self.__infile__):
+            self.sp_data = iris.load_cube(self.__infile__)
+        else:
+            self.__read_data_mock__()
+            
+            print("self.__infile__ was not found! Generic data used instead.")
+#            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
+            
+        return
+
+
+    def __read_data_mock__(self):
+        """
+        reads artificial data for testing uses
+        TODO: Remove after loading is tested.
+        """
+        datadir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/testdata")
+        self.sp_data = iris.load_cube(
+            os.path.join(datadir, "test.nc"))       
         
         
     def __do_overview__(self):
@@ -258,8 +250,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # plotting routine
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lat_time" + "." + self.__output_type__
         list_of_plots.append(filename)
-        x=Plot2D(missing_values_Lati)
-        x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
+        x = Plot2D(missing_values_Lati)
+        fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        fig.savefig(filename)
+        plt.close(fig)
         
         ESMValMD("meta",
                  filename,
@@ -282,7 +276,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lon_time" + "." + self.__output_type__
         list_of_plots.append(filename)
         x=Plot2D(missing_values_Loti)
-        x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
+        fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        fig.savefig(filename)
+        plt.close(fig)
         
         ESMValMD("meta",
                  filename,
@@ -293,7 +289,60 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
-        self.__prepare_report__(plot_list=list_of_plots, filename=this_file.upper())
+        # Lon time plot of fractional available measurements
+        all_data = self.sp_data.copy()
+        all_data.data = np.ma.masked_array(all_data.data, mask=np.isnan(all_data.data))
+         
+        # plotting routine
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hist_all_vals" + "." + self.__output_type__
+        list_of_plots.append(filename)
+        x=PlotHist(all_data)
+        fig = x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        fig.savefig(filename)
+        plt.close(fig)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_overview'],
+                 str('Full temporal and spatial histogram of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'histall' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        # produce reports
+        self.__prepare_report__(content=list_of_plots, filename=this_file.upper())
+
+
+        # dimension information
+        lon_range = (self.sp_data.coord("longitude").points)
+        lat_range = (self.sp_data.coord("latitude").points)
+        tim_range = (self.sp_data.coord("time").points)
+        
+        lon_range_spec = utils.__minmeanmax__(lon_range)
+        lat_range_spec = utils.__minmeanmax__(lat_range)
+        tim_range_spec = utils.__minmeanmax__(tim_range)
+
+
+        lon_freq = np.diff(lon_range)
+        lat_freq = np.diff(lat_range)
+        tim_freq = np.diff(tim_range)
+        
+        lon_freq_spec = utils.__minmeanmax__(lon_freq)
+        lat_freq_spec = utils.__minmeanmax__(lat_freq)
+        tim_freq_spec = utils.__minmeanmax__(tim_freq)
+        
+        overview_dict=collections.OrderedDict()
+        
+        overview_dict.update({'longitude range [degrees]': collections.OrderedDict([("min",str(lon_range_spec[0])), ("max",str(lon_range_spec[2]))])})
+        overview_dict.update({'longitude frequency [degrees]': collections.OrderedDict([("min",str(lon_freq_spec[0])), ("average",str(lon_freq_spec[1])), ("max",str(lon_freq_spec[2]))])})
+        overview_dict.update({'latitude range [degrees]': collections.OrderedDict([("min",str(lat_range_spec[0])), ("max",str(lat_range_spec[2]))])})
+        overview_dict.update({'latitude frequency [degrees]': collections.OrderedDict([("min",str(lat_freq_spec[0])), ("average",str(lat_freq_spec[1])), ("max",str(lat_freq_spec[2]))])})
+        overview_dict.update({'temporal range [days since 01/01/1970]': collections.OrderedDict([("min",str(tim_range_spec[0])), ("max",str(tim_range_spec[2]))])})
+        overview_dict.update({'temporal frequency [days]': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(tim_freq_spec[1])), ("max",str(tim_freq_spec[2]))])})
+        
+        # produce reports
+        self.__prepare_report__(content=overview_dict, filename=this_file.upper()+str(2))
 
 
         return
@@ -302,9 +351,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         # TODO specify sphinx structure
         
-        plot_list = kwargs.get('plot_list', [])
-        if not isinstance(plot_list, list):
-            raise TypeError("plot_list", "Element is not a list.")
+        content = kwargs.get('content', [])
+        if not isinstance(content, (list, dict)):
+            raise TypeError("content", "Element is not a list, nor a dict.")
             
         rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)])
             
@@ -312,5 +361,32 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not isinstance(filename, str):
             raise TypeError("filename", "Element is not a string.")
             
-        report(plot_list,filename,self.__work_dir__)
+        report(content,filename,self.__work_dir__)
+        return
+    
+    
+    def __do_maturity_matrix__(self):
+        
+        this_file = "System maturity matrix"
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_file.split()) + "." + self.__output_type__
+        fig = do_smm_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_smm_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/smm_definitions.csv")
+        fig.savefig(filename)
+        plt.close(fig)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['C3S_SMM'],
+                 str(this_file + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'SMM' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        self.__prepare_report__(content=[filename], filename="".join(this_file.upper().split()))
+        
+        return
+    
+    
+    def __do_gcos_requirements__(self):
+        do_gcos_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv",self.__work_dir__)
         return
