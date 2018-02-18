@@ -16,14 +16,13 @@ sys.path.append(os.path.abspath("./diag_scripts"))
 from METAdata import METAdata
 #import csv
 
-# TO DO: get work directory from ESMValTool namelist
-#w ork_dir = "/athome/laue_ax/sphinx/out"
-
 def do_report(report_data, report_title, work_dir):
     """
-    - report_data  is a list of plot file names  (.png, ...) including *full path*
+    - report_data  a dictionary of a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
     - report_title is a string used as title for the report 
+    
+    Updated: February 18th, 2018 (B. Mueller)
     """
 
     # define output and temporary directories for Sphinx (source, build);
@@ -52,58 +51,90 @@ def do_report(report_data, report_title, work_dir):
     my_title = report_title
     outfile.write(my_title + "\n")
     outfile.write("=" * len(my_title) + "\n\n")
-
-    # if the input data are a dictionary, we create a bullet point list
-    # from all key value pairs
-
+    
+    #search for text and plots instances in report_data
+    
     if isinstance(report_data, dict):
+        
+        if "text" in report_data.keys():
 
-    # if the input data are a list of filenames (plots), we simply put all
-    # figures with their corresponding caption read from the plot meta data
-    # into the report
+            # if the input data are a dictionary, we create a bullet point list
+            # from all key value pairs
+            
+            this_title = "General Information:"
+            outfile.write(this_title + "\n")
+            outfile.write("-" * len(this_title) + "\n\n")
 
-        for key in report_data:
-            if isinstance(report_data[key], dict):
-                outfile.write("* " + key + "\n\n")
-                for key2 in report_data[key]:
-                    if isinstance(report_data[key][key2], dict):
-                        outfile.write("  * " + key2 + "\n\n")
-                        for key3 in report_data[key][key2]:
-                            outfile.write("    * " + key3 + ": " + report_data[key][key2][key3] + "\n")
+            if isinstance(report_data["text"], dict):
+        
+            # if the input data are a list of filenames (plots), we simply put all
+            # figures with their corresponding caption read from the plot meta data
+            # into the report
+        
+                for key in report_data["text"]:
+                    if isinstance(report_data["text"][key], dict):
+                        outfile.write("* " + key + "\n\n")
+                        for key2 in report_data["text"][key]:
+                            if isinstance(report_data["text"][key][key2], dict):
+                                outfile.write("  * " + key2 + "\n\n")
+                                for key3 in report_data["text"][key][key2]:
+                                    outfile.write("    * " + key3 + ": " + report_data["text"][key][key2][key3] + "\n")
+                                outfile.write("\n")
+                            else:
+                                outfile.write("  * " + key2 + ": " + report_data["text"][key][key2] + "\n")
                         outfile.write("\n")
                     else:
-                        outfile.write("  * " + key2 + ": " + report_data[key][key2] + "\n")
-                outfile.write("\n")
+                        outfile.write("* " + key + ": " + report_data["text"][key] + "\n")
+                        
+                outfile.write(".. raw:: latex \n")
+                outfile.write("   \clearpage \n")
+                        
             else:
-                outfile.write("* " + key + ": " + report_data[key] + "\n")
+                print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
+                        
+        else:
+            print("No writable text found! There was no 'text' in the dictionary!")
+            
+        if "plots" in report_data.keys():
+            
+            this_title = "Figures:"
+            outfile.write(this_title + "\n")
+            outfile.write("-" * len(this_title) + "\n\n")
 
-    elif isinstance(report_data, list):
-        MD = METAdata()
-
-        # add all plots in plot_list to Sphinx source code file;
-        # the figure captions are extracted from the exif file headers
-        # of the .png files (if present)
-
-        for f in report_data:
-
-            filename = f.rpartition(os.sep)[-1]
-            filepath = f.rpartition(os.sep)[0]
-
-            shutil.copy(f, src_dir)
-
-            try:
-                caption = MD.read(f).get_dict()['ESMValTool']['caption']
-            except:
-                caption = ["Error: empty caption in " + filename]
-    
-            outfile.write(".. figure:: " + filename + "\n" 
-                          "   :align:   center" + "\n" 
-                          "   :width:   95%" + "\n\n" 
-                          "   " + caption[0] + "\n"
-                         )
-
-    else:
-        raise Exception
+            if isinstance(report_data["plots"], list):
+                MD = METAdata()
+        
+                # add all plots in plot_list to Sphinx source code file;
+                # the figure captions are extracted from the exif file headers
+                # of the .png files (if present)
+        
+                for f in report_data["plots"]:
+        
+                    filename = f.rpartition(os.sep)[-1]
+                    filepath = f.rpartition(os.sep)[0]
+        
+                    shutil.copy(f, src_dir)
+        
+                    try:
+                        caption = MD.read(f).get_dict()['ESMValTool']['caption']
+                    except:
+                        caption = ["Error: empty caption in " + filename]
+            
+                    outfile.write(".. figure:: " + filename + "\n" 
+                                  "   :align:   center" + "\n" 
+                                  "   :width:   95%" + "\n\n" 
+                                  "   " + caption[0] + "\n"
+                                 )
+        
+            else:
+                print("Wrong format in plots entry, nothing can be written!") # TODO: ERROR function 
+                
+        else:
+            print("No plottable links found! There was no 'plots' in the dictionary!")
+            
+        if "text" not in report_data.keys() and "plots" not in report_data.keys():
+            print("Nothing to write reports from!! There was no 'plots' nor 'text' in the dictionary!") # TODO: ERROR function 
+            return
 
     outfile.close() 
 
@@ -131,9 +162,11 @@ def do_report(report_data, report_title, work_dir):
     if os.path.exists(src_dir):
          # remove if exists
          shutil.rmtree(src_dir)
+         pass
     if os.path.exists(bld_dir):
          # remove if exists
          shutil.rmtree(bld_dir)
+         pass
 
     print("Successfully created " + pdfname + "!")
     
@@ -315,7 +348,7 @@ def do_smm_table(csv_expert, csv_definitions):
 #              )
 #    file.close()    
 
-def do_gcos_table(gcos_expert, gcos_reference, plot_dir):
+def do_gcos_table(gcos_expert, gcos_reference):
     """
     Author  :  F. Massonnet
     Creation: February 9th, 2018
@@ -354,16 +387,16 @@ def do_gcos_table(gcos_expert, gcos_reference, plot_dir):
           second row = numbers from expert with green or red shading depending
           on whether the GCOS standards are met or not
 
-    TO DO:
+    TODO:
         - is a GCOS standard met if the expert value is less in an absolute sense?
         - how about frequency? reported as "hourly", "decadal", not numbers
     """
 
-    # WILL HAVE TO BE DELETED
-    # -----------------------
-    path_out = work_dir + "/plot_scripts/python/gcos"
-
-    path_report_out = work_dir + "/reports/sphinx/source"
+#    # WILL HAVE TO BE DELETED
+#    # -----------------------
+#    path_out = work_dir + "/plot_scripts/python/gcos"
+#
+#    path_report_out = work_dir + "/reports/sphinx/source"
 
     # ----------------------
 
@@ -427,37 +460,39 @@ def do_gcos_table(gcos_expert, gcos_reference, plot_dir):
                      fontweight = fontweight, fontsize = fontsize)
 
     # Add legend on the left
-    plt.text(-0.1, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center")
-    plt.text(-0.1, ny - 2.5, "ECV", rotation = 90, ha = "center", va = "center")
+    plt.text(-0.1, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center", fontsize=10)
+    plt.text(-0.1, ny - 2.5, "ECV", rotation = 90, ha = "center", va = "center", fontsize=10)
     plt.xticks([])
     plt.yticks([])
     plt.xlim(0, nx)
     plt.ylim(0, ny)
     plt.tight_layout()
 
-    # Create output path for figure
-    if not (os.path.exists(path_out)):
-      os.makedirs(path_out)
-    plt.savefig(path_out + "/" + "gcos_requirements.png", dpi = 400)
-    plt.close(fig)
+    return fig
 
-
-    # Create *.rst report
-    if not (os.path.exists(path_report_out)):
-      os.makedirs(path_report_out)
-
-    output_file = "report_gcos.rst"
-    file = open(path_report_out + "/" + output_file, "w")
-
-    my_title ="GCOS"
-    file.write(my_title + "\n")
-    file.write("=" * len(my_title) + "\n\n")
-
-    file.write(".. figure:: " + "../../../../plot_scripts/python/gcos/gcos_requirements.png" + "\n"
-               "   :align:   center"   + "\n"
-               "   :width:   95%" + "\n"
-              )
-    file.close()
+#    # Create output path for figure
+#    if not (os.path.exists(path_out)):
+#      os.makedirs(path_out)
+#    plt.savefig(path_out + "/" + "gcos_requirements.png", dpi = 400)
+#    plt.close(fig)
+#
+#
+#    # Create *.rst report
+#    if not (os.path.exists(path_report_out)):
+#      os.makedirs(path_report_out)
+#
+#    output_file = "report_gcos.rst"
+#    file = open(path_report_out + "/" + output_file, "w")
+#
+#    my_title ="GCOS"
+#    file.write(my_title + "\n")
+#    file.write("=" * len(my_title) + "\n\n")
+#
+#    file.write(".. figure:: " + "../../../../plot_scripts/python/gcos/gcos_requirements.png" + "\n"
+#               "   :align:   center"   + "\n"
+#               "   :width:   95%" + "\n"
+#              )
+#    file.close()
 
 
 # dummy code to test do_report

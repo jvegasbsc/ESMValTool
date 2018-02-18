@@ -5,6 +5,8 @@ Basic implementation for diagnostics into ESMValTool
 import iris
 import os
 import sys
+import shutil
+import errno
 import numpy as np
 import random, string
 import collections
@@ -309,9 +311,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.__infile__,
                  self.diagname,
                  self.authors)
-        
-        # produce reports
-        self.__prepare_report__(content=list_of_plots, filename=this_file.upper())
 
 
         # dimension information
@@ -338,12 +337,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         overview_dict.update({'longitude frequency [degrees]': collections.OrderedDict([("min",str(lon_freq_spec[0])), ("average",str(lon_freq_spec[1])), ("max",str(lon_freq_spec[2]))])})
         overview_dict.update({'latitude range [degrees]': collections.OrderedDict([("min",str(lat_range_spec[0])), ("max",str(lat_range_spec[2]))])})
         overview_dict.update({'latitude frequency [degrees]': collections.OrderedDict([("min",str(lat_freq_spec[0])), ("average",str(lat_freq_spec[1])), ("max",str(lat_freq_spec[2]))])})
-        overview_dict.update({'temporal range [days since 01/01/1970]': collections.OrderedDict([("min",str(tim_range_spec[0])), ("max",str(tim_range_spec[2]))])})
+        overview_dict.update({'temporal range [days since 01/01/1950]': collections.OrderedDict([("min",str(tim_range_spec[0])), ("max",str(tim_range_spec[2]))])})
         overview_dict.update({'temporal frequency [days]': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(tim_freq_spec[1])), ("max",str(tim_freq_spec[2]))])})
         
         # produce reports
-        self.__prepare_report__(content=overview_dict, filename=this_file.upper()+str(2))
-
+        self.__prepare_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_file.upper())
 
         return
     
@@ -368,25 +366,70 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     def __do_maturity_matrix__(self):
         
         this_file = "System maturity matrix"
+        
+        expected_input = self.__work_dir__ + os.sep + "smm_input" + os.sep + self.__basic_filename__ + "_smm_expert.csv"
+        if not os.path.isfile(expected_input):
+            try:
+                os.makedirs(os.path.dirname(expected_input))
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+            shutil.copy2(os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/empty_smm_expert.csv", expected_input)
+            print("*******************************************************************************WARNING*******************************************************************************")
+            print("Expected " + this_file + " input file " + expected_input + " not found!")
+            print("Created dummy file instead. Please fill in appropriate values and rerun!")
+            print("(This won't fail if you do not do so and produce a white matrix!!!!)")
+            print("*******************************************************************************WARNING*******************************************************************************")
+            captionerror = True
+        else:
+            print("Processing " + this_file + " input file: " + expected_input) 
+            captionerror = False
+
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_file.split()) + "." + self.__output_type__
-        fig = do_smm_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_smm_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/smm_definitions.csv")
+        fig = do_smm_table(expected_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/smm_definitions.csv")
         fig.savefig(filename)
         plt.close(fig)
+        
+        if captionerror:
+            caption = "The expected input file: " + expected_input + " was not found and an empty dummy file created, therefore this plot is blank. Please edit the expected file!"
+        else:
+            caption = str(this_file + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+
         
         ESMValMD("meta",
                  filename,
                  self.__basetags__ + ['C3S_SMM'],
-                 str(this_file + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 caption,
                  '#C3S' + 'SMM' + self.__varname__,
                  self.__infile__,
                  self.diagname,
                  self.authors)
         
-        self.__prepare_report__(content=[filename], filename="".join(this_file.upper().split()))
+        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_file.upper().split()))
         
         return
     
     
     def __do_gcos_requirements__(self):
-        do_gcos_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv",self.__work_dir__)
+        
+        this_file = "GCOS requirements"
+        
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_file.split()) + "." + self.__output_type__
+        fig = do_gcos_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
+        fig.savefig(filename)
+        plt.close(fig)
+        
+        caption = str(this_file + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['C3S_GCOS'],
+                 caption,
+                 '#C3S' + 'GCOS' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_file.upper().split()))
+        
         return
