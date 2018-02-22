@@ -42,7 +42,10 @@ class PlotHist(object):
 
         # Check arguments
         if isinstance(data, iris.cube.Cube):
-            self.name = [data.standard_name if data.standard_name is not None else data.attributes["comment"]][0]
+            try:
+                self.name = data.long_name
+            except:
+                pass
             self.units = ' [' + str(data.units) + ']'
             self.data = np.ravel(data.data)
         elif isinstance(data, np.ndarray):
@@ -226,7 +229,10 @@ class Plot2D(object):
         self.cube = iris.util.squeeze(cube)
         if (self.cube.ndim != 2):
             raise TypeError("Invalid input: expected 2-dimensional iris cube")
-        self.name = [cube.standard_name if cube.standard_name is not None else cube.attributes["comment"]][0]
+        try:
+            self.name = cube.long_name
+        except:
+            pass
         self.units = ' [' + str(cube.units) + ']'
 
 
@@ -277,7 +283,7 @@ class Plot2D(object):
 ###############################################################################
 
     def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
-             y_label=None, title=None):
+             y_label=None, title=None, ax=None, fig=None):
         """
         Arguments
             summary_plot   : Add summary line plot
@@ -296,82 +302,172 @@ class Plot2D(object):
             20180207-A_schl_ma: written
         """
 
-        # Summary plot yes/no
-        if (not summary_plot):
-            G = gridspec.GridSpec(1, 1)
-            colorbar = 'vertical'
-        elif (self.summary_location == 'right'):
-            colorbar = 'horizontal'
-            G = gridspec.GridSpec(2, 2, width_ratios=[4, 1],
-                                  height_ratios=[8, 1])
-        elif (self.summary_location == 'bottom'):
-            colorbar = 'vertical'
-            G = gridspec.GridSpec(2, 2, width_ratios=[8, 1],
-                                  height_ratios=[4, 1])
-
-        # Main plot
-        plt.subplot(G[0])
-        if (title is not None):
-            plt.title(title)
-        else:
-            plt.title(self.name + self.units)
-        if (x_label is not None):
-            plt.xlabel(x_label)
-        if (y_label is not None):
-            plt.ylabel(y_label)
-        if (self.plot_type == 'latlon'):
-            x = self.cube.coord(self.lon_var).points
-            y = self.cube.coord(self.lat_var).points
-            z = self.cube.data
-            collapse = self.lon_var
-            line_plot_axes = 1
-            cb_axes = 2
-            m = bm.Basemap(projection='cyl', llcrnrlat=-90.0, urcrnrlat=90.0,
-                           llcrnrlon=0.0, urcrnrlon=360.0, lat_ts=20.0,
-                           resolution='c')
-            m.drawcoastlines()
-            x, y = m(*np.meshgrid(x, y))
-            ax_main = m.contourf(x, y, z)
-        else:
-            if (self.plot_type == 'lattime'):
-                x = self.cube.coord(self.time_var).points
+        
+        if ax is None:
+            
+            # Summary plot yes/no
+            if (not summary_plot):
+                G = gridspec.GridSpec(1, 1)
+                colorbar = 'vertical'
+            elif (self.summary_location == 'right'):
+                colorbar = 'horizontal'
+                G = gridspec.GridSpec(2, 2, width_ratios=[4, 1],
+                                      height_ratios=[8, 1])
+            elif (self.summary_location == 'bottom'):
+                colorbar = 'vertical'
+                G = gridspec.GridSpec(2, 2, width_ratios=[8, 1],
+                                      height_ratios=[4, 1])
+    
+            # Main plot
+            plt.subplot(G[0])
+            if (title is not None):
+                plt.title(title)
+            else:
+                plt.title(self.name + self.units)
+            if (x_label is not None):
+                plt.xlabel(x_label)
+            if (y_label is not None):
+                plt.ylabel(y_label)
+            if (self.plot_type == 'latlon'):
+                x = self.cube.coord(self.lon_var).points
                 y = self.cube.coord(self.lat_var).points
-                z = self.cube.data.T
-                collapse = self.time_var
+                z = self.cube.data
+                collapse = self.lon_var
                 line_plot_axes = 1
                 cb_axes = 2
-            elif (self.plot_type == 'lontime'):
-                x = self.cube.coord(self.lon_var).points
-                y = self.cube.coord(self.time_var).points
-                z = self.cube.data
-                collapse = self.time_var
-                line_plot_axes = 2
-                cb_axes = 1
-            ax_main = plt.contourf(x, y, z)
-
-        # Line plot
-        if (summary_plot):
-            ax_cb = plt.subplot(G[cb_axes])
-            cb = plt.colorbar(ax_main, cax=ax_cb, orientation=colorbar,
-                              ticks=colorbar_ticks)
-            plt.subplot(G[line_plot_axes])
-            if (collapse == self.lat_var):
-                grid_areas = iris.analysis.cartography.area_weights(self.cube)
+                m = bm.Basemap(projection='cyl', llcrnrlat=-90.0, urcrnrlat=90.0,
+                               llcrnrlon=0.0, urcrnrlon=360.0, lat_ts=20.0,
+                               resolution='c')
+                m.drawcoastlines()
+                x, y = m(*np.meshgrid(x, y))
+                ax_main = m.contourf(x, y, z)
             else:
-                grid_areas = None
-            cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
-                                            weights=grid_areas)
-
-            if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
-                x = cube_line
-                y = cube_line.coord(self.lat_var)
+                if (self.plot_type == 'lattime'):
+                    x = self.cube.coord(self.time_var).points
+                    y = self.cube.coord(self.lat_var).points
+                    z = self.cube.data.T
+                    collapse = self.time_var
+                    line_plot_axes = 1
+                    cb_axes = 2
+                elif (self.plot_type == 'lontime'):
+                    x = self.cube.coord(self.lon_var).points
+                    y = self.cube.coord(self.time_var).points
+                    z = self.cube.data
+                    collapse = self.time_var
+                    line_plot_axes = 2
+                    cb_axes = 1
+                ax_main = plt.contourf(x, y, z)
+    
+            # Line plot
+            if (summary_plot):
+                ax_cb = plt.subplot(G[cb_axes])
+                cb = plt.colorbar(ax_main, cax=ax_cb, orientation=colorbar,
+                                  ticks=colorbar_ticks)
+                plt.subplot(G[line_plot_axes])
+                if (collapse == self.lat_var):
+                    grid_areas = iris.analysis.cartography.area_weights(self.cube)
+                else:
+                    grid_areas = None
+                cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
+                                                weights=grid_areas)
+    
+                if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
+                    x = cube_line
+                    y = cube_line.coord(self.lat_var)
+                else:
+                    x = cube_line.coord(self.lon_var)
+                    y = cube_line
+                ax_line = iplt.plot(x, y)
             else:
-                x = cube_line.coord(self.lon_var)
-                y = cube_line
-            ax_line = iplt.plot(x, y)
+                cb = plt.colorbar(ax_main, orientation=colorbar,
+                                  ticks=colorbar_ticks)
+    
+            plt.tight_layout()
+            return plt.gcf()
+        
         else:
-            cb = plt.colorbar(ax_main, orientation=colorbar,
-                              ticks=colorbar_ticks)
-
-        plt.tight_layout()
-        return plt.gcf()
+            
+            if fig is None:
+                assert False, "fig should be provided and is missing!"
+            
+            # Summary plot yes/no
+            if (not summary_plot):
+                G = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=ax)
+                colorbar = 'vertical'
+            elif (self.summary_location == 'right'):
+                colorbar = 'horizontal'
+                G = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=ax, width_ratios=[4, 1],
+                                      height_ratios=[8, 1])
+            elif (self.summary_location == 'bottom'):
+                colorbar = 'vertical'
+                G = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=ax, width_ratios=[8, 1],
+                                      height_ratios=[4, 1])
+            # Main plot
+            axl = plt.Subplot(fig, G[0])
+            if (title is not None):
+                plt.title(title)
+            else:
+                plt.title(self.name + self.units)
+            if (x_label is not None):
+                plt.xlabel(x_label)
+            if (y_label is not None):
+                plt.ylabel(y_label)
+            if (self.plot_type == 'latlon'):
+                x = self.cube.coord(self.lon_var).points
+                y = self.cube.coord(self.lat_var).points
+                z = self.cube.data
+                collapse = self.lon_var
+                line_plot_axes = 1
+                cb_axes = 2
+                m = bm.Basemap(projection='cyl', llcrnrlat=-90.0, urcrnrlat=90.0,
+                               llcrnrlon=0.0, urcrnrlon=360.0, lat_ts=20.0,
+                               resolution='c')
+                m.drawcoastlines()
+                x, y = m(*np.meshgrid(x, y))
+                ax_main = m.contourf(x, y, z)
+            else:
+                if (self.plot_type == 'lattime'):
+                    x = self.cube.coord(self.time_var).points
+                    y = self.cube.coord(self.lat_var).points
+                    z = self.cube.data.T
+                    collapse = self.time_var
+                    line_plot_axes = 1
+                    cb_axes = 2
+                elif (self.plot_type == 'lontime'):
+                    x = self.cube.coord(self.lon_var).points
+                    y = self.cube.coord(self.time_var).points
+                    z = self.cube.data
+                    collapse = self.time_var
+                    line_plot_axes = 2
+                    cb_axes = 1
+                ax_main = plt.contourf(x, y, z)
+            fig.add_subplot(ax_main)
+    
+            # Line plot
+            if (summary_plot):
+                ax_cb = plt.Subplot(fig, G[cb_axes])
+                cb = plt.colorbar(ax_main, cax=ax_cb, orientation=colorbar,
+                                  ticks=colorbar_ticks)
+                fig.add_subplot(ax_cb)
+                axl = plt.Subplot(fig, G[line_plot_axes])
+                if (collapse == self.lat_var):
+                    grid_areas = iris.analysis.cartography.area_weights(self.cube)
+                else:
+                    grid_areas = None
+                cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
+                                                weights=grid_areas)
+    
+                if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
+                    x = cube_line
+                    y = cube_line.coord(self.lat_var)
+                else:
+                    x = cube_line.coord(self.lon_var)
+                    y = cube_line
+                ax_line = iplt.plot(x, y)
+                fig.add_subplot(axl)
+            else:
+                cb = plt.colorbar(ax_main, orientation=colorbar,
+                                  ticks=colorbar_ticks)
+                fig.add_subplot(cb)
+    
+            return 

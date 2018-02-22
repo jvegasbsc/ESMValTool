@@ -61,7 +61,7 @@ def do_report(report_data, report_title, work_dir):
             # if the input data are a dictionary, we create a bullet point list
             # from all key value pairs
             
-            this_title = "General Information:"
+            this_title = "General Information"
             outfile.write(this_title + "\n")
             outfile.write("-" * len(this_title) + "\n\n")
 
@@ -97,7 +97,7 @@ def do_report(report_data, report_title, work_dir):
             
         if "plots" in report_data.keys():
             
-            this_title = "Figures:"
+            this_title = "Figures"
             outfile.write(this_title + "\n")
             outfile.write("-" * len(this_title) + "\n\n")
 

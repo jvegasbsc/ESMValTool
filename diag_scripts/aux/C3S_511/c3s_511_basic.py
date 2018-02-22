@@ -3,6 +3,7 @@ Basic implementation for diagnostics into ESMValTool
 """
 # used modules
 import iris
+import iris.coord_categorisation
 import os
 import sys
 import shutil
@@ -12,7 +13,10 @@ import random, string
 import collections
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+from scipy import stats
+import datetime
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
@@ -70,7 +74,12 @@ class __Diagnostic_skeleton__(object):
         self.__basetags__ = []
         self.__infile__ = None
         self.__inpath__= None
-        self.report_dict = dict()
+        self.gcos = dict()
+        # save GCOS requirements
+        self.gcos.update({"frequency":None})
+        self.gcos.update({"resolution":None})
+        self.gcos.update({"acuracy":None})
+        self.gcos.update({"stability":None})
         
         self.authors = ["A_muel_bn", "A_hass_bg", "A_laue_ax",
                         "A_broe_bj", "A_mass_fr", "A_nico_nd",
@@ -92,41 +101,47 @@ class __Diagnostic_skeleton__(object):
         self.__do_mean_var__()
         self.__do_trends__()
         self.__do_extremes__()
+        self.__do_sectors__()
         self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
 
     def __do_overview__(self):
-#        self.__prepare_report__()
+        self.__prepare_report__(content={},filename="do_overview_default")
         raise ImplementationError("__do_overview__","This method has to be implemented.")
         return
 
     def __do_mean_var__(self):
-#        self.__prepare_report__()
-        warnings.warn("Implementation Warning", UserWarning)
+        self.__prepare_report__(content={},filename="do_mean_var_default")
+        raise ImplementationError("__do_mean_var__","This method has to be implemented.")
         return
 
     def __do_trends__(self):
-#        self.__prepare_report__()
-        warnings.warn("Implementation Warning", UserWarning)
+        self.__prepare_report__(content={},filename="do_trends_default")
+        raise ImplementationError("__do_trends__","This method has to be implemented.")
         return
 
     def __do_extremes__(self):
-#        self.__prepare_report__()
+        self.__prepare_report__(content={},filename="do_extremes_default")
+        warnings.warn("Implementation Warning", UserWarning)
+        return
+    
+    def __do_sectors__(self):
+        self.__prepare_report__(content={},filename="do_sectors_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
 
     def __do_maturity_matrix__(self):
-#        self.__prepare_report__()
+        self.__prepare_report__(content={},filename="do_maturity_matrix_default")
         raise ImplementationError("__do_maturity_matrix__","This method has to be implemented.")
         return
 
     def __do_gcos_requirements__(self):
-#        self.__prepare_report__()
+        self.__prepare_report__(content={},filename="do_gcos_requirements_default")
         raise ImplementationError("__do_gcos_requirements__","This method has to be implemented.")
         return
 
     def __prepare_report__(self):
-        warnings.warn("Implementation Warning", UserWarning)
+        raise ImplementationError("__prepare_report__","This method has to be implemented.")
         return
 
 #    def write_reports(self):
@@ -185,12 +200,20 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__dataset_id__ = [file_info[self.__infile__]["name"], file_info[self.__infile__]["case_name"], file_info[self.__infile__]["ensemble"], file_info[self.__infile__]["var"]]
         
         self.__basic_filename__ = "_".join(self.__dataset_id__ + [self.__time_period__])
+        
+        self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
 
 
     def read_data(self):
 
         if os.path.isfile(self.__infile__):
             self.sp_data = iris.load_cube(self.__infile__)
+            self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
+            self.sp_data.coord('latitude').guess_bounds()
+            self.sp_data.coord('longitude').guess_bounds()
+            if self.sp_data.units == "no-unit":
+                self.sp_data.units = '1'
+
         else:
             self.__read_data_mock__()
             
@@ -212,88 +235,42 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
     def __do_overview__(self):
         
-        this_file = "overview"
+        this_function = "overview"
         
         # TODO all the other plots
         
         list_of_plots=[]
         
-        # Lat lon plot of fractional available measurements
-        missing_values_2D = self.sp_data.copy()
-        missing_values_2D.data = np.ma.masked_array(missing_values_2D.data, mask=np.isnan(missing_values_2D.data))
-        missing_values_2D.data = missing_values_2D.data*0.+1.
-        missing_values_2D = missing_values_2D.collapsed("time", iris.analysis.SUM)
-        missing_values_2D.data = missing_values_2D.data / \
-            float(len(self.sp_data.coord("time").points))
-         
-        # plotting routine
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lat_lon" + "." + self.__output_type__
-        list_of_plots.append(filename)
-        x=Plot2D(missing_values_2D)
-        x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
+        for d in self.dimensions:
+            
+            long_left_over = self.dimensions[self.dimensions!=d]
+            short_left_over = np.array([sl[0:3] for sl in long_left_over])
+            
+            # data of fractional available measurements
+            missing_values = self.sp_data.copy()
+            missing_values.data = missing_values.data*0.+1.
+            missing_values = missing_values.collapsed(d, iris.analysis.SUM)
+            missing_values.data = missing_values.data / \
+                float(len(self.sp_data.coord(d).points))
+             
+            # plotting routine
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
+            list_of_plots.append(filename)
+            x=Plot2D(missing_values)
+            x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_overview'],
+                     str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+
         
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_overview'],
-                 str('Overview on latitude/longitude availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'fravlalo' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
-        # Lat time plot of fractional available measurements
-        missing_values_Lati = self.sp_data.copy()
-        missing_values_Lati.data = np.ma.masked_array(missing_values_Lati.data, mask=np.isnan(missing_values_Lati.data))
-        missing_values_Lati.data = missing_values_Lati.data*0.+1.
-        missing_values_Lati = missing_values_Lati.collapsed("longitude", iris.analysis.SUM)
-        missing_values_Lati.data = missing_values_Lati.data / \
-            float(len(self.sp_data.coord("longitude").points))
-         
-        # plotting routine
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lat_time" + "." + self.__output_type__
-        list_of_plots.append(filename)
-        x = Plot2D(missing_values_Lati)
-        fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        fig.savefig(filename)
-        plt.close(fig)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_overview'],
-                 str('Overview on latitude/time availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'fravlati' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
-        # Lon time plot of fractional available measurements
-        missing_values_Loti = self.sp_data.copy()
-        missing_values_Loti.data = np.ma.masked_array(missing_values_Loti.data, mask=np.isnan(missing_values_Loti.data))
-        missing_values_Loti.data = missing_values_Loti.data*0.+1.
-        missing_values_Loti = missing_values_Loti.collapsed("latitude", iris.analysis.SUM)
-        missing_values_Loti.data = missing_values_Loti.data / \
-            float(len(self.sp_data.coord("latitude").points))
-         
-        # plotting routine
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_lon_time" + "." + self.__output_type__
-        list_of_plots.append(filename)
-        x=Plot2D(missing_values_Loti)
-        fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        fig.savefig(filename)
-        plt.close(fig)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_overview'],
-                 str('Overview on longitude/time availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'fravloti' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
-        # Lon time plot of fractional available measurements
+        # histogram plot of available measurements
         all_data = self.sp_data.copy()
-        all_data.data = np.ma.masked_array(all_data.data, mask=np.isnan(all_data.data))
          
         # plotting routine
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hist_all_vals" + "." + self.__output_type__
@@ -314,14 +291,33 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
 
         # dimension information
-        lon_range = (self.sp_data.coord("longitude").points)
-        lat_range = (self.sp_data.coord("latitude").points)
-        tim_range = (self.sp_data.coord("time").points)
+        lon_range = self.sp_data.coord("longitude").points
+        lat_range = self.sp_data.coord("latitude").points
+        tim_range = self.sp_data.coord("time").points
+        t_info = str(self.sp_data.coord("time").units)
+#        tim_range_read = [datetime.datetime(1950, 1, 1) + datetime.timedelta(days=dt) for dt in tim_range]
         
         lon_range_spec = utils.__minmeanmax__(lon_range)
         lat_range_spec = utils.__minmeanmax__(lat_range)
         tim_range_spec = utils.__minmeanmax__(tim_range)
-
+        
+        origin = datetime.datetime.strptime("_".join(t_info.split(" ")[-2:]), '%Y-%m-%d_%H:%M:%S')
+        if t_info.split(" ")[0] == 'days':
+            tim_range_spec_read = [origin + datetime.timedelta(days=dt) for dt in tim_range_spec]
+        elif t_info.split(" ")[0] == 'seconds':
+            tim_range_spec_read = [origin + datetime.timedelta(seconds=dt) for dt in tim_range_spec]
+        elif t_info.split(" ")[0] == 'microseconds':
+            tim_range_spec_read = [origin + datetime.timedelta(microseconds=dt) for dt in tim_range_spec]
+        elif t_info.split(" ")[0] == 'milliseconds':
+            tim_range_spec_read = [origin + datetime.timedelta(milliseconds=dt) for dt in tim_range_spec]
+        elif t_info.split(" ")[0] == 'minutes':
+            tim_range_spec_read = [origin + datetime.timedelta(minutes=dt) for dt in tim_range_spec]
+        elif t_info.split(" ")[0] == 'hours':
+            tim_range_spec_read = [origin + datetime.timedelta(hours=dt) for dt in tim_range_spec]
+        elif t_info.split(" ")[0] == 'weeks':
+            tim_range_spec_read = [origin + datetime.timedelta(weeks=dt) for dt in tim_range_spec]
+        else:
+            assert False, 'Wrong increment in coord("time")!'
 
         lon_freq = np.diff(lon_range)
         lat_freq = np.diff(lat_range)
@@ -333,16 +329,20 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         overview_dict=collections.OrderedDict()
         
-        overview_dict.update({'longitude range [degrees]': collections.OrderedDict([("min",str(lon_range_spec[0])), ("max",str(lon_range_spec[2]))])})
-        overview_dict.update({'longitude frequency [degrees]': collections.OrderedDict([("min",str(lon_freq_spec[0])), ("average",str(lon_freq_spec[1])), ("max",str(lon_freq_spec[2]))])})
-        overview_dict.update({'latitude range [degrees]': collections.OrderedDict([("min",str(lat_range_spec[0])), ("max",str(lat_range_spec[2]))])})
-        overview_dict.update({'latitude frequency [degrees]': collections.OrderedDict([("min",str(lat_freq_spec[0])), ("average",str(lat_freq_spec[1])), ("max",str(lat_freq_spec[2]))])})
-        overview_dict.update({'temporal range [days since 01/01/1950]': collections.OrderedDict([("min",str(tim_range_spec[0])), ("max",str(tim_range_spec[2]))])})
-        overview_dict.update({'temporal frequency [days]': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(tim_freq_spec[1])), ("max",str(tim_freq_spec[2]))])})
+        overview_dict.update({'longitude range [' + str(self.sp_data.coord("longitude").units) + ']': collections.OrderedDict([("min",str(lon_range_spec[0])), ("max",str(lon_range_spec[2]))])})
+        overview_dict.update({'longitude frequency [' + str(self.sp_data.coord("longitude").units) + ']': collections.OrderedDict([("min",str(lon_freq_spec[0])), ("average",str(lon_freq_spec[1])), ("max",str(lon_freq_spec[2]))])})
+        overview_dict.update({'latitude range [' + str(self.sp_data.coord("latitude").units) + ']': collections.OrderedDict([("min",str(lat_range_spec[0])), ("max",str(lat_range_spec[2]))])})
+        overview_dict.update({'latitude frequency [' + str(self.sp_data.coord("latitude").units) + ']': collections.OrderedDict([("min",str(lat_freq_spec[0])), ("average",str(lat_freq_spec[1])), ("max",str(lat_freq_spec[2]))])})
+        overview_dict.update({'temporal range': collections.OrderedDict([("min",str(tim_range_spec_read[0])), ("max",str(tim_range_spec_read[2]))])})
+        overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
         
         # produce reports
-        self.__prepare_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_file.upper())
-
+        self.__prepare_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
+        
+        # save GCOS requirements
+        self.gcos.update({"frequency":tim_freq_spec})
+        self.gcos.update({"resolution":[lon_freq_spec,lat_freq_spec]})
+        
         return
     
     def __prepare_report__(self,**kwargs):
@@ -360,6 +360,171 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             raise TypeError("filename", "Element is not a string.")
             
         report(content,filename,self.__work_dir__)
+        return
+    
+    
+    def __do_mean_var__(self):
+        
+        this_function = "mean & variability"
+        
+        list_of_plots = []
+        
+        maths = ["MEAN","STD_DEV","LOG_COV", "PERCENTILE", "CLIMATOLOGY"]
+        
+        percentiles = [1.,5.,10.,25.,1./3.*100,50.,2./3.*100,75.,90.,95.,99.]
+        
+        for d in self.dimensions:
+            
+            long_left_over = self.dimensions[self.dimensions!=d]
+            short_left_over = np.array([sl[0:3] for sl in long_left_over])
+        
+            mean_std_cov=collections.OrderedDict()
+            
+            for m in maths:
+                
+                if m == "PERCENTILE":
+                    
+                    perc = self.sp_data.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
+                    
+                    for p in percentiles:
+                    
+                        mean_std_cov.update({m + " " + str(int(round(p,0))) + " percent":perc.extract(iris.Constraint(percentile_over_time=p))})
+                
+                elif m == "CLIMATOLOGY":
+                    
+                    try:
+                        clim = self.sp_data.copy()
+                        iris.coord_categorisation.add_month_number(clim, d, name='month_num')
+                        clim_comp = clim.aggregated_by('month_num',iris.analysis.MEAN)
+                        
+                        clim_anom = clim.copy()
+                        
+                        for mn in range(len(clim_anom.coord('month_num').points)):
+                        
+                            idx = clim_comp.coord('month_num').points.tolist().index(clim_anom.coord('month_num').points[mn])
+                            clim_anom.data[mn,:,:] = clim_anom.data[mn,:,:]-clim_comp.data[idx,:,:]
+                        
+                        iris.coord_categorisation.add_year(clim_anom, d, name='year')
+                        clim_anom = clim_anom.aggregated_by('year', iris.analysis.MEAN)
+                        
+                        for mon in clim_comp.coord('month_num').points:
+                    
+                            mean_std_cov.update({m + " " + str(int(mon)):clim_comp.extract(iris.Constraint(month_num=mon))})
+                            
+                        for y in clim_anom.coord('year').points:
+                    
+                            mean_std_cov.update({"mean anomalies from " + m + " per year " + str(int(y)):clim_anom.extract(iris.Constraint(year=y))})
+        
+                    except:
+                        pass
+                
+                elif m in ["MEAN","STD_DEV"]:
+        
+                    mean_std_cov.update({m:self.sp_data.collapsed(d, iris.analysis.__dict__[m])})
+                    
+                elif m == "LOG_COV": 
+                    
+                    mean_std_cov.update({m:iris.analysis.maths.log(iris.analysis.maths.divide(mean_std_cov["STD_DEV"],mean_std_cov["MEAN"]))})
+         
+                else:
+                    raise ConfigurationError(m,"This maths functionality has to be implemented in _do_mean_var_.") 
+            
+            for m in mean_std_cov.keys():
+                
+                # plotting routine
+                if mean_std_cov[m] is not None:
+                    filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
+                    list_of_plots.append(filename)
+                    x=Plot2D(mean_std_cov[m])
+                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                    fig.savefig(filename)
+                    plt.close(fig)
+                    
+                    ESMValMD("meta",
+                             filename,
+                             self.__basetags__ + ['DM_global', 'C3S_mean_var'],
+                             str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                             '#C3S' + m + "".join(short_left_over) + self.__varname__,
+                             self.__infile__,
+                             self.diagname,
+                             self.authors)
+        
+        
+        self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
+
+        return
+    
+    
+    def __do_trends__(self):
+        
+        this_function = "trends & stability"
+        
+        list_of_plots = []
+        
+        _,S,_,P = utils.__temporal_trend__(self.sp_data, pthres=1.01)
+    
+    
+#        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
+#        list_of_plots.append(filename)
+#        
+#        fig = plt.figure()
+#        outer = gridspec.GridSpec(1, 2, wspace=0.2, hspace=0.2)
+#        
+#        x=Plot2D(S)
+#        x.plot(summary_plot=True, ax=outer[0], fig=fig, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+#        x=Plot2D(P)
+#        x.plot(summary_plot=True, ax=outer[1], fig=fig, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+#        
+#        fig.savefig(filename)
+#        
+#        plt.close(fig)
+#        
+#        ESMValMD("meta",
+#                 filename,
+#                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+#                 str("Latitude/Longitude" + ' slope and p-values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+#                 '#C3S' + 'temptrend' + self.__varname__,
+#                 self.__infile__,
+#                 self.diagname,
+#                 self.authors)
+        
+
+        x=Plot2D(S)
+        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
+        list_of_plots.append(filename)
+        figS.savefig(filename)
+        plt.close(figS)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        x=Plot2D(P)
+        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_pvals." + self.__output_type__
+        list_of_plots.append(filename)
+        figP.savefig(filename)
+        plt.close(figP)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' p-values for slopes of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        
+        self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
         return
     
     
