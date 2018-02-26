@@ -6,10 +6,27 @@ Created on Wed Feb  7 12:17:48 2018
 """
 
 import imp
+import os
+import sys
 import numpy as np
 from scipy import stats
 import cf_units
-import matplotlib.pyplot as plt
+
+sys.path.insert(0,
+                os.path.abspath(os.path.join(os.path.join(
+                        os.path.dirname(os.path.abspath(
+                                __file__)), os.pardir),
+                                os.pardir))) 
+from TempStab.TempStab import TempStab as TS
+
+
+class HiddenPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout = self._original_stdout
 
 
 def __getInfoFromFile__(filename):
@@ -229,5 +246,82 @@ def __get_valid_data__(cube, mode='all', thres=-99):
     return data, msk
 
 
+def __loc_TSA_fun__(array,**kwargs):
+    
+    breakpoint_method = kwargs.get('breakpoint_method', "CUMSUMADJ")
+    max_num_period = kwargs.get('max_num_periods', 3)
+    detrend = kwargs.get('detrend', False)
+    deseason = kwargs.get('deseason', True)
+    periods_method = kwargs.get('periods_method', "autocorr")
+    temporal_resolution = kwargs.get('temporal_resolution', 1.)
+
+    RES = None
+    done = False
+    
+    timearray = kwargs.get('dates', None)
+    
+    if timearray is not None:
+        try:
+            with HiddenPrints():
+                TSA = TS(timearray, array,
+                         breakpoint_method=breakpoint_method,
+                         detrend=detrend,
+                         deseason=deseason,
+                         max_num_periods=max_num_period,
+                         periods_method=periods_method,
+                         temporal_resolution = temporal_resolution)
+                RES = TSA.analysis(homogenize=True)
+                done = True
+        except:
+            done = False
+    else:
+        "Error in timearray."
+        
+    if RES is not None:
+        slope_diff = RES["homogenized_trend"]["slope"]
+        return np.atleast_1d(np.array([slope_diff,
+                                       len(RES["breakpoints"]),
+                                       done]))
+    
+    else: 
+        return np.atleast_1d(np.array([np.nan, np.nan, done]))
+
+
+def __TS_of_cube__(cube,**kwargs):
+    
+    breakpoint_method = kwargs.get('breakpoint_method', "CUMSUMADJ")
+    max_num_period = kwargs.get('max_num_periods', 3)
+    detrend = kwargs.get('detrend', False)
+    deseason = kwargs.get('deseason', True)
+    periods_method = kwargs.get('periods_method', "autocorr")
+    temporal_resolution = kwargs.get('temporal_resolution', 1.)
+    
+    min_trend = cube[0,:,:].copy()
+    num_bp = cube[0,:,:].copy()
+    
+    timearray = kwargs.get('dates', None)
+     
+    if timearray is None:
+        timearray = cube.coord("time").points
+    
+    res = np.apply_along_axis(__loc_TSA_fun__, 0, cube.data,
+                                  dates=timearray,
+                                  breakpoint_method=breakpoint_method,
+                                  max_num_period=max_num_period,
+                                  detrend=detrend,
+                                  deseason=deseason,
+                                  periods_method=periods_method,
+                                  temporal_resoution=temporal_resolution)
 
     
+    mask = np.isnan(res[0,:,:]) + min_trend.data.mask
+    min_trend.data = np.ma.array(data=res[0,:,:]*365.2425*10, mask=mask)
+    if min_trend.units in [None,'no_unit','1','unknown']:
+        min_trend.units = cf_units.Unit('0.1 year-1')
+    else:
+        min_trend.units += cf_units.Unit(str(min_trend.units) + ' 0.1 year-1')
+    
+    num_bp.data = np.ma.array(data=res[1,:,:], mask=mask)
+    num_bp.units = cf_units.Unit("1")
+    
+    return({"slope": min_trend, "number_breakpts":num_bp})

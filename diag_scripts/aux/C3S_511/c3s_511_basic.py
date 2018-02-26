@@ -30,7 +30,6 @@ from plot import Plot2D, PlotHist
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 
-
 # All packages checked
 
 # ignored GLOBAL values:
@@ -98,12 +97,12 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
         self.__do_overview__()
-        self.__do_mean_var__()
+#        self.__do_mean_var__()
         self.__do_trends__()
-        self.__do_extremes__()
-        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
+#        self.__do_extremes__()
+#        self.__do_sectors__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
 
     def __do_overview__(self):
         self.__prepare_report__(content={},filename="do_overview_default")
@@ -202,6 +201,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__basic_filename__ = "_".join(self.__dataset_id__ + [self.__time_period__])
         
         self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
+        
 
 
     def read_data(self):
@@ -219,6 +219,29 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
             print("self.__infile__ was not found! Generic data used instead.")
 #            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
+            
+            
+        # Human readable time
+        t_info = str(self.sp_data.coord("time").units)
+        origin = datetime.datetime.strptime("_".join(t_info.split(" ")[-2:]), '%Y-%m-%d_%H:%M:%S')
+        if t_info.split(" ")[0] == 'days':
+            tim_read = [origin + datetime.timedelta(days=dt) for dt in self.sp_data.coord("time").points]
+        elif t_info.split(" ")[0] == 'seconds':
+            tim_read = [origin + datetime.timedelta(seconds=dt) for dt in self.sp_data.coord("time").points]
+        elif t_info.split(" ")[0] == 'microseconds':
+            tim_read = [origin + datetime.timedelta(microseconds=dt) for dt in self.sp_data.coord("time").points]
+        elif t_info.split(" ")[0] == 'milliseconds':
+            tim_read = [origin + datetime.timedelta(milliseconds=dt) for dt in self.sp_data.coord("time").points]
+        elif t_info.split(" ")[0] == 'minutes':
+            tim_read = [origin + datetime.timedelta(minutes=dt) for dt in self.sp_data.coord("time").points]
+        elif t_info.split(" ")[0] == 'hours':
+            tim_read = [origin + datetime.timedelta(hours=dt) for dt in self.sp_data.coord("time").points]
+        elif t_info.split(" ")[0] == 'weeks':
+            tim_read = [origin + datetime.timedelta(weeks=dt) for dt in self.sp_data.coord("time").points]
+        else:
+            assert False, 'Wrong increment in coord("time")!'
+        
+        self.__tim_read__ = tim_read
             
         return
 
@@ -295,7 +318,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         lat_range = self.sp_data.coord("latitude").points
         tim_range = self.sp_data.coord("time").points
         t_info = str(self.sp_data.coord("time").units)
-#        tim_range_read = [datetime.datetime(1950, 1, 1) + datetime.timedelta(days=dt) for dt in tim_range]
         
         lon_range_spec = utils.__minmeanmax__(lon_range)
         lat_range_spec = utils.__minmeanmax__(lat_range)
@@ -336,12 +358,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         overview_dict.update({'temporal range': collections.OrderedDict([("min",str(tim_range_spec_read[0])), ("max",str(tim_range_spec_read[2]))])})
         overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
         
-        # produce reports
+        # produce report
         self.__prepare_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
         
         # save GCOS requirements
         self.gcos.update({"frequency":tim_freq_spec})
         self.gcos.update({"resolution":[lon_freq_spec,lat_freq_spec]})
+        
+        # save values for other diagnostics
+        self.__avg_timestep__ = tim_freq_spec[1]
         
         return
     
@@ -449,7 +474,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                              self.diagname,
                              self.authors)
         
-        
+        # produce report
         self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
 
         return
@@ -461,34 +486,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         list_of_plots = []
         
-        _,S,_,P = utils.__temporal_trend__(self.sp_data, pthres=1.01)
-    
-    
-#        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
-#        list_of_plots.append(filename)
-#        
-#        fig = plt.figure()
-#        outer = gridspec.GridSpec(1, 2, wspace=0.2, hspace=0.2)
-#        
-#        x=Plot2D(S)
-#        x.plot(summary_plot=True, ax=outer[0], fig=fig, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-#        x=Plot2D(P)
-#        x.plot(summary_plot=True, ax=outer[1], fig=fig, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-#        
-#        fig.savefig(filename)
-#        
-#        plt.close(fig)
-#        
-#        ESMValMD("meta",
-#                 filename,
-#                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-#                 str("Latitude/Longitude" + ' slope and p-values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-#                 '#C3S' + 'temptrend' + self.__varname__,
-#                 self.__infile__,
-#                 self.diagname,
-#                 self.authors)
         
+        # simple linear trend (slope) and p-values
+        _,S,_,P = utils.__temporal_trend__(self.sp_data, pthres=1.01)        
 
+        # plotting routines
         x=Plot2D(S)
         figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
 
@@ -523,14 +525,58 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
+        # linear trend (slope) and breakpoints after homogenization
+        TempStab = utils.__TS_of_cube__(self.sp_data,
+                                        dates=self.__tim_read__,
+                                        breakpoint_method="CUMSUMADJ",
+                                        deseason=True,
+                                        max_num_periods=3,
+                                        periods_method="autocorr",
+                                        temporal_resolution = self.__avg_timestep__)
         
+        # plotting routines
+        x=Plot2D(TempStab["slope"])
+        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_min_slope." + self.__output_type__
+        list_of_plots.append(filename)
+        figS.savefig(filename)
+        plt.close(figS)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade after breakpoint detection for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        x=Plot2D(TempStab["number_breakpts"])
+        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_num_bps." + self.__output_type__
+        list_of_plots.append(filename)
+        figP.savefig(filename)
+        plt.close(figP)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' number of breakpoints of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        # produce report
         self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
         return
     
     
     def __do_maturity_matrix__(self):
         
-        this_file = "System maturity matrix"
+        this_function = "System maturity matrix"
         
         expected_input = self.__work_dir__ + os.sep + "smm_input" + os.sep + self.__basic_filename__ + "_smm_expert.csv"
         if not os.path.isfile(expected_input):
@@ -540,17 +586,18 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 if exc.errno != errno.EEXIST:
                     raise
             shutil.copy2(os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/empty_smm_expert.csv", expected_input)
-            print("*******************************************************************************WARNING*******************************************************************************")
-            print("Expected " + this_file + " input file " + expected_input + " not found!")
+            print("************************************** WARNING **************************************")
+            print("Expected " + this_function + " input file " + expected_input + " not found!")
             print("Created dummy file instead. Please fill in appropriate values and rerun!")
             print("(This won't fail if you do not do so and produce a white matrix!!!!)")
-            print("*******************************************************************************WARNING*******************************************************************************")
+            print("************************************** WARNING **************************************")
             captionerror = True
         else:
-            print("Processing " + this_file + " input file: " + expected_input) 
+            print("Processing " + this_function + " input file: " + expected_input) 
             captionerror = False
 
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_file.split()) + "." + self.__output_type__
+        # plotting routines
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
         fig = do_smm_table(expected_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/smm_definitions.csv")
         fig.savefig(filename)
         plt.close(fig)
@@ -558,9 +605,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if captionerror:
             caption = "The expected input file: " + expected_input + " was not found and an empty dummy file created, therefore this plot is blank. Please edit the expected file!"
         else:
-            caption = str(this_file + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+            caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
 
-        
+
         ESMValMD("meta",
                  filename,
                  self.__basetags__ + ['C3S_SMM'],
@@ -570,21 +617,25 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
-        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_file.upper().split()))
+        # produce report
+        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
     
     
     def __do_gcos_requirements__(self):
         
-        this_file = "GCOS requirements"
+        this_function = "GCOS requirements"
         
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_file.split()) + "." + self.__output_type__
+        # TODO: Feed from results
+        
+        # plotting routines
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
         fig = do_gcos_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
         fig.savefig(filename)
         plt.close(fig)
         
-        caption = str(this_file + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
         
         ESMValMD("meta",
                  filename,
@@ -595,6 +646,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
-        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_file.upper().split()))
+        # produce report
+        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return

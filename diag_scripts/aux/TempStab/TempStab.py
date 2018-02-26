@@ -12,13 +12,14 @@ import numpy as np
 #from scipy import fft
 from scipy import signal
 from scipy import interpolate
-#from scipy.stats import mode
+from scipy.stats import t
 import scipy.fftpack as fftpack
 import scipy.optimize as optimize
 from scipy.ndimage.filters import uniform_filter1d
 import statsmodels.api as sm
 from models import LinearTrend, SineSeason3  # , SineSeasonk, SineSeason1
 import matplotlib.pyplot as plt
+
 #from bfast import BFAST # not working with rpy2
 
 ####
@@ -105,7 +106,6 @@ class TempStab(object):
         self.__numdate_orig__ = self.numdate.copy()
         self.__identified_gaps__ = []
         self.__min_time_step__ = None
-        self.__temp_fac__ = 1.
 
         # constants:
         # numeric tolerance for shift
@@ -122,14 +122,15 @@ class TempStab(object):
         self.__periods_method__ = kwargs.get('periods_method', "autocorr")
         # TODO smoothing filter size is a hard question
         self.smoothing = kwargs.get('smoothing4periods', 3)
-        self.temporal_res = kwargs.get('temporal_resolution', 'daily')
+        self.temporal_res = kwargs.get('temporal_resolution', 1.)
         self.__detrend_bool__ = kwargs.get('detrend', False)
         self.__deseason_bool__ = kwargs.get('deseason', False)
 
         self.__run__ = kwargs.get('run', False)
 
         # Set methods, conversion and integritiy checks
-        self.__set_temp_fac__()
+#        self.__set_temp_fac__()
+        self.__temp_fac__ = self.temporal_res
         self.__set_break_model__()
         self.__set_season_model__()
         self.__set_time__()
@@ -383,10 +384,19 @@ class TempStab(object):
         #  remove linear trend res = x - (slope*t + offset)
         if self.__detrend_bool__:
             self.__detrend__()
+            print("detrended")
 
         # remove seasonality
         if self.__deseason_bool__:
-            self.__deseason__()
+            count=0
+            while count<1:
+                try:
+                    self.__deseason__()
+                    count = 99
+                except:
+                    count += 1    
+            
+            print("deseasoned")
 
     def __deseason__(self):
         print('Deseasonalization of the data ...')
@@ -517,6 +527,9 @@ class TempStab(object):
         res.update({'season' : self.__season_removed__})
         res.update({'breakpoints' : self.breakpoints})
         res.update({'nbreak' : len(self.breakpoints)})
+#        print(res)
+#        import time
+#        time.sleep(50)
         return res
     
     def __get_indices__(self, bp, i, n):
@@ -531,7 +544,7 @@ class TempStab(object):
             i2 = n
         return min([i1, i2]), max([i1, i2])
 
-    def __get_trend_parameters__(self, bp, x):
+    def __get_trend_parameters__(self, bp, x, remove_seasonality=False):
         """
         calculate linear trend parameters for each segment between breakpoints
 
@@ -553,6 +566,8 @@ class TempStab(object):
             return trends
         xx = self.numdate[0:bp[0]]
         yy = x[0:bp[0]]
+        if remove_seasonality:
+            assert False
 
         # estimate piecewise linear trend
         L = LinearTrend(xx, yy) ### todo uncertatinis???
@@ -930,17 +945,46 @@ class TempStab(object):
     def __break_CUMSUMADJ__(self,x,**kwargs):
         # doi: 10.1016/j.jhydrol.2014.12.002
         
+        alpha=0.05 #TODO make this an input
+        
         m = len(x)/2
              
         csx = x.cumsum()
         
-        CUMSMADJ=[]
+        CUMSUMADJ=[]
         
         for j in np.arange(len(x)):
-            CUMSMADJ.append(csx[j] - j/float(m) * csx[m])
+            CUMSUMADJ.append(csx[j] - j/float(m) * csx[m])
             
-        print('###########################################################')
-#        plt.plot(CUMSMADJ)
+        
+        lin=np.polyfit(np.arange(len(CUMSUMADJ)),CUMSUMADJ,1)
+        lin_fn=np.poly1d(lin)
+        errors=lin_fn(np.arange(len(CUMSUMADJ)))-CUMSUMADJ
+        std_error=np.sqrt(1./(len(x)-2.)*sum(errors**2))
+        quantile = t.ppf(1.-alpha, len(x)-2)
+        deltaC=std_error*quantile
+        pot_bps=abs(errors)>deltaC
+        pot_bps2=self.__single_peaks_CUMSUMADJ__(errors,pot_bps)
+        r=list(compress(xrange(len(pot_bps2)), pot_bps2))
+        return(r)
+
+    def __single_peaks_CUMSUMADJ__(self,x,choice)  :
+        #if there are 2 breakpoints following each other, it's the bigger one!
+        new_choice=np.repeat(False,len(x))
+        i=0
+        while i<len(x):
+            v=[]
+            if choice[i]:
+                j=i
+                while (choice[min([j,len(x)-1])] and j<len(x)):
+                    v.append(x[j])
+                    j+=1
+                new_choice[i+np.argmax(np.abs(v))]=True
+                i=j
+            else:
+                i+=1
+        return(new_choice)
+                    
         
     def __get_breakpoints_spline__(self, x, y):
         # estimate breakpoints using splines
