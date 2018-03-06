@@ -348,13 +348,16 @@ def do_smm_table(csv_expert, csv_definitions):
 #              )
 #    file.close()    
 
-def do_gcos_table(gcos_expert, gcos_reference):
+def do_gcos_table(varname, gcos_expert, gcos_reference):
     """
     Author  :  F. Massonnet
     Creation: February 9th, 2018
     Updated: February 15th, 2018 (B. Mueller)
+             March 1st, 2018 (B. Mueller) (no csv for expert)
 
     Inputs:
+        - varname: the variable name to read the right gcos table parts
+        
         - gcos_expert: A CSV file giving the GCOS criteria value for the dataset
                        or product assessed.
                        The first line is supposed to be a header with
@@ -376,14 +379,15 @@ def do_gcos_table(gcos_expert, gcos_reference):
                             "Accuracy", "Stability", "Frequency",         "Resolution"
                             0.3       , 0.02       , "Hourly\nto weekly", 0.9
 
-        - gcos_reference: A CSV file with the reference values (GCOS standards for that product)
-                          Order of columns must of course match the expert file!
+        - gcos_reference: A dictionary the reference values (GCOS standards for that product)
+                          keys must of course match the expert file!
                           Example:
-                          >> cat gcos_reference.csv
-                               "Accuracy", "Stability", "Frequency", "Resolution"
-                               0.05       , 0.05       , 0.2        , 0.5
+                          {"Accuracy":{"value":0.3,"unit":"m2"},
+                           "Stability":{"value":0.5,"unit":"m2 0.1 y-1"},
+                           "Frequency":{"value":28,"unit":"days"},
+                           "Resolution":{"value":0.5,"unit":"degrees"}}
     Outputs:
-        - A *.rst file that includes a two-row table: first row = header,
+        - A *.png file that includes a two-row table: first row = header,
           second row = numbers from expert with green or red shading depending
           on whether the GCOS standards are met or not
 
@@ -411,18 +415,34 @@ def do_gcos_table(gcos_expert, gcos_reference):
     # Get the horizontal dimension of the GCOS table
     nx = len(contents[0])
     
-    # Read in the product table and store the data. ignore the header!
-    counter_y = 0 # Counter along rows of the CSV file
-    with open(gcos_expert, 'rb') as csvfile:
-        # Check the match up between headers
-        s = csv.reader(csvfile, delimiter = ",", skipinitialspace = True)
-        for row in s:
-            if counter_y == 0:
-                if not [l.strip().lower() for l in row] == [l.strip().lower() for l in contents[0]]:
-                    sys.exit("(do_gcos_report) NO MATCH-UP BETWEEN HEADER NAMES IN REFERENCE AND PRODUCT CSV FILES. MAKE SURE NAMES AND ORDER MATCH UP.")
+#    # Read in the product table and store the data. ignore the header!
+#    counter_y = 0 # Counter along rows of the CSV file
+#    with open(gcos_expert, 'rb') as csvfile:
+#        # Check the match up between headers
+#        s = csv.reader(csvfile, delimiter = ",", skipinitialspace = True)
+#        for row in s:
+#            if counter_y == 0:
+#                if not [l.strip().lower() for l in row] == [l.strip().lower() for l in contents[0]]:
+#                    sys.exit("(do_gcos_report) NO MATCH-UP BETWEEN HEADER NAMES IN REFERENCE AND PRODUCT CSV FILES. MAKE SURE NAMES AND ORDER MATCH UP.")
+#            else:
+#                contents.append(row)
+#            counter_y += 1
+    
+    if not isinstance(gcos_expert, dict):
+        assert False, "wrong input type in gcos"
+    elif not np.all(np.sort(gcos_expert.keys()) == np.sort(contents[0])):
+        assert False, "wrong names in gcos"
+    else:
+        data_contents=[]
+        for key in contents[0]:
+            if gcos_expert[key]["unit"] is None:
+                this_unit = ""
+            elif gcos_expert[key]["unit"] in ["1","unkown","no-unit"]:
+                this_unit = ""
             else:
-                contents.append(row)
-            counter_y += 1
+                this_unit = " " + gcos_expert[key]["unit"]
+            data_contents.append(str(gcos_expert[key]["value"]) + this_unit)
+        contents.append(data_contents)
 
     ny = len(contents)
 
@@ -433,13 +453,13 @@ def do_gcos_table(gcos_expert, gcos_reference):
         sys.exit("(do_gcos_report) STOP: uneven number of columns in reference file")
 
     # Create the figure
-    fig = plt.figure(figsize = (5, 2))
+    fig = plt.figure(figsize = (10, 4))
     # X-Y mesh to plot the color array
     # The Y dimension is written from ny to zero as to write items in visually
     # descending order.
     x_grid, y_grid = np.meshgrid(np.arange(nx + 1), np.arange(ny, -1, -1))
 
-    plt.title("GCOS requirements", fontsize = 18)
+    plt.title("GCOS requirements", fontsize = 36)
     # Grid lines
     [plt.plot((0, nx), (y, y), color = 'k') for y in range(ny)]
     [plt.plot((x, x), (0, ny), color = 'k') for x in range(nx)]
@@ -448,10 +468,10 @@ def do_gcos_table(gcos_expert, gcos_reference):
     for y in range(ny):
         if y == ny - 1: # if header
           fontweight = "bold"
-          fontsize   = 10
+          fontsize   = 20
         else:
           fontweight = "normal"
-          fontsize   = 10
+          fontsize   = 20
         for x in range(nx):
             # Read in the "go to line" in the csv and convert it to "go to line" instruction
             # When \n stands in a CSV, python reads \\n
@@ -460,8 +480,8 @@ def do_gcos_table(gcos_expert, gcos_reference):
                      fontweight = fontweight, fontsize = fontsize)
 
     # Add legend on the left
-    plt.text(-0.1, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center", fontsize=10)
-    plt.text(-0.1, ny - 2.5, "ECV", rotation = 90, ha = "center", va = "center", fontsize=10)
+    plt.text(-0.3, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center", fontsize=15)
+    plt.text(-0.3, ny - 2.5, "ECV\n(averages)", rotation = 90, ha = "center", va = "center", fontsize=15)
     plt.xticks([])
     plt.yticks([])
     plt.xlim(0, nx)

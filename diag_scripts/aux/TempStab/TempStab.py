@@ -298,7 +298,7 @@ class TempStab(object):
         
     def __periods_fft_optim__(self):
         """
-        periods from autocorrelation
+        periods from fft optimization
         """
         
         keep = [not math.isnan(pp) for pp in self.prep]
@@ -463,6 +463,8 @@ class TempStab(object):
         """
         
         self.__prep_orig__ = self.prep.copy()
+        if np.ma.isMaskedArray(self.prep):
+            self.prep = self.prep.data
         self.__numdate_orig__ = self.numdate.copy()
 
         assert homogenize is not None, \
@@ -507,13 +509,16 @@ class TempStab(object):
 #                plt.show()
 #                assert False
             else:
-                self.homogenized = self.array
+                self.homogenized = self.prep.copy()
         else:
             self.trend = None
-            self.homogenized = self.array
+            self.homogenized = self.prep.copy()
 
         # perform final trend estimation
-        L_orig = LinearTrend(self.numdate, self.__orig__)  # TODO uncertatinties???
+        keep = [not math.isnan(pp) for pp in self.__orig__]
+        loc_orig = np.array(list(compress(self.__orig__, keep)))
+        loc_numdate = np.array(list(compress(self.numdate, keep)))
+        L_orig = LinearTrend(loc_numdate, loc_orig)  # TODO uncertatinties???
         L_orig.fit()  # should store also significance information if possible
         L_res = LinearTrend(self.numdate, self.homogenized)  # TODO uncertatinties???
         L_res.fit()  # should store also significance information if possible
@@ -548,7 +553,7 @@ class TempStab(object):
         """
         calculate linear trend parameters for each segment between breakpoints
 
-        todo: significance of trends xxx, consideration of uncertainties of
+        TODO: significance of trends xxx, consideration of uncertainties of
         samples
         how to deal wih seasonality here ??? would need to be removed ???
 
@@ -569,18 +574,30 @@ class TempStab(object):
         if remove_seasonality:
             assert False
 
+        if bp[0]!=0:
         # estimate piecewise linear trend
-        L = LinearTrend(xx, yy) ### todo uncertatinis???
-        L.fit()
-        L.__i1__ = 0
-        L.__i2__ = bp[0]
-        trends.append(L)
+            L = LinearTrend(xx, yy) ### TODO uncertainties???
+            L.fit()
+            L.__i1__ = 0
+            L.__i2__ = bp[0]
+            trends.append(L)
+        else:
+            L = LinearTrend(self.numdate[0:2], np.repeat(x[0],2)) ### TODO uncertainties???
+            L.fit()
+            L.__i1__ = 0
+            L.__i2__ = bp[0]
+            trends.append(L)
         n = len(x)
         for i in xrange(len(bp)):
             i1, i2 = self.__get_indices__(bp, i, n)
-            L = LinearTrend(self.numdate[i1:i2], x[i1:i2])
-            L.__i1__= i1
-            L.__i2__ = i2
+            if self.numdate[i1]==self.numdate[-1]:
+                L = LinearTrend(self.numdate[(i1-1):i2], np.repeat(x[i1],2))   
+                L.__i1__= i1
+                L.__i2__ = i2
+            else:
+                L = LinearTrend(self.numdate[i1:i2], x[i1:i2])
+                L.__i1__= i1
+                L.__i2__ = i2
             L.fit()
             trends.append(L)
         return trends
@@ -618,8 +635,13 @@ class TempStab(object):
             T2=trends[i+1]
             hlp = np.append(r[:T1.__i1__], self.array[T1.__i1__:T1.__i2__])
             F = T2.eval_func(x[T2.__i1__:T2.__i2__])
-            L = T1.eval_func(x[T1.__i1__:T1.__i2__])
-            O = (L[-1]-F[0])
+            if T1.__i1__==T1.__i2__:
+                index=np.array(x[T1.__i1__])
+                L_val = T1.eval_func(index)
+            else:
+                index=x[T1.__i1__:T1.__i2__]
+                L_val = T1.eval_func(index)[-1]
+            O = (L_val-F[0])
 #            plt.plot(x[T1.__i1__:T2.__i2__],np.append(L,F))
 #            plt.plot(x[T1.__i1__:T2.__i2__],np.append(L-O,F))
 #            plt.show()
@@ -678,6 +700,7 @@ class TempStab(object):
         """
         fill data gaps if existing
         """
+        
         if sum(self.__identified_gaps__) > 0:
             keep = [not math.isnan(pp) for pp in self.prep]
             loc_prep = np.array(list(compress(self.prep, keep)))

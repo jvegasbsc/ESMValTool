@@ -4,6 +4,7 @@ Basic implementation for diagnostics into ESMValTool
 # used modules
 import iris
 import iris.coord_categorisation
+from iris.analysis import stats as cubestats
 import os
 import sys
 import shutil
@@ -73,12 +74,12 @@ class __Diagnostic_skeleton__(object):
         self.__basetags__ = []
         self.__infile__ = None
         self.__inpath__= None
-        self.gcos = dict()
+        self.__gcos_dict__ = dict()
         # save GCOS requirements
-        self.gcos.update({"frequency":None})
-        self.gcos.update({"resolution":None})
-        self.gcos.update({"acuracy":None})
-        self.gcos.update({"stability":None})
+        self.__gcos_dict__.update({"Frequency":{"value":None, "unit":None}})
+        self.__gcos_dict__.update({"Resolution":{"value":None, "unit":None}})
+        self.__gcos_dict__.update({"Accuracy":{"value":None, "unit":None}})
+        self.__gcos_dict__.update({"Stability":{"value":None, "unit":None}})
         
         self.authors = ["A_muel_bn", "A_hass_bg", "A_laue_ax",
                         "A_broe_bj", "A_mass_fr", "A_nico_nd",
@@ -97,12 +98,12 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
         self.__do_overview__()
-#        self.__do_mean_var__()
+        self.__do_mean_var__()
         self.__do_trends__()
-#        self.__do_extremes__()
-#        self.__do_sectors__()
-#        self.__do_maturity_matrix__()
-#        self.__do_gcos_requirements__()
+        self.__do_extremes__()
+        self.__do_sectors__()
+        self.__do_maturity_matrix__()
+        self.__do_gcos_requirements__()
 
     def __do_overview__(self):
         self.__prepare_report__(content={},filename="do_overview_default")
@@ -362,8 +363,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__prepare_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
         
         # save GCOS requirements
-        self.gcos.update({"frequency":tim_freq_spec})
-        self.gcos.update({"resolution":[lon_freq_spec,lat_freq_spec]})
+        self.__gcos_dict__.update({"Frequency":{"value":round(tim_freq_spec[1],2), "unit":t_info.split(" ")[0]}})
+        self.__gcos_dict__.update({"Resolution":{"value":round(np.mean([lon_freq_spec[1],lat_freq_spec[1]]),2), "unit":str(self.sp_data.coord("longitude").units)}})
         
         # save values for other diagnostics
         self.__avg_timestep__ = tim_freq_spec[1]
@@ -529,7 +530,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         TempStab = utils.__TS_of_cube__(self.sp_data,
                                         dates=self.__tim_read__,
                                         breakpoint_method="CUMSUMADJ",
-                                        deseason=True,
                                         max_num_periods=3,
                                         periods_method="autocorr",
                                         temporal_resolution = self.__avg_timestep__)
@@ -569,8 +569,64 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
+        x=Plot2D(TempStab["version"])
+        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_ver_trend." + self.__output_type__
+        list_of_plots.append(filename)
+        figS.savefig(filename)
+        plt.close(figS)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' versions of trend estimation of ' + self.__varname__ + ' temporal trends per decade after breakpoint detection for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        x=Plot2D(TempStab["slope"]-S)
+        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_mean_diff." + self.__output_type__
+        list_of_plots.append(filename)
+        figP.savefig(filename)
+        plt.close(figP)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' slope difference after breakpoint reduction for ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        x=Plot2D(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
+        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+        
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_corr." + self.__output_type__
+        list_of_plots.append(filename)
+        figP.savefig(filename)
+        plt.close(figP)
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+                 str("Latitude/Longitude" + ' correlation after breakpoint reduction for ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                 '#C3S' + 'temptrend' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
         # produce report
         self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
+        
+        # update gcos
+        self.__gcos_dict__.update({"Accuracy":{"value":None, "unit":None}})
+        self.__gcos_dict__.update({"Stability":{"value":None, "unit":None}})
+        
         return
     
     
@@ -627,11 +683,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         this_function = "GCOS requirements"
         
-        # TODO: Feed from results
-        
         # plotting routines
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
-        fig = do_gcos_table(os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_expert.csv", os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
+        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
         fig.savefig(filename)
         plt.close(fig)
         
