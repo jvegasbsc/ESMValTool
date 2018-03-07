@@ -197,8 +197,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         self.__inpath__ = file_info[self.__infile__]["dir"]
         self.__time_period__ = "-".join([file_info[self.__infile__]["start_year"],file_info[self.__infile__]["end_year"]])
-        self.__dataset_id__ = [file_info[self.__infile__]["name"], file_info[self.__infile__]["case_name"], file_info[self.__infile__]["ensemble"], file_info[self.__infile__]["var"]]
-        
+        try:
+            self.__dataset_id__ = [file_info[self.__infile__]["name"], file_info[self.__infile__]["case_name"], file_info[self.__infile__]["ensemble"], file_info[self.__infile__]["var"]]
+        except:
+            self.__dataset_id__ = [file_info[self.__infile__]["name"], file_info[self.__infile__]["mip"], file_info[self.__infile__]["experiment"], file_info[self.__infile__]["ensemble"], file_info[self.__infile__]["var"]]
+
         self.__basic_filename__ = "_".join(self.__dataset_id__ + [self.__time_period__])
         
         self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
@@ -526,15 +529,18 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
-        # linear trend (slope) and breakpoints after homogenization
+        # linear trend (slope),breakpoints, and actual data after homogenization
         TempStab = utils.__TS_of_cube__(self.sp_data,
                                         dates=self.__tim_read__,
                                         breakpoint_method="CUMSUMADJ",
                                         max_num_periods=3,
                                         periods_method="autocorr",
-                                        temporal_resolution = self.__avg_timestep__)
+                                        temporal_resolution=self.__avg_timestep__,
+                                        min_avail_pts=2)
         
         # plotting routines
+        
+        # plotting the slope after break point correction
         x=Plot2D(TempStab["slope"])
         figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
 
@@ -552,6 +558,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
+        # plotting number of breakpoints
         x=Plot2D(TempStab["number_breakpts"])
         figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
         
@@ -569,22 +576,23 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.diagname,
                  self.authors)
         
-        x=Plot2D(TempStab["version"])
-        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_ver_trend." + self.__output_type__
-        list_of_plots.append(filename)
-        figS.savefig(filename)
-        plt.close(figS)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' versions of trend estimation of ' + self.__varname__ + ' temporal trends per decade after breakpoint detection for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
+        # plotting the version (2=deseason, 1=detrend, 0=neither, -1=not enough data available, -2=something went wrong)
+#        x=Plot2D(TempStab["version"])
+#        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+#
+#        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_ver_trend." + self.__output_type__
+#        list_of_plots.append(filename)
+#        figS.savefig(filename)
+#        plt.close(figS)
+#        
+#        ESMValMD("meta",
+#                 filename,
+#                 self.__basetags__ + ['DM_global', 'C3S_trend'],
+#                 str("Latitude/Longitude" + ' versions of trend estimation of ' + self.__varname__ + ' temporal trends per decade after breakpoint detection for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+#                 '#C3S' + 'temptrend' + self.__varname__,
+#                 self.__infile__,
+#                 self.diagname,
+#                 self.authors)
         
         x=Plot2D(TempStab["slope"]-S)
         figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")

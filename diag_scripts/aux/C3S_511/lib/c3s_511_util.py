@@ -254,6 +254,10 @@ def __loc_TSA_fun__(array,**kwargs):
     max_num_period = kwargs.get('max_num_periods', 3)
     periods_method = kwargs.get('periods_method', 'autocorr')
     temporal_resolution = kwargs.get('temporal_resolution', 1.)
+    minimum_available_data_points = kwargs.get('min_avail_pts',1)
+    
+    if minimum_available_data_points < 2:
+        assert False, "No trend calculation possible for less than 2 data points"
 
     RES = None
     done = -2
@@ -261,10 +265,10 @@ def __loc_TSA_fun__(array,**kwargs):
     timearray = kwargs.get('dates', None)
     
     if timearray is not None:
-        if array.mask.sum()==0:
-#            try:
-#                with HiddenPrints():
-                    print array
+        if array.mask.sum()<len(array.mask)-(minimum_available_data_points-1):
+            try:
+                with HiddenPrints():
+#                    print array
                     TSA = TS(timearray, array,
                              breakpoint_method=breakpoint_method,
                              detrend=True,
@@ -274,32 +278,32 @@ def __loc_TSA_fun__(array,**kwargs):
                              temporal_resolution = temporal_resolution)
                     RES = TSA.analysis(homogenize=True)
                     done = 2
-#            except:
-#                try:
-#                    with HiddenPrints():
-#                        TSA = TS(timearray, array,
-#                                 breakpoint_method=breakpoint_method,
-#                                 detrend=True,
-#                                 deseason=False,
-#                                 max_num_periods=max_num_period,
-#                                 periods_method=periods_method,
-#                                 temporal_resolution = temporal_resolution)
-#                        RES = TSA.analysis(homogenize=True)
-#                        done = 1
-#                except:
-#                    try:
-#                        with HiddenPrints():
-#                            TSA = TS(timearray, array,
-#                                     breakpoint_method=breakpoint_method,
-#                                     detrend=False,
-#                                     deseason=False,
-#                                     max_num_periods=max_num_period,
-#                                     periods_method=periods_method,
-#                                     temporal_resolution = temporal_resolution)
-#                            RES = TSA.analysis(homogenize=True)
-#                            done = 0
-#                    except:
-#                        done = False
+            except:
+                try:
+                    with HiddenPrints():
+                        TSA = TS(timearray, array,
+                                 breakpoint_method=breakpoint_method,
+                                 detrend=True,
+                                 deseason=False,
+                                 max_num_periods=max_num_period,
+                                 periods_method=periods_method,
+                                 temporal_resolution = temporal_resolution)
+                        RES = TSA.analysis(homogenize=True)
+                        done = 1
+                except:
+                    try:
+                        with HiddenPrints():
+                            TSA = TS(timearray, array,
+                                     breakpoint_method=breakpoint_method,
+                                     detrend=False,
+                                     deseason=False,
+                                     max_num_periods=max_num_period,
+                                     periods_method=periods_method,
+                                     temporal_resolution = temporal_resolution)
+                            RES = TSA.analysis(homogenize=True)
+                            done = 0
+                    except:
+                        done = False
         else:
              done = -1      
     else:
@@ -324,6 +328,7 @@ def __TS_of_cube__(cube,**kwargs):
     max_num_period = kwargs.get('max_num_periods', 3)
     periods_method = kwargs.get('periods_method', 'autocorr')
     temporal_resolution = kwargs.get('temporal_resolution', 1.)
+    minimum_available_data_points = kwargs.get('min_avail_pts',1)
     
     min_trend = cube[0,:,:].copy()
     num_bp = cube[0,:,:].copy()
@@ -340,6 +345,7 @@ def __TS_of_cube__(cube,**kwargs):
                                   breakpoint_method=breakpoint_method,
                                   max_num_period=max_num_period,
                                   periods_method=periods_method,
+                                  min_avail_pts=minimum_available_data_points,
                                   temporal_resoution=temporal_resolution)
     
     mask = np.isnan(res[0,:,:]) + min_trend.data.mask
