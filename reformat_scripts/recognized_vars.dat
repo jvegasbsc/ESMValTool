@@ -23,10 +23,10 @@ std_name = lev
 alt_name = 
 
 std_name = lat
-alt_name = rlat,latitude,yt
+alt_name = rlat,latitude,yt,y
 
 std_name = lon
-alt_name = rlon,longitude,xt
+alt_name = rlon,longitude,xt,x
 
 std_name = lat_vertices
 alt_name = lat_bounds

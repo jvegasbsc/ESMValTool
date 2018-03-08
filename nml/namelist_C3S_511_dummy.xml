@@ -43,6 +43,23 @@ This namelist is part of the ESMValTool
 
 <DIAGNOSTICS>
     
+    
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="QA4ECV">			   			fAPAR                                       </variable>
+        <field_type>                      						T2Ds                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_land, T_ghg, T_chem 					  </tags>
+		<tags> 													R_land 					  </tags>
+		
+		<model> OBS        QA4ECV				   ECV				avh-geo-res050 	 1982 2016  @{OBSPATH} </model>
+		<model> OBS        QA4ECV				   ECV				L3-Mosaic-Albedo-Merge-05 	 1982 2016  @{OBSPATH}  </model>
+    </diag>
+    
+    
+<!--	
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -52,12 +69,10 @@ This namelist is part of the ESMValTool
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_atmos, T_ghg, T_chem 					  </tags>
 	
-		<!-- <model>  CMIP5_ETHZ  GFDL-CM3            Amon  historical   r1i1p1  1997 2010  @{MODELPATH}ETHZ_CMIP5/  </model> -->
-		<!-- <model> OBS        QA4ECV				   ECV				avh-geo-res050 	 2002 2005  @{OBSPATH}  </model> -->
-		<!-- <model> CMIP5 		GFDL-CM3 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model> -->
+		<model> OBS        QA4ECV				   ECV				avh-geo-res050 	 2002 2005  @{OBSPATH}  </model>
 		<model> CMIP5 		MPI-ESM-MR 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>
-		<!-- <model>  OBS         NIWA                reanaly      1             1997 2010  @{OBSPATH}/Tier3/NIWA            </model> -->
     </diag>
+-->
 
 <!--	
 	<diag>
