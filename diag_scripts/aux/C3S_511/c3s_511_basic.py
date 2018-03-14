@@ -268,22 +268,35 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         list_of_plots=[]
         
+        nonmissing_values = self.sp_data.copy()
+        nonmissing_values.data = nonmissing_values.data*0.+1.   
+        
+        general_mask = np.broadcast_to(
+                    np.expand_dims(
+                            np.all(nonmissing_values.data.mask,
+                                   axis=0),#
+                                   axis=0),#
+                                       nonmissing_values.data.shape)
+        
+        available_values = nonmissing_values.copy()
+        available_values.data.data[np.isnan(available_values.data.data)]=1.
+        available_values.data = available_values.data*0.+1.   
+        available_values.data.mask = general_mask.copy()
+
         for d in self.dimensions:
             
             long_left_over = self.dimensions[self.dimensions!=d]
             short_left_over = np.array([sl[0:3] for sl in long_left_over])
             
             # data of fractional available measurements
-            missing_values = self.sp_data.copy()
-            missing_values.data = missing_values.data*0.+1.
-            missing_values = missing_values.collapsed(d, iris.analysis.SUM)
-            missing_values.data = missing_values.data / \
-                float(len(self.sp_data.coord(d).points))
+            nonmissing_values_2d = nonmissing_values.collapsed(d, iris.analysis.SUM)
+            available_values_2d = available_values.collapsed(d, iris.analysis.SUM)
+            nonmissing_values_2d = iris.analysis.maths.divide(nonmissing_values_2d,available_values_2d)
              
             # plotting routine
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
             list_of_plots.append(filename)
-            x=Plot2D(missing_values)
+            x=Plot2D(nonmissing_values_2d)
             x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
             
             ESMValMD("meta",
@@ -294,7 +307,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.__infile__,
                      self.diagname,
                      self.authors)
-
+            
+        del nonmissing_values
+        del available_values
+        del nonmissing_values_2d
+        del available_values_2d
         
         # histogram plot of available measurements
         all_data = self.sp_data.copy()
@@ -315,7 +332,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.__infile__,
                  self.diagname,
                  self.authors)
-
+        
+        del all_data
 
         # dimension information
         lon_range = self.sp_data.coord("longitude").points
@@ -418,6 +436,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     for p in percentiles:
                     
                         mean_std_cov.update({m + " " + str(int(round(p,0))) + " percent":perc.extract(iris.Constraint(percentile_over_time=p))})
+                        
+                    del perc
                 
                 elif m == "CLIMATOLOGY":
                     
@@ -427,6 +447,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         clim_comp = clim.aggregated_by('month_num',iris.analysis.MEAN)
                         
                         clim_anom = clim.copy()
+                        
+                        del clim
                         
                         for mn in range(len(clim_anom.coord('month_num').points)):
                         
@@ -439,11 +461,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         for mon in clim_comp.coord('month_num').points:
                     
                             mean_std_cov.update({m + " " + str(int(mon)):clim_comp.extract(iris.Constraint(month_num=mon))})
-                            
+                        
+                        del clim_comp
+                        
                         for y in clim_anom.coord('year').points:
                     
                             mean_std_cov.update({"mean anomalies from " + m + " per year " + str(int(y)):clim_anom.extract(iris.Constraint(year=y))})
-        
+                            
+                        del clim_anom
+                            
                     except:
                         pass
                 
@@ -465,9 +491,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
                     list_of_plots.append(filename)
                     x=Plot2D(mean_std_cov[m])
-                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                     fig.savefig(filename)
                     plt.close(fig)
+                    
+                    del mean_std_cov[m]
                     
                     ESMValMD("meta",
                              filename,
@@ -477,6 +505,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                              self.__infile__,
                              self.diagname,
                              self.authors)
+                    
+                    
+                    
+            del mean_std_cov
         
         # produce report
         self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
@@ -528,6 +560,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.__infile__,
                  self.diagname,
                  self.authors)
+        
+        del P
         
         # linear trend (slope),breakpoints, and actual data after homogenization
         TempStab = utils.__TS_of_cube__(self.sp_data,
@@ -627,6 +661,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.__infile__,
                  self.diagname,
                  self.authors)
+        
+        del TempStab
         
         # produce report
         self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())

@@ -4,7 +4,7 @@
 variable_info = True
 variable_info@derived = True
 variable_info@long_name = "fAPAR"
-variable_info@units = "-"
+variable_info@units = "1"
 
 undef("calculate")
 function calculate(index [1] : integer,

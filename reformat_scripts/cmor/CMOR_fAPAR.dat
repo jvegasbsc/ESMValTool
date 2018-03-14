@@ -7,7 +7,7 @@ modeling_realm:    land
 ! Variable attributes:
 !----------------------------------
 standard_name:     Fraction_of_absorbed_Photosynthetic_Active_Radiation
-units:             -
+units:             1
 cell_methods:      time: point area: mean where land
 cell_measures:     area: areacella
 long_name:         Fraction of absorbed Photosynthetic Active Radiation
