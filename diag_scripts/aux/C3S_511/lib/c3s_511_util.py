@@ -303,7 +303,7 @@ def __loc_TSA_fun__(array,**kwargs):
                             RES = TSA.analysis(homogenize=True)
                             done = 0
                     except:
-                        done = False
+                        done = -9
         else:
              done = -1      
     else:

@@ -12,7 +12,8 @@ import mpl_toolkits.basemap as bm
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
-
+import matplotlib.cm as mpl_cm
+import cartopy.crs as ccrs
 
 MPLSTYLE = os.path.dirname(os.path.realpath(__file__)) + os.sep + 'default.mplstyle'
 
@@ -471,3 +472,198 @@ class Plot2D(object):
                 fig.add_subplot(cb)
     
             return 
+        
+        
+class Plot2D_2(object):
+    """
+    Description
+        Basic class for 2-dimensional plotting
+
+    Contents
+        method plot
+    """
+
+    # Class attributes
+    LATS = ['latitude']     # accepted lat names
+    LONS = ['longitude']    # accepted lon names
+    TIME = ['time']         # accepted time names
+    GRIDSPEC_LENGTH = 5     # size of the matplotlib gridspec
+    
+    
+    def __init__(self, cube):
+        """
+        Arguments
+            cube : iris cube
+
+        Description
+            Initializes the class.
+
+        TODO
+            optional summary placement
+            swap x/y axis
+
+        Modification history
+            20180207-A_schl_ma: written
+        """
+        
+        # Check arguments
+        if (not isinstance(cube, iris.cube.Cube)):
+            raise TypeError("Invalid input: expected iris cube")
+        self.cube = iris.util.squeeze(cube)
+        if (self.cube.ndim != 2):
+            raise TypeError("Invalid input: expected 2-dimensional iris cube")
+        try:
+            self.name = cube.long_name
+        except:
+            pass
+        self.units = ' [' + str(cube.units) + ']'
+        
+        # Get dimension names
+        dim_names = [dim.standard_name for dim in self.cube.dim_coords]
+        for dim in dim_names:
+            if (dim in self.__class__.LATS):
+                self.lat_var = dim
+                break
+            else:
+                self.lat_var = None
+        for dim in dim_names:
+            if (dim in self.__class__.LONS):
+                self.lon_var = dim
+                break
+            else:
+                self.lon_var = None
+        for dim in dim_names:
+            if (dim in self.__class__.TIME):
+                self.time_var = dim
+                break
+            else:
+                self.time_var = None
+                
+        # Lat/lon plot
+        if (self.lat_var is not None and self.lon_var is not None):
+            self.plot_type = 'latlon'
+
+        # Lat/time plot
+        elif (self.lat_var is not None and self.time_var is not None):
+            self.plot_type = 'lattime'
+
+        # Lon/time plot
+        elif (self.lon_var is not None and self.time_var is not None):
+            self.plot_type = 'lontime'
+
+        # Default case
+        else:
+            raise TypeError("Invalid input: cube does not contain supported " +
+                            "dimensions")
+        
+        # Setup matplotlib
+        plt.style.use(MPLSTYLE)
+
+###############################################################################
+    
+    def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
+             y_label=None, title=None, ax=None, fig=None):
+        """
+        Arguments
+            summary_plot   : Add summary line plot
+            colorbar_ticks : Ticks of the colorbar
+            x_label        : label of x-axis
+            y_label        : label of y-axis
+            title          : title of the plot
+
+        Returns
+            Matplotlib figure instance
+
+        Description
+            Actual plotting routine
+
+        Modification history
+            20180207-A_schl_ma: written
+        """
+        
+        # preprocessing cube information
+        self.cube.rename(title)
+        
+        brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
+        
+        try:
+            
+            vmin,vmax=np.nanpercentile(self.cube.data.data,[5,95])
+            
+            rounder=int(np.ceil(-np.log10(vmax-vmin)+1))
+            
+            vmin,vmax=np.round([vmin,vmax],rounder)
+            
+            levels=np.round(np.linspace(vmin,vmax,num=11),rounder)
+        except:
+            vmin=vmax=levels=None
+
+        
+        # check axes
+        if ax is None:
+            ax = plt.gca()
+        elif len(ax) == 2:
+            summary_plot = True
+        elif len(ax)>2:
+            raise ValueError("Invalid input: axes should not be more than 2!")
+        
+        # plot summary if necessary
+        if summary_plot:
+            plt.sca(ax[1])
+            
+            if (self.plot_type == 'latlon'):
+                collapse = self.lon_var
+            else:
+                if (self.plot_type == 'lattime'):
+                    collapse = self.time_var
+    
+                elif (self.plot_type == 'lontime'):
+                    collapse = self.time_var
+            
+            if (collapse == self.lat_var):
+                    grid_areas = iris.analysis.cartography.area_weights(self.cube)
+            else:
+                grid_areas = None
+            cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
+                                            weights=grid_areas)
+
+            if self.plot_type == 'lattime':
+                x = cube_line
+                y = cube_line.coord(self.lat_var)
+                latrange = self.cube.coords(self.lat_var).pop()
+#                lat_inc = np.diff(latrange.points).mean()
+                latrange = (np.min(latrange.points),np.max(latrange.points))
+                plt.gca().set_xlim(vmin,vmax)
+                plt.gca().set_ylim(latrange)
+            elif self.plot_type == 'lontime':
+                x = cube_line.coord(self.lon_var)
+                y = cube_line
+                lonrange = self.cube.coords(self.lon_var).pop()
+#                lon_inc = np.diff(lonrange.points).mean()
+                lonrange = (np.min(lonrange.points),np.max(lonrange.points))
+                plt.gca().set_ylim(vmin,vmax)
+                plt.gca().set_xlim(lonrange)
+            else:
+                raise ValueError("Invalid input: latlon should not have a summary plot")
+             
+            iplt.plot(x, y)
+            
+        plt.sca(ax[0])
+
+        # plot map
+        qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+        if self.plot_type == 'latlon':
+            mean= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.MEAN).data
+            std= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.STD_DEV).data
+            plt.gca().coastlines()
+            plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",linestyle=':')
+            plt.gca().text(-180,-100,r'mean: {0} $\pm$ {1} '.format(str(round(mean,2)),str(round(std,2))))
+            
+        plt.tight_layout()
+                       
+        if self.plot_type == 'lattime':
+            bb=ax[1].get_position()
+            bb.y0=ax[0].get_position().y0
+            ax[1].set_position(bb)
+        
+        return

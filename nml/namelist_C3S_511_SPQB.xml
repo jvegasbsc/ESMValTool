@@ -24,7 +24,7 @@ This namelist is part of the ESMValTool
   <write_netcdf type="boolean">       True                      </write_netcdf>
   <force_processing type="boolean">   False                     </force_processing>
   <wrk_dir type="path">               @{WORKPATH}               </wrk_dir>
-  <plot_dir type="path">              @{PLOTPATH}/dev/  		</plot_dir>
+  <plot_dir type="path">              @{PLOTPATH}/test/  		</plot_dir>
   <climo_dir type="path">             @{CLIMOPATH}       		</climo_dir>
   <write_plot_vars type="boolean">    True                      </write_plot_vars>
   <max_data_filesize type="integer">  100                       </max_data_filesize>
@@ -58,17 +58,18 @@ This namelist is part of the ESMValTool
     </diag>
     
  -->
-    	
+   
+    
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable ref_model="QA4ECV">			   			fAPAR                                       </variable>
-        <field_type>                      						T2Ds                                      </field_type>
+        <field_type>                      						T2Ms                                      </field_type>
         <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Land					  </tags>
 	
-		<model> OBS        QA4ECV				   ECV				avh-geo-res050 	 2002 2016  @{OBSPATH}  </model>
+		<model> OBS        QA4ECV				   ECV				avh-geo-res050-14D 	 1992 2006  @{OBSPATH}  </model>
 		 <!--   <model> CMIP5 		MPI-ESM-MR 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>-->
     </diag>
 

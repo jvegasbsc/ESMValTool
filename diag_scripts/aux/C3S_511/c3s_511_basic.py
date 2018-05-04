@@ -21,13 +21,14 @@ import datetime
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
+
 import c3s_511_util as utils
 from customErrors import ImplementationError, ConfigurationError, PathError, EmptyContentError
 import warnings
 from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
-from plot import Plot2D, PlotHist
+from plot import Plot2D_2, PlotHist
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 
@@ -104,44 +105,50 @@ class __Diagnostic_skeleton__(object):
         self.__do_sectors__()
         self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
+        self.__do_esmvalidation__()
 
     def __do_overview__(self):
-        self.__prepare_report__(content={},filename="do_overview_default")
+        self.__do__report__(content={},filename="do_overview_default")
         raise ImplementationError("__do_overview__","This method has to be implemented.")
         return
 
     def __do_mean_var__(self):
-        self.__prepare_report__(content={},filename="do_mean_var_default")
+        self.__do__report__(content={},filename="do_mean_var_default")
         raise ImplementationError("__do_mean_var__","This method has to be implemented.")
         return
 
     def __do_trends__(self):
-        self.__prepare_report__(content={},filename="do_trends_default")
+        self.__do__report__(content={},filename="do_trends_default")
         raise ImplementationError("__do_trends__","This method has to be implemented.")
         return
 
     def __do_extremes__(self):
-        self.__prepare_report__(content={},filename="do_extremes_default")
+        self.__do__report__(content={},filename="do_extremes_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
     
     def __do_sectors__(self):
-        self.__prepare_report__(content={},filename="do_sectors_default")
+        self.__do__report__(content={},filename="do_sectors_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
 
     def __do_maturity_matrix__(self):
-        self.__prepare_report__(content={},filename="do_maturity_matrix_default")
+        self.__do__report__(content={},filename="do_maturity_matrix_default")
         raise ImplementationError("__do_maturity_matrix__","This method has to be implemented.")
         return
 
     def __do_gcos_requirements__(self):
-        self.__prepare_report__(content={},filename="do_gcos_requirements_default")
+        self.__do__report__(content={},filename="do_gcos_requirements_default")
         raise ImplementationError("__do_gcos_requirements__","This method has to be implemented.")
         return
+    
+    def __do_esmvalidation__(self):
+        self.__do__report__(content={},filename="do_esmvalidation_default")
+        warnings.warn("Implementation Warning", UserWarning)
+        return
 
-    def __prepare_report__(self):
-        raise ImplementationError("__prepare_report__","This method has to be implemented.")
+    def __do__report__(self):
+        raise ImplementationError("__do__report__","This method has to be implemented.")
         return
 
 #    def write_reports(self):
@@ -292,21 +299,40 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             nonmissing_values_2d = nonmissing_values.collapsed(d, iris.analysis.SUM)
             available_values_2d = available_values.collapsed(d, iris.analysis.SUM)
             nonmissing_values_2d = iris.analysis.maths.divide(nonmissing_values_2d,available_values_2d)
-             
-            # plotting routine
-            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
-            list_of_plots.append(filename)
-            x=Plot2D(nonmissing_values_2d)
-            x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")").savefig(filename)
             
-            ESMValMD("meta",
-                     filename,
-                     self.__basetags__ + ['DM_global', 'C3S_overview'],
-                     str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                     '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
-                     self.__infile__,
-                     self.diagname,
-                     self.authors)
+            try:
+                # plotting routine
+                filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
+                list_of_plots.append(filename)
+                x=Plot2D_2(nonmissing_values_2d)
+                
+                fig = plt.figure()
+                if "longitude" == d:     
+                    gs = gridspec.GridSpec(1, 5)
+                    ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                    fig.set_figwidth(1.7*fig.get_figwidth())
+                    fig.set_figheight(1.2*fig.get_figheight())
+                elif "time" == d:
+                    ax = [plt.subplot(1,1,1)]
+                    fig.set_figheight(1.2*fig.get_figheight())
+                elif "latitude" == d:
+                    gs = gridspec.GridSpec(5, 1)
+                    ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
+                    fig.set_figheight(1.7*fig.get_figheight())
+                x.plot(ax=ax, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                fig.savefig(filename)
+                plt.close(fig.number)
+                
+                ESMValMD("meta",
+                         filename,
+                         self.__basetags__ + ['DM_global', 'C3S_overview'],
+                         str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                         '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
+                         self.__infile__,
+                         self.diagname,
+                         self.authors)
+            except:
+                print('no figure done # 001')
             
         del nonmissing_values
         del available_values
@@ -316,22 +342,25 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # histogram plot of available measurements
         all_data = self.sp_data.copy()
          
-        # plotting routine
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hist_all_vals" + "." + self.__output_type__
-        list_of_plots.append(filename)
-        x=PlotHist(all_data)
-        fig = x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        fig.savefig(filename)
-        plt.close(fig)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_overview'],
-                 str('Full temporal and spatial histogram of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'histall' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
+        try:
+            # plotting routine
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hist_all_vals" + "." + self.__output_type__
+            list_of_plots.append(filename)
+            x=PlotHist(all_data)
+            fig = x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_overview'],
+                     str('Full temporal and spatial histogram of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'histall' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+        except:
+            print('no figure done #002')
         
         del all_data
 
@@ -381,7 +410,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
         
         # produce report
-        self.__prepare_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
+        self.__do__report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
         
         # save GCOS requirements
         self.__gcos_dict__.update({"Frequency":{"value":round(tim_freq_spec[1],2), "unit":t_info.split(" ")[0]}})
@@ -392,10 +421,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
     
-    def __prepare_report__(self,**kwargs):
+    def __do__report__(self,**kwargs):
         
         # TODO specify sphinx structure
-        
         content = kwargs.get('content', [])
         if not isinstance(content, (list, dict)):
             raise TypeError("content", "Element is not a list, nor a dict.")
@@ -488,30 +516,50 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 # plotting routine
                 if mean_std_cov[m] is not None:
-                    filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
-                    list_of_plots.append(filename)
-                    x=Plot2D(mean_std_cov[m])
-                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-                    fig.savefig(filename)
-                    plt.close(fig)
+                    try:
+                        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
+                        list_of_plots.append(filename)
+                        x=Plot2D_2(mean_std_cov[m])
+                        
+                        fig = plt.figure()
+                        if "longitude" == d:     
+                            gs = gridspec.GridSpec(1, 5)
+                            ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                            fig.set_figwidth(1.7*fig.get_figwidth())
+                            fig.set_figheight(1.2*fig.get_figheight())
+                        elif "time" == d:
+                            ax = [plt.subplot(1,1,1)]
+                            fig.set_figheight(1.2*fig.get_figheight())
+                        elif "latitude" == d:
+                            gs = gridspec.GridSpec(5, 1)
+                            ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
+                            fig.set_figheight(1.7*fig.get_figheight())
+                        x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                        fig.savefig(filename)
+                        plt.close(fig.number)
+    #                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+    #                    fig.savefig(filename)
+    #                    plt.close(fig)
                     
-                    del mean_std_cov[m]
-                    
-                    ESMValMD("meta",
-                             filename,
-                             self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                             str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                             '#C3S' + m + "".join(short_left_over) + self.__varname__,
-                             self.__infile__,
-                             self.diagname,
-                             self.authors)
+                        del mean_std_cov[m]
+                        
+                        ESMValMD("meta",
+                                 filename,
+                                 self.__basetags__ + ['DM_global', 'C3S_mean_var'],
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                                 '#C3S' + m + "".join(short_left_over) + self.__varname__,
+                                 self.__infile__,
+                                 self.diagname,
+                                 self.authors)
+                    except:
+                        print('no figure done #003')
                     
                     
                     
             del mean_std_cov
         
         # produce report
-        self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
+        self.__do__report__(content={"plots":list_of_plots}, filename=this_function.upper())
 
         return
     
@@ -525,41 +573,53 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         # simple linear trend (slope) and p-values
         _,S,_,P = utils.__temporal_trend__(self.sp_data, pthres=1.01)        
-
-        # plotting routines
-        x=Plot2D(S)
-        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
-        list_of_plots.append(filename)
-        figS.savefig(filename)
-        plt.close(figS)
         
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
-        x=Plot2D(P)
-        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_pvals." + self.__output_type__
-        list_of_plots.append(filename)
-        figP.savefig(filename)
-        plt.close(figP)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' p-values for slopes of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
+        try:
+            # plotting routines
+            x=Plot2D_2(S)
+            
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
+            list_of_plots.append(filename)
+            
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+            
+            x=Plot2D_2(P)
+    
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_pvals." + self.__output_type__
+            list_of_plots.append(filename)
+            
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' p-values for slopes of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+            
+        except:
+            print('no figure done #004')
         
         del P
         
@@ -573,42 +633,52 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                                         min_avail_pts=2)
         
         # plotting routines
-        
-        # plotting the slope after break point correction
-        x=Plot2D(TempStab["slope"])
-        figS = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_min_slope." + self.__output_type__
-        list_of_plots.append(filename)
-        figS.savefig(filename)
-        plt.close(figS)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade after breakpoint detection for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
-        # plotting number of breakpoints
-        x=Plot2D(TempStab["number_breakpts"])
-        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_num_bps." + self.__output_type__
-        list_of_plots.append(filename)
-        figP.savefig(filename)
-        plt.close(figP)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' number of breakpoints of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
+        try:
+            # plotting the slope after break point correction
+            x=Plot2D_2(TempStab["slope"])
+    
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_min_slope." + self.__output_type__
+            list_of_plots.append(filename)
+            
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade after breakpoint detection for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+            
+            # plotting number of breakpoints
+            x=Plot2D_2(TempStab["number_breakpts"])
+            
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_num_bps." + self.__output_type__
+            list_of_plots.append(filename)
+    
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' number of breakpoints of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+        except:
+            print('no figure done #005')
         
         # plotting the version (2=deseason, 1=detrend, 0=neither, -1=not enough data available, -2=something went wrong)
 #        x=Plot2D(TempStab["version"])
@@ -627,45 +697,55 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 #                 self.__infile__,
 #                 self.diagname,
 #                 self.authors)
-        
-        x=Plot2D(TempStab["slope"]-S)
-        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_mean_diff." + self.__output_type__
-        list_of_plots.append(filename)
-        figP.savefig(filename)
-        plt.close(figP)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' slope difference after breakpoint reduction for ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
-        x=Plot2D(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
-        figP = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-        
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_corr." + self.__output_type__
-        list_of_plots.append(filename)
-        figP.savefig(filename)
-        plt.close(figP)
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['DM_global', 'C3S_trend'],
-                 str("Latitude/Longitude" + ' correlation after breakpoint reduction for ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                 '#C3S' + 'temptrend' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
+        try:
+            x=Plot2D_2(TempStab["slope"]-S)
+    
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_mean_diff." + self.__output_type__
+            list_of_plots.append(filename)
+    
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' slope difference after breakpoint reduction for ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+            
+            x=Plot2D_2(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
+            
+            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_corr." + self.__output_type__
+            list_of_plots.append(filename)
+            
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' correlation after breakpoint reduction for ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+        except:
+            print('no figure done #006')
         
         del TempStab
         
         # produce report
-        self.__prepare_report__(content={"plots":list_of_plots}, filename=this_function.upper())
+        self.__do__report__(content={"plots":list_of_plots}, filename=this_function.upper())
         
         # update gcos
         self.__gcos_dict__.update({"Accuracy":{"value":None, "unit":None}})
@@ -718,7 +798,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.authors)
         
         # produce report
-        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        self.__do__report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
     
@@ -745,6 +825,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.authors)
         
         # produce report
-        self.__prepare_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        self.__do__report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
