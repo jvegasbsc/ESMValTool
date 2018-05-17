@@ -14,6 +14,8 @@ import iris.plot as iplt
 import iris.quickplot as qplt
 import matplotlib.cm as mpl_cm
 import cartopy.crs as ccrs
+import random
+import sys
 
 MPLSTYLE = os.path.dirname(os.path.realpath(__file__)) + os.sep + 'default.mplstyle'
 
@@ -487,7 +489,6 @@ class Plot2D_2(object):
     LATS = ['latitude']     # accepted lat names
     LONS = ['longitude']    # accepted lon names
     TIME = ['time']         # accepted time names
-    GRIDSPEC_LENGTH = 5     # size of the matplotlib gridspec
     
     
     def __init__(self, cube):
@@ -503,7 +504,7 @@ class Plot2D_2(object):
             swap x/y axis
 
         Modification history
-            20180207-A_schl_ma: written
+            20180207-A_muel_bn: copied Plot2D and adjusted
         """
         
         # Check arguments
@@ -562,7 +563,7 @@ class Plot2D_2(object):
 ###############################################################################
     
     def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
-             y_label=None, title=None, ax=None, fig=None):
+             y_label=None, title=None, ax=None, fig=None, vminmax=None):
         """
         Arguments
             summary_plot   : Add summary line plot
@@ -578,7 +579,7 @@ class Plot2D_2(object):
             Actual plotting routine
 
         Modification history
-            20180207-A_schl_ma: written
+            20180515-A_muel_bn: copied Plot2D and adjusted
         """
         
         # preprocessing cube information
@@ -586,17 +587,25 @@ class Plot2D_2(object):
         
         brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
         
-        try:
-            
-            vmin,vmax=np.nanpercentile(self.cube.data.data,[5,95])
-            
+        if vminmax is None:
+            try:     
+                vmin,vmax=np.nanpercentile(self.cube.data.data,[5,95])
+                
+                rounder=int(np.ceil(-np.log10(vmax-vmin)+1))
+                
+                vmin,vmax=np.round([vmin,vmax],rounder)
+                
+                levels=np.round(np.linspace(vmin,vmax,num=11),rounder)
+            except:
+                vmin=vmax=levels=None
+        else:
+            vmin,vmax=vminmax
+                
             rounder=int(np.ceil(-np.log10(vmax-vmin)+1))
             
             vmin,vmax=np.round([vmin,vmax],rounder)
             
             levels=np.round(np.linspace(vmin,vmax,num=11),rounder)
-        except:
-            vmin=vmax=levels=None
 
         
         # check axes
@@ -651,7 +660,15 @@ class Plot2D_2(object):
         plt.sca(ax[0])
 
         # plot map
-        qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+        # this needs to be done due to an error in cartopy
+        try:
+            qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            iplt.pcolormesh(self.cube)
+            plt.text(0.5, 0.5,'Data cannot be displayed due to cartopy bug! \n Updates of cartopy may resolve this issue.',horizontalalignment='center',verticalalignment='center',transform = plt.gca().transAxes)
         if self.plot_type == 'latlon':
             mean= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.MEAN).data
             std= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.STD_DEV).data
@@ -667,3 +684,31 @@ class Plot2D_2(object):
             ax[1].set_position(bb)
         
         return
+    
+    
+class Plot2D_blank(Plot2D_2):
+    """
+    Description
+        Blank class for 2-dimensional plotting
+
+    Contents
+        method plot
+    """
+    def __init__(self, cube):
+        """
+        Arguments
+            cube : iris cube
+
+        Description
+            Initializes the class.
+
+        TODO
+            optional summary placement
+            swap x/y axis
+
+        Modification history
+            20180515-A_muel_bn: written
+        """
+        super(Plot2D_blank, self).__init__(cube)
+        # erase all data
+        self.cube.data=self.cube.data*np.nan        

@@ -139,8 +139,10 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'ESMValToolC3S_511Report.tex', u'ESMValTool C3S\\_511 Report',
-     u'ESMValTool Development Team', 'manual'),
+     u'ESMValTool Development Team', 'howto'),
 ]
+
+
 
 
 # -- Options for manual page output ---------------------------------------

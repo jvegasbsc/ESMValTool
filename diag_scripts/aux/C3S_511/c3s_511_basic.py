@@ -28,7 +28,7 @@ import warnings
 from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
-from plot import Plot2D_2, PlotHist
+from plot import Plot2D_2, PlotHist, Plot2D_blank
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 
@@ -100,55 +100,55 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
         self.__do_overview__()
         self.__do_mean_var__()
-        self.__do_trends__()
-        self.__do_extremes__()
-        self.__do_sectors__()
+#        self.__do_trends__()
+#        self.__do_extremes__()
+#        self.__do_sectors__()
         self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
-        self.__do_esmvalidation__()
+#        self.__do_esmvalidation__()
 
     def __do_overview__(self):
-        self.__do__report__(content={},filename="do_overview_default")
+        self.__do_report__(content={},filename="do_overview_default")
         raise ImplementationError("__do_overview__","This method has to be implemented.")
         return
 
     def __do_mean_var__(self):
-        self.__do__report__(content={},filename="do_mean_var_default")
+        self.__do_report__(content={},filename="do_mean_var_default")
         raise ImplementationError("__do_mean_var__","This method has to be implemented.")
         return
 
     def __do_trends__(self):
-        self.__do__report__(content={},filename="do_trends_default")
+        self.__do_report__(content={},filename="do_trends_default")
         raise ImplementationError("__do_trends__","This method has to be implemented.")
         return
 
     def __do_extremes__(self):
-        self.__do__report__(content={},filename="do_extremes_default")
+        self.__do_report__(content={},filename="do_extremes_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
     
     def __do_sectors__(self):
-        self.__do__report__(content={},filename="do_sectors_default")
+        self.__do_report__(content={},filename="do_sectors_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
 
     def __do_maturity_matrix__(self):
-        self.__do__report__(content={},filename="do_maturity_matrix_default")
+        self.__do_report__(content={},filename="do_maturity_matrix_default")
         raise ImplementationError("__do_maturity_matrix__","This method has to be implemented.")
         return
 
     def __do_gcos_requirements__(self):
-        self.__do__report__(content={},filename="do_gcos_requirements_default")
+        self.__do_report__(content={},filename="do_gcos_requirements_default")
         raise ImplementationError("__do_gcos_requirements__","This method has to be implemented.")
         return
     
     def __do_esmvalidation__(self):
-        self.__do__report__(content={},filename="do_esmvalidation_default")
+        self.__do_report__(content={},filename="do_esmvalidation_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
 
-    def __do__report__(self):
-        raise ImplementationError("__do__report__","This method has to be implemented.")
+    def __do_report__(self):
+        raise ImplementationError("__do_report__","This method has to be implemented.")
         return
 
 #    def write_reports(self):
@@ -410,7 +410,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
         
         # produce report
-        self.__do__report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
+        self.__do_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
         
         # save GCOS requirements
         self.__gcos_dict__.update({"Frequency":{"value":round(tim_freq_spec[1],2), "unit":t_info.split(" ")[0]}})
@@ -421,7 +421,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
     
-    def __do__report__(self,**kwargs):
+    def __do_report__(self,**kwargs):
         
         # TODO specify sphinx structure
         content = kwargs.get('content', [])
@@ -454,19 +454,30 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             short_left_over = np.array([sl[0:3] for sl in long_left_over])
         
             mean_std_cov=collections.OrderedDict()
-            
+            disp_min_max=collections.OrderedDict()
+            disp_min_max.update({"abs_vals":np.array([np.nan])})
+            disp_min_max.update({"diff_vals":np.array([np.nan])})
+
             for m in maths:
                 
                 if m == "PERCENTILE":
                     
-                    perc = self.sp_data.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
-                    
-                    for p in percentiles:
-                    
-                        mean_std_cov.update({m + " " + str(int(round(p,0))) + " percent":perc.extract(iris.Constraint(percentile_over_time=p))})
+                    try:
+                        perc = self.sp_data.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
                         
-                    del perc
-                
+                        for p in percentiles:
+                            
+                            loc_data = perc.extract(iris.Constraint(percentile_over_time=p))
+                                                        
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                            
+                            mean_std_cov.update({m + " " + str(int(round(p,0))) + " percent":loc_data})
+                            
+                            
+                        del perc
+                    except:
+                        pass
+                    
                 elif m == "CLIMATOLOGY":
                     
                     try:
@@ -488,23 +499,39 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         
                         for mon in clim_comp.coord('month_num').points:
                     
-                            mean_std_cov.update({m + " " + str(int(mon)):clim_comp.extract(iris.Constraint(month_num=mon))})
+                            loc_data=clim_comp.extract(iris.Constraint(month_num=mon))
+                            
+                            mean_std_cov.update({m + " " + str(int(mon)):loc_data})
+                        
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
                         
                         del clim_comp
                         
                         for y in clim_anom.coord('year').points:
-                    
-                            mean_std_cov.update({"mean anomalies from " + m + " per year " + str(int(y)):clim_anom.extract(iris.Constraint(year=y))})
                             
+                            loc_data=clim_anom.extract(iris.Constraint(year=y))
+                            
+                            mean_std_cov.update({"mean anomalies from " + m + " per year " + str(int(y)):loc_data})
+                            
+                            disp_min_max.update({"diff_vals":np.nanpercentile(np.concatenate([disp_min_max["diff_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                                                        
                         del clim_anom
                             
                     except:
                         pass
                 
-                elif m in ["MEAN","STD_DEV"]:
+                elif m == "MEAN":
+                    
+                    loc_data=self.sp_data.collapsed(d, iris.analysis.__dict__[m])
+        
+                    mean_std_cov.update({m:loc_data})
+                    
+                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                    
+                elif m == "STD_DEV":
         
                     mean_std_cov.update({m:self.sp_data.collapsed(d, iris.analysis.__dict__[m])})
-                    
+                                 
                 elif m == "LOG_COV": 
                     
                     mean_std_cov.update({m:iris.analysis.maths.log(iris.analysis.maths.divide(mean_std_cov["STD_DEV"],mean_std_cov["MEAN"]))})
@@ -515,11 +542,61 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             for m in mean_std_cov.keys():
                 
                 # plotting routine
+                vminmax=None
+                
+                if np.any([m_typ in m for m_typ in ["MEAN", "PERCENTILE", "CLIMATOLOGY"]]):
+                    vminmax=disp_min_max["abs_vals"]
+                
+                if np.any([m_typ in m for m_typ in ["anomalies"]]):
+                    vminmax=disp_min_max["diff_vals"]
+                
                 if mean_std_cov[m] is not None:
+                # this needs to be done due to an error in cartopy
+                    filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
+                    list_of_plots.append(filename)
                     try:
-                        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
-                        list_of_plots.append(filename)
                         x=Plot2D_2(mean_std_cov[m])
+                        
+                        fig = plt.figure()
+                        if "longitude" == d:     
+                            gs = gridspec.GridSpec(1, 5)
+                            ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                            fig.set_figwidth(1.7*fig.get_figwidth())
+                            fig.set_figheight(1.2*fig.get_figheight())
+                        elif "time" == d:
+                            ax = [plt.subplot(1,1,1)]
+                            fig.set_figheight(1.2*fig.get_figheight())
+                        elif "latitude" == d:
+                            gs = gridspec.GridSpec(5, 1)
+                            ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
+                            fig.set_figheight(1.7*fig.get_figheight())
+                        x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmax)
+                        fig.savefig(filename)
+                        plt.close(fig.number)
+                        # old plotting
+    #                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+    #                    fig.savefig(filename)
+    #                    plt.close(fig)
+                    
+                        del mean_std_cov[m]
+                        
+                        ESMValMD("meta",
+                                 filename,
+                                 self.__basetags__ + ['DM_global', 'C3S_mean_var'],
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                                 '#C3S' + m + "".join(short_left_over) + self.__varname__,
+                                 self.__infile__,
+                                 self.diagname,
+                                 self.authors)
+                        
+                    except Exception as e:
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                        print(exc_type, fname, exc_tb.tb_lineno)
+                        print(mean_std_cov[m])
+                        print('no figure done #003, blank figure')
+                        
+                        x=Plot2D_blank(mean_std_cov[m])
                         
                         fig = plt.figure()
                         if "longitude" == d:     
@@ -537,6 +614,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                         fig.savefig(filename)
                         plt.close(fig.number)
+                        # old plotting
     #                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
     #                    fig.savefig(filename)
     #                    plt.close(fig)
@@ -546,20 +624,16 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         ESMValMD("meta",
                                  filename,
                                  self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                                  '#C3S' + m + "".join(short_left_over) + self.__varname__,
                                  self.__infile__,
                                  self.diagname,
                                  self.authors)
-                    except:
-                        print('no figure done #003')
-                    
-                    
                     
             del mean_std_cov
         
         # produce report
-        self.__do__report__(content={"plots":list_of_plots}, filename=this_function.upper())
+        self.__do_report__(content={"plots":list_of_plots}, filename=this_function.upper())
 
         return
     
@@ -569,7 +643,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         this_function = "trends & stability"
         
         list_of_plots = []
-        
         
         # simple linear trend (slope) and p-values
         _,S,_,P = utils.__temporal_trend__(self.sp_data, pthres=1.01)        
@@ -745,7 +818,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         del TempStab
         
         # produce report
-        self.__do__report__(content={"plots":list_of_plots}, filename=this_function.upper())
+        self.__do_report__(content={"plots":list_of_plots}, filename=this_function.upper())
         
         # update gcos
         self.__gcos_dict__.update({"Accuracy":{"value":None, "unit":None}})
@@ -798,7 +871,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.authors)
         
         # produce report
-        self.__do__report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
     
@@ -825,6 +898,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.authors)
         
         # produce report
-        self.__do__report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
