@@ -5,6 +5,7 @@ Basic implementation for diagnostics into ESMValTool
 import iris
 import iris.coord_categorisation
 from iris.analysis import stats as cubestats
+import iris.coords as icoords
 import os
 import sys
 import shutil
@@ -85,7 +86,8 @@ class __Diagnostic_skeleton__(object):
         self.authors = ["A_muel_bn", "A_hass_bg", "A_laue_ax",
                         "A_broe_bj", "A_mass_fr", "A_nico_nd",
                         "A_schl_mn", "A_bock_ls"]  # TODO fill in
-        self.diagname = "c3s_511_skeleton.py"
+        self.diagname = "Diagnostic_skeleton.py"
+        self.CDS_ID = "XXX_XX_01"
 
         self.sp_data = None
 
@@ -99,12 +101,12 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
         self.__do_overview__()
-        self.__do_mean_var__()
+#        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
 #        self.__do_esmvalidation__()
 
     def __do_overview__(self):
@@ -158,16 +160,14 @@ class __Diagnostic_skeleton__(object):
 
 
 class Basic_Diagnostic(__Diagnostic_skeleton__):
-    """    def write_reports(self):
-
-        return
+    """    
     class to implement basic diagnostics, like e.g. global means,
     global differences, RMSD etc.
     """
 
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
-        self.diagname = "c3s_511_basic.py"
+        self.diagname = "Basic_Diagnostic.py"
 
 
     def set_info(self, **kwargs):
@@ -214,17 +214,26 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
         
 
-
     def read_data(self):
 
         if os.path.isfile(self.__infile__):
             self.sp_data = iris.load_cube(self.__infile__)
             self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
             self.sp_data.coord('latitude').guess_bounds()
+#            if not self.sp_data.coords('grid_longitude'):
+#            mima_lon=np.nanpercentile(self.sp_data.coord('longitude').points,[0,100])
+#            if np.all(mima_lon <= 360) and np.all(mima_lon>=0):
+#                print self.sp_data.coord('longitude')
+#                long_2 = self.sp_data.coord('longitude').points.copy()
+#                long_2[long_2>180]=long_2[long_2>180]-360
+#                long_2_coord = icoords.Coord(long_2, units='degrees', long_name=u'longitude_2', var_name='lon_2')
+#                print long_2_coord
+#                self.sp_data.add_aux_coord(long_2_coord)
+#                print self.sp_data
+#                self.sp_data.coord('longitude_2').guess_bounds()
             self.sp_data.coord('longitude').guess_bounds()
             if self.sp_data.units == "no-unit":
                 self.sp_data.units = '1'
-
         else:
             self.__read_data_mock__()
             
@@ -274,37 +283,31 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # TODO all the other plots
         
         list_of_plots=[]
-        
-        nonmissing_values = self.sp_data.copy()
-        nonmissing_values.data = nonmissing_values.data*0.+1.   
-        
-        general_mask = np.broadcast_to(
-                    np.expand_dims(
-                            np.all(nonmissing_values.data.mask,
-                                   axis=0),#
-                                   axis=0),#
-                                       nonmissing_values.data.shape)
-        
-        available_values = nonmissing_values.copy()
-        available_values.data.data[np.isnan(available_values.data.data)]=1.
-        available_values.data = available_values.data*0.+1.   
-        available_values.data.mask = general_mask.copy()
+
+        maxnumtemp = len(self.sp_data.coord("time").points)
+
+        sp_masked_vals = self.sp_data.collapsed("time",iris.analysis.COUNT,function=lambda values: values.mask)
+        sp_masked_vals.data.mask = sp_masked_vals.data==maxnumtemp
+        sp_masked_vals.data = sp_masked_vals.data*0.+1.
 
         for d in self.dimensions:
             
             long_left_over = self.dimensions[self.dimensions!=d]
             short_left_over = np.array([sl[0:3] for sl in long_left_over])
-            
-            # data of fractional available measurements
-            nonmissing_values_2d = nonmissing_values.collapsed(d, iris.analysis.SUM)
-            available_values_2d = available_values.collapsed(d, iris.analysis.SUM)
-            nonmissing_values_2d = iris.analysis.maths.divide(nonmissing_values_2d,available_values_2d)
+                        
+                        
+            num_available_vals = self.sp_data.collapsed(d,iris.analysis.COUNT,function=lambda values: values>=np.min(self.sp_data.data.flatten()))
+            if d in ["time"]:
+                frac_available_vals = iris.analysis.maths.divide(num_available_vals,maxnumtemp)
+            else:
+                sp_agg_array=sp_masked_vals.collapsed(d,iris.analysis.SUM)   
+                frac_available_vals = iris.analysis.maths.divide(num_available_vals,sp_agg_array.data)
             
             try:
                 # plotting routine
                 filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
                 list_of_plots.append(filename)
-                x=Plot2D_2(nonmissing_values_2d)
+                x=Plot2D_2(frac_available_vals)
                 
                 fig = plt.figure()
                 if "longitude" == d:     
@@ -319,7 +322,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     gs = gridspec.GridSpec(5, 1)
                     ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
                     fig.set_figheight(1.7*fig.get_figheight())
-                x.plot(ax=ax, title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                x.plot(ax=ax, vminmax=[0.,1.], title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                 fig.savefig(filename)
                 plt.close(fig.number)
                 
@@ -334,10 +337,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             except:
                 print('no figure done # 001')
             
-        del nonmissing_values
-        del available_values
-        del nonmissing_values_2d
-        del available_values_2d
+        del sp_masked_vals
+        del num_available_vals
+        del frac_available_vals
         
         # histogram plot of available measurements
         all_data = self.sp_data.copy()
@@ -354,7 +356,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_overview'],
-                     str('Full temporal and spatial histogram of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
                      '#C3S' + 'histall' + self.__varname__,
                      self.__infile__,
                      self.diagname,
