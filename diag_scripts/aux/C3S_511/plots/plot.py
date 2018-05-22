@@ -14,8 +14,12 @@ import iris.plot as iplt
 import iris.quickplot as qplt
 import matplotlib.cm as mpl_cm
 import cartopy.crs as ccrs
-import random
+#import random
 import sys
+from matplotlib.ticker import FuncFormatter
+
+def label_in_perc(x, pos=0):
+    return '%1.1f%%' % (x*100)
 
 MPLSTYLE = os.path.dirname(os.path.realpath(__file__)) + os.sep + 'default.mplstyle'
 
@@ -92,9 +96,15 @@ class PlotHist(object):
             y_label = 'frequency'
 
         # Create historgramm
-        self.ax.hist(self.data, bins, normed=1, facecolor=color, alpha=alpha)
+#        self.ax.hist(self.data, bins, density=False, facecolor=color, alpha=alpha)
+#        print self.ax.__dict__.keys()
+        hist, bins = np.histogram(self.data.data[np.logical_not(self.data.mask)], bins=bins)
+        hist = hist.astype(float)/hist.sum()
+        binWidth = bins[1] - bins[0]
+        self.ax.bar(bins[:-1]+0.5*binWidth, hist, binWidth, facecolor=color, alpha=alpha)
         self.ax.set_xlabel(x_label)
         self.ax.set_ylabel(y_label)
+        self.ax.yaxis.set_major_formatter(FuncFormatter(label_in_perc))
         if (title is not None):
             self.ax.set_title(title)
 

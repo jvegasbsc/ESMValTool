@@ -127,7 +127,7 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    'preamble': '\pagestyle{fancy}',
 
     # Latex figure (float) alignment
     #
