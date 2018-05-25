@@ -101,7 +101,7 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
         self.__do_overview__()
-#        self.__do_mean_var__()
+        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
@@ -551,6 +551,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 if np.any([m_typ in m for m_typ in ["anomalies"]]):
                     vminmax=disp_min_max["diff_vals"]
+                    
+                print d,m,vminmax
                 
                 if mean_std_cov[m] is not None:
                 # this needs to be done due to an error in cartopy

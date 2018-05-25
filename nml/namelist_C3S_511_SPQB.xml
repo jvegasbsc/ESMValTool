@@ -59,7 +59,7 @@ This namelist is part of the ESMValTool
     
  -->
    
-   
+   <!--  
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -71,9 +71,9 @@ This namelist is part of the ESMValTool
 	
 		<model> OBS        QA4ECV				   ECV				avh-geo-res050-14D 	 1992 2006  @{OBSPATH}  </model>
     </diag>
-   
+   -->
 
-   <!--  
+<!-- 
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -86,6 +86,19 @@ This namelist is part of the ESMValTool
 		<model> OBS        ESACCI-OZONE				   sat				L3 	 1997 2010  @{OBSPATH}  </model>
     </diag>
        -->
+    
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ECDS-XCO2">			   			xco2                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Land					  </tags>
+	
+		<model> OBS        CDS-XCO2				   sat				L3 	 2003 2016  @{OBSPATH}  </model>
+		 <!--   <model> CMIP5 		MPI-ESM-MR 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>-->
+    </diag>
 
 <!--	
 	<diag>
