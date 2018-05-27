@@ -100,6 +100,7 @@ class __Diagnostic_skeleton__(object):
         return
 
     def run_diagnostic(self):
+#        self.sp_data = self.__spatial_subsets__()[1]["Germany"]
         self.__do_overview__()
         self.__do_mean_var__()
 #        self.__do_trends__()
@@ -240,7 +241,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             print("self.__infile__ was not found! Generic data used instead.")
 #            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
             
-            
         # Human readable time
         t_info = str(self.sp_data.coord("time").units)
         origin = datetime.datetime.strptime("_".join(t_info.split(" ")[-2:]), '%Y-%m-%d_%H:%M:%S')
@@ -262,7 +262,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             assert False, 'Wrong increment in coord("time")!'
         
         self.__tim_read__ = tim_read
-            
+        
         return
 
 
@@ -551,8 +551,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 if np.any([m_typ in m for m_typ in ["anomalies"]]):
                     vminmax=disp_min_max["diff_vals"]
-                    
-                print d,m,vminmax
                 
                 if mean_std_cov[m] is not None:
                 # this needs to be done due to an error in cartopy
@@ -905,3 +903,38 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
+    
+    
+    def __spatial_subsets__(self,dict_of_regions={'Germany':{'latitude':(47,56),'longitude':(5,16)}}):
+        """
+        produces spatial subset data sets for further calculation
+        """
+        
+        subset_cubes={}
+        
+        for R in dict_of_regions.keys():
+            if all([k_dim in self.dimensions for k_dim in dict_of_regions[R].keys()]):
+                loc_subset=self.sp_data
+                for dim in dict_of_regions[R].keys():
+                    if dim=='latitude':
+                        r_min,r_max=np.sort(dict_of_regions[R]['latitude'])
+                        loc_subset=loc_subset.extract(iris.Constraint(latitude=lambda point: r_min <= point <= r_max))
+                    if dim=='longitude':
+                        r_min,r_max=np.sort(dict_of_regions[R]['longitude'])
+                        if r_min<0:
+                            if r_max<0:
+                                r_min+=360
+                                r_max+=360
+                            else:
+                                r_min+=360
+                                if r_min>r_max:
+                                    raise ImplementationError("__spatial_subsets__","This method is not yet implemented for regions crossing the 0 degrees longitude.")
+                        loc_subset=loc_subset.extract(iris.Constraint(longitude=lambda point: r_min <= point <= r_max))
+                    if dim=='time':
+                        r_min,r_max=np.sort(dict_of_regions[R]['time'])
+                        loc_subset=loc_subset.extract(iris.Constraint(time=lambda point: r_min <= point <= r_max))
+                subset_cubes.update({R:loc_subset})
+            else:
+                print "Region " + R + " specifications not specified correctly: " + str(dict_of_regions[R]) + "!"
+        return subset_cubes
+        

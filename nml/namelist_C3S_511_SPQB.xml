@@ -87,6 +87,7 @@ This namelist is part of the ESMValTool
     </diag>
        -->
     
+    <!-- 
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -97,8 +98,8 @@ This namelist is part of the ESMValTool
 		<tags> 													R_Land					  </tags>
 	
 		<model> OBS        CDS-XCO2				   sat				L3 	 2003 2016  @{OBSPATH}  </model>
-		 <!--   <model> CMIP5 		MPI-ESM-MR 				Lmon 	  historical 			r1i1p1 2002 2005  @{MODELPATH} </model>-->
     </diag>
+       -->
 
 <!--	
 	<diag>
