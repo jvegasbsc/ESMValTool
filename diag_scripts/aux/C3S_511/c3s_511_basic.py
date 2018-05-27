@@ -67,7 +67,7 @@ class __Diagnostic_skeleton__(object):
 
         self.__varname__ = 'var'  # default value
         self.__output_type__ = 'png'  # default ouput file type
-        self.__regions__ = {"example": (10, 20, -10, -20)}  # default regions
+        self.__regions__ = None  # default regions
 
         self.__verbosity_level__ = 0  # default information during runtime
         self.__debug_info__ = "No debug info"  # default debug information
@@ -100,7 +100,7 @@ class __Diagnostic_skeleton__(object):
         return
 
     def run_diagnostic(self):
-#        self.sp_data = self.__spatial_subsets__()[1]["Germany"]
+#        self.sp_data = self.__spatial_subsets__()["Germany"]
         self.__do_overview__()
         self.__do_mean_var__()
 #        self.__do_trends__()
@@ -188,7 +188,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         else:
             self.__varname__ = self.__varname__[0]
         self.__output_type__ = 'png'  # default ouput file type for the basic diagnostics
-        self.__regions__ = {"example": (10, 20, -10, -20)}  # default regions
+        self.__regions__ = {'Germany':{'latitude':(47,56),'longitude':(5,16)}}  # default regions
 
         self.__verbosity_level__ = self.__project_info__.get_verbosity() # default information during runtime
         self.__debug_info__ = "No debug info"  # default debug information
@@ -905,10 +905,14 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         return
     
     
-    def __spatial_subsets__(self,dict_of_regions={'Germany':{'latitude':(47,56),'longitude':(5,16)}}):
+    def __spatial_subsets__(self,dict_of_regions=None):
         """
         produces spatial subset data sets for further calculation
         """
+        
+        if dict_of_regions is None:
+            dict_of_regions = self.__regions__
+            print dict_of_regions
         
         subset_cubes={}
         
