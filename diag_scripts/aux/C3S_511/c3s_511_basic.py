@@ -100,7 +100,7 @@ class __Diagnostic_skeleton__(object):
         return
 
     def run_diagnostic(self):
-#        self.sp_data = self.__spatial_subsets__()["Germany"]
+#        self.sp_data = self.__spatial_subsets__()["Germany_2001-2005"]
         self.__do_overview__()
         self.__do_mean_var__()
 #        self.__do_trends__()
@@ -188,7 +188,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         else:
             self.__varname__ = self.__varname__[0]
         self.__output_type__ = 'png'  # default ouput file type for the basic diagnostics
-        self.__regions__ = {'Germany':{'latitude':(47,56),'longitude':(5,16)}}  # default regions
+        self.__regions__ = {'Germany_2001-2005':{'latitude':(47,56),'longitude':(5,16),'time':(datetime.datetime(2001,01,01),datetime.datetime(2005,12,31))}}  # default regions
 
         self.__verbosity_level__ = self.__project_info__.get_verbosity() # default information during runtime
         self.__debug_info__ = "No debug info"  # default debug information
@@ -936,7 +936,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         loc_subset=loc_subset.extract(iris.Constraint(longitude=lambda point: r_min <= point <= r_max))
                     if dim=='time':
                         r_min,r_max=np.sort(dict_of_regions[R]['time'])
-                        loc_subset=loc_subset.extract(iris.Constraint(time=lambda point: r_min <= point <= r_max))
+                        loc_subset=loc_subset.extract(iris.Constraint(time=lambda cell: r_min <= cell.point  <= r_max))
                 subset_cubes.update({R:loc_subset})
             else:
                 print "Region " + R + " specifications not specified correctly: " + str(dict_of_regions[R]) + "!"
