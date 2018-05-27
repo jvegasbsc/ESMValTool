@@ -177,7 +177,7 @@ begin
                                     diag_script_info@time_avg, True)
         end if
         climofiles = interface_get_inpaths(imod) + "/" + \
-                     interface_get_infile(variables(0), field_types(0), imod)
+            interface_get_infile(variables(0), field_types(0), imod)
 
         idx_rcp = find_model_index(models@name(imod), models@name, \
                                    diag_script_info@experiment, \
@@ -188,7 +188,7 @@ begin
                                 diag_script_info@time_avg, True)
 
         climofiles = interface_get_inpaths(idx_rcp) + "/" + \
-                     interface_get_infile(variables(0), field_types(0), idx_rcp)
+            interface_get_infile(variables(0), field_types(0), idx_rcp)
 
         ;;##############################################
         ;;# Calculate change from period 1 to period 2 #
@@ -349,14 +349,14 @@ begin
 
 ;;# add tags
     alltags = array_append_record(tags, \
-           (/"DM_global", "PT_geo", "ST_clim"/), 0)
+                                  (/"DM_global", "PT_geo", "ST_clim"/), 0)
     caption = "Surface change in " + variable_info@long_name + " in " + \
-              models@start_year(idx_rcp)+ "-" + models@end_year(idx_rcp) + \
+              models@start_year(idx_rcp) + "-" + models@end_year(idx_rcp) + \
               " displayed as anomalies with respect to " + \
-              models@start_year(0)+ "-" + models@end_year(0) + " for " + \
-              models@case_name(idx_rcp) + " from one ensemble member of each" +\
-              " of the concentration driven models available in the CMIP5 " + \
-              "archive. Similar to Figure 12.9 of Collins et a. (2013)."
+              models@start_year(0) + "-" + models@end_year(0) + " for " + \
+              models@case_name(idx_rcp) + " from one ensemble member of" +\
+              " each of the concentration driven models available in the" + \
+              "CMIP5 archive. Similar to Figure 12.9 of Collins et a. (2013)."
     id = diag_script + "_" + variables(0) + "_" + diag_script_info@time_avg
     contrib_authors = (/"A_lore_ru", "A_sedl_ja"/)
 

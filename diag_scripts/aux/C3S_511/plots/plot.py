@@ -599,7 +599,7 @@ class Plot2D_2(object):
         
         if vminmax is None:
             try:     
-                vmin,vmax=np.nanpercentile(self.cube.data.data,[5,95])
+                vmin,vmax=np.nanpercentile(self.cube.data.data[np.logical_not(self.cube.data.mask)],[5,95])
                 
                 rounder=int(np.ceil(-np.log10(vmax-vmin)+1))
                 

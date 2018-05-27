@@ -64,6 +64,12 @@ load "./diag_scripts/aux/SAMonsoon/SAMonsoon.ncl"
 ;load "./diag_scripts/aux/WAMonsoon/descriptions.ncl"
 
 exact_panel_position_file = "./diag_scripts/aux/" + diag_script_info@my_region + "Monsoon/exact_panel_positions_pr-mmday.ncl"
+; A_laue_ax+
+; option to override panel positioning file
+if (isatt(diag_script_info, "exact_panel_position_file")) then
+    exact_panel_position_file = diag_script_info@exact_panel_position_file
+end if
+; A_laue_ax-
 
 load "./plot_scripts/ncl/monsoon_panels.ncl"
 
@@ -285,18 +291,26 @@ begin
     ;; Define transforms apply and and debug data to display
     ;;------------------------------------------------------
     transforms = True
-    transforms@apply_these = (/"interp",\
-                               "latrange",\
-                               "lonrange",\
-                               "fill_missing_w_poisson",\
-                               "lonflip"/)
+
+    if (di@destgrid .eq. "native") then
+        transforms@apply_these = (/"latrange",\
+                                   "lonrange",\
+                                   "fill_missing_w_poisson",\
+                                   "lonflip"/)
+    else
+        transforms@apply_these = (/"interp",\
+                                   "latrange",\
+                                   "lonrange",\
+                                   "fill_missing_w_poisson",\
+                                   "lonflip"/)
+    end if
 
     transforms@season = di@season
     transforms@latrange = di@latrange_basic
     transforms@lonrange = di@lonrange_basic
     transforms@is_cyclic = False
 
-    transforms@destgrid = di@destgrid  ; "1x1"
+    transforms@destgrid = di@destgrid  ; "native" (no interpolation), "1x1" or "2.5x2.5"
 
     debuginfo@latrange = di@latrange_basic(0) + "-" + di@latrange_basic(1)
     debuginfo@lonrange = di@lonrange_basic(0) + "-" + di@lonrange_basic(1)
@@ -385,15 +399,26 @@ begin
             season_filtered = extract_season(filtered, di@season)
             var_stddev = dim_stddev_n_Wrap(season_filtered, 0)
 
-            ;; Compute reference statistical values over Sahel (sahel)
-            stat_sahel_const = coswgt_areaave(var_stddev({lat|di@sahel_latrange(0):di@sahel_latrange(1)},\
-                                                         {lon|di@sahel_lonrange(0):di@sahel_lonrange(1)}))
+; a_laue_ax+
+            if (isatt(diag_script_info, "plot_squared")) then
+                if (diag_script_info@plot_squared) then
+                    var_stddev = var_stddev * var_stddev
+                end if
+            end if
 
-            clim_mean = coswgt_areaave(data_jjas({lat|di@sahel_latrange(0):di@sahel_latrange(1)},\
-                                                 {lon|di@sahel_lonrange(0):di@sahel_lonrange(1)}))
-            stat_sahel_normalized = stat_sahel_const / clim_mean
+            if ((di@sahel_lonrange(0) .eq. -1) .or. (di@sahel_latrange(0) .eq. -1)) then
+            else
+; a_laue_ax-
+                ;; Compute reference statistical values over Sahel (sahel)
+                stat_sahel_const = coswgt_areaave(var_stddev({lat|di@sahel_latrange(0):di@sahel_latrange(1)},\
+                                                             {lon|di@sahel_lonrange(0):di@sahel_lonrange(1)}))
 
-            var_stddev@sahel = stat_sahel_const
+                clim_mean = coswgt_areaave(data_jjas({lat|di@sahel_latrange(0):di@sahel_latrange(1)},\
+                                                     {lon|di@sahel_lonrange(0):di@sahel_lonrange(1)}))
+                stat_sahel_normalized = stat_sahel_const / clim_mean
+
+                var_stddev@sahel = stat_sahel_const
+            end if
             var_stddev@idx = idx_mod
             var_stddev@GridType = "rectilinear"
             var_stddev@Regional = True
@@ -408,7 +433,10 @@ begin
             data_jjas_with_fillvalues = where(data_jjas .lt. 1., var_FillValue, data_jjas)
             var_stddev_norm = var_stddev / data_jjas_with_fillvalues
 
-            var_stddev_norm@sahel = stat_sahel_normalized
+            if ((di@sahel_lonrange(0) .eq. -1) .or. (di@sahel_latrange(0) .eq. -1)) then
+            else
+                var_stddev_norm@sahel = stat_sahel_normalized
+            end if
             var_stddev_norm@idx = idx_mod
             var_stddev_norm@GridType = "rectilinear"
             var_stddev_norm@Regional = True
@@ -466,6 +494,20 @@ begin
 
     ;; Three panel plot (reference, model, and diff)
     plot_settings = True
+
+; a_laue_ax+
+    if (isatt(diag_script_info, "plot_squared")) then
+        plot_settings@plot_squared = diag_script_info@plot_squared
+        if (plot_settings@plot_squared) then
+            if (isatt(diag_script_info, "squared_unit")) then
+                lb_units = diag_script_info@squared_unit
+            end if
+        end if
+    else
+        plot_settings@plot_squared = False
+    end if
+; a_laue_ax-
+
     plot_settings@diag_script = diag_script
     plot_settings@idx_ref = idx_ref
     plot_settings@lb_title = lb_units
@@ -476,7 +518,12 @@ begin
 
     plot_settings@gsn_right_string = variable_info@long_name
     plot_settings@main_title_suffix = " (" + filter + " " + variable_info@long_name + ")"
-    valid_statistics = (/"yrs", "mean", "rmse", "sahel"/)
+
+    if ((di@sahel_lonrange(0) .eq. -1) .or. (di@sahel_latrange(0) .eq. -1)) then
+        valid_statistics = (/"yrs", "mean", "rmse"/)
+    else
+        valid_statistics = (/"yrs", "mean", "rmse", "sahel"/)
+    end if
 
     ;; Colormaps
     if (isatt(di, "diff_colormap")) then
@@ -484,86 +531,97 @@ begin
         plot_settings@diff_palette = diff_colormap
     end if
 
-    ;; Three panel plots (ref, model, diff), here for stddev
-    three_by_one_diff(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
-
-    ;; Attach Metadata to plots
-    xml_name = getenv("ESMValTool_xml_name")
-    suffix = get_file_suffix(xml_name, 0)
-    base_name = str_sub_str(xml_name, suffix, "")
+; a_laue_ax+
+    if (isatt(diag_script_info, "three_panel_plots")) then
+        three_panel_plots = diag_script_info@three_panel_plots
+    else
+        three_panel_plots = True
+    end if
 
     contrib_authors = (/"A_roeh_ro"/)
-    diag_script_base = basename(diag_script)
-    output_dir = get_output_dir(plot_dir, diag_script_base)
 
-    do idx_mod = 0, dim_MOD - 1
-        if (idx_mod .eq. plot_settings@idx_ref) then
-            continue
-        end if
-        caption = "Standard deviation of the " + filter + " " + variable_info@long_name \
-                + " over the " + di@season + " season."
-        alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
-        climofiles = new(2, string)
-        climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), idx_mod)
-        climofiles(1) = interface_get_inpaths(idx_ref) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), idx_ref)
-        allmodelnames = (/models@name(idx_mod), models@name(idx_ref)/)
-        id = diag_script + "_stddev_" + variables(0)
-        aux_filename_info = di@season + "-stddev"
-        output_filename = interface_get_figure_filename(diag_script_base,\
-                                                    var0,\
-                                                    field_type0,\
-                                                    aux_filename_info, idx_mod)
-        output_file_path = output_dir + output_filename + "." + output_file_type
-
-        ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
-
-    end do
-
-
-    if (di@plot_norm) then
-        ;; Three panel plots (ref, model, diff), here for normalized and masked stddev
-        plot_settings@main_title_suffix = " (" + filter + " " + variable_info@long_name + " normalized)"
-
-        plot_settings@lb_units = "unitless"
-        ;debuginfo@description = WAMonsoon_daily_precip_filter_norm_descr(di)
-        three_by_one_diff(storage_vault, di, plot_settings, "stddev_norm", debuginfo, valid_statistics, res)
+    if (three_panel_plots) then
+; a_laue_ax-
+        ;; Three panel plots (ref, model, diff), here for stddev
+        three_by_one_diff(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
 
         ;; Attach Metadata to plots
+        xml_name = getenv("ESMValTool_xml_name")
+        suffix = get_file_suffix(xml_name, 0)
+        base_name = str_sub_str(xml_name, suffix, "")
+
+        diag_script_base = basename(diag_script)
+        output_dir = get_output_dir(plot_dir, diag_script_base)
+
         do idx_mod = 0, dim_MOD - 1
-            if (any(idx_mod .eq. plot_settings@idx_ref)) then
+            if (idx_mod .eq. plot_settings@idx_ref) then
                 continue
             end if
-            caption = "Normalized standard deviation of " + filter + " " \
-                      + variable_info@long_name + " (normalized) over the " \
-                      + di@season + " season."
-            alltags = array_append_record(tags, (/"DM_trop", "ST_stddev", "PT_geo"/), 0)
-            id = diag_script + "_stddev_norm_" + variables(0)
-            aux_filename_info = di@season + "-stddev_norm"
+            caption = "Standard deviation of the filtered field over the " + di@season + " season."
+            alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
+            climofiles = new(2, string)
+            climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), idx_mod)
+            climofiles(1) = interface_get_inpaths(idx_ref) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), idx_ref)
+            allmodelnames = (/models@name(idx_mod), models@name(idx_ref)/)
+            id = diag_script + "_stddev_" + variables(0)
+            aux_filename_info = di@season + "-stddev"
             output_filename = interface_get_figure_filename(diag_script_base,\
                                                         var0,\
                                                         field_type0,\
                                                         aux_filename_info, idx_mod)
             output_file_path = output_dir + output_filename + "." + output_file_type
 
-            ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
+            ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, \
+                     climofiles, diag_script, contrib_authors)
+
         end do
 
-    end if
+        if (di@plot_norm) then
+            ;; Three panel plots (ref, model, diff), here for normalized and masked stddev
+            plot_settings@main_title_suffix = " (" + filter + " " + variable_info@long_name + " normalized)"
 
-    if (isvar("alltags")) then
-        delete(alltags)
-    end if
-    if (isvar("caption")) then
-        delete(caption)
-    end if
-    if (isvar("id")) then
-        delete(id)
-    end if
-    if (isvar("climofiles")) then
-        delete(climofiles)
-    end if
+            plot_settings@lb_units = "unitless"
+            ;debuginfo@description = WAMonsoon_daily_precip_filter_norm_descr(di)
+            three_by_one_diff(storage_vault, di, plot_settings, "stddev_norm", debuginfo, valid_statistics, res)
+
+            ;; Attach Metadata to plots
+            do idx_mod = 0, dim_MOD - 1
+                if (any(idx_mod .eq. plot_settings@idx_ref)) then
+                    continue
+                end if
+                caption = "Normalized standard deviation of the filtered field over the " \
+                           + di@season + " season."
+                alltags = array_append_record(tags, (/"DM_trop", "ST_stddev", "PT_geo"/), 0)
+                id = diag_script + "_stddev_norm_" + variables(0)
+                aux_filename_info = di@season + "-stddev_norm"
+                output_filename = interface_get_figure_filename(diag_script_base,\
+                                                            var0,\
+                                                            field_type0,\
+                                                            aux_filename_info, idx_mod)
+                output_file_path = output_dir + output_filename + "." + output_file_type
+
+                ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, \
+                         climofiles, diag_script, contrib_authors)
+            end do
+        end if
+
+        if (isvar("alltags")) then
+            delete(alltags)
+        end if
+        if (isvar("caption")) then
+            delete(caption)
+        end if
+        if (isvar("id")) then
+            delete(id)
+        end if
+        if (isvar("climofiles")) then
+            delete(climofiles)
+        end if
+; a_laue_ax+
+    end if ; if three_panel_plots
+; a_laue_ax-
 
     res = orig_res
     plot_settings@gsn_right_string = False
@@ -572,17 +630,31 @@ begin
     plot_settings@type = "mean"
 
     plot_settings@lb_units = lb_units
-    plot_settings@part_of_header = " stddev of " + filter + " " + variable_info@long_name
+; a_laue_ax+
+    if (plot_settings@plot_squared) then
+        typestr = "variance"
+        alltags = array_append_record(tags, (/"DM_reg", "PT_geo"/), 0)
+    else
+        typestr = "stddev"
+        alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
+    end if
+    ;plot_settings@part_of_header = " stddev of " + filter + " " + variable_info@long_name
+    plot_settings@part_of_header = " " + typestr + " of " + filter + " " + variable_info@long_name
+; a_laue_ax-
     ;debuginfo@description = WAMonsoon_daily_precip_filter_descr(di)
-    page_models = multipanel(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
+    page_models = multipanel(storage_vault, di, plot_settings, "stddev", debuginfo, \
+                             valid_statistics, res)
 
     ;; Attach Metadata to plot
-    alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
-
-    caption = "Standard deviation of " + filter + " " + variable_info@long_name \
-               + " for " + di@season + " season."
+    caption = typestr + " of the filtered field over the " + di@season + " season."
 
     id = diag_script + "_stddev_" + variables(0)
+
+    climofiles = new(dimsizes(models@name), string)
+    do imod = 0, dimsizes(models@name) - 1
+            climofiles(imod) = interface_get_inpaths(imod) + "/" + \
+                 interface_get_infile(variables(0), field_types(0), imod)
+    end do
 
     diag_script_base = basename(diag_script)
     output_dir = get_output_dir(plot_dir, diag_script_base)
@@ -592,62 +664,63 @@ begin
                                                     field_type0,\
                                                     aux_title_info, -1)
 
+    if (isatt(di, "figurename_suffix")) then
+        output_filename = output_filename + di@figurename_suffix
+    end if
+
     figures_per_page = page_models[0]
     model_panel_placement = page_models[1]
     delete(page_models)
 
     if (dimsizes(figures_per_page).gt.1) then
 
-        curr_idx=0
+        curr_idx = 0
 
-        do ipage=0,dimsizes(figures_per_page)-1
+        do ipage = 0, dimsizes(figures_per_page) - 1
 
-            climofiles = new(figures_per_page(ipage),string)
-            modelsname = new(figures_per_page(ipage),string)
-            do ifig = 0, figures_per_page(ipage)-1
-               imod = model_panel_placement(curr_idx)
-               climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
-                     interface_get_infile(variables(0), field_types(0), imod)
-               modelsname(ifig) = models@name(model_panel_placement(curr_idx))
-               curr_idx=curr_idx+1
+            climofiles2 = new(figures_per_page(ipage), string)
+            modelsname = new(figures_per_page(ipage), string)
+            do ifig = 0, figures_per_page(ipage) - 1
+                imod = model_panel_placement(curr_idx)
+                climofiles2(ifig) = interface_get_inpaths(imod) + "/" + \
+                    interface_get_infile(variables(0), field_types(0), imod)
+                modelsname(ifig) = models@name(model_panel_placement(curr_idx))
+                curr_idx=curr_idx + 1
             end do
 
-        output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+            output_file_path = output_dir + output_filename + "-page" + ipage \
+                               + "." + output_file_type
 
-        ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, \
+                     climofiles2, diag_script, contrib_authors)
 
-        delete([/climofiles,modelsname/])
+            delete([/climofiles2, modelsname/])
 
         end do
 
     else
 
-        climofiles = new(dimsizes(models@name), string)
-        do imod = 0, dimsizes(models@name) - 1
-                climofiles(imod) = interface_get_inpaths(imod) + "/" + \
-                     interface_get_infile(variables(0), field_types(0), imod)
-        end do
-
         output_file_path = output_dir + output_filename + "." + output_file_type
 
-        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+        ESMValMD(output_file_path, alltags, caption, id, variables, models@name, \
+                 climofiles, diag_script, contrib_authors)
 
     end if
-
 
     delete([/alltags, caption, id, imod/])
 
     if (di@plot_norm) then
         plot_settings@lb_units = "unitless (normalized with climatology)"
-        plot_settings@part_of_header = " stddev of " + filter + " " + variable_info@long_name + " (climatology mask+norm)"
+        plot_settings@part_of_header = " stddev of " + filter + " " + variable_info@long_name + \
+                                       " (climatology mask+norm)"
         ;debuginfo@description = WAMonsoon_daily_precip_filter_norm_descr(di)
-        page_models = multipanel(storage_vault, di, plot_settings, "stddev_norm", debuginfo, valid_statistics, res)
+        page_models = multipanel(storage_vault, di, plot_settings, "stddev_norm", \
+                                 debuginfo, valid_statistics, res)
 
         ;; Attach Metadata to plot
         alltags = array_append_record(tags, (/"DM_reg", "ST_stddev", "PT_geo"/), 0)
 
-        caption = "Normalized standard deviation of " + filter + " "  \
-                   + variable_info@long_name + "over the " \
+        caption = "Normalized standard deviation of the filtered field over the " \
                        + di@season + " season."
 
         id = diag_script + "_stddev_norm" + variables(0)
@@ -659,6 +732,9 @@ begin
                                                         var0,\
                                                         field_type0,\
                                                         aux_title_info, -1)
+        if (isatt(di, "figurename_suffix")) then
+            output_filename = output_filename + di@figurename_suffix
+        end if
 
         figures_per_page = page_models[0]
         model_panel_placement = page_models[1]
@@ -666,39 +742,36 @@ begin
 
         if (dimsizes(figures_per_page).gt.1) then
 
-            curr_idx=0
+            curr_idx = 0
 
-            do ipage=0,dimsizes(figures_per_page)-1
+            do ipage = 0, dimsizes(figures_per_page) - 1
 
-                climofiles = new(figures_per_page(ipage),string)
-                modelsname = new(figures_per_page(ipage),string)
-                do ifig = 0, figures_per_page(ipage)-1
-                   imod = model_panel_placement(curr_idx)
-                   climofiles(ifig) = interface_get_inpaths(imod) + "/" + \
-                         interface_get_infile(variables(0), field_types(0), imod)
+                climofiles2 = new(figures_per_page(ipage), string)
+                modelsname = new(figures_per_page(ipage), string)
+                do ifig = 0, figures_per_page(ipage) - 1
+                    imod = model_panel_placement(curr_idx)
+                    climofiles2(ifig) = interface_get_inpaths(imod) + "/" + \
+                        interface_get_infile(variables(0), field_types(0), imod)
                    modelsname(ifig) = models@name(model_panel_placement(curr_idx))
-                   curr_idx=curr_idx+1
+                   curr_idx=curr_idx + 1
                 end do
 
-            output_file_path = output_dir + output_filename + "-page" + ipage + "." + output_file_type
+                output_file_path = output_dir + output_filename + "-page" + ipage \
+                                   + "." + output_file_type
 
-            ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, climofiles, diag_script, contrib_authors)
+                ESMValMD(output_file_path, alltags, caption, id, variables, modelsname, \
+                         climofiles2, diag_script, contrib_authors)
 
-            delete([/climofiles,modelsname/])
+                delete([/climofiles2, modelsname/])
 
             end do
 
         else
 
-            climofiles = new(dimsizes(models@name), string)
-            do imod = 0, dimsizes(models@name) - 1
-                    climofiles(imod) = interface_get_inpaths(imod) + "/" + \
-                         interface_get_infile(variables(0), field_types(0), imod)
-            end do
-
             output_file_path = output_dir + output_filename + "." + output_file_type
 
-            ESMValMD(output_file_path, alltags, caption, id, variables, models@name, climofiles, diag_script, contrib_authors)
+            ESMValMD(output_file_path, alltags, caption, id, variables, models@name, \
+                     climofiles, diag_script, contrib_authors)
 
         end if
 

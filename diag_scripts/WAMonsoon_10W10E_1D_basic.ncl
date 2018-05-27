@@ -59,6 +59,12 @@ load "./diag_scripts/lib/ncl/statistics.ncl"
 
 load "./diag_scripts/aux/SAMonsoon/SAMonsoon.ncl"
 exact_panel_position_file = "./diag_scripts/aux/WAMonsoon/exact_panel_positions_wind.ncl"
+; A_laue_ax+
+; option to override panel positioning file
+if (isatt(diag_script_info, "exact_panel_position_file")) then
+    exact_panel_position_file = diag_script_info@exact_panel_position_file
+end if
+; A_laue_ax-
 load "./plot_scripts/ncl/monsoon_panels.ncl"
 load "./diag_scripts/aux/SAMonsoon/exact_panel_positions_generic.ncl"
 load "./diag_scripts/aux/SAMonsoon/SAMonsoon_panel_positions.ncl"
@@ -282,7 +288,7 @@ begin
                        + models@start_year(0)\
                        + "-" + models@end_year(0)
     else
-        years_string = "~F22~yrs:~F21~ inconsistent"
+        years_string = "" ;"~F22~yrs:~F21~ inconsistent"
     end if
 
     ;; Three panel plots (ref, model, diff)

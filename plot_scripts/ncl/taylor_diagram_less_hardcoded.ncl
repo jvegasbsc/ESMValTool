@@ -308,7 +308,8 @@ begin
           rmsobj(1) = gsn_add_polygon(wks, taylor, xx, yy, respl0)
       else  ; uncertainty circle covers only part of the plotting area
           dist = rr + 1.0
-          if (dist .gt. max(rxy@tmXBValues)) then ; uncertainty circle has to be cropped
+;          if (dist .gt. max(rxy@tmXBValues)) then ; uncertainty circle has to be cropped
+          if (dist .gt. xyMax) then ; uncertainty circle has to be cropped
               ; need to find point of intersection between uncertainty circule and outer arc
               xtmp = (xyMax^2 - rr^2 + 1.0) / 2.0
               ytmp = sqrt(xyMax^2 - xtmp^2)

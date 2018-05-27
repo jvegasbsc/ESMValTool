@@ -20,6 +20,10 @@
 ;;    embracesetup:    True = 2 plots per line, False = 4 plots per line (default)
 ;;    extralegend:     plot legend(s) to extra file(s)
 ;;    showdiff         calculate and plot differences
+;;    rel_diff:        if showdiff = True, then plot relative differences (%)
+;;    ref_diff_min:    lower cutoff value in case of calculating relative differences
+;;                     (in units of input variable)
+;;    region:          show only selected geographic region given as latmin, latmax, lonmin, lonmax
 ;;    timemean:        time averaging - "seasonal" = DJF, MAM, JJA, SON), 
 ;;                                      "annual" = annual mean
 ;;
@@ -105,9 +109,18 @@ begin
     end if
 
     flag_diff = False
+    flag_rel_diff = False
     if (isatt(diag_script_info, "showdiff")) then
         if (diag_script_info@showdiff) then
             flag_diff = True
+            if (isatt(diag_script_info, "rel_diff")) then
+                flag_rel_diff = diag_script_info@rel_diff
+                if (isatt(diag_script_info, "rel_diff_min")) then
+                    rel_diff_min = diag_script_info@rel_diff_min
+                else
+                    rel_diff_min = -1.0e19
+                end if
+            end if
         end if
     end if
 
@@ -137,14 +150,12 @@ begin
 
     timemean = "annualclim"  ; default
     numseas = 1              ; default
-    season = (/"annual"/)
+    season = (/"DJF", "MAM", "JJA", "SON"/)
 
     if (isatt(diag_script_info, "timemean")) then
         timemean = diag_script_info@timemean
         if (timemean.eq."seasonalclim") then
             numseas = 4
-            delete(season)
-            season = (/"DJF", "MAM", "JJA", "SON"/)
         end if
     end if
 
@@ -173,7 +184,12 @@ begin
             + interface_get_infile(variables(0), field_types(0), ii)
     end do
 
-    alltags = array_append_record(tags, (/"PT_geo", "ST_clim", "DM_global"/), 0)
+    
+    if (isatt(diag_script_info, "region")) then
+        alltags = array_append_record(tags, (/"PT_geo", "ST_clim", "DM_reg"/), 0)
+    else
+        alltags = array_append_record(tags, (/"PT_geo", "ST_clim", "DM_global"/), 0)
+    end if
 
     outfile = new(numseas, string)
 
@@ -239,7 +255,7 @@ begin
         delete(models_ind)
 
         if (flag_mean) then
-            ; add entry "multi-model mean"
+            ; add entry "multi-model-mean"
 
             dim_MOD = dim_MOD + 1
             modelsatname = array_append_record((/"multi-model-mean"/), \
@@ -253,7 +269,7 @@ begin
             models@project = projectsatname
             delete(projectsatname)
 
-            ; move "multi-model mean" entry to the end of the array
+            ; move "multi-model-mean" entry to the end of the array
 
             dumstr = models@name(0)
             do i = 1, dim_MOD - 1
@@ -484,9 +500,28 @@ begin
 
         end if  ; flag_mean or flag_diff
 
-     end do  ; imod-loop
+    end do  ; imod-loop
 
-     do imod = 0, dim_MOD - 1
+    ; if requested, select geographical region
+
+    if (isvar("diff")) then
+        if (isatt(diag_script_info, "region")) then
+            region = diag_script_info@region
+            diff := area_operations(diff, region(0), region(1), region(2), region(3), "extract", False)
+            if (region(2).eq.0. .and. region(3).eq.360.) then
+            else
+                diff@res_gsnAddCyclic = False
+            end if
+            diff@res_mpMinLatF = region(0)      ; range to zoom in on
+            diff@res_mpMaxLatF = region(1)
+            diff@res_mpMinLonF = region(2)
+            diff@res_mpMaxLonF = region(3)
+            diff@res_mpCenterLonF = 0.5 * (region(2) + region(3))
+            delete(region)
+        end if
+    end if
+
+    do imod = 0, dim_MOD - 1
 
         if (isvar("data1")) then
             delete(data1)
@@ -519,13 +554,24 @@ begin
 
             delete(A0)
             delete(data)
-        end if
 
-        ; ###########################################
-        ; # Style dependent annotation              #
-        ; ###########################################
-        ; retrieve unique strings describing the data
-        ; function in ./diag_scripts/lib/ncl/style.ncl
+            ; if requested, extract geographical region
+
+            if (isatt(diag_script_info, "region")) then
+                region = diag_script_info@region
+                data1 := area_operations(data1, region(0), region(1), region(2), region(3), "extract", False)
+                if (region(2).eq.0. .and. region(3).eq.360.) then
+                else
+                    data1@res_gsnAddCyclic = False
+                end if
+                data1@res_mpMinLatF = region(0)      ; range to zoom in on
+                data1@res_mpMaxLatF = region(1)
+                data1@res_mpMinLonF = region(2)
+                data1@res_mpMaxLonF = region(3)
+                data1@res_mpCenterLonF = 0.5 * (region(2) + region(3))
+                delete(region)
+            end if
+        end if
 
         ; ###########################################
         ; # plot ressources                         #
@@ -534,9 +580,6 @@ begin
         data1@res_cnFillOn          = True         ; Color plot desired
         data1@res_cnLineLabelsOn    = False        ; Contour lines
         data1@res_cnLinesOn         = False
-
-        ; colors
-        ; http://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml
 
         ; annotation
 
@@ -791,10 +834,10 @@ begin
     pres@gsnPanelLabelBar                 = True      ; add common colorbar
     if (panel_labels) then
         pres@gsnPanelFigureStrings        = models@name(plotind)    ; print model name on
-                                                               ; each panel
+                                                                    ; each panel
     end if
-    pres@gsnPanelFigureStringsFontHeightF = max((/0.008, 0.008 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
-    pres@lbLabelFontHeightF               = max((/0.01, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+    pres@gsnPanelFigureStringsFontHeightF = min((/0.015, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
+    pres@lbLabelFontHeightF               = min((/0.02, 0.01 * 6.0 / tofloat((dim_MOD + 1) / 2)/))
     pres@lbAutoManage                     = False
     pres@lbTopMarginF                     = 0.1
     pres@lbTitleOn                        = True
@@ -921,19 +964,38 @@ begin
             end if
 
             if (numseas.gt.1) then
-                diff(imod, :, :, :) = diff(imod, :, :, :) - diff(ref_ind, :, :, :)
+                if (flag_rel_diff) then
+                    diff(imod, :, :, :) = (diff(imod, :, :, :) - diff(ref_ind, :, :, :)) / diff(ref_ind, :, :, :) * 100.0
+                    diff(imod, :, :, :) = where(diff(ref_ind, :, :, :).le.rel_diff_min, diff@_FillValue, diff(imod, :, :, :))
+                else
+                    diff(imod, :, :, :) = diff(imod, :, :, :) - diff(ref_ind, :, :, :)
+                end if
+
                 diff@res_gsnLeftString  = ""
                 diff@res_gsnRightString = ""
             else
-                rmsd = calculate_metric(diff(imod, :, :), diff(ref_ind, :, :), "RMSD")
-                diff@res_gsnRightString = "rmsd = " + sprintf("%6.3f", rmsd)
-                diff(imod, :, :) = diff(imod, :, :) - diff(ref_ind, :, :)
+                if (flag_rel_diff) then
+                    diff@res_gsnRightString = ""
+                else
+                    rmsd = calculate_metric(diff(imod, :, :), diff(ref_ind, :, :), "RMSD")
+                    diff@res_gsnRightString = "rmsd = " + sprintf("%6.3f", rmsd)
+                end if
+                if (flag_rel_diff) then
+                    diff(imod, :, :) = (diff(imod, :, :) - diff(ref_ind, :, :)) / diff(ref_ind, :, :) * 100.0
+                    diff(imod, :, :) = where(diff(ref_ind, :, :).le.rel_diff_min, diff@_FillValue, diff(imod, :, :))
+                else
+                    diff(imod, :, :) = diff(imod, :, :) - diff(ref_ind, :, :)
+                end if
                 if (all(ismissing(diff(imod, :, :)))) then
                     diff@res_gsnLeftString = ""
                     diff@res_gsnRightString = ""
                 else
-                    gavg = area_operations(diff(imod, :, :), -90., 90., 0., 360., "average", True)
-                    diff@res_gsnLeftString = "bias = " + sprintf("%6.3f", gavg)
+                    if (flag_rel_diff) then
+                        diff@res_gsnLeftString = ""
+                    else
+                        gavg = area_operations(diff(imod, :, :), -90., 90., 0., 360., "average", True)
+                        diff@res_gsnLeftString = "bias = " + sprintf("%6.3f", gavg)
+                    end if
                 end if
             end if
 
@@ -951,9 +1013,6 @@ begin
             diff@res_cnFillOn          = True         ; Color plot desired
             diff@res_cnLineLabelsOn    = False        ; Contour lines
             diff@res_cnLinesOn         = False
-
-            ; colors
-            ; http://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml
 
             ; annotation
 
@@ -989,7 +1048,7 @@ begin
                 end if
             end if
 
-            if (var0.eq."tas-degC") then
+            if ((var0.eq."tas-degC") .or. (var0.eq."ts")) then
                 if (isatt(diff, "res_cnFillColors")) then
                     delete(diff@res_cnFillColors)
                 end if
@@ -998,6 +1057,12 @@ begin
                 end if
                 pal = read_colormap_file("diag_scripts/lib/ncl/rgb/ipcc-tas-delta.rgb")
                 diff@res_cnFillPalette = pal
+                if (var0.eq."ts") then
+                    if (isatt(diff, "res_cnLevels")) then
+                        delete(diff@res_cnLevels)
+                    end if
+                    diff@res_cnLevels = variable_info@map_diff_Levels * 0.5
+                end if
             end if
 
             if (var0.eq."lwp") then
@@ -1021,6 +1086,27 @@ begin
                 delete(diff@res_cnLevels)
                 diff@res_cnLevels                 = variable_info@map_diff_Levels * 0.001
             end if
+
+            ; ******************************************************
+            ; *** relative differences: use specific color table ***
+            ; ******************************************************
+
+            if (flag_rel_diff) then
+                if (isatt(diff, "res_cnLevels")) then
+                    delete(diff@res_cnLevels)
+                end if
+                if (isatt(diff, "res_cnFillColors")) then
+                    delete(diff@res_cnFillColors)
+                end if
+                diff@res_cnLevels = fspan(-100, 100, 21)
+                if (isvar("pal")) then
+                    delete(pal)
+                end if
+                pal = read_colormap_file("diag_scripts/lib/ncl/rgb/percent100.rgb")
+                diff@res_cnFillColors = pal
+            end if
+
+            ; ******************************************************
 
             if (imod.eq.ref_ind) then
                 diff@res_lbLabelBarOn = True
@@ -1304,8 +1390,12 @@ begin
                 end if
             end do
 
-            pres@lbTitleString = "~F33~D~F21~" + data1@long_name + " (" + \
+            if (flag_rel_diff) then
+                pres@lbTitleString = "~F33~D~F21~" + data1@long_name + " (%)"
+            else
+                pres@lbTitleString = "~F33~D~F21~" + data1@long_name + " (" + \
                                  data1@units + ")"
+            end if
 
             if (isatt(diff, "res_cnFillColors")) then
                 pres@lbFillColors = diff@res_cnFillColors

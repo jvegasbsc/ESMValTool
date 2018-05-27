@@ -7,10 +7,11 @@ load "./interface_scripts/messaging.ncl"
 variable_info = True
 variable_info@derived = True
 variable_info@units = "degC"
+variable_info@long_name = "surface temperature"
 
 ; Contour levels
 variable_info@map_ref_Levels = ispan(-30, 30, 3)
-variable_info@map_diff_Levels = ispan(-50, 50, 10) * 0.1
+variable_info@map_diff_Levels = ispan(-5, 5, 1)
 
 ;;#############################################################################
 load "interface_scripts/data_handling.ncl"

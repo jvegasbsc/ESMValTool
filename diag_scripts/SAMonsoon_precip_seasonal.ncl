@@ -230,9 +230,9 @@ begin
 
     ;; Set years_string depending on whether all models include the same years
     if (model_years_consistent) then
-        years_string = "~F22~yrs:~F21~ " + models@start_year(0) + "-" + models@end_year(0)
+        years_string = ", ~F22~yrs:~F21~ " + models@start_year(0) + "-" + models@end_year(0)
     else
-        years_string = "~F22~yrs:~F21~ inconsistent"
+        years_string = "" ;;"~F22~yrs:~F21~ inconsistent"
     end if
     di@left_plot_subheader = latlon_header_string + ", " + years_string
     di@years_string = years_string
@@ -257,7 +257,7 @@ begin
     plot_settings@title_string = "Seasonal cycle"
     plot_settings@yaxis_string = "Precipitation"
     plot_settings@type = "monthly_climatology"
-    plot_settings@left_plot_subheader = latlon_header_string + ", " + years_string
+    plot_settings@left_plot_subheader = latlon_header_string + years_string
 
     xy_plot_wrapper(storage_vault, di, plot_settings, "precip-seasonal-cycle", debuginfo)
 

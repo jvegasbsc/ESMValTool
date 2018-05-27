@@ -471,7 +471,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             loc_data = perc.extract(iris.Constraint(percentile_over_time=p))
                                                         
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
                             
                             mean_std_cov.update({m + " " + str(int(round(p,0))) + " percent":loc_data})
                             
@@ -505,7 +505,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             mean_std_cov.update({m + " " + str(int(mon)):loc_data})
                         
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
                         
                         del clim_comp
                         
@@ -515,7 +515,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             mean_std_cov.update({"mean anomalies from " + m + " per year " + str(int(y)):loc_data})
                             
-                            disp_min_max.update({"diff_vals":np.nanpercentile(np.concatenate([disp_min_max["diff_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                            disp_min_max.update({"diff_vals":np.nanpercentile(np.concatenate([disp_min_max["diff_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
                                                         
                         del clim_anom
                             
@@ -528,7 +528,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
                     mean_std_cov.update({m:loc_data})
                     
-                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data,[5,95])]),[0,100])})
+                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
                     
                 elif m == "STD_DEV":
         

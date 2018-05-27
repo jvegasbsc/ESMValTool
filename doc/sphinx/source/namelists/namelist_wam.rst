@@ -1,3 +1,5 @@
+.. _nml_wam:
+
 West African Monsoon (WAM)
 ==========================
 

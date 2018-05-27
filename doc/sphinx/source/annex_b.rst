@@ -174,4 +174,3 @@ Don't-s
 * Avoid large (memory, disk space) intermediate results. Delete intermediate files/variables or see modular/functional programming style.
 * Do not use hard-coded pathnames or filenames.
 
-

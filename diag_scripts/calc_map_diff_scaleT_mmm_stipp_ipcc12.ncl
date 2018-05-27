@@ -415,7 +415,8 @@ begin
                 dim_mod = dimsizes(idx_rcp)
                 if (dim_mod .lt. 2) then
                     error_msg("f", diag_script, "", \
-                    "Only one model found, multi-model needs at least two.")
+                              "Only one model found, multi-model needs at" + \
+                              " least two.")
                 end if
                 var_diff_scal = new((/dim_mod, dimsizes(dest_grd&lat), \
                                     dimsizes(dest_grd&lon)/), typeof(var_grd),\

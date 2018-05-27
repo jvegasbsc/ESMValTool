@@ -394,7 +394,7 @@ begin
 
   caption = "Carbon Cycle -Climate feedback of tropical land carbon vs. the " \
             +"sensitivity of co2flux to interannual temperature variability in " \
-            +"the tropics (30°S-30°N). The red line shows the linear best fit " \
+            +"the tropics (30S-30N). The red line shows the linear best fit " \
             +"of the regression together with the prediction error (orange shading)" \
             +" and the gray shading shows the observed range, "\
             +"similar to Wenzel et al., JGR, 2014, fig. 5."

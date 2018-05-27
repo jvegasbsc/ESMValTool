@@ -379,9 +379,9 @@ begin
 
     ;; Set years_string depending on whether all models include the same years
     if (model_years_consistent) then
-        years_string = "~F22~yrs:~F21~ " + models@start_year(0) + "-" + models@end_year(0)
+        years_string = ", ~F22~yrs:~F21~ " + models@start_year(0) + "-" + models@end_year(0)
     else
-        years_string = "~F22~yrs:~F21~ inconsistent"
+        years_string = "" ;;"~F22~yrs:~F21~ inconsistent"
     end if
     di@years_string = years_string
 
@@ -401,7 +401,7 @@ begin
     plot_settings@aux_filename_info = "goswami-seasonal-cycle"
     plot_settings@yaxis_string = "v850-v200"
     plot_settings@type = "monthly_climatology"
-    plot_settings@left_plot_subheader = "Seasonal cycle, " + years_string
+    plot_settings@left_plot_subheader = "Seasonal cycle" + years_string
     debuginfo@description_ycoord = 0.7
     debuginfo@description = "~F22~Diag def:~F21~ Monthly climatology for the Goswami Monsoon Index (GMI)"\
                                 + "~C~   across specified years. GMI is the vertical northward wind shear for"\

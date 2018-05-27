@@ -189,9 +189,11 @@ def main(project_info):
     for i in range(nummod):
         modeltags[i] = 'M_' + models[i]
 
+    basetags = [x.strip() for x in project_info.get('GLOBAL')['tags']]
+
     ESMValMD("both",
              oname,
-             ['DM_global', 'PT_bar'] + modeltags + vartags,
+             basetags + ['DM_global', 'PT_bar'] + modeltags + vartags,
              'Cloud Regime Error Metric (CREM) following Williams and Webb (2009, Clim. Dyn.).',
              '#ID_ww09_crem',
              ','.join(climofiles), 'ww09_ESMValTool.py', 'A_will_ke')

@@ -68,6 +68,9 @@ begin
        if (model.eq."CMCC-CMS") then
           sub_iwp = 0
        end if
+       if (model.eq."EC-EARTH3") then
+          sub_iwp = 0
+       end if
        if (model.eq."IPSL-CM5A-MR") then
           sub_iwp = 0
        end if

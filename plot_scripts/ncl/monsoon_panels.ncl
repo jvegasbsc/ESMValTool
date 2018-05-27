@@ -1209,6 +1209,19 @@ begin
 
     statistics = True
     statistics = compute_stat((/"yrs", "refA", "lonB", "mean", "bob", "eio", "sahel", "sa34", "en34"/), valid_statistics, ref, dummy_array)
+
+; a_laue_ax+
+    plotref = True
+    if (isatt(plot_settings, "plot_diff_reference")) then
+        plotref = plot_settings@plot_diff_reference
+    end if
+
+    txres = True
+    txres@txFuncCode = "~"
+
+    if (plotref) then
+; a_laue_ax-
+
     plot_ref = single_contour(wks,\
                               ref,\
                               main_title_prefix,\
@@ -1218,15 +1231,19 @@ begin
                               statistics,\
                               res)
     delete(statistics)
-    txres = True
-    txres@txFuncCode = "~"
+
     if (debuginfo) then
         debugbox = write_info(debuginfo)
         am_infobox_id = place_debuginfo(wks, debugbox, txres, plot_ref)
     end if
 
     idx_fig = figure_panel_placement(curr_idx)
+
     plot_array(idx_fig) = plot_ref
+
+; a_laue_ax+
+    end if
+; a_laue_ax-
 
     ;; Skip past the reference plot
     curr_idx = curr_idx + 1
@@ -1234,8 +1251,14 @@ begin
     lbres = True
 
     if (plot_settings@type .eq. "diff") then
+; a_laue_ax+
+        if (plotref) then
+; a_laue_ax-
         inset_top_text(wks, plot_ref, "REF", txres)
         inset_labelbar(wks, plot_ref, res, "REF", lbres)
+; a_laue_ax+
+        end if
+; a_laue_ax-
         main_title_suffix = " - REF"
 
         ;; Possibly switch from default colormap for diff plot
@@ -1246,13 +1269,23 @@ begin
             res@cnFillPalette = plot_settings@diff_palette
         end if
     else
+; a_laue_ax+
+        if (plotref) then
+; a_laue_ax-
         inset_top_text(wks, plot_ref, "Reference", txres)
+; a_laue_ax+
+        end if
+; a_laue_ax-
         main_title_suffix = ""
     end if
 
     delete(res@cnLevels)
     cn_levels_string = str_sub_str("cn_levels_" + storage_name + type_specifier + "_basic", "-", "_")
     res@cnLevels = di@$cn_levels_string$
+
+;print(res@cnLevels)
+;printVarSummary(res)
+
     ;; -----------------------------
     ;; Create the non-reference plots
     ;; -----------------------------
@@ -1276,7 +1309,6 @@ begin
 
         storage_record = str_join((/storage_name, sprinti("%i", idx_mod)/), str_vault_sep)
         curr = retrieve_from_vault(storage_vault, storage_record)
-
 
         statistics = True
         statistics = compute_stat((/"yrs"/), valid_statistics, curr, dummy_array)
@@ -1308,7 +1340,6 @@ begin
             debugbox = write_info(debuginfo)
             am_infobox_id = place_debuginfo(wks, debugbox, txres, plot)
         end if
-
         plot_array(idx_fig) = plot
 
         ;; Update index to point to next field
@@ -1329,6 +1360,7 @@ begin
                                       header_prefix + di@season + "-" + title_name + plot_settings@part_of_header,\
                                       rows,\
                                       cols)
+
     ;; Create shared labelbar
     n_by_cols_labelbar(wks,\
                        blank_plot,\
@@ -1447,6 +1479,7 @@ begin
     ;; --------------------------------------
     ;; Compute the layout of paneled figures
     ;; --------------------------------------
+
     figures_per_page = get_figures_per_page(dim_MOD,\
                                             max_figures_pp,\
                                             min_figures_pp)
@@ -1510,6 +1543,11 @@ begin
                                                         field_type0 + field_type1,\
                                                         aux_title_info,\
                                                         idx_mod)
+
+        if (isatt(di, "figurename_suffix")) then
+            output_filename = output_filename + di@figurename_suffix
+        end if
+
         output_file_path = output_dir + output_filename
         wks = gsn_open_wks(output_file_type, output_file_path)
 
@@ -1547,6 +1585,11 @@ begin
                                                             field_type0 + field_type1,\
                                                             aux_title_info,\
                                                             idx_mod)
+
+            if (isatt(di, "figurename_suffix")) then
+                output_filename = output_filename + di@figurename_suffix
+            end if
+
             output_file_path = output_dir + output_filename
             wks_debug = gsn_open_wks(output_file_type, output_file_path)
 
@@ -1680,6 +1723,15 @@ begin
 
     statistics = True
     statistics = compute_stat((/"yrs", "mean"/), valid_statistics, speed_ref, dummy_array)
+
+; a_laue_ax+
+    plotref = True
+    if (isatt(plot_settings, "plot_diff_reference")) then
+        plotref = plot_settings@plot_diff_reference
+    end if
+    if (plotref) then
+; a_laue_ax-
+
     plot_ref = single_contour(wks,\
                               speed_ref,\
                               main_title_prefix,\
@@ -1711,12 +1763,16 @@ begin
         am_infobox_id = place_debuginfo(wks, debugbox, txres, plot_ref)
     end if
 
+    idx_fig = figure_panel_placement(curr_idx)
+    plot_array(idx_fig) = plot_ref
+
+; a_laue_ax+
+    end if
+; a_laue_ax-
+
     delete(res@cnLevels)
     cn_levels_string = str_sub_str("cn_levels_" + storage_names@base_name + type_specifier + "_basic", "-", "_")
     res@cnLevels = di@$cn_levels_string$
-
-    idx_fig = figure_panel_placement(curr_idx)
-    plot_array(idx_fig) = plot_ref
 
     ;; Skip past the reference plot
     curr_idx = curr_idx + 1
@@ -1725,6 +1781,9 @@ begin
     txres = True
     txres@txFuncCode = "~"
 
+; a_laue_ax+
+    if (plotref) then
+; a_laue_ax-
     if (plot_settings@type .eq. "diff") then
         inset_top_text(wks, plot_ref, "REF", txres)
         inset_labelbar(wks, plot_ref, res, "REF", lbres)
@@ -1733,6 +1792,9 @@ begin
         inset_top_text(wks, plot_ref, "Reference", txres)
         main_title_suffix = ""
     end if
+; a_laue_ax+
+    end if
+; a_laue_ax-
 
     ;; ------------------------------
     ;; Create the non-reference plots
@@ -2455,7 +2517,20 @@ begin
         res@xyLineThicknesses = thicks
         res@xyLineThicknesses(:) = 3
     end if
-    
+
+; A_laue_ax+
+    if (isatt(diag_script_info, "legend_outside")) then
+        if (diag_script_info@legend_outside) then
+            values@legend_outside = True
+            wks@legendfile = get_outfile_name(diag_script, "legend")
+            res@trXMinF = min(values&$x_axis_coord$) - 0.05 * \
+                (max(values&$x_axis_coord$) - min(values&$x_axis_coord$))
+            res@trXMaxF = max(values&$x_axis_coord$) + 0.05 * \
+                (max(values&$x_axis_coord$) - min(values&$x_axis_coord$))
+        end if
+    end if
+; A_laue_ax-
+
     xy_line(wks, values, values&month, values_stddev, res, False)
 
     if (debuginfo) then
@@ -2698,8 +2773,8 @@ begin
     annots = project_style(di, "annots")
     avgstd = project_style(di, "avgstd")
     do idx_th = 0, dimsizes(thicks) - 1
-        if (thicks(idx_th) .lt. 5) then
-            thicks(idx_th) = 5
+        if (thicks(idx_th) .lt. 3) then
+            thicks(idx_th) = 3
         end if
     end do
     if (diag_script_info@multi_model_mean .eq. "y") then
@@ -2798,7 +2873,6 @@ begin
     interp_mod = new((/interp_size, dim_MOD/), float)    
     delete(values)
 
-    
     do idx_mod = 0, dim_MOD - 1
         storage_variable_name = str_join((/storage_name, sprinti("%i", idx_mod)/), str_vault_sep)
         values = retrieve_from_vault(storage_vault, storage_variable_name)
@@ -2946,7 +3020,55 @@ begin
     bres@vpHeightF         = vph
     blank_plot = gsn_csm_blank_plot(wks, bres)
     ;; Add legend to plot
-    annoid = gsn_add_annotation(blank_plot, lbid, amres)
+; A_laue_ax+
+    if (isatt(di, "legend_outside")) then
+        if (di@legend_outside) then
+            bres@vpWidthF          = vpw  ; overwrite plot width
+        else
+            annoid = gsn_add_annotation(blank_plot, lbid, amres)
+        end if
+    else
+; A_laue_ax-
+        annoid = gsn_add_annotation(blank_plot, lbid, amres)
+; A_laue_ax+
+    end if
+; A_laue_ax-
+
+; A_laue_ax+
+; copied from ESMValTool v1.1.0, added multi-model mean to legend (if calculated)
+
+    ;; Put legend into an extra file
+    if (isatt(di, "legend_outside")) then
+        if (di@legend_outside) then
+            lg_outfile = get_outfile_name(diag_script, "legend")
+            if (di@multi_model_mean .eq. "y") then
+                tmp = array_append_record(colors, colors_mmm, 0)
+                delete(colors)
+                colors = tmp
+                delete(tmp)
+                tmp = array_append_record(dashes, dashes_mmm, 0)
+                delete(dashes)
+                dashes = tmp
+                delete(tmp)
+                tmp = array_append_record(thicks, thicks_mmm, 0)
+                delete(thicks)
+                thicks = where(tmp.lt.3, 3, tmp)
+                delete(tmp)
+                tmp = array_append_record(annots, annots_mmm, 0)
+                delete(annots)
+                annots = tmp
+                delete(tmp)
+            end if
+
+            styles = True
+            styles@colors = colors
+            styles@dashes = dashes
+            styles@thicks = thicks
+
+            create_legend_lines(annots, styles, lg_outfile, "lines")
+        end if
+    end if
+; A_laue_ax-
 
     ;; Create another blank plot to make sure plot border thickness is even
     bres@tmXBBorderOn = True

@@ -40,7 +40,7 @@
 ;;    att2: short description
 ;;
 ;; Caveats
-;;    slow for irregular ocean grids (regridding on each depth level), 
+;;    slow for irregular ocean grids (regridding on each depth level),
 ;;    regridding only works for models with all relevant information provided
 ;;    (therefore model name printed in loop, in case of crash know which model
 ;;    caused crash)
@@ -389,7 +389,7 @@ begin
     end if
 
     do imod = 0, dim_MOD - 1
-	print(models@name(imod))
+        print(models@name(imod))
         if (imod .ne. 0) then
             A0 = extract_data(imod, data, -1, 0, 0)
             data1 = time_operations(A0, -1, -1, "average", "annualclim", True)

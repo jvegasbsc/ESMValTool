@@ -1,5 +1,5 @@
-! SOURCE: CMIP5 (adapted from ec550aer)
-!============
+SOURCE: CMIP5 (adapted from od550aer)
+=============
 variable_entry:    ec532dust
 !============
 modeling_realm:    aerosol

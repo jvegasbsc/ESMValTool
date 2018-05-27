@@ -33,9 +33,9 @@ This namelist is part of the ESMValTool
     <write_plot_vars type="boolean">       True      </write_plot_vars>
     <max_data_filesize type="integer">      100      </max_data_filesize>
     <max_data_blocksize type="integer">     500      </max_data_blocksize>
-    <verbosity  type="integer">               5      </verbosity>
+    <verbosity  type="integer">               1      </verbosity>
     <exit_on_warning  type="boolean">     False      </exit_on_warning>
-    <output_file_type>                      ps       </output_file_type>
+    <output_file_type>                      png      </output_file_type>
     <force_calc type="boolean">           False      </force_calc>
     <force_gradecalc type="boolean">      False      </force_gradecalc>
     <force_taylorcalc type="boolean">     False      </force_taylorcalc>
@@ -604,7 +604,7 @@ This namelist is part of the ESMValTool
         <model> CMIP5_ETHZ CCSM4          Amon rcp85 r1i1p1 2006 2100 @{MODELPATH} </model>
         <model> CMIP5_ETHZ CESM1-BGC      Amon rcp85 r1i1p1 2006 2100 @{MODELPATH} </model>
         <model> CMIP5_ETHZ CESM1-CAM5     Amon rcp85 r1i1p1 2006 2100 @{MODELPATH} </model>
-        <model> CMIP5_ETHZ CESM1-WACCM    Amon rcp85 r2i1p1 2006 2099 @{MODELPATH} </model>
+        <model> CMIP5_ETHZ CESM1-WACCM    Amon rcp85 r3i1p1 2006 2099 @{MODELPATH} </model>
         <model> CMIP5_ETHZ CMCC-CESM      Amon rcp85 r1i1p1 2006 2100 @{MODELPATH} </model>
         <model> CMIP5_ETHZ CMCC-CM        Amon rcp85 r1i1p1 2006 2100 @{MODELPATH} </model>
         <model> CMIP5_ETHZ CNRM-CM5       Amon rcp85 r1i1p1 2006 2100 @{MODELPATH} </model>

@@ -1,3 +1,5 @@
+.. _nml_sam:
+
 South asian monsoon
 ===================
 

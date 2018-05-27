@@ -1,0 +1,196 @@
+###############################################################################
+## PLOT STYLE MANAGEMENT
+## Based on diag_scripts/lib/ncl/style.ncl
+###############################################################################
+
+[CNRM-CM5]
+RGB = 0.6 0.6 0.6
+dash = 0
+thickness = 1
+avgstd = 0
+
+[CNRM-AM-PRE6]
+RGB = 0.0 0.9843 0.9843
+dash = 0
+thickness = 1
+avgstd = 0
+
+[EC-EARTH]
+RGB = 0.6 0.6 0.6
+dash = 0
+thickness = 1
+avgstd = 0
+
+[EC-EARTH3]
+RGB = 0.0 0.9843 0.2
+dash = 0
+thickness = 1
+avgstd = 0
+
+[HadCM3]
+RGB = 0.5450 0.5450 0.
+dash = 0
+thickness = 1
+avgstd = 0
+
+[HadGEM2-A]
+RGB = 0.6 0.6 0.6
+dash = 0
+thickness = 1
+avgstd = 0
+
+[HadGEM2-ES]
+RGB = 0.6 0.6 0.6
+dash = 0
+thickness = 1
+avgstd = 0
+
+[HadGEM3-A]
+RGB = 0.0 0.1 0.9843
+dash = 0
+thickness = 1
+avgstd = 0
+
+[HadGEM3-GC2-N96]
+RGB = 0.0 0.1 0.9843
+dash = 0
+thickness = 1
+avgstd = 0
+
+[HadGEM2-CC]
+RGB = 0.5450 0.5450 0.
+dash = 2
+thickness = 1
+avgstd = 0
+
+[MPI-ESM-LR]
+RGB = 0.6 0.6 0.6
+dash = 0
+thickness = 1
+avgstd = 0
+
+[MPIESM_1_1]
+RGB = 1.0 0.0 0.0
+dash = 0
+thickness = 1
+avgstd = 0
+
+[MPI-ESM-MR]
+RGB = 0.3725 0.6196 0.627
+dash = 1
+thickness = 1
+avgstd = 0
+
+[MPI-ESM-P]
+RGB = 0.3725 0.6196 0.627
+dash = 2
+thickness = 1
+avgstd = 0
+
+[MPI-ESMwithembrace]
+RGB = 1.0 0.0 0.0
+dash = 0
+thickness = 1
+avgstd = 0
+
+[MPI-ESMnoembrace]
+RGB = 0.6 0.6 0.6
+dash = 0
+thickness = 1
+avgstd = 0
+
+[ERAINT]
+RGB = 0. 0. 0.
+dash = 3
+thickness = 3
+avgstd = 1
+
+[ERA-Interim]
+RGB = 0. 0. 0.
+dash = 3
+thickness = 3
+avgstd = 1
+
+[NCEP]
+RGB = 0. 0. 0.
+dash = 4
+thickness = 3
+avgstd = 1
+
+[TRMM-3B43-v7-0.25deg]
+RGB = 0. 0. 0.
+dash = 5
+thickness = 3
+avgstd = 1
+
+[TRMM-L3]
+RGB = 0. 0. 0.
+dash = 5
+thickness = 3
+avgstd = 1
+
+[CMAP]
+RGB = 0. 0. 0.
+dash = 6
+thickness = 3
+avgstd = 1
+
+[GPCP-1DD-V12]
+RGB = 0. 0. 0.
+dash = 7
+thickness = 3
+avgstd = 1
+
+[MERRA]
+RGB = 0. 0. 0.
+dash = 8
+thickness = 3
+avgstd = 1
+
+[CERES-EBAF]
+RGB = 0. 0. 0.
+dash = 12
+thickness = 3
+avgstd = 1
+
+[CERES-EBAF-L3B-Ed2]
+RGB = 0. 0. 0.
+dash = 0
+thickness = 3
+avgstd = 1
+
+[WHOI-OAFlux]
+RGB = 0. 0. 0.
+dash = 10
+thickness = 3
+avgstd = 1
+
+[CloudSat-L3]
+RGB = 0. 0. 0.
+dash = 11
+thickness = 3
+avgstd = 1
+
+[HadISST]
+RGB = 0. 0. 0.
+dash = 1
+thickness = 3
+avgstd = 1
+
+[MODIS-L3]
+RGB = 0. 0. 0.
+dash = 12
+thickness = 3
+avgstd = 1
+
+[model_mean]
+RGB = 0.6 0. 0.0078
+dash = 0
+thickness = 3
+avgstd = 1
+
+[unknown]
+RGB = 0. 0. 0.
+dash = 0
+thickness = 10
+avgstd = 0

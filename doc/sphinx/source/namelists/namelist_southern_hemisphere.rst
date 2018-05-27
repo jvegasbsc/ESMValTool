@@ -1,3 +1,5 @@
+.. _nml_sh:
+
 Southern hemisphere
 ===================
 

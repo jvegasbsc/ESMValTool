@@ -170,16 +170,32 @@ def main(project_info):
     modelconfig.read(config_file)
     E.ensure_directory(plot_dir)
 
+    if (modelconfig.has_option('general', 'styleset')):
+        project_info['GLOBAL']['styleset'] = modelconfig.get('general', 'styleset')
+
     # Check which parts of the code to run
     if (modelconfig.getboolean('general', 'plot_scatter')):
-        info("Starting scatter plot", verbosity, 2)
-        process_scatter(E, modelconfig)
+        if (modelconfig.has_option('SouthernHemisphere_scatter_default', 'comparative_scatter')):
+            if (modelconfig.get('SouthernHemisphere_scatter_default', 'comparative_scatter') == 'True'):
+                info("Starting model comparative scatterplot", verbosity, 2)
+                gr = modelconfig.get('SouthernHemisphere_scatter_default', 'groups')
+                groups = gr.split(';')
+                info("The following model groups are defined:", verbosity, 1)
+                info(groups, verbosity, 1)
+                process_scatter_comparative(E, modelconfig, groups)
+            else:
+                info("Starting scatterplot", verbosity, 2)
+                process_scatter(E, modelconfig)
+        else:
+            info("Starting scatterplot", verbosity, 2)
+            process_scatter(E, modelconfig)
 
 
 # All callable functions below are in alphabetical order
 # E. style functions are in the general python file esmval_lib.py
 
-def calculate_scatterplot_values(modelconfig,
+def calculate_scatterplot_values(E, modelconfig,
+                                 verbosity,
                                  area,
                                  cl_key,
                                  cloud,
@@ -190,7 +206,11 @@ def calculate_scatterplot_values(modelconfig,
     
     Parameters
     ----------
+    E : xxxx
+        xxxx
     modelconfig : xxxx
+        xxxx
+    verbosity : xxxx
         xxxx
     area : xxxx
         xxxx
@@ -209,7 +229,7 @@ def calculate_scatterplot_values(modelconfig,
     else:
         nbins = modelconfig.getint('SouthernHemisphere_scatter_' + area,
                                    'points')
-        if (cl_key == 'clt'):
+        if ((cl_key == 'clt') or (cl_key == 'clt-ocean')):
             cl_min = 0
             cl_max = 100
         else:
@@ -232,12 +252,49 @@ def calculate_scatterplot_values(modelconfig,
             cl_masked = np.ma.masked_less(cloud, bins[i])
         else:
             cl_masked = np.ma.masked_outside(cloud, bins[i], bins[i + 1])
+        cl_masked = np.ma.masked_invalid(cl_masked)
         rd_masked = np.ma.masked_array(radiation, cl_masked.mask)
-        cl_values[i] = cl_masked.mean()
-        rd_values[i] = rd_masked.mean()
+
+        # A_laue_ax+
+        # mask unwanted values if specified
+        mask = modelconfig.getboolean('general', 'mask_unwanted_values')
+        if (mask is True):
+            # enquire what to do
+            llow, lhigh = False, False
+            if modelconfig.has_option('general', 'mask_limit_low'):
+                llow = True
+                low = modelconfig.getfloat('general', 'mask_limit_low')
+            if modelconfig.has_option('general', 'mask_limit_high'):
+                lhigh = True
+                high = modelconfig.getfloat('general', 'mask_limit_high')
+            # call the masking process
+            if (llow and lhigh):
+                cl_masked = E.mask_unwanted_values(cl_masked, low=low, high=high)
+                rd_masked = E.mask_unwanted_values(rd_masked, low=low, high=high)
+            elif (lhigh):
+                cl_masked = E.mask_unwanted_values(cl_masked, high=high)
+                rd_masked = E.mask_unwanted_values(rd_masked, high=high)
+            elif (llow):
+                cl_masked = E.mask_unwanted_values(cl_masked, low=low)
+                rd_masked = E.mask_unwanted_values(rd_masked, low=low)
+        # A_laue_ax-
+
+        #cl_values[i] = cl_masked.mean()
+        #rd_values[i] = rd_masked.mean()
         cl_fraction[i] = np.ma.count(cl_masked)
+        if (cl_masked.count() == 0):
+            cl_values[i] = np.NaN
+            rd_values[i] = np.NaN
+        else:
+            cl_values[i] = cl_masked.mean()
+            rd_values[i] = rd_masked.mean()
     cl_sum = cl_fraction.sum()
-    cl_fraction[:] = cl_fraction[:] / cl_sum
+    if (cl_sum > 0):
+        cl_fraction[:] = cl_fraction[:] / cl_sum
+    else:
+        info("I'm not receiving any unmasked values for: ", verbosity, 1)
+        info(cl_key, verbosity, 1)
+
     return bins, cl_fraction, cl_values, rd_values
 
 
@@ -335,6 +392,11 @@ def process_scatter(E, modelconfig):
     experiment = 'SouthernHemisphere'
     areas = modelconfig.get(experiment, 'scatter_areas').split()
     seasons = modelconfig.get(experiment, 'seasons').split()
+    # A_Laue_ax+
+    radtag = None
+    if modelconfig.has_option('general', 'scatter_radtag'):
+        radtag = modelconfig.get('general', 'scatter_radtag')
+    # A_Laue_ax-
     plot_grid = modelconfig.getboolean('general', 'plot_background_grid')
     plot_dir = E.get_plot_dir()
     verbosity = E.get_verbosity()
@@ -344,6 +406,8 @@ def process_scatter(E, modelconfig):
     # Check which cloud diagnostic we are working with
     if   ('clt' in datakeys):
         cl_key = 'clt'
+    elif ('clt-ocean' in datakeys):
+        cl_key = 'clt-ocean'
     elif ('clivi' in datakeys):
         cl_key = 'clivi'
     elif ('clwvi' in datakeys):
@@ -452,17 +516,20 @@ def process_scatter(E, modelconfig):
                                                              season,
                                                              monthly=True)
                     # Calculate scatterplot values
-                    obs_out = calculate_scatterplot_values(modelconfig,
+                    obs_out = calculate_scatterplot_values(E, modelconfig,
+                                                           verbosity,
                                                            area,
                                                            cl_key,
                                                            obs_cl,
                                                            obs_rd)
-                    model_out = calculate_scatterplot_values(modelconfig,
+                    model_out = calculate_scatterplot_values(E, modelconfig,
+                                                             verbosity,
                                                              area,
                                                              cl_key,
                                                              data_cl,
                                                              data_rd,
                                                              bins=obs_out[0])
+
                     centers = np.zeros(len(obs_out[0]) - 1)
                     for i in xrange(len(centers)):
                         centers[i] = (obs_out[0][i + 1] + obs_out[0][i]) / 2.
@@ -483,7 +550,7 @@ def process_scatter(E, modelconfig):
 
                     if (len(dashes) == 0):
                         axs[1, col].plot(centers,
-                                         obs_out[1],
+                                         model_out[1],
                                          color=modelcolor,
                                          linewidth=width,
                                          label=model)
@@ -528,7 +595,12 @@ def process_scatter(E, modelconfig):
                 xlabel = E.get_title_basename(cl_key)
                 ylabel = E.get_title_basename(datakey)
                 axs[0, 0].set_xlabel(xlabel)
-                axs[0, 0].set_ylabel('Radiation')
+                # A_laue_ax+
+                if (radtag is not None):
+                    axs[0, 0].set_ylabel('Radiation (' + radtag + ')')
+                else:
+                    axs[0, 0].set_ylabel('Radiation')
+                # A_laue_ax-
 
                 axs[1, 0].set_xlabel('Cloud cover percentage')
                 axs[1, 0].set_ylabel('Proportion of values')
@@ -559,3 +631,301 @@ def process_scatter(E, modelconfig):
                 info(output_file, verbosity, 1)
     cl_obsfile.close()
     rd_obsfile.close()
+
+def process_scatter_comparative(E, modelconfig, groups):
+    """
+    Main script for gathering cloud vs radiation values and plotting them.
+    """
+    config_file = E.get_configfile()
+    experiment = 'SouthernHemisphere'
+    areas = modelconfig.get(experiment, 'scatter_areas').split()
+    seasons = modelconfig.get(experiment, 'seasons').split()
+    plot_grid = modelconfig.getboolean('general', 'plot_background_grid')
+    # A_Laue_ax+
+    radtag = None
+    if modelconfig.has_option('general', 'scatter_radtag'):
+        radtag = modelconfig.get('general', 'scatter_radtag')
+    # A_Laue_ax-
+
+    plot_dir = E.get_plot_dir()
+    verbosity = E.get_verbosity()
+    work_dir = E.get_work_dir()
+    datakeys = E.get_currVars()
+    output_dpi = E.get_output_dpi()
+
+    # Check which cloud diagnostic we are working with
+    if   ('clt' in datakeys):
+        cl_key = 'clt'
+    elif ('clivi' in datakeys):
+        cl_key = 'clivi'
+    elif ('clwvi' in datakeys):
+        cl_key = 'clwvi'
+
+    # Extract cloud observations
+    datakeys.remove(cl_key)
+    cl_obs, cl_loc, cl_models = E.get_clim_model_and_obs_filenames(cl_key)
+
+    cl_obsfile = nc.Dataset(cl_loc, 'r')
+    # A-laue_ax+
+    E.add_to_filelist(cl_loc)
+    # A-laue_ax-
+
+    for datakey in datakeys:
+        # Extract radiation observations
+        rd_obs, rd_loc, rd_models = E.get_clim_model_and_obs_filenames(datakey)
+        rd_obsfile = nc.Dataset(rd_loc, 'r')
+        # A-laue_ax+
+        E.add_to_filelist(rd_loc)
+        # A-laue_ax-
+
+        ngroups  = len(groups)
+
+        # For each group we are generating one image for each season.
+        for group in groups:
+
+            for area in areas:
+
+                for season in seasons:
+                    plt.clf()
+                    fig, axs = plt.subplots(2, figsize=(4 * len(seasons), 8))
+                    fig.subplots_adjust(top=0.8)
+                    fig.subplots_adjust(bottom=0.15)
+                    fig.subplots_adjust(right=0.75)
+                    fig.subplots_adjust(hspace=0.4)
+                    fig.subplots_adjust(wspace=0.4)
+
+                    for model in group.split(','):
+                        if not model in cl_models:
+                            print("no data for ", model)
+                            continue
+                        # Get model and area specific values
+                        cl_datafile = nc.Dataset(cl_models[model], 'r')
+                        rd_datafile = nc.Dataset(rd_models[model], 'r')
+                        # A-laue_ax+
+                        E.add_to_filelist(cl_models[model])
+                        E.add_to_filelist(rd_models[model])
+                        # A-laue_ax-
+
+                        modelcolor, dashes, width = E.get_model_plot_style(model)
+
+                        # Basic structure of the figure is same for all
+                        # plots - we clear it at intervals
+
+                        # Get area specific configuration and observations
+                        coords = E.get_area_coordinates(modelconfig, experiment, area)
+                        area_key = experiment + '_scatter_' + area
+                        cl_lats, cl_lons, cl_data = E.get_model_data(modelconfig, experiment,
+                                                                     area, cl_key, cl_obsfile)
+                        cl_data = E.average_data(cl_data, 'annual')
+
+                        rd_lats, rd_lons, rd_data = E.get_model_data(modelconfig,
+                                                                     experiment,
+                                                                     area,
+                                                                     datakey,
+                                                                     rd_obsfile,
+                                                                     extend='lons')
+                        # Check that we have similar model sets
+                        E.check_model_instances(cl_models, rd_models)
+
+                        # Average and interpolate to cloud obsevation grid
+                        rd_data = E.average_data(rd_data, 'annual')
+                        rd_data = interpolate_3d(rd_data,
+                                                 rd_lats,
+                                                 rd_lons,
+                                                 cl_lats,
+                                                 cl_lons)
+
+                        mcl_lats, mcl_lons, mcl_data = E.get_model_data(modelconfig,
+                                                                        experiment,
+                                                                        area,
+                                                                        cl_key,
+                                                                        cl_datafile)
+                        mrd_lats, mrd_lons, mrd_data = E.get_model_data(modelconfig,
+                                                                        experiment,
+                                                                        area,
+                                                                        datakey,
+                                                                        rd_datafile,
+                                                                        extend='lons')
+                        cl_datafile.close()
+                        rd_datafile.close()
+                        # Average and interpolate model data to cloud data grid
+                        mcl_data = E.average_data(mcl_data, 'annual')
+                        mrd_data = E.average_data(mrd_data, 'annual')
+                        mrd_data = interpolate_3d(mrd_data,
+                                                  mrd_lats,
+                                                  mrd_lons,
+                                                  mcl_lats,
+                                                  mcl_lons)
+
+                        # Mask unwanted seasonal values
+                        obs_cl = E.extract_seasonal_mean_values(modelconfig,
+                                                                cl_data,
+                                                                experiment,
+                                                                season,
+                                                                monthly=True)
+                        obs_rd = E.extract_seasonal_mean_values(modelconfig,
+                                                                rd_data,
+                                                                experiment,
+                                                                season,
+                                                                monthly=True)
+                        data_cl = E.extract_seasonal_mean_values(modelconfig,
+                                                                 mcl_data,
+                                                                 experiment,
+                                                                 season,
+                                                                 monthly=True)
+                        data_rd = E.extract_seasonal_mean_values(modelconfig,
+                                                                 mrd_data,
+                                                                 experiment,
+                                                                 season,
+                                                                 monthly=True)
+                        # Calculate scatterplot values
+                        obs_out = calculate_scatterplot_values(E, modelconfig,
+                                                               verbosity,
+                                                               area,
+                                                               cl_key,
+                                                               obs_cl,
+                                                               obs_rd)
+                        model_out = calculate_scatterplot_values(E, modelconfig,
+                                                                 verbosity,
+                                                                 area,
+                                                                 cl_key,
+                                                                 data_cl,
+                                                                 data_rd,
+                                                                 bins=obs_out[0])
+                        centers = np.zeros(len(obs_out[0]) - 1)
+                        for i in xrange(len(centers)):
+                            centers[i] = (obs_out[0][i + 1] + obs_out[0][i]) / 2.
+
+                        # Plot and make it pretty
+                        obs_label = cl_obs + ', \n' + rd_obs
+                        axs[0].scatter(model_out[2],
+                                            model_out[3],
+                                            facecolors=modelcolor,
+                                            edgecolors=modelcolor,
+                                            label=model)
+                        axs[0].scatter(obs_out[2],
+                                            obs_out[3],
+                                            facecolors='none',
+                                            edgecolors='black',
+                                            label=obs_label)
+
+                        if (len(dashes) == 0):
+                            axs[1].plot(centers,
+                                             model_out[1],
+                                             color=modelcolor,
+                                             linewidth=width,
+                                             label=model)
+                        else:
+                            line1, = axs[1].plot(centers,
+                                                      model_out[1],
+                                                      '--',
+                                                      color=modelcolor,
+                                                      linewidth=width,
+                                                      label=model)
+                            line1.set_dashes(dashes)
+                        axs[1].plot(centers,
+                                         obs_out[1],
+                                         color='black',
+                                         label=obs_label)
+
+                        # If we get nan as values we convert it to zero
+                        obs_x = np.ma.masked_array(obs_out[2])
+                        obs_y = np.ma.masked_array(obs_out[3])
+                        model_x = np.ma.masked_array(model_out[2])
+                        model_y = np.ma.masked_array(model_out[3])
+                        rmse = (np.mean((obs_x - model_x) ** 2)
+                                + np.mean((obs_y - model_y) ** 2)) ** 0.5
+                        rmse = round(rmse, 1)
+                        xmin = int(obs_out[0][0])
+                        xmax = int(np.ceil(obs_out[0][-1]))
+
+                        # Make it prettier
+                        #axs[0].set_title(E.display_name(model) + "\n rmse: " + str(rmse), fontsize=12)
+                        axs[0].set_xlim(xmin, xmax)
+                        axs[0].locator_params(axis='x', nbins=5)
+                        axs[0].locator_params(axis='y', nbins=5)
+                        axs[0].grid(plot_grid)
+                        axs[1].set_xlim(xmin, xmax)
+                        axs[1].locator_params(axis='x', nbins=5)
+                        axs[1].locator_params(axis='y', nbins=5)
+                        axs[1].grid(plot_grid)
+
+                        xlabel = E.get_title_basename(cl_key)
+                        ylabel = E.get_title_basename(datakey)
+                        axs[0].set_xlabel(xlabel)
+                        # A_laue_ax+
+                        if (radtag is not None):
+                            axs[0].set_ylabel('Radiation (' + radtag + ')')
+                        else:
+                            axs[0].set_ylabel('Radiation')
+                        # A_laue_ax-
+
+                        axs[1].set_xlabel('Cloud cover percentage')
+                        axs[1].set_ylabel('Proportion of values')
+
+                # Title and legend
+
+                suptitle = season + " - " + ylabel + " sensitivity to " + xlabel
+                plt.suptitle(suptitle, fontsize=20)
+
+                # Handles first row
+                handles_list_of_list = [axs[0].get_legend_handles_labels()[0]]
+                handles0 = [item for sublist in handles_list_of_list for item in sublist]  # Flatten
+
+                # Handles second row
+                handles_list_of_list = [axs[1].get_legend_handles_labels()[0]]
+                handles1 = [item for sublist in handles_list_of_list for item in sublist]  # Flatten
+
+                # Labels first row
+                labels_list_of_list = [axs[0].get_legend_handles_labels()[1]]
+                labels0 = [item for sublist in labels_list_of_list for item in sublist]  # Flatten
+                labels0 = [E.display_name(label) for label in labels0]
+
+                to_keep = sorted([dup[1][0] for dup in sorted(list_duplicates(labels0))])
+                labels0 = [labels0[idx] for idx in to_keep]
+                handles0 =[handles0[idx]for idx in to_keep]
+
+                # Labels second row
+                labels_list_of_list = [axs[1].get_legend_handles_labels()[1]]
+                labels1 = [item for sublist in labels_list_of_list for item in sublist]
+                labels1 = [E.display_name(label) for label in labels1]
+
+                to_keep = sorted([dup[1][0] for dup in sorted(list_duplicates(labels1))])
+                labels1 = [labels1[idx] for idx in to_keep]
+                handles1 =[handles1[idx]for idx in to_keep]
+
+                handles = handles0 + handles1
+                labels = labels0 + labels1
+                lgd = plt.legend(handles, labels, loc='center left',
+                           bbox_to_anchor=(0.78, 0.5),
+                           bbox_transform=plt.gcf().transFigure)
+
+                # Define ouput name and save
+                variable = cl_key + '-' + datakey
+                diag_name = E.get_diag_script_name()
+                specifier = experiment + '_' + season + '_' + area
+                if (ngroups > 1):
+                    part = groups.index(group)
+                    specifier += '_group_' + str(part)
+                output_file = E.get_plot_output_filename(diag_name=diag_name,
+                                                         variable=variable,
+                                                         specifier=specifier)
+                output_dir = os.path.join(plot_dir, diag_name)
+                E.ensure_directory(output_dir)
+                plt.savefig(os.path.join(output_dir, output_file), dpi=output_dpi, 
+                            bbox_extra_artists=(lgd,), bbox_inches='tight')
+                plt.clf()
+                info("", verbosity, 1)
+                info("Created image: ", verbosity, 1)
+                info(output_file, verbosity, 1)
+        rd_obsfile.close()
+    cl_obsfile.close()
+
+from collections import defaultdict
+
+def list_duplicates(seq):
+    tally = defaultdict(list)
+    for i,item in enumerate(seq):
+        tally[item].append(i)
+    return ((key,locs) for key,locs in tally.items() 
+                            if len(locs)>0)

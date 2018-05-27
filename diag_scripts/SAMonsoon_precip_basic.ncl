@@ -24,6 +24,7 @@
 ;;
 ;; Modification history
 ;;    20170821-A_bock_ls: added tags for reporting
+;;    20161020-A_laue_ax: added option to override exact panel positioning file
 ;;    20151027-A_laue_ax: moved call to 'write_references' to the beginning
 ;;                        of the code
 ;;    20150702-A_eval_ma: written.
@@ -39,6 +40,13 @@ load "./interface_scripts/messaging.ncl"
 load "./diag_scripts/lib/ncl/set_operators.ncl"
 
 exact_panel_position_file = "./diag_scripts/aux/" + diag_script_info@my_region + "Monsoon/exact_panel_positions_wind.ncl"
+
+; A_laue_ax+
+; option to override panel positioning file
+if (isatt(diag_script_info, "exact_panel_position_file")) then
+    exact_panel_position_file = diag_script_info@exact_panel_position_file
+end if
+; A_laue_ax-
 
 load "./plot_scripts/ncl/monsoon_panels.ncl"
 
@@ -277,57 +285,71 @@ begin
     ;; Three panel plots (ref, model, diff)
     valid_statistics = (/"yrs", "mean", "rmse", "corr"/)
 
-    three_by_one_diff(storage_vault, di, plot_settings, "mean", debuginfo, valid_statistics, res)
-    plot_settings@prefix_to_header = "Interannual "
-    three_by_one_diff(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
+; a_laue_ax+
+    if (isatt(diag_script_info, "three_panel_plots")) then
+        three_panel_plots = diag_script_info@three_panel_plots
+    else
+        three_panel_plots = True
+    end if
 
-    ;; Attach Metadata to plots
-    xml_name = getenv("ESMValTool_xml_name")
-    suffix = get_file_suffix(xml_name, 0)
-    base_name = str_sub_str(xml_name, suffix, "")
+    if (three_panel_plots) then
+; a_laue_ax-
+        three_by_one_diff(storage_vault, di, plot_settings, "mean", debuginfo, valid_statistics, res)
+        plot_settings@prefix_to_header = "Interannual "
+        three_by_one_diff(storage_vault, di, plot_settings, "stddev", debuginfo, valid_statistics, res)
 
-    diag_script_base = basename(diag_script)
-    output_dir = get_output_dir(plot_dir, diag_script_base)
+        ;; Attach Metadata to plots
+        xml_name = getenv("ESMValTool_xml_name")
+        suffix = get_file_suffix(xml_name, 0)
+        base_name = str_sub_str(xml_name, suffix, "")
 
-    do idx_mod = 0, dim_MOD - 1
-        if (any(idx_mod .eq. plot_settings@idx_ref)) then
-            continue
-        end if
-        caption = "Intensity of variable "  + variables(0) + \
-               " over given seasons (" + di@season + ")"
-        alltags = array_append_record(tags, (/"DM_reg", "ST_clim", "PT_geo"/), 0)
-        climofiles = new(2, string)
-        climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), idx_mod)
-        climofiles(1) = interface_get_inpaths(idx_ref(0)) + "/" + \
-                 interface_get_infile(variables(0), field_types(0), idx_ref(0))
-        allmodelnames = (/models@name(idx_mod), models@name(idx_ref(0))/)
-        id = diag_script + "_mean_" + variables(0)
-        aux_filename_info = di@season + "-mean"
-        output_filename = interface_get_figure_filename(diag_script_base,\
-                                                    var0,\
-                                                    field_type0,\
-                                                    aux_filename_info, idx_mod)
-        output_file_path = output_dir + output_filename + "." + output_file_type
+        diag_script_base = basename(diag_script)
+        output_dir = get_output_dir(plot_dir, diag_script_base)
 
-        ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
+        do idx_mod = 0, dim_MOD - 1
+            if (any(idx_mod .eq. plot_settings@idx_ref)) then
+                continue
+            end if
+            caption = "Intensity of variable "  + variables(0) + \
+                   " over given seasons (" + di@season + ")"
+            alltags = array_append_record(tags, (/"DM_reg", "ST_clim", "PT_geo"/), 0)
+            climofiles = new(2, string)
+            climofiles(0) = interface_get_inpaths(idx_mod) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), idx_mod)
+            climofiles(1) = interface_get_inpaths(idx_ref(0)) + "/" + \
+                     interface_get_infile(variables(0), field_types(0), idx_ref(0))
+            allmodelnames = (/models@name(idx_mod), models@name(idx_ref(0))/)
+            id = diag_script + "_mean_" + variables(0)
+            aux_filename_info = di@season + "-mean"
+            output_filename = interface_get_figure_filename(diag_script_base,\
+                                                        var0,\
+                                                        field_type0,\
+                                                        aux_filename_info, idx_mod)
+            output_file_path = output_dir + output_filename + "." + output_file_type
 
-        caption = "Standard deviation of variable "  + variables(0) + \
-               " over given seasons (" + di@season + ")"
-        alltags = array_append_record(tags, (/"DM_trop", "ST_stddev", "PT_geo"/), 0)
-        id = diag_script + "_stddev_" + variables(0)
-        aux_filename_info = di@season + "-stddev"
-        output_filename = interface_get_figure_filename(diag_script_base,\
-                                                    var0,\
-                                                    field_type0,\
-                                                    aux_filename_info, idx_mod)
-        output_file_path = output_dir + output_filename + "." + output_file_type
+            ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, \
+                     climofiles, diag_script, contrib_authors)
 
-        ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, climofiles, diag_script, contrib_authors)
+            caption = "Standard deviation of variable "  + variables(0) + \
+                   " over given seasons (" + di@season + ")"
+            alltags = array_append_record(tags, (/"DM_trop", "ST_stddev", "PT_geo"/), 0)
+            id = diag_script + "_stddev_" + variables(0)
+            aux_filename_info = di@season + "-stddev"
+            output_filename = interface_get_figure_filename(diag_script_base,\
+                                                        var0,\
+                                                        field_type0,\
+                                                        aux_filename_info, idx_mod)
+            output_file_path = output_dir + output_filename + "." + output_file_type
 
-        delete([/alltags, caption, id, climofiles/])
+            ESMValMD(output_file_path, alltags, caption, id, variables, allmodelnames, \
+                     climofiles, diag_script, contrib_authors)
 
-    end do    
+            delete([/alltags, caption, id, climofiles/])
+
+        end do    
+; a_laue_ax+
+    end if  ;  if (three_panel_plots)
+; a_laue_ax-
 
     res = orig_res
     plot_settings@gsn_right_string = False
@@ -398,6 +420,13 @@ begin
 
     delete([/alltags, caption, id, imod/])
 
+; a_laue_ax+
+    if (isatt(diag_script_info, "plot_diff_reference")) then
+        plot_settings@plot_diff_reference = diag_script_info@plot_diff_reference
+    else
+        plot_settings@plot_diff_reference = False
+    end if
+; a_laue_ax-
 
     plot_settings@type = "diff"
     plot_settings@part_of_header = " of Precipitation"
@@ -464,6 +493,15 @@ begin
 
     delete([/alltags, caption, id/])
 
+; a_laue_ax+
+    if (isatt(diag_script_info, "plot_stddev")) then
+        plot_stddev = diag_script_info@plot_stddev
+    else
+        plot_stddev = True
+    end if
+
+    if (plot_stddev) then
+; a_laue_ax-
 
     plot_settings@type = "mean"
     plot_settings@prefix_to_header = "Interannual "
@@ -597,6 +635,10 @@ begin
 
 
     delete([/alltags, caption, id, climofiles/])
+
+; a_laue_ax+
+    end if  ; if plot_stddev
+; a_laue_ax-
 
     info_output(">>>>>>>> Leaving " + diag_script, verbosity, 4)
 end

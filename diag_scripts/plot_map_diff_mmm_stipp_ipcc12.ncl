@@ -515,47 +515,47 @@ begin
 
 ;;# add tags
     alltags = array_append_record(tags, \
-           (/"DM_global", "PT_geo", "ST_clim"/), 0)
+                                  (/"DM_global", "PT_geo", "ST_clim"/), 0)
     if (diag_script_info@diagscript .eq. \
         "calc_map_diff_scaleT_mmm_stipp_ipcc12") then
         string1 = variable_info@long_name + \
-                  " change patterns derived from transient " + \
-                  "simulations from the CMIP5 ensemble, scaled to 1C of " + \
-                  "global mean surface temperature change. The patterns " + \
-                  " have been calculated by computing 20-year averages " + \
-                  "starting in " + str_join(diag_script_info@periods, ", ") +  \
-                  " and over the period " + models@start_year(0)+ "-" +  \
-                  models@end_year(0) + " for the available simulations" + \
-                  "under all RCP's, taking their difference "
+            " change patterns derived from transient " + \
+            "simulations from the CMIP5 ensemble, scaled to 1C of " + \
+            "global mean surface temperature change. The patterns " + \
+            " have been calculated by computing 20-year averages " + \
+            "starting in " + str_join(diag_script_info@periods, ", ") + \
+            " and over the period " + models@start_year(0) + "-" +  \
+            models@end_year(0) + " for the available simulations" + \
+            "under all RCP's, taking their difference "
         if (variables(0) .eq. "pr") then
             string2 = "(percentage difference in the case of precipitation) "
         else
             string2 = ""
         end if
         string3 = "and normalizing it, grid-point by grid-point, by the " + \
-        "corresponding value of global average temperature change for " + \
-        "each model and scenario. The normalized patterns have then been " + \
-        "averaged across models and scenarios. Stippling indicates where " + \
-        "the mean change averaged over all ralizations is larger than the " + \
-        "95% percentile of the distribution of models." + \
-        " Similar to Figure + diag_script_info@figure_nr + of Collins et al. (2013)."
+            "corresponding value of global average temperature change for " + \
+            "each model and scenario. The normalized patterns have then " + \
+            "been averaged across models and scenarios. Stippling " + \
+            "indicates where the mean change averaged over all ralizations" + \
+            " is larger than the 95% percentile of the distribution of " + \
+            "models. Similar to Figure 12.10 of Collins et al. (2013)."
         caption = string1 + string2 + string3
     else
         caption = "Multi-model ensemble average of " + \
-              variable_info@long_name + \
-              " change (compared to " + models@start_year(0)+ "-" + \
-              models@end_year(0) + " base period) for 20 year periods " + \
-              "starting in " + str_join(diag_script_info@periods, ", ")  + \
-              " for " + str_join(diag_script_info@scenarios, ", ") + \
-              ". Hatching indicates " + \
-              "regions where the multi-model mean change is less than one " + \
-              "standard deviation of internal variability. Stippling " + \
-              "indicates regions where the multi-model change is greater " + \
-              "than two standard deviations of internal variability and " + \
-              "where at least 90% of the models agree on the sign of change." +\
-              " The number of CMIP5 models used is indicated in the upper " + \
-              "right corner of each plot. " + \
-              "Similar to Figure + diag_script_info@figure_nr + of Collins et al. (2013)."
+            variable_info@long_name + \
+            " change (compared to " + models@start_year(0) + "-" + \
+            models@end_year(0) + " base period) for 20 year periods " + \
+            "starting in " + str_join(diag_script_info@periods, ", ") + \
+            " for " + str_join(diag_script_info@scenarios, ", ") + \
+            ". Hatching indicates " + \
+            "regions where the multi-model mean change is less than one " + \
+            "standard deviation of internal variability. Stippling " + \
+            "indicates regions where the multi-model change is greater " + \
+            "than two standard deviations of internal variability and " + \
+            "where at least 90% of the models agree on the sign of " + \
+            "change. The number of CMIP5 models used is indicated in the" + \
+            " upper right corner of each plot. Similar to Figure " + \
+            "12.11 of Collins et al. (2013)."
     end if
 
     id = diag_script + "_" + variables(0) + "_" + diag_script_info@time_avg

@@ -546,7 +546,7 @@ directory and then execute the following shell command:
 
 This will search recursively for test files and execute these tests. A
 statistic on success and failures is provided at the end of execution. More
-details on using nose can be found in the package’s documentation
+details on using nose can be found in the package's documentation
 (https://nose.readthedocs.org/en/latest/).
 
 To run integration tests for each diagnostic, a small script needs to be

@@ -205,6 +205,9 @@ def main(project_info):
     modelconfig.read(config_file)
     E.ensure_directory(plot_dir)
 
+    if (modelconfig.has_option('general', 'styleset')):
+        project_info['GLOBAL']['styleset'] = modelconfig.get('general', 'styleset')
+
     # Here we check and process only desired parts of the diagnostics
     if (modelconfig.getboolean('general', 'plot_zonal_means')):
         info("Starting to plot zonal means", verbosity, 2)
@@ -318,6 +321,12 @@ def process_equatorial_means(E, modelconfig):
     work_dir = E.get_work_dir()
     areas = modelconfig.get(experiment, 'areas').split()
 
+    work_dir = work_dir + '/TropicalVariability/'
+    if (modelconfig.has_option('general', 'filesuffix')):
+        work_dir = work_dir + modelconfig.get('general', 'filesuffix') + '/'
+
+    E.ensure_directory(work_dir)
+
     # This should be redundant (no more than one equatorial area) but we'll do
     # the looping similarly to other parts of the code
     for area in areas:
@@ -325,7 +334,7 @@ def process_equatorial_means(E, modelconfig):
         for datakey in datakeys:
             # create a python array file for each area, model  and datakey
             # overwrite if exists
-            base_name = work_dir\
+            base_name = work_dir \
                         + 'TropicalVariability_'\
                         + area_key + '_'\
                         + datakey\
@@ -378,9 +387,9 @@ def process_scatterplot(E, modelconfig):
     # mmday or kg/m2s - this affects the datakey (pr or pr-mmday)
     # For consistency we do this also for ts
     for datakey in datakeys:
-        if   (datakey == 'ts'):
+        if   (datakey == 'ts' or datakey == 'ts-ocean'):
             ts_key = datakey
-        elif (datakey == 'pr' or datakey == 'pr-mmday'):
+        elif (datakey == 'pr' or datakey == 'pr-mmday' or datakey == 'pr-ocean' or datakey == 'pr-mmday-ocean'):
             pr_key = datakey
 
     # Get the required filenames and check consistency of model filenames
@@ -549,12 +558,20 @@ def process_scatterplot(E, modelconfig):
                              pr_key])
 
         diag_name = E.get_diag_script_name()
+
+        if (modelconfig.has_option('general', 'filesuffix')):
+            suffix = modelconfig.get('general', 'filesuffix')
+        else:
+            suffix = ''
+
         output_file = E.get_plot_output_filename(diag_name=diag_name,
                                                  variable=variable,
                                                  model=model,
-                                                 specifier=experiment)
+                                                 specifier=experiment,
+                                                 end_specifier=suffix)
         output_dir = os.path.join(plot_dir, diag_name)
         E.ensure_directory(output_dir)
+
         plt.savefig(os.path.join(output_dir, output_file))
         info("", verbosity, 1)
         info("Created image: ", verbosity, 1)
@@ -719,9 +736,17 @@ def process_zonal_means(E, modelconfig):
         E.ensure_directory(output_dir)
         specifier = area + '-seasonal-mean'
         variable = "".join(E.get_currVars())
+
+        if (modelconfig.has_option('general', 'filesuffix')):
+            suffix = modelconfig.get('general', 'filesuffix')
+        else:
+            suffix = ''
+
         output_file = E.get_plot_output_filename(diag_name=diag_name,
                                                  variable=variable,
-                                                 specifier=specifier)
+                                                 specifier=specifier,
+                                                 end_specifier=suffix)
+
         plt.savefig(os.path.join(output_dir, output_file))
         info("", verbosity, 1)
         info("Created image: ", verbosity, 1)

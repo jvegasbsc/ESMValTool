@@ -44,6 +44,11 @@ begin
         else if (res_string .eq. "n_by_cols_3_tmFontHeightF") then
             resource@tmXBLabelFontHeightF = n_by_cols_3_tmFontHeightF
             resource@tmYLLabelFontHeightF = n_by_cols_3_tmFontHeightF
+        else if (res_string .eq. "n_5_by_cols_2_tiMainFontHeightF") then
+            resource@tiMainFontHeightF = n_5_by_cols_2_tiMainFontHeightF
+            resource@tiMainOffsetYF = n_5_by_cols_2_tiMainOffsetYF
+            resource@gsnStringFontHeightF = n_5_by_cols_2_gsnStringFontHeightF
+        end if
         end if
         end if
         end if
@@ -63,7 +68,9 @@ begin
     verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
     info_output("<<<<<<<< Entering panel_two_by_one.ncl", verbosity, 6)
     res@vpKeepAspect = True
-    res@gsnStringFontHeightF = 0.011
+    if (.not.isatt(res, "gsnStringFontHeightF")) then
+        res@gsnStringFontHeightF = 0.011
+    end if
     if (id .eq. 0) then
         res@tmXBLabelsOn = True
         res@lbLabelBarOn = False
@@ -99,7 +106,9 @@ begin
     verbosity  = stringtointeger(getenv("ESMValTool_verbosity"))
     info_output("<<<<<<<< Entering panel_three_by_one.ncl", verbosity, 6)
     res@vpKeepAspect = True
-    res@gsnStringFontHeightF = 0.011
+    if (.not.isatt(res, "gsnStringFontHeightF")) then
+        res@gsnStringFontHeightF = 0.011
+    end if
     if (id .eq. 0) then
         res@tmXBLabelsOn = False
         res@lbLabelBarOn = False
@@ -302,13 +311,22 @@ begin
     add_explicit_title_font_size_if_defined(res, font_title_height)
     add_explicit_title_font_size_if_defined(res, font_label_height)
 
+    ; EMBRACE layout: override the above default
+
+    if (isdefined("n_5_by_cols_2_tiMainFontHeightF")) then
+        font_title_height = "n_5_by_cols_" + cols + "_tiMainFontHeightF"
+        add_explicit_title_font_size_if_defined(res, font_title_height)
+    end if
+
     ;; Add xlabels or not...
     if (id + 1 .gt. no_figs - cols) then
         res@tmXBLabelsOn = True
     else
         res@tmXBLabelsOn = False
     end if
-    res@gsnStringFontHeightF = 0.011
+    if (.not.isatt(res, "gsnStringFontHeightF")) then
+        res@gsnStringFontHeightF = 0.011
+    end if
 
     rows_int = tointeger(ceil(rows))
     res@vpKeepAspect = True
@@ -438,7 +456,9 @@ begin
         end if
 
     else if (cols .eq. 3) then
-        res@gsnStringFontHeightF = 0.008
+        if (.not.isatt(res, "gsnStringFontHeightF")) then
+            res@gsnStringFontHeightF = 0.008
+        end if
         if (id .eq. 0) then
             res@tmYLLabelsOn = True
             res@lbLabelBarOn = False
@@ -572,6 +592,7 @@ begin
     end getvalues
 
     ;; Copy the end cnFillColor to end-1
+
     if (isatt(plottype_lbres, "shift_down_maxcolor")) then
         if (plottype_lbres@shift_down_maxcolor) then
             max_cnfill_idx = dimsizes(cnFillColors)
@@ -630,9 +651,15 @@ begin
         end do
     end if
 
-    nboxes = dimsizes(cnLevels)
-    lblabels = sprintf("%5.2f", cnLevels)
+    nboxes = dimsizes(cnLevels) + 1
+
+    lblabels = sprintf("%5.1f", cnLevels)
     lbres@gsnFrame = False
+
+;printVarSummary(lbres)
+;print(lbres@lbFillColors)
+;print(nboxes)
+
     lbid = gsn_create_labelbar(wks, nboxes, lblabels, lbres)
     if (cols .eq. 1) then
         setvalues lbid
@@ -834,8 +861,8 @@ begin
     lbres@lbBoxMinorExtentF = 0.2
     lbres@lbTitleOn         = False
     lbres@lbLabelAlignment  = "InteriorEdges"
-    nboxes = dimsizes(cnLevels)
-    lblabels = sprintf("%5.2f", cnLevels)
+    nboxes = dimsizes(cnLevels) + 1
+    lblabels = sprintf("%5.1f", cnLevels)
     lbres@vpHeightF = vpHeightF
     lbres@vpWidthF = 0.05
     lbres@lbPerimOn = True
@@ -849,7 +876,7 @@ begin
     amres = True
     amres@amZone           = 2
     amres@amSide           = "Top"
-    amres@amParallelPosF   = lbres@vpWidthF + 0.01    ; Center labelbar.
+    amres@amParallelPosF   = lbres@vpWidthF + 0.11    ; Center labelbar.
     amres@amOrthogonalPosF = -1.0            ; Move down, away from plot
     annoid = gsn_add_annotation(plot, lbid, amres)
     info_output(">>>>>>>> Leaving inset_labelbar.ncl", verbosity, 6)

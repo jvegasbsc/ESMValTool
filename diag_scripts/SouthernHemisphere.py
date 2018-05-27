@@ -176,7 +176,7 @@ def main(project_info):
     clouds = False
     fluxes = False
     radiation = False
-    if ('clt' in datakeys or 'clivi' in datakeys or 'clwvi' in datakeys):
+    if ('clt' in datakeys or 'clivi' in datakeys or 'clwvi' in datakeys or 'lwp' in datakeys):
         clouds = True
     elif ('hfls' in datakeys or 'hfss' in datakeys):
         fluxes = True
@@ -243,6 +243,9 @@ def process_clouds(E, modelconfig):
             process_simple_maps(E, modelconfig, datakey, specifier + '-map')
 
         if (plot_liq_path and datakey == 'clwvi'):
+            process_simple_maps(E, modelconfig, datakey, specifier + '-map')
+
+        if (plot_liq_path and datakey == 'lwp'):
             process_simple_maps(E, modelconfig, datakey, specifier + '-map')
 
         if (plot_liq_path and datakey == 'clivi'):
@@ -394,7 +397,7 @@ def get_contour_config(modelconfig, config_file, area_key, datakey):
         xxxx
     """
     contour_key = 'contour_limits_' + datakey
-    if   (datakey in ['clt', 'clivi', 'clwvi']):
+    if   (datakey in ['clt', 'clivi', 'clwvi', 'lwp']):
         required = 3
         cm_model = modelconfig.get(area_key, 'colourmap_clouds')
     elif (datakey in ['hfls', 'hfss']):
@@ -531,6 +534,14 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
     areas = []
     plot_grid = modelconfig.getboolean('general', 'plot_background_grid')
 
+    show_rmse = True  # default
+    if (modelconfig.has_option('general', 'show_rmse')):
+        show_rmse = modelconfig.getboolean('general', 'show_rmse')
+
+    hide_obsname = False  # default
+    if (modelconfig.has_option('general', 'hide_obsname')):
+        hide_obsname = modelconfig.getboolean('general', 'hide_obsname')
+
     # Extract required keys based on datakey
     if (orientation == 'monthly'):
         if (modelconfig.getboolean('general', 'plot_monthly_averages')):
@@ -551,7 +562,7 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
 
     scale_cloud = False
     # Ugly fix for scaling cloud ice/liquid water path values
-    if (datakey == 'clivi' or datakey == 'clwvi'):
+    if (datakey == 'clivi' or datakey == 'clwvi' or datakey == 'lwp'):
         scale_cloud = True
         scale = 1E3
         scale_str = ' * 1E3'
@@ -605,19 +616,24 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
 
             # Plot model values to first graph
             ocolor, odashes, owidth = E.get_model_plot_style(obsmodel)
+            owidth = owidth * 1.5
+            if (hide_obsname):
+                mlabel = 'observations'
+            else:
+                mlabel = obsmodel + ' (obs)'
             if (len(odashes) == 0):
                 axs[0].plot(xobs,
                             odata,
                             color=ocolor,
                             linewidth=owidth,
-                            label=obsmodel + ' (obs)')
+                            label=mlabel)
             else:
                 line1, = axs[0].plot(xobs,
                                      odata,
                                      '--',
                                      color=ocolor,
                                      linewidth=owidth,
-                                     label=obsmodel + ' (obs)')
+                                     label=mlabel)
                 line1.set_dashes(odashes)
 
             multimodelmean_initialized = False
@@ -647,7 +663,7 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
                 if (scale_cloud):
                     data = data * scale
                     if (data_units == 'kg m-2'):
-                        data_units = r'$\mu$m'
+                        data_units = 'g m-2' # r'$\mu$m'
                     else:
                         data_units += scale_str
 
@@ -679,9 +695,13 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
 
                 # plotting custom dashes requires some extra effort (else)
                 # with empty dashes the format is default
-                rmse = round(np.mean((idata - odata) ** 2) ** 0.5, 1)
-                mlabel = model + " (RMSE: " + str(rmse) + ")"
+                if (show_rmse):
+                    rmse = round(np.mean((idata - odata) ** 2) ** 0.5, 1)
+                    mlabel = model + " (RMSE: " + str(rmse) + ")"
+                else:
+                    mlabel = model
                 color, dashes, width = E.get_model_plot_style(model)
+                width = width * 2
                 if (len(dashes) == 0):
                     axs[0].plot(xdata,
                                 data, color=color,
@@ -717,8 +737,11 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
             # Plot the multimodel mean out if required
             if (len(models) > 1):
                 mmmean = mmmean / len(models)
-                rmse = round(np.mean((mmmean - odata) ** 2) ** 0.5, 1)
-                mlabel = "Multimodel mean (RMSE: " + str(rmse) + ")"
+                if (show_rmse):
+                    rmse = round(np.mean((mmmean - odata) ** 2) ** 0.5, 1)
+                    mlabel = "multi-model mean (RMSE: " + str(rmse) + ")"
+                else:
+                    mlabel = "multi-model mean"
 
                 color, dashes, width = E.get_model_plot_style('model_mean')
                 if (len(dashes) == 0):
@@ -822,14 +845,14 @@ def process_mean_plots(E, modelconfig, datakey, orientation, mean_name):
                        loc='center left',
                        bbox_to_anchor=(0.7, 0.5),
                        bbox_transform=plt.gcf().transFigure)
-            plt.savefig(os.path.join(output_dir, output_file))
+            plt.savefig(os.path.join(output_dir, output_file), dpi=E.get_output_dpi())
             info("", verbosity, 1)
             info("Created image: ", verbosity, 1)
             info(output_file, verbosity, 1)
     obsfile.close()
 
 
-def process_radiation_maps(E, modelconfig, datakey, specifier):
+def process_radiation_maps(E, modelconfig, datakey, base_specifier):
     """
     Main script for gathering radiation seasonal
     map values and plotting them.
@@ -842,7 +865,7 @@ def process_radiation_maps(E, modelconfig, datakey, specifier):
         xxxx
     datakey : xxxx
         xxxx
-    specifier : xxxxx
+    base_specifier : xxxxx
         xxxxx
     """
 
@@ -1052,14 +1075,14 @@ def process_radiation_maps(E, modelconfig, datakey, specifier):
                 suptitle = E.get_title_basename(datakey) + " for months: " + season
                 plt.suptitle(suptitle, fontsize=20)
                 variable = datakey
-                specifier = specifier + "-" + season
+                specifier = base_specifier + "-" + season
                 diag_name = E.get_diag_script_name()
                 output_file = E.get_plot_output_filename(variable=variable,
                                                          specifier=specifier,
                                                          model=model)
                 output_dir = os.path.join(plot_dir, diag_name)
                 E.ensure_directory(output_dir)
-                plt.savefig(os.path.join(output_dir, output_file))
+                plt.savefig(os.path.join(output_dir, output_file), dpi=E.get_output_dpi())
                 plt.clf()
                 info("", verbosity, 1)
                 info("Created image: ", verbosity, 1)
@@ -1094,7 +1117,7 @@ def separate_list(inlist, rule):
     return list1, list2
 
 
-def process_simple_maps(E, modelconfig, datakey, specifier):
+def process_simple_maps(E, modelconfig, datakey, base_specifier):
     """
     Main script for gathering seasonal map values and plotting them.
     
@@ -1106,7 +1129,7 @@ def process_simple_maps(E, modelconfig, datakey, specifier):
         xxxx
     datakey : xxxxx
         xxxx
-    specifier : xxxxx
+    base_specifier : xxxxx
         xxxx
     """
     config_file = E.get_configfile()
@@ -1126,7 +1149,7 @@ def process_simple_maps(E, modelconfig, datakey, specifier):
 
     scale_cloud = False
     # Ugly fix for scaling cloud ice/liquid water path values
-    if (datakey == 'clivi' or datakey == 'clwvi'):
+    if (datakey == 'clivi' or datakey == 'clwvi' or datakey == 'lwp'):
         scale_cloud = True
         scale = 1E3
         scale_str = ' * 1E3'
@@ -1164,7 +1187,7 @@ def process_simple_maps(E, modelconfig, datakey, specifier):
             if (scale_cloud):
                 mdata = mdata * scale
                 if (units == 'kg m-2'):
-                    units = r'$\mu$m'
+                    units = 'g m-2'  # r'$\mu$m'
                 else:
                     units += scale_str
 
@@ -1234,7 +1257,7 @@ def process_simple_maps(E, modelconfig, datakey, specifier):
                 suptitle = E.get_title_basename(datakey) + " for months: " + season
                 plt.suptitle(suptitle, fontsize=20)
                 variable = datakey
-                specifier = specifier + "-" + season
+                specifier = base_specifier + "-" + season
                 diag_name = E.get_diag_script_name()
                 output_file = E.get_plot_output_filename(diag_name=diag_name,
                                                          variable=variable,
@@ -1243,7 +1266,7 @@ def process_simple_maps(E, modelconfig, datakey, specifier):
                 # Save the image and let the user know what happened
                 output_dir = os.path.join(plot_dir, diag_name)
                 E.ensure_directory(output_dir)
-                plt.savefig(os.path.join(output_dir, output_file))
+                plt.savefig(os.path.join(output_dir, output_file), dpi=E.get_output_dpi())
                 plt.clf()
                 info("", verbosity, 1)
                 info("Created image: ", verbosity, 1)

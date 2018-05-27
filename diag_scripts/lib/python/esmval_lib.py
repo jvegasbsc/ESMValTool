@@ -13,6 +13,42 @@ import numpy as np
 
 from auxiliary import info, warning
 
+class logger(object):
+    """ Very simple wrapper to log functinality in this
+        library
+    """
+    def __init__(self, logfile, stdout=False, stderr=False):
+        """
+        Parameters
+        ----------
+        logfile: string
+            path to logfile
+        stdout: logical
+            also log to stdout
+        stderr: logical
+            also log to stderr
+        """
+        self.stdout = stdout
+        self.stderr = stderr
+        self.logfile = logfile
+        self.fhandle = open(logfile, 'a+')
+
+    def write(self, text):
+        """
+        Parameters
+        ----------
+        text: string
+            text to log
+        """
+        if self.stdout:
+            sys.stdout.write(text)
+        if self.stderr:
+            sys.stderr.write(text)
+        self.fhandle.write(text)
+
+    def close(self):
+        self.fhandle.close()
+
 
 class ESMValProject(object):
     """
@@ -96,6 +132,35 @@ class ESMValProject(object):
                 print("PY  ERROR: Stopping the script and exiting")
                 sys.exit()
 
+    def divide_models_in_groups(self, models, grouping):
+        """Divide models into groups for plotting purposes. Grouping may be an
+        integer or an integer list or array. The routine tries to fill with 
+        largest value and check if remainder is acceptable. """
+        # First we extract the number of groups and then we separate them
+        groups = []
+        if (type(grouping) == int):
+            ngroups  = np.int( np.ceil(1.0 * len(models) / grouping) )
+            grouplen = grouping
+        elif (type(grouping) == list or type(grouping) == np.ndarray):
+            grouping.sort(reverse=True)
+            for i in xrange(len(grouping)):
+                grouplen  = grouping[i]
+                remainder = len(models) % grouping[i]
+                if (remainder == 0 or remainder in grouping[(i+1):]):
+                    ngroups = np.int( np.ceil(1.0 * len(models) / grouping[i]) )
+                    break
+        else:
+            print("PY  ERROR: I am getting inconsistent type for grouping in " +
+                  "esmval_lib.py  function  divide_models_in_groups")
+            print("PY  ERROR: I should receive an integer or an integer list.")
+            print("PY  ERROR: I am getting " + str(type(grouping)))
+            print("PY  ERROR: Stopping the script and exiting")
+            sys.exit()
+        # Now we divide the models into groups and return them                
+        for i in xrange(ngroups):
+            groups.append( models[i*grouplen:(i+1)*grouplen] ) 
+        return groups
+            
     def compare_models(self, model1, model2, variable):
         """
         Arguments
@@ -514,13 +579,25 @@ class ESMValProject(object):
             20171128-A_schl_ma: written
         """
 
-        return self.global_conf["exit_on_warning"]
+        if 'exit_on_warning' in self.project_info['GLOBAL']:
+            return self.global_conf["exit_on_warning"]
+        else:
+            return True  # default
+        return output_dpi
 
     def get_field_type(self):
         """ returns the first (and often only) field type """
         currDiag = self.project_info['RUNTIME']['currDiag']
         field_type = currDiag.get_field_types()[0]
         return field_type
+
+    def get_output_dpi(self):
+        """ returns the default or the requested dpi from the namelist """
+        if 'output_dpi' in self.project_info['GLOBAL']:
+            output_dpi = self.project_info['GLOBAL']['output_dpi']
+        else:
+            output_dpi = 70  # default
+        return output_dpi
 
     def get_global_conf(self):
         """
@@ -734,6 +811,11 @@ class ESMValProject(object):
             style_file = default_path + default_file
         else:
             style_file = default_path + file
+
+        # override settings if styleset is specified in configuration file
+        if self.project_info['GLOBAL'].has_key('styleset'):
+            style_file = self.project_info['GLOBAL']['styleset']
+
         if os.path.isfile(style_file):
             styleconfig = ConfigParser.ConfigParser()
             styleconfig.read(style_file)
@@ -898,48 +980,74 @@ class ESMValProject(object):
             for key in self.project_info['MODELS']:
                 if (key.split_entries()[1] == model):
                     project, name, MIP, scenario, ensemble, start, end = key.split_entries()[0:7]
-            years = "-".join([start, end])
-            base = separator.join([base,
-                                   project,
-                                   model,
-                                   MIP,
-                                   scenario,
-                                   ensemble,
-                                   years])
+
+            if (project == 'OBS' or project == 'obs4mips'):
+                years = "-".join([ensemble, start])
+                base = separator.join([base,
+                                       project,
+                                       model,
+                                       MIP,
+                                       scenario,
+                                       years])
+            else:            
+                years = "-".join([start, end])
+                base = separator.join([base,
+                                       project,
+                                       model,
+                                       MIP,
+                                       scenario,
+                                       ensemble,
+                                       years])
 
         base = ".".join([base,
                          self.get_graphic_format()])
         return base
 
-    def get_ticks(self, maxticks, array1, array2=''):
+    def get_ticks(self, maxticks, array1, array2='', use_floats=False):
         """Returns suitable ticks for plots - we only deal with integers here.
         Takes in maxticks and max two arrays. This is because we want it was
         coded for scatterplotting observations and values simultaneously. """
-        # getting the int limits
-        if (len(array2) > 0):
-            start = int(np.min([array1[0], array2[0]]))
-            end_float = np.max([array1[-1], array2[-1]])
+        if use_floats:
+            marray = max([max(array1) - 1., 1. - min(array1)])
+            ticks_low = np.linspace(1. - marray, 1., maxticks / 2) 
+            ticks_high = np.linspace(1. + ticks_low[1] - ticks_low[0], 1. + marray, maxticks / 2 - 1) 
+            ticks = np.concatenate([ticks_low, ticks_high])
+            ticks = np.round(ticks, 3)
         else:
-            start = int(array1[0])
-            end_float = array1[-1]
-        if (int(end_float) >= end_float):
-            end = int(end_float)
-        else:
-            end = int(end_float + 1)
+            # getting the int limits
+            if (len(array2) > 0):
+                start = int(np.min([array1[0], array2[0]]))
+                end_float = np.max([array1[-1], array2[-1]])
+            else:
+                try:
+                    start = int(array1[0])
+                except:
+                    start = 298
+                end_float = array1[-1]
+                try:
+                    endtest = int(end_float)
+                except:
+                    end_float = 302.
+                #end_float = array1[-1]
+                
+            if (int(end_float) >= end_float):
+                end = int(end_float)
+            else:
+                end = int(end_float + 1)
 
-        # Next we define the ticks - always at least 2 (start and end)
-        # The first if is here for correct behavior when looping over lons
+            # Next we define the ticks - always at least 2 (start and end)
+            # The first if is here for correct behavior when looping over lons
 
-        if (start <= end):
-            length = end - start
-        else:
-            length = 360 - start + end
+            if (start <= end):
+                length = end - start
+            else:
+                length = 360 - start + end
 
-        for i in xrange(maxticks - 1):
-            num_ticks = maxticks - i
-            if ((length) % (num_ticks - 1) == 0):
-                ticks = (np.linspace(start, start + length, num_ticks)).astype(int)
-                break
+            for i in xrange(maxticks - 1):
+                num_ticks = maxticks - i
+                if ((length) % (num_ticks - 1) == 0):
+                    ticks = (np.linspace(start, start + length, num_ticks)).astype(int)
+                    break
 
         return ticks
 
@@ -985,11 +1093,11 @@ class ESMValProject(object):
 
     def get_title_basename(self, datakey):
         """Return the title basename based on datakey."""
-        if   (datakey == 'clt'):
+        if   ((datakey == 'clt') or (datakey == 'clt-ocean')):
             title = "Total cloud cover"
         elif (datakey == 'clivi'):
             title = "Cloud ice path"
-        elif (datakey == 'clwvi'):
+        elif (datakey == 'clwvi' or datakey == 'lwp'):
             title = "Cloud liquid water path"
         elif (datakey == 'hfls'):
             title = "Surface latent heat flux"
@@ -999,7 +1107,7 @@ class ESMValProject(object):
             title = "TOA outgoing longwave radiation"
         elif (datakey == 'rlutcs'):
             title = "TOA clear-sky outgoing longwave radiation"
-        elif (datakey == 'rsut'):
+        elif ((datakey == 'rsut') or (datakey == 'rsut-ocean')):
             title = "TOA outgoing shortwave radiation"
         elif (datakey == 'rsutcs'):
             title = "TOA clear-sky outgoing shortwave radiation"
@@ -1011,6 +1119,8 @@ class ESMValProject(object):
             title = "Surface incoming shortwave radiation"
         elif (datakey == 'rsdscs'):
             title = "Surface clear-sky incoming shortwave radiation"
+        elif (datakey == 'ts'):
+            title = "Sea surface temperature"
         else:
             print("")
             print("PY  INFO: Unexpected datakey, no title selected.")
@@ -1035,7 +1145,7 @@ class ESMValProject(object):
         if (low is not None):
             out_array = np.ma.masked_less(array, low)
             if (high is not None):
-                out_array = np.ma.masked_greater(array, high)
+                out_array = np.ma.masked_greater(out_array, high)
         elif (high is not None):
             out_array = np.ma.masked_greater(array, high)
         elif (low is None and high is None):
@@ -1162,7 +1272,7 @@ class ESMValProject(object):
     def add_to_filelist(self, filename):
 
         logfile = self.project_info['RUNTIME']['out_refs']
-        log = open(logfile, "a+")
+        log = logger(logfile)
 
         f = Dataset(filename, 'r')
 
@@ -1264,3 +1374,38 @@ class ESMValProject(object):
         log.write("\n")
         log.close()
 
+    def display_name(self, model):
+        """
+        Replaces given model name (from file) with a display name
+        read from an external file
+        Parameters:
+            model - string
+                the model name as written in the file name
+        """
+        disp_name_dict = self.get_display_name_dict()
+        if (disp_name_dict is not None and model.lower() in disp_name_dict.keys()):
+            return disp_name_dict[model.lower()]
+        else:
+           return model
+
+    def get_display_name_dict(self):
+        if "display_name_file" in self.project_info['GLOBAL']:
+            disp_name_file = self.project_info['GLOBAL']["display_name_file"]
+        else:
+            return None
+        Config = ConfigParser.ConfigParser()
+        Config.read(disp_name_file)
+        return self.ConfigSectionMap(Config, Config.sections()[Config.sections().index("display_names")])
+
+    def ConfigSectionMap(self, Config, section):
+        dict1 = {}
+        options = Config.options(section)
+        for option in options:
+            try:
+                dict1[option] = Config.get(section, option)
+                if dict1[option] == -1:
+                    DebugPrint("skip: %s" % option)
+            except:
+                print("exception on %s!" % option)
+                dict1[option] = None
+        return dict1

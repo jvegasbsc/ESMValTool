@@ -277,25 +277,51 @@ local title_string
 begin
     verbosity = stringtointeger(getenv("ESMValTool_verbosity"))
     info_output("<<<<<<<< Entering get_plot_main_string", verbosity, 8)
+
     if (switches@skip_default_title) then
         title_string = title_prefix
     else
         if (dimsizes(idx) .gt. 1) then
             if (idx(0) .eq. idx(1)) then
-                title_string = title_prefix + models@name(idx(0)) + " "\
-                                            + models@experiment(idx(0))\
-                                            + title_suffix
+; A_laue_ax+
+                if (isStrSubset(models@experiment(idx(0)), "No_value")) then
+                    title_string = title_prefix + models@name(idx(0)) \
+                                                + title_suffix
+                else
+; A_laue_ax-
+                    title_string = title_prefix + models@name(idx(0)) + " "\
+                                                + models@experiment(idx(0))\
+                                                + title_suffix
+; A_laue_ax+
+                end if
+; A_laue_ax-
             else
                 title_string = title_prefix + models@name(idx(0)) + "/"\
                                             + models@name(idx(1))\
                                             + title_suffix
             end if
         else
-            title_string = title_prefix + models@name(idx(0)) + " "\
-                                        + models@experiment(idx(0))\
-                                        + title_suffix
+; a_laue_ax+
+  ; fix for EMAC experiments + do not print "No_value" for obs data
+      if (.not.isatt(models, "experiment")) then
+            if (.not.isdefined("m_name0")) then
+                m_name0 = ""
+            end if
+            title_string = title_prefix + m_name0 + title_suffix
+      else
+            if (isStrSubset(models@experiment(idx(0)), "No_value")) then
+                title_string = title_prefix + models@name(idx(0)) \
+                                            + title_suffix
+            else
+                title_string = title_prefix + models@name(idx(0)) + " "\
+                                            + models@experiment(idx(0))\
+                                            + title_suffix
+            end if
+      end if
+; a_laue_ax-
         end if
     end if
+
     info_output(">>>>>>>> Leaving get_plot_main_string", verbosity, 8)
     return title_string
 end
@@ -897,7 +923,10 @@ begin
     info_output("<<<<<<<< Entering inset_top_text", verbosity, 6)
     res@gsnDraw               = False
     res@gsnFrame              = False
-    res@txFontHeightF         = 0.012
+; A_laue_ax+
+;;;    res@txFontHeightF         = 0.012
+    res@txFontHeightF         = 0.008
+; A_laue_ax-
     res@txBackgroundFillColor = 0
     res@txFuncCode            = "~"
     res@txPerimOn             = True

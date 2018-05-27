@@ -225,8 +225,8 @@ begin
     do j = 1, dims_data
         if (all(ismissing(to_plot(j * 3, :)))) then
             error_msg("w", diag_script, "", "all missing values for " + \
-                      "dimension " + j * 3  + " in to_plot, need at least 5" + \
-                      " models, go to next")
+                      "dimension " + j * 3 + " in to_plot, need at " + \
+                      "least 5 models, go to next")
             continue
         end if
         res@xyLineColor      = colors_main(j)
@@ -280,23 +280,26 @@ begin
     frame(wks)
 
     alltags = array_append_record(tags,\
-           (/"DM_global", "PT_times", "ST_mean", "ST_stddev", "ST_anomaly"/), 0)
-    string1 = "Time series of global annual mean  " + variable_info@long_name +\
-              " anomalies (relative to " + diag_script_info@begin_ref_year + "-" + \
-              diag_script_info@end_ref_year + ") from CMIP5 concentration drive " + \
+                                  (/"DM_global", "PT_times", "ST_mean", \
+                                  "ST_stddev", "ST_anomaly"/), 0)
+    string1 = "Time series of global annual mean  " + \
+              variable_info@long_name + " anomalies (relative to " + \
+              diag_script_info@begin_ref_year + "-" + \
+              diag_script_info@end_ref_year + \
+              ") from CMIP5 concentration drive " + \
               "experiments. Projections are shown for each RCP for the " + \
               "multi-model mean (solid lines) and the 5 to 95% range " + \
               "(+-1.64 standard deviation) across the distribution of " + \
               "individual models (shading). "
     if (nperiods .gt. 1) then
-        string2 = "Discontinuities at 2100 are due to different numbers of " + \
-		  "models performing the extension runs beyond the 21st " + \
-		  "century and have no physical meaning. Only one ensemble " + \
-		  "member is used from each model and numbers in the " + \
-		  "figure indicate the number of different models " + \
-		  "contributing to the different time periods. No ranges " + \
-		  "are given for the RCP6.0 projections beyond 2100 as only" + \
-                  " 2 models are available."
+        string2 = "Discontinuities at 2100 are due to different numbers " + \
+                  "of models performing the extension runs beyond the " + \
+                  "21st century and have no physical meaning. Only one" + \
+                  " ensemble member is used from each model and numbers in" + \
+                  " the figure indicate the number of different models " + \
+                  "contributing to the different time periods. No ranges " + \
+                  "are given for the RCP6.0 projections beyond 2100 as " + \
+                  "only 2 models are available."
     else
         string2 = ""
     end if

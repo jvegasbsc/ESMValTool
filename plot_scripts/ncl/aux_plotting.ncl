@@ -49,6 +49,8 @@ procedure create_legend_lines(labels:string, \
 ;; Caveats
 ;;
 ;; Modification history:
+;;    20171201-A_laue_ax: added check if outfile already contains a filename
+;;                        extension (to avoid double file extensions such as .ps.epsi)
 ;;    20150511-A_laue_ax: added safe lower limits for panelling plot
 ;;    20150508-A_righ_ma: added lines/markers option.
 ;;    20150120-A_gott_kl: remove pre-existing file type suffix
@@ -72,7 +74,21 @@ begin
     end if
 
     ;; Open workstation
-    wks_legend = gsn_open_wks("epsi", outfile)
+; A_laue_ax+
+    sfx = get_file_suffix(outfile, 0)
+    if (.not.ismissing(sfx)) then
+        base = str_sub_str(outfile, sfx, "")
+        ext = str_sub_str(sfx, ".", "")
+        wks_legend = gsn_open_wks(ext, base)
+        delete(base)
+        delete(sfx)
+        delete(ext)
+    else
+; A_laue_ax-
+        wks_legend = gsn_open_wks("epsi", outfile)
+; A_laue_ax+
+    end if
+; A_laue_ax-
 
     ;; General resources
     res = True

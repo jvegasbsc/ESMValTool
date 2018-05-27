@@ -215,6 +215,9 @@ def main(project_info):
     modelconfig.read(config_file)
     E.ensure_directory(plot_dir)
 
+    if (modelconfig.has_option('general', 'styleset')):
+        project_info['GLOBAL']['styleset'] = modelconfig.get('general', 'styleset')
+
     # Here we check and process only desired parts of the diagnostics
     if (modelconfig.getboolean('general', 'plot_equatorial')):
         info("Starting to gather values for equatorial divergence plots",
@@ -371,6 +374,11 @@ def process_divergence(E, modelconfig):
         print ("PY ERROR: Stopping the script and exiting")
         sys.exit()
 
+    work_dir = work_dir + '/TropicalVariability/'
+
+    if (modelconfig.has_option('general', 'filesuffix')):
+        work_dir = work_dir + modelconfig.get('general', 'filesuffix') + '/'
+
     # Starting to extract required areas
     for area in areas:
         area_key = experiment + '_' + area
@@ -381,6 +389,9 @@ def process_divergence(E, modelconfig):
 
         # create a python array file for each area, model  and datakey
         # overwrite if exists
+        if not os.path.exists(work_dir):
+            os.mkdir(work_dir)
+
         base_name = work_dir\
                     + 'TropicalVariability_'\
                     + area_key\
@@ -501,6 +512,11 @@ def process_divergence(E, modelconfig):
             axs[1].set_xticklabels(xlabels)
             axs[1].set_yticklabels(ylabels)
 
+            if (modelconfig.has_option('general', 'filesuffix')):
+                suffix = '_' + modelconfig.get('general', 'filesuffix')
+            else:
+                suffix = ''
+
             # Get output filename and save the figure
             diag_name = E.get_diag_script_name()
             output_dir = os.path.join(plot_dir, diag_name)
@@ -510,7 +526,9 @@ def process_divergence(E, modelconfig):
             output_file = E.get_plot_output_filename(diag_name=diag_name,
                                                      model=model,
                                                      variable=variable_string,
-                                                     specifier=area)
+                                                     specifier=area,
+                                                     end_specifier=model + suffix)
+
             plt.savefig(os.path.join(output_dir, output_file))
 
             info("", verbosity, 1)

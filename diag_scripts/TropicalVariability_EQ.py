@@ -217,6 +217,9 @@ def main(project_info):
     modelconfig.read(config_file)
     E.ensure_directory(plot_dir)
 
+    if (modelconfig.has_option('general', 'styleset')):
+        project_info['GLOBAL']['styleset'] = modelconfig.get('general', 'styleset')
+
     # Here we check and process only desired parts of the diagnostics
     if (modelconfig.getboolean('general', 'plot_equatorial')):
         info("Starting to plot equatorial means", verbosity, 2)
@@ -243,16 +246,27 @@ def check_data_existance(E, modelconfig):
     work_dir = E.get_work_dir()
     base_name = 'TropicalVariability_' + experiment + '_' + areas[0] + '_'
 
+    work_dir = work_dir + '/TropicalVariability/'
+
+    if (modelconfig.has_option('general', 'filesuffix')):
+        work_dir = work_dir + modelconfig.get('general', 'filesuffix') + '/'
+
     additional_keys = []
     # First test temperature
     ts_test = glob(work_dir + base_name + 'ts*')
     if (len(ts_test) > 0):
-        additional_keys.append('ts')
+        if ('ts-ocean' in ts_test[0]):
+            additional_keys.append('ts-ocean')
+        else:
+            additional_keys.append('ts')
     # Next precipitation
     pr_test = glob(work_dir + base_name + 'pr*')
     if (len(pr_test) > 0):
         if ('pr-mmday' in pr_test[0]):
-            additional_keys.append('pr-mmday')
+            if ('pr-mmday-ocean' in pr_test[0]):
+                additional_keys.append('pr-mmday-ocean')
+            else:
+                additional_keys.append('pr-mmday')
         else:
             additional_keys.append('pr')
     # Finally divergence
@@ -311,6 +325,11 @@ def process_equatorial_means(E, modelconfig):
     plot_grid = modelconfig.getboolean('general', 'plot_grid')
     ua_key = datakeys[0]
 
+    work_dir = work_dir + '/TropicalVariability/'
+
+    if (modelconfig.has_option('general', 'filesuffix')):
+        work_dir = work_dir + modelconfig.get('general', 'filesuffix') + '/'
+
     # Get the model paths etc. including the obs file for winds
     models = E.get_clim_model_filenames(ua_key)
     # Get other variables and check data existance
@@ -335,13 +354,13 @@ def process_equatorial_means(E, modelconfig):
             suptitle = area + " ocean equatorial ["
             suptitle += lat_area[0] + ":" + lat_area[1] + "] mean"
             plt.suptitle(suptitle, fontsize=16)
-            if (datakey == 'pr' or datakey == 'pr-mmday'):
+            if (datakey == 'pr' or datakey == 'pr-mmday' or datakey == 'pr-mmday-ocean'):
                 row = 0
                 title = "Precipitation"
-            elif (datakey == 'ts'):
+            elif (datakey == 'ts' or datakey == 'ts-ocean'):
                 row = 1
                 title = "Temperature"
-            elif (datakey == 'ua' or datakey == 'ua-1000'):
+            elif (datakey == 'ua' or datakey == 'ua-1000' or datakey == 'ua-1000-ocean'):
                 row = 2
                 title = "Eastward wind"
             elif (datakey == 'divergence'):
@@ -352,7 +371,7 @@ def process_equatorial_means(E, modelconfig):
             # For winds we have to extract the data for each model
             # For the rest we only have one file / datakey
             scaling = ''
-            if (datakey == 'ua' or datakey == 'ua-1000'):
+            if (datakey == 'ua' or datakey == 'ua-1000' or datakey == 'ua-1000-ocean'):
                 for model in models:
                     # extract the model specific data
                     datafile = nc.Dataset(models[model], 'r')
@@ -384,7 +403,8 @@ def process_equatorial_means(E, modelconfig):
             # Next the datakeys with all data in one file (per datakey)
             # These will be read from external files previously written by
             # TropicalVariability.py
-            elif (datakey == 'pr' or datakey == 'pr-mmday' or datakey == 'ts'):
+            elif (datakey == 'pr' or datakey == 'pr-mmday' or datakey == 'pr-mmday-ocean' \
+                  or datakey == 'ts' or datakey == 'ts-ocean'):
                 base_name = work_dir + 'TropicalVariability_'\
                             + area_key + '_' + datakey + '_model_'
                 datafiles = glob(base_name + '*')
@@ -412,7 +432,7 @@ def process_equatorial_means(E, modelconfig):
                         line.set_dashes(dashes)
 
                 # Some additional figure config
-                if   (datakey == 'pr' or datakey == 'pr-mmday'):
+                if   (datakey == 'pr' or datakey == 'pr-mmday' or datakey == 'pr-mmday-ocean'):
                     ymin = modelconfig.getint(area_key, 'prec_min')
                     ymax = modelconfig.getint(area_key, 'prec_max')
                     yticks = E.get_ticks(6, np.array([ymin, ymax]))
@@ -420,7 +440,7 @@ def process_equatorial_means(E, modelconfig):
                         data_units = 'kg/m2s'
                     else:
                         data_units = 'mm/day'
-                elif (datakey == 'ts'):
+                elif (datakey == 'ts' or datakey == 'ts-ocean'):
                     ymin = modelconfig.getint(area_key, 'temp_min')
                     ymax = modelconfig.getint(area_key, 'temp_max')
                     yticks = E.get_ticks(6, np.array([ymin, ymax]))
@@ -508,9 +528,16 @@ def process_equatorial_means(E, modelconfig):
                               experiment,
                               'mean'])
         variable = "".join(E.get_currVars())
+
+        if (modelconfig.has_option('general', 'filesuffix')):
+            suffix = modelconfig.get('general', 'filesuffix')
+        else:
+            suffix = ''
+
         output_file = E.get_plot_output_filename(diag_name=diag_name,
                                                  variable=variable,
-                                                 specifier=specifier)
+                                                 specifier=specifier,
+                                                 end_specifier=suffix)
         plt.savefig(os.path.join(output_dir, output_file))
         info("", verbosity, 1)
         info("Created image: ", verbosity, 1)
