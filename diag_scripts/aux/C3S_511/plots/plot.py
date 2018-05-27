@@ -723,3 +723,135 @@ class Plot2D_blank(Plot2D_2):
         super(Plot2D_blank, self).__init__(cube)
         # erase all data
         self.cube.data=self.cube.data*np.nan        
+        
+        
+class Plot1D(object):
+    """
+    Description
+        Basic class for 21-dimensional plotting
+
+    Contents
+        method plot
+    """
+
+    # Class attributes
+    LATS = ['latitude']     # accepted lat names
+    LONS = ['longitude']    # accepted lon names
+    TIME = ['time']         # accepted time names
+    
+    
+    def __init__(self, cube):
+        """
+        Arguments
+            cube : iris cube
+
+        Description
+            Initializes the class.
+
+
+        Modification history
+            20180527-A_muel_bn: copied Plot2D_2 and adjusted
+        """
+        
+        # Check arguments
+        if (not isinstance(cube, iris.cube.Cube)):
+            raise TypeError("Invalid input: expected iris cube")
+        self.cube = iris.util.squeeze(cube)
+        if (self.cube.ndim != 1):
+            raise TypeError("Invalid input: expected 1-dimensional iris cube")
+        try:
+            self.name = cube.long_name
+        except:
+            pass
+        self.units = ' [' + str(cube.units) + ']'
+        
+        # Get dimension names
+        dim_names = [dim.standard_name for dim in self.cube.dim_coords]
+        for dim in dim_names:
+            if (dim in self.__class__.LATS):
+                self.lat_var = dim
+                break
+            else:
+                self.lat_var = None
+        for dim in dim_names:
+            if (dim in self.__class__.LONS):
+                self.lon_var = dim
+                break
+            else:
+                self.lon_var = None
+        for dim in dim_names:
+            if (dim in self.__class__.TIME):
+                self.time_var = dim
+                break
+            else:
+                self.time_var = None
+                
+        # Lat/lon plot
+        if (self.lat_var is not None):
+            self.plot_type = 'lat'
+
+        # Lat/time plot
+        elif (self.time_var is not None):
+            self.plot_type = 'time'
+
+        # Lon/time plot
+        elif (self.lon_var is not None):
+            self.plot_type = 'lon'
+
+        # Default case
+        else:
+            raise TypeError("Invalid input: cube does not contain supported " +
+                            "dimensions")
+        
+        # Setup matplotlib
+        plt.style.use(MPLSTYLE)
+
+###############################################################################
+    
+    def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
+             y_label=None, title=None, ax=None, fig=None, vminmax=None):
+        """
+        Arguments
+            summary_plot   : Add summary line plot
+            colorbar_ticks : Ticks of the colorbar
+            x_label        : label of x-axis
+            y_label        : label of y-axis
+            title          : title of the plot
+
+        Returns
+            Matplotlib figure instance
+
+        Description
+            Actual plotting routine
+
+        Modification history
+            20180527-A_muel_bn: copied Plot2D_2 and adjusted
+        """
+        
+        # preprocessing cube information
+        self.cube.rename(title)
+        
+        brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
+        
+        if len(ax)>=2:
+            raise ValueError("Invalid input: axes should not be more than 1!")
+            
+        plt.sca(ax[0])
+
+        # plot line
+        try:
+            iplt.plot(self.cube)
+            plt.title(title)
+            plt.grid()
+            
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
+            plt.text(0.5, 0.5,'Data cannot be displayed as intended due to cartopy bug! \n Deviations are color levels and time axis display. \n Future updates of cartopy module may resolve this issue (#946).',horizontalalignment='center',verticalalignment='center',transform = plt.gca().transAxes)
+            
+        plt.tight_layout()
+        
+        return
+    
