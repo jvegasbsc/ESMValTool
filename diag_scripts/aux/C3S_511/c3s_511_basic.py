@@ -107,7 +107,7 @@ class __Diagnostic_skeleton__(object):
         return
 
     def run_diagnostic(self):
-#        self.sp_data = self.__spatial_subsets__()["Germany_2001-2005"]
+#        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
         self.__do_overview__()
         self.__do_mean_var__()
 #        self.__do_trends__()
@@ -938,7 +938,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         return
     
     
-    def __spatial_subsets__(self,dict_of_regions=None):
+    def __spatiotemp_subsets__(self,dict_of_regions=None):
         """
         produces spatial subset data sets for further calculation
         """
