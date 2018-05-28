@@ -96,7 +96,14 @@ class __Diagnostic_skeleton__(object):
         return
 
     def read_data(self):
-        raise ImplementationError("read_data","This method has to be implemented.")
+        """
+        reads artificial data for testing uses
+        TODO: Remove after loading is tested.
+        """
+        datadir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/testdata")
+        self.sp_data = iris.load_cube(
+            os.path.join(datadir, "test.nc"))  
+        warnings.warn("Implementation Warning", UserWarning)
         return
 
     def run_diagnostic(self):
@@ -217,28 +224,33 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
     def read_data(self):
 
-        if os.path.isfile(self.__infile__):
-            self.sp_data = iris.load_cube(self.__infile__)
-            self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
-            self.sp_data.coord('latitude').guess_bounds()
-#            if not self.sp_data.coords('grid_longitude'):
-#            mima_lon=np.nanpercentile(self.sp_data.coord('longitude').points,[0,100])
-#            if np.all(mima_lon <= 360) and np.all(mima_lon>=0):
-#                print self.sp_data.coord('longitude')
-#                long_2 = self.sp_data.coord('longitude').points.copy()
-#                long_2[long_2>180]=long_2[long_2>180]-360
-#                long_2_coord = icoords.Coord(long_2, units='degrees', long_name=u'longitude_2', var_name='lon_2')
-#                print long_2_coord
-#                self.sp_data.add_aux_coord(long_2_coord)
-#                print self.sp_data
-#                self.sp_data.coord('longitude_2').guess_bounds()
-            self.sp_data.coord('longitude').guess_bounds()
-            if self.sp_data.units == "no-unit":
-                self.sp_data.units = '1'
-        else:
-            self.__read_data_mock__()
-            
-            print("self.__infile__ was not found! Generic data used instead.")
+        """
+        reads data
+        """ 
+        try:
+            if os.path.isfile(self.__infile__):
+                self.sp_data = iris.load_cube(self.__infile__)
+                self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
+                self.sp_data.coord('latitude').guess_bounds()
+    #            if not self.sp_data.coords('grid_longitude'):
+    #            mima_lon=np.nanpercentile(self.sp_data.coord('longitude').points,[0,100])
+    #            if np.all(mima_lon <= 360) and np.all(mima_lon>=0):
+    #                print self.sp_data.coord('longitude')
+    #                long_2 = self.sp_data.coord('longitude').points.copy()
+    #                long_2[long_2>180]=long_2[long_2>180]-360
+    #                long_2_coord = icoords.Coord(long_2, units='degrees', long_name=u'longitude_2', var_name='lon_2')
+    #                print long_2_coord
+    #                self.sp_data.add_aux_coord(long_2_coord)
+    #                print self.sp_data
+    #                self.sp_data.coord('longitude_2').guess_bounds()
+                self.sp_data.coord('longitude').guess_bounds()
+                if self.sp_data.units == "no-unit":
+                    self.sp_data.units = '1'
+            else:
+                raise PathError(self.__infile__,"This file is not accessible.")
+        except:
+            super(Basic_Diagnostic, self).read_data()
+            print("Error in reading data- Generic data used instead.")
 #            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
             
         # Human readable time
@@ -265,17 +277,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
 
-
-    def __read_data_mock__(self):
-        """
-        reads artificial data for testing uses
-        TODO: Remove after loading is tested.
-        """
-        datadir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/testdata")
-        self.sp_data = iris.load_cube(
-            os.path.join(datadir, "test.nc"))       
-        
-        
     def __do_overview__(self):
         
         this_function = "overview"

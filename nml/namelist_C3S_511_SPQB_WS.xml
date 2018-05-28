@@ -43,7 +43,7 @@ This namelist is part of the ESMValTool
 
 <DIAGNOSTICS>
    
-
+   <!--  
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -55,7 +55,7 @@ This namelist is part of the ESMValTool
 	
 		<model> OBS        QA4ECV				   ECV				avh-geo-res050-14D 	 1992 2006  @{OBSPATH}  </model>
     </diag>
-
+   -->
 
 <!-- 
     <diag>
