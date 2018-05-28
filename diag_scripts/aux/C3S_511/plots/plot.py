@@ -848,9 +848,7 @@ class Plot1D(object):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
-            plt.text(0.5, 0.5,'Data cannot be displayed as intended due to cartopy bug! \n Deviations are color levels and time axis display. \n Future updates of cartopy module may resolve this issue (#946).',horizontalalignment='center',verticalalignment='center',transform = plt.gca().transAxes)
-            
+            print 'We did not expect this to fail!'            
         plt.tight_layout()
         
         return
