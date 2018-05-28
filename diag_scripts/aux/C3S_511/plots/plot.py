@@ -203,7 +203,7 @@ class PlotScatter(object):
         return self.fig
 
 
-class Plot2D(object):
+class Plot2D_deprecated(object):
     """
     Description
         Basic class for 2-dimensional plotting
@@ -486,7 +486,7 @@ class Plot2D(object):
             return 
         
         
-class Plot2D_2(object):
+class Plot2D(object):
     """
     Description
         Basic class for 2-dimensional plotting
@@ -697,7 +697,7 @@ class Plot2D_2(object):
         return
     
     
-class Plot2D_blank(Plot2D_2):
+class Plot2D_blank(Plot2D):
     """
     Description
         Blank class for 2-dimensional plotting

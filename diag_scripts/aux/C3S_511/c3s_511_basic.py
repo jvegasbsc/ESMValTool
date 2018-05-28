@@ -29,7 +29,7 @@ import warnings
 from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
-from plot import Plot2D_2, PlotHist, Plot2D_blank, Plot1D
+from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 
@@ -312,7 +312,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 # plotting routine
                 filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
                 list_of_plots.append(filename)
-                x=Plot2D_2(frac_available_vals)
+                x=Plot2D(frac_available_vals)
                 
                 fig = plt.figure()
                 if "longitude" == d:     
@@ -590,7 +590,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
                     list_of_plots.append(filename)
                     try:
-                        x=Plot2D_2(mean_std_cov[m])
+                        x=Plot2D(mean_std_cov[m])
                         
                         fig = plt.figure()
                         if "longitude" == d:     
@@ -684,7 +684,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         try:
             # plotting routines
-            x=Plot2D_2(S)
+            x=Plot2D(S)
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
             list_of_plots.append(filename)
@@ -705,7 +705,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
             
-            x=Plot2D_2(P)
+            x=Plot2D(P)
     
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_pvals." + self.__output_type__
             list_of_plots.append(filename)
@@ -743,7 +743,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # plotting routines
         try:
             # plotting the slope after break point correction
-            x=Plot2D_2(TempStab["slope"])
+            x=Plot2D(TempStab["slope"])
     
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_min_slope." + self.__output_type__
             list_of_plots.append(filename)
@@ -765,7 +765,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.authors)
             
             # plotting number of breakpoints
-            x=Plot2D_2(TempStab["number_breakpts"])
+            x=Plot2D(TempStab["number_breakpts"])
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_num_bps." + self.__output_type__
             list_of_plots.append(filename)
@@ -806,7 +806,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 #                 self.diagname,
 #                 self.authors)
         try:
-            x=Plot2D_2(TempStab["slope"]-S)
+            x=Plot2D(TempStab["slope"]-S)
     
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_mean_diff." + self.__output_type__
             list_of_plots.append(filename)
@@ -827,7 +827,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
             
-            x=Plot2D_2(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
+            x=Plot2D(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_corr." + self.__output_type__
             list_of_plots.append(filename)
