@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath("./diag_scripts"))
 from METAdata import METAdata
 #import csv
 
-def do_report(report_data, report_title, work_dir):
+def do_report(report_data, report_title, work_dir, signature=""):
     """
     - report_data  a dictionary of a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
@@ -155,7 +155,7 @@ def do_report(report_data, report_title, work_dir):
     os.chdir(oldpath)
 
     # move pdf to the output directory and rename to report_xxx.pdf
-    pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + ".pdf"
+    pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
     os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
     # clean up temporary directories

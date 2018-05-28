@@ -71,7 +71,7 @@ This namelist is part of the ESMValTool
     </diag>
        -->
     
-    <!-- 
+    
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -83,7 +83,7 @@ This namelist is part of the ESMValTool
 	
 		<model> OBS        CDS-XCO2				   sat				L3 	 2003 2016  @{OBSPATH}  </model>
     </diag>
-       -->
+
 
 </DIAGNOSTICS>
 

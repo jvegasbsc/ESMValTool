@@ -221,6 +221,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
         
+        # TODO: for testing purpose (should come from CDS)
+        self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        self.__output_type__ = self.CDS_ID + "." + self.__output_type__
+        
 
     def read_data(self):
 
@@ -437,7 +441,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not isinstance(filename, str):
             raise TypeError("filename", "Element is not a string.")
             
-        report(content,filename,self.__work_dir__)
+        report(content,filename,self.__work_dir__, signature = self.CDS_ID)
         return
     
     
