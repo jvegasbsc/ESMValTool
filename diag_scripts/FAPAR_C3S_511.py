@@ -63,7 +63,7 @@ def main(project_info):
 # A_laue_ax-
 
 # read variable
-    variable = project_info['RUNTIME']['currDiag'].get_variables()
+    variable = project_info['RUNTIME']['currDiag'].get_variables()[0]
 
     if variable in ["fAPAR", "FAPAR"]:
 
