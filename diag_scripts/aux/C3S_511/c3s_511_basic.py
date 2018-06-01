@@ -109,14 +109,15 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
         self.__do_overview__()
-#        self.__do_mean_var__()
+        self.__do_mean_var__()
 #        self.__do_trends__()
-#        self.__do_extremes__()
-#        self.__do_sectors__()
-#        self.__do_maturity_matrix__()
-#        self.__do_gcos_requirements__()
-#        self.__do_esmvalidation__()
-
+        self.__do_extremes__()
+        self.__do_sectors__()
+        self.__do_maturity_matrix__()
+        self.__do_gcos_requirements__()
+        self.__do_esmvalidation__()
+        pass
+    
     def __do_overview__(self):
         self.__do_report__(content={},filename="do_overview_default")
         raise ImplementationError("__do_overview__","This method has to be implemented.")
