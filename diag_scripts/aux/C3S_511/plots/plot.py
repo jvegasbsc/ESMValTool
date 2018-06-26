@@ -672,7 +672,8 @@ class Plot2D(object):
         # this needs to be done due to an error in cartopy
         try:
 #            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)#,levels=levels, extend='both')
-            qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+#            qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -839,6 +840,9 @@ class Plot1D(object):
 
         # plot line
         try:
+            print self.cube
+            print self.cube.data
+            print self.cube.coords("time")[0].points
             iplt.plot(self.cube)
             plt.title(title)
             plt.grid()
@@ -847,7 +851,8 @@ class Plot1D(object):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            print 'We did not expect this to fail!'            
+            print 'We did not expect this to fail!'  
+            plt.plot(self.cube.coords("time").points,self.cube.data)
         plt.tight_layout()
         
         return
