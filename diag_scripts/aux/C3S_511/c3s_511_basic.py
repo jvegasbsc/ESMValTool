@@ -937,7 +937,66 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
-    
+ 
+    def __do_esm_evaluation__(self):
+        
+        this_function = "ESM evaluation"
+
+        expected_input = self.__work_dir__ + os.sep + "smm_input" + os.sep + self.__basic_filename__ + "_smm_expert.csv"
+        if not os.path.isfile(expected_input):
+            try:
+                os.makedirs(os.path.dirname(expected_input))
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+            shutil.copy2(os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/empty_smm_expert.csv", expected_input)
+            print("************************************** WARNING **************************************")
+            print("Expected " + this_function + " input file " + expected_input + " not found!")
+            print("Created dummy file instead. Please fill in appropriate values and rerun!")
+            print("(This won't fail if you do not do so and produce a white matrix!!!!)")
+            print("************************************** WARNING **************************************")
+            captionerror = True
+        else:
+            print("Processing " + this_function + " input file: " + expected_input) 
+            captionerror = False
+		
+		
+        overview_dict=collections.OrderedDict()
+        
+        overview_dict.update({'longitude range [' + str(self.sp_data.coord("longitude").units) + ']': collections.OrderedDict([("min",str(lon_range_spec[0])), ("max",str(lon_range_spec[2]))])})
+        overview_dict.update({'longitude frequency [' + str(self.sp_data.coord("longitude").units) + ']': collections.OrderedDict([("min",str(lon_freq_spec[0])), ("average",str(lon_freq_spec[1])), ("max",str(lon_freq_spec[2]))])})
+        overview_dict.update({'latitude range [' + str(self.sp_data.coord("latitude").units) + ']': collections.OrderedDict([("min",str(lat_range_spec[0])), ("max",str(lat_range_spec[2]))])})
+        overview_dict.update({'latitude frequency [' + str(self.sp_data.coord("latitude").units) + ']': collections.OrderedDict([("min",str(lat_freq_spec[0])), ("average",str(lat_freq_spec[1])), ("max",str(lat_freq_spec[2]))])})
+        overview_dict.update({'temporal range': collections.OrderedDict([("min",str(tim_range_spec_read[0])), ("max",str(tim_range_spec_read[2]))])})
+        overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
+        
+        # produce report
+        self.__do_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
+        
+
+        
+        # plotting routines
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
+        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
+        fig.savefig(filename)
+        plt.close(fig)
+        
+        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+        
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['C3S_ESMeval'],
+                 caption,
+                 '#C3S' + 'ESMeval' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        # produce report
+        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        
+        return
+
     
     def __spatiotemp_subsets__(self,dict_of_regions=None):
         """
