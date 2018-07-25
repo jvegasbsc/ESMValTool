@@ -19,6 +19,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from scipy import stats
 import datetime
+import csv
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
@@ -108,14 +109,14 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
-        self.__do_overview__()
-        self.__do_mean_var__()
+#        self.__do_overview__()
+#        self.__do_mean_var__()
 #        self.__do_trends__()
-        self.__do_extremes__()
-        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
-        self.__do_esmvalidation__()
+#        self.__do_extremes__()
+#        self.__do_sectors__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
+        self.__do_esm_evaluation__()
         pass
     
     def __do_overview__(self):
@@ -194,7 +195,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not len(self.__varname__)==1:
             raise EmptyContentError("self.__varname__", "Element is of wrong length.")
         else:
-            self.__varname__ = self.__varname__[0]
+            self.__varname__ = str(self.__varname__[0])
         self.__output_type__ = 'png'  # default ouput file type for the basic diagnostics
         self.__regions__ = {'Germany_2001-2005':{'latitude':(47,56),'longitude':(5,16),'time':(datetime.datetime(2001,01,01),datetime.datetime(2005,12,31))}}  # default regions
 
@@ -941,61 +942,36 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     def __do_esm_evaluation__(self):
         
         this_function = "ESM evaluation"
-
-        expected_input = self.__work_dir__ + os.sep + "smm_input" + os.sep + self.__basic_filename__ + "_smm_expert.csv"
-        if not os.path.isfile(expected_input):
-            try:
-                os.makedirs(os.path.dirname(expected_input))
-            except OSError as exc: # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-            shutil.copy2(os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/empty_smm_expert.csv", expected_input)
-            print("************************************** WARNING **************************************")
-            print("Expected " + this_function + " input file " + expected_input + " not found!")
-            print("Created dummy file instead. Please fill in appropriate values and rerun!")
-            print("(This won't fail if you do not do so and produce a white matrix!!!!)")
-            print("************************************** WARNING **************************************")
-            captionerror = True
-        else:
-            print("Processing " + this_function + " input file: " + expected_input) 
-            captionerror = False
 		
+        # read in the ESM evaluation csv file
+        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/esmeval_expert.csv"
 		
-        overview_dict=collections.OrderedDict()
-        
-        overview_dict.update({'longitude range [' + str(self.sp_data.coord("longitude").units) + ']': collections.OrderedDict([("min",str(lon_range_spec[0])), ("max",str(lon_range_spec[2]))])})
-        overview_dict.update({'longitude frequency [' + str(self.sp_data.coord("longitude").units) + ']': collections.OrderedDict([("min",str(lon_freq_spec[0])), ("average",str(lon_freq_spec[1])), ("max",str(lon_freq_spec[2]))])})
-        overview_dict.update({'latitude range [' + str(self.sp_data.coord("latitude").units) + ']': collections.OrderedDict([("min",str(lat_range_spec[0])), ("max",str(lat_range_spec[2]))])})
-        overview_dict.update({'latitude frequency [' + str(self.sp_data.coord("latitude").units) + ']': collections.OrderedDict([("min",str(lat_freq_spec[0])), ("average",str(lat_freq_spec[1])), ("max",str(lat_freq_spec[2]))])})
-        overview_dict.update({'temporal range': collections.OrderedDict([("min",str(tim_range_spec_read[0])), ("max",str(tim_range_spec_read[2]))])})
-        overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
-        
-        # produce report
-        self.__do_report__(content={"text":overview_dict,"plots":list_of_plots}, filename=this_function.upper())
-        
+        # Create a list. Each item of the list will be itself a list of strings, corresponding either to the 
+        # headers or to the ESM evaluation entries for the different ECVs
+        contents = list()
+        with open(esm_eval_input, 'rb') as csvfile:
+            s = csv.reader(csvfile, delimiter = ";", skipinitialspace = True)
+            for row in s:
+                contents.append(row)
+		
+        # convert the list into an array
+        esmeval_data = np.asarray(contents)
+		
+        # check the number of entries for the ECV in question, and write all of the available entries in an ordered dictionary
+        # for easy output in the reports
+        esmeval_dict=collections.OrderedDict()
+		
+        for num_entries in range(0, len(np.nonzero(esmeval_data == self.__varname__)[0])):
+            insert_dict=collections.OrderedDict()
+            for column in range(1, len(esmeval_data[0,:])): 
+                insert_dict.update({esmeval_data[0, column]: esmeval_data[np.nonzero(esmeval_data == self.__varname__)[0][num_entries], column]}) 
+            esmeval_dict.update({'R' + str(num_entries + 1):insert_dict})
 
-        
-        # plotting routines
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
-        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
-        fig.savefig(filename)
-        plt.close(fig)
-        
-        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
-        
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['C3S_ESMeval'],
-                 caption,
-                 '#C3S' + 'ESMeval' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
-        
+		              
         # produce report
-        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        self.__do_report__(content={"text":esmeval_dict}, filename = this_function.upper())
         
-        return
+        return 
 
     
     def __spatiotemp_subsets__(self,dict_of_regions=None):
