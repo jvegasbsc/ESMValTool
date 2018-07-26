@@ -19,6 +19,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from scipy import stats
 import datetime
+import csv
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
@@ -29,7 +30,7 @@ import warnings
 from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
-from plot import Plot2D_2, PlotHist, Plot2D_blank, Plot1D
+from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 
@@ -107,16 +108,17 @@ class __Diagnostic_skeleton__(object):
         return
 
     def run_diagnostic(self):
-#        self.sp_data = self.__spatial_subsets__()["Germany_2001-2005"]
-        self.__do_overview__()
-        self.__do_mean_var__()
+#        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
+#        self.__do_overview__()
+#        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
 #        self.__do_maturity_matrix__()
 #        self.__do_gcos_requirements__()
-#        self.__do_esmvalidation__()
-
+        self.__do_esm_evaluation__()
+        pass
+    
     def __do_overview__(self):
         self.__do_report__(content={},filename="do_overview_default")
         raise ImplementationError("__do_overview__","This method has to be implemented.")
@@ -193,7 +195,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not len(self.__varname__)==1:
             raise EmptyContentError("self.__varname__", "Element is of wrong length.")
         else:
-            self.__varname__ = self.__varname__[0]
+            self.__varname__ = str(self.__varname__[0])
         self.__output_type__ = 'png'  # default ouput file type for the basic diagnostics
         self.__regions__ = {'Germany_2001-2005':{'latitude':(47,56),'longitude':(5,16),'time':(datetime.datetime(2001,01,01),datetime.datetime(2005,12,31))}}  # default regions
 
@@ -312,7 +314,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 # plotting routine
                 filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
                 list_of_plots.append(filename)
-                x=Plot2D_2(frac_available_vals)
+                x=Plot2D(frac_available_vals)
                 
                 fig = plt.figure()
                 if "longitude" == d:     
@@ -590,7 +592,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
                     list_of_plots.append(filename)
                     try:
-                        x=Plot2D_2(mean_std_cov[m])
+                        x=Plot2D(mean_std_cov[m])
                         
                         fig = plt.figure()
                         if "longitude" == d:     
@@ -684,7 +686,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         try:
             # plotting routines
-            x=Plot2D_2(S)
+            x=Plot2D(S)
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
             list_of_plots.append(filename)
@@ -705,7 +707,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
             
-            x=Plot2D_2(P)
+            x=Plot2D(P)
     
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_pvals." + self.__output_type__
             list_of_plots.append(filename)
@@ -743,7 +745,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # plotting routines
         try:
             # plotting the slope after break point correction
-            x=Plot2D_2(TempStab["slope"])
+            x=Plot2D(TempStab["slope"])
     
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_min_slope." + self.__output_type__
             list_of_plots.append(filename)
@@ -765,7 +767,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.authors)
             
             # plotting number of breakpoints
-            x=Plot2D_2(TempStab["number_breakpts"])
+            x=Plot2D(TempStab["number_breakpts"])
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_num_bps." + self.__output_type__
             list_of_plots.append(filename)
@@ -806,7 +808,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 #                 self.diagname,
 #                 self.authors)
         try:
-            x=Plot2D_2(TempStab["slope"]-S)
+            x=Plot2D(TempStab["slope"]-S)
     
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_mean_diff." + self.__output_type__
             list_of_plots.append(filename)
@@ -827,7 +829,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
             
-            x=Plot2D_2(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
+            x=Plot2D(cubestats.pearsonr(TempStab["homogenized"], self.sp_data, corr_coords="time"))
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hom_corr." + self.__output_type__
             list_of_plots.append(filename)
@@ -936,9 +938,43 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
+ 
+    def __do_esm_evaluation__(self):
+        
+        this_function = "ESM evaluation"
+		
+        # read in the ESM evaluation csv file
+        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/esmeval_expert.csv"
+		
+        # Create a list. Each item of the list will be itself a list of strings, corresponding either to the 
+        # headers or to the ESM evaluation entries for the different ECVs
+        contents = list()
+        with open(esm_eval_input, 'rb') as csvfile:
+            s = csv.reader(csvfile, delimiter = ";", skipinitialspace = True)
+            for row in s:
+                contents.append(row)
+		
+        # convert the list into an array
+        esmeval_data = np.asarray(contents)
+		
+        # check the number of entries for the ECV in question, and write all of the available entries in an ordered dictionary
+        # for easy output in the reports
+        esmeval_dict=collections.OrderedDict()
+		
+        for num_entries in range(0, len(np.nonzero(esmeval_data == self.__varname__)[0])):
+            insert_dict=collections.OrderedDict()
+            for column in range(1, len(esmeval_data[0,:])): 
+                insert_dict.update({esmeval_data[0, column]: esmeval_data[np.nonzero(esmeval_data == self.__varname__)[0][num_entries], column]}) 
+            esmeval_dict.update({'R' + str(num_entries + 1):insert_dict})
+
+		              
+        # produce report
+        self.__do_report__(content={"text":esmeval_dict}, filename = this_function.upper())
+        
+        return 
+
     
-    
-    def __spatial_subsets__(self,dict_of_regions=None):
+    def __spatiotemp_subsets__(self,dict_of_regions=None):
         """
         produces spatial subset data sets for further calculation
         """
