@@ -3,42 +3,42 @@
 <settings>
 	<pathCollection>
 		<usrpath category="userDirectory" type="output" id="WORKPATH">
-			<path>/path/to/work/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/work/</path>
 			<description>working directory</description>
 		</usrpath>
 
 		<usrpath category="userDirectory" type="output" id="PLOTPATH">
-			<path>/path/to/plots/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/plots/</path>
 			<description>directory for output plots</description>
 		</usrpath>
 
 		<usrpath category="userDirectory" type="output" id="CLIMOPATH">
-			<path>/path/to/climo/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/climo/</path>
 			<description>directory for output files</description>
 		</usrpath>
 
 		<usrpath category="userDirectory" type="output" id="REGRPATH">
-			<path>/path/to/regridding/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/regridding/</path>
 			<description>directory for regridding files</description>
 		</usrpath>
 
 		<usrpath category="simulation" type="input" id="MODELPATH">
-			<path>/path/to/modeldata/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/modeldata/</path>
 			<description>root directory of model data</description>
 		</usrpath>
 
 		<usrpath category="observation" type="input" id="OBSPATH">
-			<path>/path/to/data/obsdata/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/obsdata/</path>
 			<description>root directory of observational data</description>
 		</usrpath>
 
                 <usrpath category="observation" type="input" id="OBSPATH2">
-                        <path>/path/to/data/obsdata2/</path>
+                        <path>/home/arunr/ESMValTool-Results/workshop/obsdata2/</path>
                         <description>alternative root directory of observational data</description>
                 </usrpath>
 
 		<usrpath category="observation" type="input" id="RAWOBSPATH">
-			<path>/path/to/data/rawobsdata/</path>
+			<path>/home/arunr/ESMValTool-Results/workshop/rawobsdata/</path>
 			<description>root directory of raw observational data (for reformat_obs scripts)</description>
 		</usrpath>
 

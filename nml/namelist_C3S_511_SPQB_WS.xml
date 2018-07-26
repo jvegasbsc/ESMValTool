@@ -1,5 +1,5 @@
 <namelist>
-<include href="./config_private_BM_local.xml"/>
+<include href="./config_private.xml"/>
 <namelist_summary>
 ###############################################################################
 namelist_C3S_511_SPQB.xml
