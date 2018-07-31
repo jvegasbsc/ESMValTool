@@ -831,7 +831,7 @@ class Plot1D(object):
         # preprocessing cube information
         self.cube.rename(title)
         
-        brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
+        #brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
         
         if len(ax)>=2:
             raise ValueError("Invalid input: axes should not be more than 1!")
@@ -840,10 +840,10 @@ class Plot1D(object):
 
         # plot line
         try:
-            print self.cube
-            print self.cube.data
-            print self.cube.coords("time")[0].points
-            iplt.plot(self.cube)
+#            print self.cube
+#            print self.cube.data
+#            print self.cube.coords("time")[0].points
+            plt.plot(self.cube.coords("time")[0].points,self.cube.data)
             plt.title(title)
             plt.grid()
             
