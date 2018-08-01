@@ -88,6 +88,8 @@ class __Diagnostic_skeleton__(object):
                         "A_schl_mn", "A_bock_ls"]  # TODO fill in
         self.diagname = "Diagnostic_skeleton.py"
         self.CDS_ID = "XXX_XX_01"
+        
+        self.colormaps=dict({"default":"binary"})
 
         self.sp_data = None
 
@@ -222,6 +224,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
         
+        self.colormaps.update({"Sequential":"YlGn"})
+        self.colormaps.update({"Diverging":"BrBG"})
+        
         # TODO: for testing purpose (should come from CDS)
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         self.__output_type__ = self.CDS_ID + "." + self.__output_type__
@@ -328,7 +333,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     gs = gridspec.GridSpec(5, 1)
                     ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
                     fig.set_figheight(1.7*fig.get_figheight())
-                x.plot(ax=ax, vminmax=[0.,1.], title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                x.plot(ax=ax, vminmax=[0.,1.], color=self.colormaps, color_type="Sequential", title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                 fig.savefig(filename)
                 plt.close(fig.number)
                 
@@ -340,8 +345,41 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                          self.__infile__,
                          self.diagname,
                          self.authors)
-            except:
-                print('no figure done # 001')
+                
+            except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(exc_type, fname, exc_tb.tb_lineno)
+                    print("Availability in " + d)
+                    print('Warning: blank figure!')
+                    
+                    x=Plot2D_blank(frac_available_vals)
+                    
+                    fig = plt.figure()
+                    if "longitude" == d:     
+                        gs = gridspec.GridSpec(1, 5)
+                        ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                        fig.set_figwidth(1.7*fig.get_figwidth())
+                        fig.set_figheight(1.2*fig.get_figheight())
+                    elif "time" == d:
+                        ax = [plt.subplot(1,1,1)]
+                        fig.set_figheight(1.2*fig.get_figheight())
+                    elif "latitude" == d:
+                        gs = gridspec.GridSpec(5, 1)
+                        ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
+                        fig.set_figheight(1.7*fig.get_figheight())
+                    x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                    fig.savefig(filename)
+                    plt.close(fig.number)
+                    
+                    ESMValMD("meta",
+                             filename,
+                             self.__basetags__ + ['DM_global', 'C3S_mean_var'],
+                             str('Availability plot for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                             '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
+                             self.__infile__,
+                             self.diagname,
+                             self.authors)
             
         del sp_masked_vals
         del num_available_vals
@@ -368,7 +406,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
         except:
-            print('no figure done #002')
+            print('Something is probably wrong with the plotting routines/modules!')
         
         del all_data
 
@@ -564,7 +602,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             mean_std_cov.update({"mean anomalies from " + m + " per year " + str(int(y)):loc_data})
                             
-                            disp_min_max.update({"diff_vals":np.nanpercentile(np.concatenate([disp_min_max["diff_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
+                            pot_min_max = np.concatenate(
+                                    [disp_min_max["diff_vals"],
+                                    np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])
+                                    ])
+            
+                            
+                            disp_min_max.update({"diff_vals":np.nanpercentile(
+                                    np.concatenate([pot_min_max,-1.*pot_min_max])
+                                    ,[0,100])})
                                                         
                         del clim_anom
                             
@@ -594,12 +640,18 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 # plotting routine
                 vminmax=None
+                ctype=None
                 
-                if np.any([m_typ in m for m_typ in ["MEAN", "PERCENTILE", "CLIMATOLOGY"]]):
+                if np.any([m_typ in m for m_typ in ["MEAN","PERCENTILE", "CLIMATOLOGY"]]):
                     vminmax=disp_min_max["abs_vals"]
+                    ctype="Data"
+                    
+                if np.any([m_typ in m for m_typ in ["STD_DEV"]]):
+                    ctype="Sequential"
                 
                 if np.any([m_typ in m for m_typ in ["anomalies"]]):
                     vminmax=disp_min_max["diff_vals"]
+                    ctype="Diverging"
                 
                 if mean_std_cov[m] is not None:
                 # this needs to be done due to an error in cartopy
@@ -621,13 +673,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             gs = gridspec.GridSpec(5, 1)
                             ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
                             fig.set_figheight(1.7*fig.get_figheight())
-                        x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmax)
+                        x.plot(ax=ax, color=self.colormaps, color_type=ctype, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmax)
                         fig.savefig(filename)
                         plt.close(fig.number)
-                        # old plotting
-    #                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-    #                    fig.savefig(filename)
-    #                    plt.close(fig)
                     
                         del mean_std_cov[m]
                         
@@ -645,7 +693,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                         print(exc_type, fname, exc_tb.tb_lineno)
                         print(mean_std_cov[m])
-                        print('no figure done #003, blank figure')
+                        print('Warning: blank figure!')
                         
                         x=Plot2D_blank(mean_std_cov[m])
                         
@@ -662,13 +710,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             gs = gridspec.GridSpec(5, 1)
                             ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
                             fig.set_figheight(1.7*fig.get_figheight())
-                        x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                        x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                         fig.savefig(filename)
                         plt.close(fig.number)
-                        # old plotting
-    #                    fig = x.plot(summary_plot=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-    #                    fig.savefig(filename)
-    #                    plt.close(fig)
                     
                         del mean_std_cov[m]
                         
@@ -682,9 +726,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                                  self.authors)
                     
             del mean_std_cov
-        
-        # produce report
-        
 
         # produce report
         expected_input, found = \
@@ -714,13 +755,16 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             # plotting routines
             x=Plot2D(S)
             
+            vminmax = np.array([-1,1])*np.max(np.abs(np.nanpercentile(S.data.data[np.logical_not(S.data.mask)],[5,95])))
+            print vminmax
+            
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
             list_of_plots.append(filename)
             
             fig = plt.figure()
             ax = [plt.subplot(1,1,1)]
             fig.set_figheight(1.2*fig.get_figheight())
-            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            x.plot(ax=ax, color=self.colormaps, color_type="Diverging", vminmax=vminmax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
             fig.savefig(filename)
             plt.close(fig.number)
             
@@ -741,7 +785,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             fig = plt.figure()
             ax = [plt.subplot(1,1,1)]
             fig.set_figheight(1.2*fig.get_figheight())
-            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            x.plot(ax=ax, color=self.colormaps, color_type="Sequential", color_reverse=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
             fig.savefig(filename)
             plt.close(fig.number)
             
@@ -754,8 +798,30 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
             
-        except:
-            print('no figure done #004')
+        except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(exc_type, fname, exc_tb.tb_lineno)
+                    print("Trend")
+                    print('Warning: blank figure!')
+                    
+                    x=Plot2D_blank(S)
+                    
+                    fig = plt.figure()
+                    ax = [plt.subplot(1,1,1)]
+                    fig.set_figheight(1.2*fig.get_figheight())
+                    x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                    fig.savefig(filename)
+                    plt.close(fig.number)
+                    
+                    ESMValMD("meta",
+                             filename,
+                             self.__basetags__ + ['DM_global', 'C3S_mean_var'],
+                             str('Trend plot for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                             '#C3S' + 'temptrend' + self.__varname__,
+                             self.__infile__,
+                             self.diagname,
+                             self.authors)
         
         del P
         
@@ -957,7 +1023,16 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.authors)
         
         # produce report
-        self.__do_report__(content={"plots":[filename],"freetext":"textfile"}, filename="".join(this_function.upper().split()))
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/smm_input",
+                                      expfile="_smm_add.csv",
+                                      protofile="empty.txt",
+                                      function=this_function)
+            
+        if found:    
+            self.__do_report__(content={"plots":[filename],"freetext":expected_input}, filename="".join(this_function.upper().split()))
+        else:
+            self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
     
@@ -984,7 +1059,16 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                  self.authors)
         
         # produce report
-        self.__do_report__(content={"plots":[filename],"freetext":"textfile"}, filename="".join(this_function.upper().split()))
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/gcos_input",
+                                      expfile="_gcos.txt",
+                                      protofile="empty.txt",
+                                      function=this_function)
+            
+        if found:    
+            self.__do_report__(content={"plots":[filename],"freetext":expected_input}, filename="".join(this_function.upper().split()))
+        else:
+            self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
     
