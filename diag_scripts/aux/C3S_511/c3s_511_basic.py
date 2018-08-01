@@ -453,7 +453,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         list_of_plots = []
         
-        maths = ["MEAN","STD_DEV","LOG_COV", "PERCENTILE", "CLIMATOLOGY"]
+        maths = ["MEAN",
+                 "STD_DEV",
+#                 "LOG_COV",
+                 "PERCENTILE",
+                 "CLIMATOLOGY"]
         
         percentiles = [1.,5.,10.,25.,1./3.*100,50.,2./3.*100,75.,90.,95.,99.]
         
