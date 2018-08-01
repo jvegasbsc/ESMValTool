@@ -994,15 +994,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         loc_subset=loc_subset.extract(iris.Constraint(latitude=lambda point: r_min <= point <= r_max))
                     if dim=='longitude':
                         r_min,r_max=np.sort(dict_of_regions[R]['longitude'])
-                        if r_min<0:
-                            if r_max<0:
-                                r_min+=360
-                                r_max+=360
-                            else:
-                                r_min+=360
-                                if r_min>r_max:
-                                    raise ImplementationError("__spatial_subsets__","This method is not yet implemented for regions crossing the 0 degrees longitude.")
-                        loc_subset=loc_subset.extract(iris.Constraint(longitude=lambda point: r_min <= point <= r_max))
+                        loc_subset=loc_subset.intersection(longitude=(r_min,r_max))
+                        loc_subset=loc_subset.intersection(longitude=(-180,180))
                     if dim=='time':
                         r_min,r_max=np.sort(dict_of_regions[R]['time'])
                         loc_subset=loc_subset.extract(iris.Constraint(time=lambda cell: r_min <= cell.point  <= r_max))

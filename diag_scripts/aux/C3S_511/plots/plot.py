@@ -593,6 +593,10 @@ class Plot2D(object):
         
         # preprocessing cube information
         self.cube.rename(title)
+        try:
+            self.cube=self.cube.intersection(longitude=(-180,180))
+        except:
+            pass
         
         brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
         
