@@ -1,7 +1,6 @@
 #/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-
 import os
 import numpy as np
 import matplotlib
@@ -203,7 +202,7 @@ class PlotScatter(object):
         return self.fig
 
 
-class Plot2D(object):
+class Plot2D_deprecated(object):
     """
     Description
         Basic class for 2-dimensional plotting
@@ -486,7 +485,7 @@ class Plot2D(object):
             return 
         
         
-class Plot2D_2(object):
+class Plot2D(object):
     """
     Description
         Basic class for 2-dimensional plotting
@@ -673,7 +672,8 @@ class Plot2D_2(object):
         # this needs to be done due to an error in cartopy
         try:
 #            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)#,levels=levels, extend='both')
-            qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+#            qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
+            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -697,7 +697,7 @@ class Plot2D_2(object):
         return
     
     
-class Plot2D_blank(Plot2D_2):
+class Plot2D_blank(Plot2D):
     """
     Description
         Blank class for 2-dimensional plotting
@@ -840,6 +840,9 @@ class Plot1D(object):
 
         # plot line
         try:
+            print self.cube
+            print self.cube.data
+            print self.cube.coords("time")[0].points
             iplt.plot(self.cube)
             plt.title(title)
             plt.grid()
@@ -848,9 +851,8 @@ class Plot1D(object):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
-            plt.text(0.5, 0.5,'Data cannot be displayed as intended due to cartopy bug! \n Deviations are color levels and time axis display. \n Future updates of cartopy module may resolve this issue (#946).',horizontalalignment='center',verticalalignment='center',transform = plt.gca().transAxes)
-            
+            print 'We did not expect this to fail!'  
+            plt.plot(self.cube.coords("time").points,self.cube.data)
         plt.tight_layout()
         
         return

@@ -30,10 +30,7 @@ import warnings
 from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
-<<<<<<< HEAD
 #from get_metadata_to_rst import do_eval_table
-=======
->>>>>>> C3S_511_Workshop
 from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
@@ -116,20 +113,12 @@ class __Diagnostic_skeleton__(object):
         self.__do_overview__()
         self.__do_mean_var__()
 #        self.__do_trends__()
-<<<<<<< HEAD
 #        self.__do_extremes__()
 #        self.__do_sectors__()
 #        self.__do_maturity_matrix__()
 #        self.__do_gcos_requirements__()
 #	self.__do_esm_validation__()
 #        self.__do_esm_evaluation__()
-=======
-        self.__do_extremes__()
-        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
-        self.__do_esmvalidation__()
->>>>>>> C3S_511_Workshop
         pass
     
     def __do_overview__(self):
@@ -983,7 +972,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         return
 
     
-<<<<<<< HEAD
     def __do_esm_evaluation__(self):
         
         this_function = "ESM evaluation"
@@ -1019,9 +1007,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         return 
 
  
-=======
-    
->>>>>>> C3S_511_Workshop
     def __spatiotemp_subsets__(self,dict_of_regions=None):
         """
         produces spatial subset data sets for further calculation
