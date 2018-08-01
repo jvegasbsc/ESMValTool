@@ -3,42 +3,42 @@
 <settings>
 	<pathCollection>
 		<usrpath category="userDirectory" type="output" id="WORKPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/work/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/work/</path>
 			<description>working directory</description>
 		</usrpath>
 
 		<usrpath category="userDirectory" type="output" id="PLOTPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/plots/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/plots/</path>
 			<description>directory for output plots</description>
 		</usrpath>
 
 		<usrpath category="userDirectory" type="output" id="CLIMOPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/climo/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/climo/</path>
 			<description>directory for output files</description>
 		</usrpath>
 
 		<usrpath category="userDirectory" type="output" id="REGRPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/regridding/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/regridding/</path>
 			<description>directory for regridding files</description>
 		</usrpath>
 
 		<usrpath category="simulation" type="input" id="MODELPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/modeldata/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/modeldata/</path>
 			<description>root directory of model data</description>
 		</usrpath>
 
 		<usrpath category="observation" type="input" id="OBSPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/obsdata/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/obsdata/</path>
 			<description>root directory of observational data</description>
 		</usrpath>
 
                 <usrpath category="observation" type="input" id="OBSPATH2">
-                        <path>/home/arunr/ESMValTool-Results/workshop/obsdata2/</path>
+                        <path>/home/arunr/esmvaltool-obs-res/workshop/obsdata2/</path>
                         <description>alternative root directory of observational data</description>
                 </usrpath>
 
 		<usrpath category="observation" type="input" id="RAWOBSPATH">
-			<path>/home/arunr/ESMValTool-Results/workshop/rawobsdata/</path>
+			<path>/home/arunr/esmvaltool-obs-res/workshop/rawobsdata/</path>
 			<description>root directory of raw observational data (for reformat_obs scripts)</description>
 		</usrpath>
 

@@ -2,7 +2,7 @@
 """
 Created on Fri Feb 09 09:29:45 2018
 
-@author: hass_bg
+@author: arunranain
 """
 
 import csv
@@ -10,29 +10,31 @@ import numpy as np
 from get_metadata_to_rst import do_report
 
 
-def create_esmeval_dict(esm_eval_csv, ecv_name, work_dir):
-    """
-    - esm_eval_csv    is a csv file containing the information about the ESM
-                      evaluation assessment
-    - ecv_name        is a string that defines which ECV is looked at in the
-                      single assessment report
-    """ 
-    
-    with open(esm_eval_csv, 'rb') as csvfile:
-        s = csv.reader(csvfile, delimiter = ",")
-        my_list = list(s)    
+    def __do_esm_validation__(self):
+        
+        this_function = "ESM validation"
+		
+        # read in the ESM evaluation grading csv file
+        esm_grad_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/esmgrad_expert.csv"
 
-    # check which ECV is supposed to be displayed and where the 
-    result = [l for l in my_list for j in range(len(l)) if l[j] == ecv_name]
+        # plotting routines
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
+        fig = do_grad_table(self.__varname__, esm_grad_input, os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_grad_reference.csv")
+        fig.savefig(filename)
+        plt.close(fig)
+        
+        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
 
-    # create a dictionary that will be handed over to the 'do_report' routine
-    esm_eval_dict = {}
-    if len(result) >=1:
-        #esm_eval_dict[my_list[0][0]] = result[0][0]
-        for num_entries in range(len(result)):
-            for num_keys in range(len(my_list[0])):
-                esm_eval_dict[my_list[0][num_keys]] = result[num_entries][num_keys]
-                
-    do_report(esm_eval_dict,"ESM Evaluation", work_dir)
-    
-#create_esmeval_dict("D:\project\ESM_Eval_list.csv", 'ozone')
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['C3S_Eval'],
+                 caption,
+                 '#C3S' + 'Eval' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
+        
+        # produce report
+        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+        
+        return
