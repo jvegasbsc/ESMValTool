@@ -128,5 +128,15 @@ class FAPAR_Diagnostic(Basic_Diagnostic):
                  self.authors)
         
         # produce report
-        self.__do_report__(content={"plots":list_of_plots}, filename=this_function.upper())
+                # produce report
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/ECV_specific_input",
+                                      expfile="_ECV_specific.txt",
+                                      protofile="empty.txt",
+                                      function=this_function)
+            
+        if found:    
+            self.__do_report__(content={"plots":list_of_plots,"freetext":expected_input}, filename=this_function.upper())
+        else:
+            self.__do_report__(content={"plots":list_of_plots}, filename=this_function.upper())
         

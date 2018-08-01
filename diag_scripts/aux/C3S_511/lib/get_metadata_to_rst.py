@@ -20,9 +20,11 @@ def do_report(report_data, report_title, work_dir, signature=""):
     """
     - report_data  a dictionary of a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
+                   keys are in ["listtext","freetext","plots"]
     - report_title is a string used as title for the report 
     
     Updated: February 18th, 2018 (B. Mueller)
+    Updated: jULY 31ST, 2018 (B. Mueller)
     """
 
     # define output and temporary directories for Sphinx (source, build);
@@ -48,58 +50,89 @@ def do_report(report_data, report_title, work_dir, signature=""):
     outfile = open(output_file, "w") 
 
     # title (headline)
-    my_title = report_title
-    outfile.write(my_title + "\n")
-    outfile.write("=" * len(my_title) + "\n\n")
+#    my_title = report_title
+#    outfile.write(my_title + "\n")
+#    outfile.write("=" * len(my_title) + "\n\n")
     
     #search for text and plots instances in report_data
     
     if isinstance(report_data, dict):
         
-        if "text" in report_data.keys():
+        if "listtext" in report_data.keys():
 
             # if the input data are a dictionary, we create a bullet point list
             # from all key value pairs
             
-            this_title = "General Information"
+            this_title = "Short Information"
             outfile.write(this_title + "\n")
-            outfile.write("-" * len(this_title) + "\n\n")
+            outfile.write("=" * len(this_title) + "\n\n")
 
-            if isinstance(report_data["text"], dict):
+            if isinstance(report_data["listtext"], dict):
         
             # if the input data are a list of filenames (plots), we simply put all
             # figures with their corresponding caption read from the plot meta data
             # into the report
         
-                for key in report_data["text"]:
-                    if isinstance(report_data["text"][key], dict):
+                for key in report_data["listtext"]:
+                    if isinstance(report_data["listtext"][key], dict):
                         outfile.write("* " + key + "\n\n")
-                        for key2 in report_data["text"][key]:
-                            if isinstance(report_data["text"][key][key2], dict):
+                        for key2 in report_data["listtext"][key]:
+                            if isinstance(report_data["listtext"][key][key2], dict):
                                 outfile.write("  * " + key2 + "\n\n")
-                                for key3 in report_data["text"][key][key2]:
-                                    outfile.write("    * " + key3 + ": " + report_data["text"][key][key2][key3] + "\n")
+                                for key3 in report_data["listtext"][key][key2]:
+                                    outfile.write("    * " + key3 + ": " + report_data["listtext"][key][key2][key3] + "\n")
                                 outfile.write("\n")
                             else:
-                                outfile.write("  * " + key2 + ": " + report_data["text"][key][key2] + "\n")
+                                outfile.write("  * " + key2 + ": " + report_data["listtext"][key][key2] + "\n")
                         outfile.write("\n")
                     else:
-                        outfile.write("* " + key + ": " + report_data["text"][key] + "\n")
+                        outfile.write("* " + key + ": " + report_data["listtext"][key] + "\n")
                         
                 outfile.write(".. raw:: latex \n")
-                outfile.write("   \clearpage \n")
+                outfile.write("   \clearpage \n") #does not react on this
                         
             else:
                 print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
                         
         else:
-            print("No writable text found! There was no 'text' in the dictionary!")
+            print("No writable list found! There was no 'listtext' in the dictionary!")
+            
+        if "freetext" in report_data.keys():
+            
+            this_title = "Description"
+                        
+            if isinstance(report_data["freetext"], (str,unicode)):
+                
+                if os.path.isfile(report_data["freetext"]):
+                    with open(report_data["freetext"],"r") as freetext:
+                        with open("./diag_scripts/aux/C3S_511/lib/predef/empty.txt","r") as empty:
+                            text = freetext.read()
+                            if len(set(text) - set(empty.read())):
+                                outfile.write(this_title + "\n")
+                                outfile.write("=" * len(this_title) + "\n\n")
+                                outfile.write(text)
+                                outfile.write("\n\n")
+                            else: 
+                                print("There is still the empty description from empty.txt!")
+                else:
+                    outfile.write(this_title + "\n")
+                    outfile.write("=" * len(this_title) + "\n\n")
+                    outfile.write(report_data["freetext"] + "\n\n")
+                
+            else:
+                print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
+                
+#            outfile.write(".. raw:: latex \n")
+#            outfile.write("   \clearpage \n") #does not react on this
+                
+        else:
+            print("No writable text found! There was no 'freetext' in the dictionary!")
             
         if "plots" in report_data.keys():
             
-            this_title = "Figures"
+            this_title = "Figure(s)"
             outfile.write(this_title + "\n")
-            outfile.write("-" * len(this_title) + "\n\n")
+            outfile.write("=" * len(this_title) + "\n\n")
 
             if isinstance(report_data["plots"], list):
                 MD = METAdata()
