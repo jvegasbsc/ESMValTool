@@ -226,6 +226,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         self.colormaps.update({"Sequential":"YlGn"})
         self.colormaps.update({"Diverging":"BrBG"})
+        self.colormaps.update({"Data":"gist_earth_r"}) # TODO from cfg
         
         # TODO: for testing purpose (should come from CDS)
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
