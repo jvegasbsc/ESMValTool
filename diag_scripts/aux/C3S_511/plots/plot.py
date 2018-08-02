@@ -572,7 +572,8 @@ class Plot2D(object):
 ###############################################################################
     
     def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
-             y_label=None, title=None, ax=None, fig=None, vminmax=None):
+             y_label=None, title=None, ax=None, fig=None, vminmax=None,
+             color=None, color_type=None, color_reverse=False):
         """
         Arguments
             summary_plot   : Add summary line plot
@@ -598,7 +599,18 @@ class Plot2D(object):
         except:
             pass
         
-        brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
+        if color is None:
+            brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
+        else:
+            if color_type is None or color_type not in color.keys():
+                if color_reverse:
+                    color["default"]=color["default"]+"_r"
+                brewer_cmap = mpl_cm.get_cmap(color["default"],lut=11)
+            else:
+                if color_reverse:
+                    color[color_type]=color[color_type]+"_r"
+                brewer_cmap = mpl_cm.get_cmap(color[color_type],lut=11)
+                            
         
         if vminmax is None:
             try:     
