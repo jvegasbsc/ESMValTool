@@ -7,7 +7,7 @@ levels=[100,300,500]
 data_colors=None
 
 # latex output 
-# (options: True = Latex output, False = No Latex outputs, None = No Pdf generation)
-show_latex=None
+# (options: True = Latex output, False = No Latex_outputs, None = No Pdf generation)
+show_latex=False
 
 

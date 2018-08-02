@@ -786,7 +786,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             x=Plot2D(S)
             
             vminmax = np.array([-1,1])*np.max(np.abs(np.nanpercentile(S.data.data[np.logical_not(S.data.mask)],[5,95])))
-            print vminmax
             
             filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
             list_of_plots.append(filename)
