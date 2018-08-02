@@ -115,8 +115,8 @@ class __Diagnostic_skeleton__(object):
 #        self.__do_extremes__()
 #        self.__do_sectors__()
 #        self.__do_maturity_matrix__()
-#        self.__do_gcos_requirements__()
-        self.__do_esm_evaluation__()
+        self.__do_gcos_requirements__()
+#        self.__do_esm_evaluation__()
         pass
     
     def __do_overview__(self):
@@ -919,7 +919,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         # plotting routines
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
-        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/example_csvs/example_gcos_reference.csv")
+        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/C3S_511_specific_GCOS_BH.csv")
         fig.savefig(filename)
         plt.close(fig)
         

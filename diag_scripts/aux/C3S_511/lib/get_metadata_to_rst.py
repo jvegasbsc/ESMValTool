@@ -3,6 +3,7 @@ import os
 import shutil
 import csv
 import numpy as np
+from collections import OrderedDict
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -408,12 +409,37 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     # headers or to the GCOS reference values
     contents = list()
     with open(gcos_reference, 'rb') as csvfile:
-        s = csv.reader(csvfile, delimiter = ",", skipinitialspace = True)
+        s = csv.reader(csvfile, delimiter = ";", skipinitialspace = True)
         for row in s:
             contents.append(row)
 
+    variable = varname
+    #variable = 'Water vapour'
+
+    # convert the list into an array for easier checks for entries
+    gcos_ref_array = np.asarray(contents)
+	
+    gcos_idx = []
+    for i in range(len(gcos_ref_array[:,1])):
+        if variable in gcos_ref_array[i,1]:
+            gcos_idx.append(i)
+
+    gcos_contents = OrderedDict()
+    if len(gcos_idx) >= 1:
+        gcos_contents["Accuracy"] = [gcos_ref_array[gcos_idx[0],4]]
+        gcos_contents["Stability"] = [gcos_ref_array[gcos_idx[0],5]]
+        gcos_contents["Frequency"] = [gcos_ref_array[gcos_idx[0],2]]
+        gcos_contents["Resolution"] = [gcos_ref_array[gcos_idx[0],3]]
+    else:
+        gcos_contents["Accuracy"] = [""]
+        gcos_contents["Stability"] = [""]
+        gcos_contents["Frequency"] = [""]
+        gcos_contents["Resolution"] = [""]
+
+    print(gcos_contents)		
+				
     # Get the horizontal dimension of the GCOS table
-    nx = len(contents[0])
+    nx = len(gcos_contents)
     
 #    # Read in the product table and store the data. ignore the header!
 #    counter_y = 0 # Counter along rows of the CSV file
@@ -427,30 +453,40 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 #            else:
 #                contents.append(row)
 #            counter_y += 1
-    
+
+    #print('gcos_expert.keys')
+    #print(gcos_expert.keys())
+    #print('sorted gcos_content')
+    #print(np.sort(gcos_contents[0]))
+        
     if not isinstance(gcos_expert, dict):
         assert False, "wrong input type in gcos"
-    elif not np.all(np.sort(gcos_expert.keys()) == np.sort(contents[0])):
+    is_equal = np.array_equal(np.sort(np.array(gcos_expert.keys())), np.sort(np.array(gcos_contents.keys())))
+    print(is_equal)
+    if not is_equal:
         assert False, "wrong names in gcos"
     else:
-        data_contents=[]
-        for key in contents[0]:
+        #data_contents=[]
+        for key in gcos_contents:
             if gcos_expert[key]["unit"] is None:
                 this_unit = ""
             elif gcos_expert[key]["unit"] in ["1","unkown","no-unit"]:
                 this_unit = ""
             else:
                 this_unit = " " + gcos_expert[key]["unit"]
-            data_contents.append(str(gcos_expert[key]["value"]) + this_unit)
-        contents.append(data_contents)
-
-    ny = len(contents)
-
+            gcos_contents[key].append(str(gcos_expert[key]["value"]) + this_unit)
+            ny = len(gcos_contents[key]) + 1
+        #gcos_contents.append(data_contents)
+    print(gcos_contents)
+    
+    #ny = len(gcos_contents)
+    #print('ny')
+    #print(ny)
 
     # Check if, possibly, one of the rows of the CSV has not the same number of items
     # TO BE IMPROVED WITH NEW BACK END
-    if sum([1.0 * (len(contents[i])==nx) for i in range(len(contents))] ) != ny:
-        sys.exit("(do_gcos_report) STOP: uneven number of columns in reference file")
+    #if sum([1.0 * (len(gcos_contents[i])==nx) for i in range(len(gcos_contents))] ) != ny:
+    #    sys.exit("(do_gcos_report) STOP: uneven number of columns in reference file")
 
     # Create the figure
     fig = plt.figure(figsize = (10, 4))
@@ -465,19 +501,31 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     [plt.plot((x, x), (0, ny), color = 'k') for x in range(nx)]
 
     
-    for y in range(ny):
-        if y == ny - 1: # if header
-          fontweight = "bold"
-          fontsize   = 20
-        else:
-          fontweight = "normal"
-          fontsize   = 20
-        for x in range(nx):
-            # Read in the "go to line" in the csv and convert it to "go to line" instruction
-            # When \n stands in a CSV, python reads \\n
-            instring = "\n".join(contents[ny - y - 1][x].split("\\n")).strip()
-            plt.text(x + 0.5, y + 0.5, instring, ha = 'center', va = 'center',
-                     fontweight = fontweight, fontsize = fontsize)
+    for y in range(ny - 1):
+        for (x, key) in enumerate(gcos_contents.keys()):
+            print(gcos_contents[key][y])
+            instring = "\n".join(gcos_contents[key][y].split("\\n")).strip()
+            print(instring)
+            plt.text(x + 0.5, ny - y - 1.5, instring, ha = 'center', va = 'center',
+                     fontweight = "normal", fontsize = 20)
+    for (x, key) in enumerate(gcos_contents.keys()):
+        instring = "\n".join(key.split("\\n")).strip()
+        plt.text(x + 0.5, ny - 0.5, instring, ha = 'center', va = 'center',
+                 fontweight = "bold", fontsize = 20)
+      
+ #   for y in range(ny):
+#        if y == ny - 1: # if header
+ #        fontweight = "bold"
+  #        fontsize   = 20
+   #     else:
+    #      fontweight = "normal"
+     #     fontsize   = 20
+      #  for (x, key) in enumerate(gcos_contents.keys()):
+       #     # Read in the "go to line" in the csv and convert it to "go to line" instruction
+        #    # When \n stands in a CSV, python reads \\n
+         #   instring = "\n".join(gcos_contents[key][y].split("\\n")).strip()
+          #           fontweight = fontweight, fontsize = fontsize)
+           # plt.text(x + 0.5, y + 0.5, instring, ha = 'center', va = 'center',
 
     # Add legend on the left
     plt.text(-0.3, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center", fontsize=15)
