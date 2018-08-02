@@ -1,4 +1,12 @@
 # This is a dummy config file for C3S_511 diagnostics
 
-dummy="test"
-colors="RdGn"
+# 3D-data levels
+levels=[100,300,500]
+
+# color setting for data
+data_colors=None
+
+# latex output
+show_latex=True
+
+

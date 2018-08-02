@@ -19,6 +19,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from scipy import stats
 import datetime
+import imp
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
@@ -90,6 +91,8 @@ class __Diagnostic_skeleton__(object):
         self.CDS_ID = "XXX_XX_01"
         
         self.colormaps=dict({"default":"binary"})
+        self.__latex_output__ = False
+        self.levels = None
 
         self.sp_data = None
 
@@ -188,6 +191,26 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__project_info__ = kwargs.get('proj_info', None)
         if not isinstance(self.__project_info__, ESMValProject):
             raise EmptyContentError("proj_info", "Element is empty.")
+            
+        cfgfile = self.__project_info__.get_configfile()#['RUNTIME']['currDiag'].diag_script_cfg
+        with open(cfgfile,"r") as file:
+            cfg = imp.load_source('cfg', '', file)
+          
+        try:
+            matplotlib.cm.get_cmap(cfg.data_colors)
+            self.colormaps.update({"Data":cfg.data_colors})
+        except:
+            print("There is no usable specification of data colors. Falling back to default.")
+        
+        try:
+            self.__latex_output__ = cfg.show_latex
+        except:
+            pass
+        
+        try:
+            self.levels = cfg.levels
+        except:
+            pass
 
         self.__plot_dir__ = self.__project_info__.get_plot_dir()
         self.__work_dir__ = self.__project_info__.get_work_dir()
@@ -226,7 +249,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         self.colormaps.update({"Sequential":"YlGn"})
         self.colormaps.update({"Diverging":"BrBG"})
-        self.colormaps.update({"Data":"gist_earth_r"}) # TODO from cfg
         
         # TODO: for testing purpose (should come from CDS)
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
@@ -492,7 +514,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not isinstance(filename, str):
             raise TypeError("filename", "Element is not a string.")
             
-        report(content,filename,self.__work_dir__, signature = self.CDS_ID)
+        report(content,filename,self.__work_dir__, signature = self.CDS_ID, latex_opts=self.__latex_output__)
         return
     
     

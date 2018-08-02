@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath("./diag_scripts"))
 from METAdata import METAdata
 #import csv
 
-def do_report(report_data, report_title, work_dir, signature=""):
+def do_report(report_data, report_title, work_dir, signature="", latex_opts=False):
     """
     - report_data  a dictionary of a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
@@ -182,9 +182,14 @@ def do_report(report_data, report_title, work_dir, signature=""):
     # run Sphinx to create a pdf
     oldpath = os.getcwd()
     os.chdir("doc/reporting")
-    with open(os.devnull, 'wb') as devnull:
-        subprocess.call("make latexpdf", shell=True,
-                        stdout=devnull, stderr=subprocess.STDOUT)
+    
+    if not latex_opts:
+        with open(os.devnull, 'wb') as devnull:
+            subprocess.call("make latexpdf", shell=True,
+                            stdout=devnull, stderr=subprocess.STDOUT)
+    else:
+        subprocess.call("make latexpdf", shell=True)
+         
     os.chdir(oldpath)
 
     # move pdf to the output directory and rename to report_xxx.pdf
