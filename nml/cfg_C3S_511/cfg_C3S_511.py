@@ -7,6 +7,6 @@ levels=[100,300,500]
 data_colors=None
 
 # latex output
-show_latex=True
+show_latex=False
 
 
