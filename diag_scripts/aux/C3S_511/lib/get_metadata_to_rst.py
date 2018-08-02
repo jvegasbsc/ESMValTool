@@ -35,8 +35,8 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     pid = str(os.getpgid(0))
 
     path_out = work_dir + os.sep + "reporting"    # the final pdf will be put here
-    src_dir = path_out + os.sep + "source_" + pid # Sphinx source code directory
-    bld_dir = path_out + os.sep + "build_" + pid  # Sphinx build directory
+    src_dir = path_out + os.sep + "source_" + report_title.split()[0].lower() + "_" + signature + "_" + pid # Sphinx source code directory
+    bld_dir = path_out + os.sep + "build_" + report_title.split()[0].lower() + "_" + signature + "_" + pid  # Sphinx build directory
 
     # create output and temporary directories
     if not (os.path.exists(path_out)):
@@ -184,30 +184,35 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     oldpath = os.getcwd()
     os.chdir("doc/reporting")
     
-    if not latex_opts:
-        with open(os.devnull, 'wb') as devnull:
-            subprocess.call("make latexpdf", shell=True,
-                            stdout=devnull, stderr=subprocess.STDOUT)
+    if latex_opts is not None:
+        if not latex_opts:
+            with open(os.devnull, 'wb') as devnull:
+                subprocess.call("make latexpdf", shell=True,
+                                stdout=devnull, stderr=subprocess.STDOUT)
+        else:
+            subprocess.call("make latexpdf", shell=True)
     else:
-        subprocess.call("make latexpdf", shell=True)
+        pass
          
     os.chdir(oldpath)
 
-    # move pdf to the output directory and rename to report_xxx.pdf
-    pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
-    os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
+    if latex_opts is not None:
+        # move pdf to the output directory and rename to report_xxx.pdf
+        pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
+        os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
-    # clean up temporary directories
-    if os.path.exists(src_dir):
-         # remove if exists
-         shutil.rmtree(src_dir)
-         pass
-    if os.path.exists(bld_dir):
-         # remove if exists
-         shutil.rmtree(bld_dir)
-         pass
+    
+        # clean up temporary directories
+        if os.path.exists(src_dir):
+             # remove if exists
+             shutil.rmtree(src_dir)
+             pass
+        if os.path.exists(bld_dir):
+             # remove if exists
+             shutil.rmtree(bld_dir)
+             pass
 
-    print("Successfully created " + pdfname + "!")
+        print("Successfully created " + pdfname + "!")
     
     
 def do_smm_table(csv_expert, csv_definitions):
