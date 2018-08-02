@@ -4,9 +4,10 @@
 levels=[100,300,500]
 
 # color setting for data
-data_colors=None
+data_colors="binary"
 
-# latex output
-show_latex=True
+# latex output 
+# (options: True = Latex output, False = No Latex_outputs, None = No Pdf generation)
+show_latex=False
 
 
