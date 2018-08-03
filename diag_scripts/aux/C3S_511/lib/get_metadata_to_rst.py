@@ -458,26 +458,27 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 
     variable = varname
     #variable = 'Water vapour'
-
+    print(variable.upper())
+    
     # convert the list into an array for easier checks for entries
     gcos_ref_array = np.asarray(contents)
 	
     gcos_idx = []
     for i in range(len(gcos_ref_array[:,1])):
-        if variable.upper() in [g.upper() for g in gcos_ref_array[i,1]]:
+        if variable.strip().upper() in gcos_ref_array[i,1].upper():
             gcos_idx.append(i)
 
     gcos_contents = OrderedDict()
+    gcos_contents["Frequency"] = [""]
+    gcos_contents["Resolution"] = [""]
+    gcos_contents["Accuracy"] = [""]
+    gcos_contents["Stability"] = [""]
+    
     if len(gcos_idx) >= 1:
         gcos_contents["Frequency"] = [gcos_ref_array[gcos_idx[0],2]]
         gcos_contents["Resolution"] = [gcos_ref_array[gcos_idx[0],3]]
         gcos_contents["Accuracy"] = [gcos_ref_array[gcos_idx[0],4]]
         gcos_contents["Stability"] = [gcos_ref_array[gcos_idx[0],5]]
-    else:
-        gcos_contents["Frequency"] = [""]
-        gcos_contents["Resolution"] = [""]
-        gcos_contents["Accuracy"] = [""]
-        gcos_contents["Stability"] = [""]
 
 
     print(gcos_contents)		
