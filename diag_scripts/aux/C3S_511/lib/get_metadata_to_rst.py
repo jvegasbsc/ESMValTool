@@ -458,7 +458,6 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 
     variable = varname
     #variable = 'Water vapour'
-    print(variable.upper())
     
     # convert the list into an array for easier checks for entries
     gcos_ref_array = np.asarray(contents)
@@ -480,8 +479,6 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
         gcos_contents["Accuracy"] = [gcos_ref_array[gcos_idx[0],4]]
         gcos_contents["Stability"] = [gcos_ref_array[gcos_idx[0],5]]
 
-
-    print(gcos_contents)		
 				
     # Get the horizontal dimension of the GCOS table
     nx = len(gcos_contents)
@@ -498,16 +495,10 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 #            else:
 #                contents.append(row)
 #            counter_y += 1
-
-    #print('gcos_expert.keys')
-    #print(gcos_expert.keys())
-    #print('sorted gcos_content')
-    #print(np.sort(gcos_contents[0]))
-        
+     
     if not isinstance(gcos_expert, dict):
         assert False, "wrong input type in gcos"
     is_equal = np.array_equal(np.sort(np.array(gcos_expert.keys())), np.sort(np.array(gcos_contents.keys())))
-    print(is_equal)
     if not is_equal:
         assert False, "wrong names in gcos"
     else:
@@ -524,9 +515,6 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
         #gcos_contents.append(data_contents)
     print(gcos_contents)
     
-    #ny = len(gcos_contents)
-    #print('ny')
-    #print(ny)
 
     # Check if, possibly, one of the rows of the CSV has not the same number of items
     # TO BE IMPROVED WITH NEW BACK END
@@ -548,9 +536,9 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     
     for y in range(ny - 1):
         for (x, key) in enumerate(gcos_contents.keys()):
-            print(gcos_contents[key][y])
+            #print(gcos_contents[key][y])
             instring = "\n".join(gcos_contents[key][y].split("\\n")).strip()
-            print(instring)
+            #print(instring)
             plt.text(x + 0.5, ny - y - 1.5, instring, ha = 'center', va = 'center',
                      fontweight = "normal", fontsize = 20)
     for (x, key) in enumerate(gcos_contents.keys()):
@@ -558,20 +546,6 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
         plt.text(x + 0.5, ny - 0.5, instring, ha = 'center', va = 'center',
                  fontweight = "bold", fontsize = 20)
       
- #   for y in range(ny):
-#        if y == ny - 1: # if header
- #        fontweight = "bold"
-  #        fontsize   = 20
-   #     else:
-    #      fontweight = "normal"
-     #     fontsize   = 20
-      #  for (x, key) in enumerate(gcos_contents.keys()):
-       #     # Read in the "go to line" in the csv and convert it to "go to line" instruction
-        #    # When \n stands in a CSV, python reads \\n
-         #   instring = "\n".join(gcos_contents[key][y].split("\\n")).strip()
-          #           fontweight = fontweight, fontsize = fontsize)
-           # plt.text(x + 0.5, y + 0.5, instring, ha = 'center', va = 'center',
-
     # Add legend on the left
     plt.text(-0.3, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center", fontsize=15)
     plt.text(-0.3, ny - 2.5, "ECV\n(averages)", rotation = 90, ha = "center", va = "center", fontsize=15)
