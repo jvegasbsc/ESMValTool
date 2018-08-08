@@ -1,5 +1,2 @@
-Mean\n climatology,Trend,Variability,,
-20,42,0.2,                                 ,     
-        ,                  ,                            ,                                 ,    
-        ,                  ,                            ,                                 ,    
-        ,                  ,                            ,                                 ,    
+ECV,Mean\n climatology,Trend,Variability
+tas,20,42,30

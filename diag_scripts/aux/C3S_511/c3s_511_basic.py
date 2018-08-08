@@ -30,7 +30,7 @@ import warnings
 from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
-#from get_metadata_to_rst import do_eval_table
+from get_metadata_to_rst import do_eval_table
 from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
@@ -110,14 +110,14 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
-        self.__do_overview__()
-        self.__do_mean_var__()
+#        self.__do_overview__()
+#        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
 #        self.__do_maturity_matrix__()
 #        self.__do_gcos_requirements__()
-#	self.__do_esm_validation__()
+	self.__do_esm_validation__()
 #        self.__do_esm_evaluation__()
         pass
     
@@ -402,6 +402,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             tim_range_spec_read = [origin + datetime.timedelta(weeks=dt) for dt in tim_range_spec]
         else:
             assert False, 'Wrong increment in coord("time")!'
+        print tim_range_spec_read[0]
 
         lon_freq = np.diff(lon_range)
         lat_freq = np.diff(lat_range)
@@ -913,8 +914,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
-    
-    
+
+
+
     def __do_gcos_requirements__(self):
         
         this_function = "GCOS requirements"
@@ -941,27 +943,28 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
 
-
+    
     def __do_esm_validation__(self):
         
         this_function = "ESM validation"
-		
-        # read in the ESM evaluation grading csv file
-        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_expert.csv"
+
+         # read in the ESM evaluation grading csv file
+        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_expert.csv"    
 
         # plotting routines
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
-        fig = do_eval_table(self.__varname__, esm_eval_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_reference.csv")
+        fig = do_eval_table(self.__varname__, esm_eval_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_data.csv")
         fig.savefig(filename)
         plt.close(fig)
         
-        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')' + ' (Green: data set is 			recommended for this application; Red: data set is not recommended for this application; Yellow: no decision about applicability of the data set can be made (e.g. uncertainty too high))')
+
 
         ESMValMD("meta",
                  filename,
-                 self.__basetags__ + ['C3S_Eval'],
+                 self.__basetags__ + ['C3S_EVAL'],
                  caption,
-                 '#C3S' + 'Eval' + self.__varname__,
+                 '#C3S' + 'EVAL' + self.__varname__,
                  self.__infile__,
                  self.diagname,
                  self.authors)
@@ -969,9 +972,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # produce report
         self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
-        return
+        return  
 
-    
+   
     def __do_esm_evaluation__(self):
         
         this_function = "ESM evaluation"
