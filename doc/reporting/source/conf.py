@@ -127,11 +127,15 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #
-    'preamble': '\pagestyle{fancy}',
+    'preamble': r'''
+	\usepackage[section]{placeins}
+	\pagestyle{fancy}
+	\extrafloats{1000}
+	''',
 
     # Latex figure (float) alignment
     #
-    # 'figure_align': 'htbp',
+    'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
