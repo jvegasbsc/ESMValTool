@@ -25,7 +25,7 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     - report_title is a string used as title for the report 
     
     Updated: February 18th, 2018 (B. Mueller)
-    Updated: jULY 31ST, 2018 (B. Mueller)
+    Updated: July 31st, 2018 (B. Mueller)
     """
 
     # define output and temporary directories for Sphinx (source, build);
