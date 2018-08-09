@@ -89,7 +89,7 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
                     else:
                         outfile.write("* " + key + ": " + report_data["listtext"][key] + "\n")
                         
-                outfile.write(".. raw:: latex \n")
+                outfile.write(".. raw:: latex \n\n")
                 outfile.write("   \clearpage \n") #does not react on this
                         
             else:
@@ -123,8 +123,8 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
             else:
                 print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
                 
-#            outfile.write(".. raw:: latex \n")
-#            outfile.write("   \clearpage \n") #does not react on this
+            outfile.write(".. raw:: latex \n\n")
+            outfile.write("   \clearpage \n") #does not react on this
                 
         else:
             print("No writable text found! There was no 'freetext' in the dictionary!")
@@ -159,6 +159,8 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
                                   "   :width:   95%" + "\n\n" 
                                   "   " + caption[0] + "\n"
                                  )
+                    outfile.write(".. raw:: latex \n\n")
+                    outfile.write("   \FloatBarrier \n") #does not react on this
         
             else:
                 print("Wrong format in plots entry, nothing can be written!") # TODO: ERROR function 
@@ -166,7 +168,7 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
         else:
             print("No plottable links found! There was no 'plots' in the dictionary!")
             
-        if "text" not in report_data.keys() and "plots" not in report_data.keys():
+        if "freetext" not in report_data.keys() and "listtext" not in report_data.keys() and "plots" not in report_data.keys():
             print("Nothing to write reports from!! There was no 'plots' nor 'text' in the dictionary!") # TODO: ERROR function 
             return
 
@@ -180,28 +182,25 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     os.environ['SOURCEDIR'] = src_dir
     os.environ['BUILDDIR'] = bld_dir
 
+    
+    if latex_opts is not None:
     # run Sphinx to create a pdf
     oldpath = os.getcwd()
     os.chdir("doc/reporting")
-    
-    if latex_opts is not None:
+
         if not latex_opts:
             with open(os.devnull, 'wb') as devnull:
                 subprocess.call("make latexpdf", shell=True,
                                 stdout=devnull, stderr=subprocess.STDOUT)
         else:
             subprocess.call("make latexpdf", shell=True)
-    else:
-        pass
          
-    os.chdir(oldpath)
+    	os.chdir(oldpath)
 
-    if latex_opts is not None:
         # move pdf to the output directory and rename to report_xxx.pdf
         pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
         os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
-    
         # clean up temporary directories
         if os.path.exists(src_dir):
              # remove if exists
@@ -211,7 +210,7 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
              # remove if exists
              shutil.rmtree(bld_dir)
              pass
-
+    
         print("Successfully created " + pdfname + "!")
     
     

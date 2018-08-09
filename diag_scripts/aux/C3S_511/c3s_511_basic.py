@@ -97,6 +97,7 @@ class __Diagnostic_skeleton__(object):
         self.levels = None
 
         self.sp_data = None
+        self.var3D = None
 
     def set_info(self, **kwargs):
         raise ImplementationError("set_info","This method has to be implemented.")
@@ -116,13 +117,12 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
         self.__do_overview__()
-#        self.__do_mean_var__()
-#        self.__do_trends__()
-#        self.__do_extremes__()
-#        self.__do_sectors__()
-#        self.__do_maturity_matrix__()
-#        self.__do_gcos_requirements__()
-#        self.__do_esm_validation__()
+        self.__do_mean_var__()
+        self.__do_trends__()
+        self.__do_extremes__()
+        self.__do_sectors__()
+        self.__do_maturity_matrix__()
+        self.__do_gcos_requirements__()
         self.__do_esm_evaluation__()
         pass
     
@@ -161,7 +161,7 @@ class __Diagnostic_skeleton__(object):
         raise ImplementationError("__do_gcos_requirements__","This method has to be implemented.")
         return
     
-    def __do_esmevaluation__(self):
+    def __do_esm_evaluation__(self):
         self.__do_report__(content={},filename="do_esmevaluation_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
@@ -248,7 +248,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         self.__basic_filename__ = "_".join(self.__dataset_id__ + [self.__time_period__])
         
-        self.dimensions = np.array(["time", "latitude", "longitude"]) # TODO: get from cube
+        self.dimensions = ["time", "latitude", "longitude"] # TODO: get from cube
         
         self.colormaps.update({"Sequential":"YlGn"})
         self.colormaps.update({"Diverging":"BrBG"})
@@ -266,7 +266,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         try:
             if os.path.isfile(self.__infile__):
                 self.sp_data = iris.load_cube(self.__infile__)
-                self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
+#                self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
+                # get dimensions
+                sp_dimensions = [c.name() for c in self.sp_data.coords()]
+                extra_dimensions = [item for item in sp_dimensions if item not in set(self.dimensions)]
+                self.dimensions = sp_dimensions
+#                assert False
                 self.sp_data.coord('latitude').guess_bounds()
     #            if not self.sp_data.coords('grid_longitude'):
     #            mima_lon=np.nanpercentile(self.sp_data.coord('longitude').points,[0,100])
@@ -285,10 +290,20 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             else:
                 raise PathError(self.__infile__,"This file is not accessible.")
         except:
-            super(Basic_Diagnostic, self).read_data()
-            print("Error in reading data- Generic data used instead.")
-#            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
+#            super(Basic_Diagnostic, self).read_data()
+#            print("Error in reading data- Generic data used instead.")
+            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
             
+        if len(extra_dimensions) == 0:
+            self.var3D=False
+            self.level_dim = None
+        elif len(extra_dimensions) == 1:
+            self.var3D=True 
+            self.level_dim = extra_dimensions[0]
+            print("available levels are: " + str(self.sp_data.coord(self.level_dim)))
+        else:
+            assert False, "Error in data dimensions. Too many dimensions!"
+        
         # Human readable time
         t_info = str(self.sp_data.coord("time").units)
         origin = datetime.datetime.strptime("_".join(t_info.split(" ")[-2:]), '%Y-%m-%d_%H:%M:%S')
@@ -312,28 +327,37 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.__tim_read__ = tim_read
         
         return
-
-    def __do_overview__(self):
+    
+    def __overview_procedures_2D__(self,cube=None,level=None):
         
-        this_function = "overview"
-        
-        # TODO all the other plots
+        if cube is None:
+            cube=self.sp_data
+            
+        if level is not None:
+            basic_filename = self.__basic_filename__ + "_lev" + str(level)
+            dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+        else:
+            basic_filename = self.__basic_filename__
+            dataset_id = self.__dataset_id__
         
         list_of_plots=[]
+        
+        reg_dimensions =  [item for item in self.dimensions if item not in set([self.level_dim])]
+        maxnumtemp = len(cube.coord("time").points)
 
-        maxnumtemp = len(self.sp_data.coord("time").points)
+        try:
+            sp_masked_vals = cube.collapsed("time",iris.analysis.COUNT,function=lambda values: values.mask)
+            sp_masked_vals.data.mask = sp_masked_vals.data==maxnumtemp
+            sp_masked_vals.data = sp_masked_vals.data*0.+1.
+        except:
+            sp_masked_vals = cube.collapsed("time",iris.analysis.MEAN) *0.+1. #errors when data is not correctly masked!
 
-        sp_masked_vals = self.sp_data.collapsed("time",iris.analysis.COUNT,function=lambda values: values.mask)
-        sp_masked_vals.data.mask = sp_masked_vals.data==maxnumtemp
-        sp_masked_vals.data = sp_masked_vals.data*0.+1.
-
-        for d in self.dimensions:
+        for d in reg_dimensions:
             
-            long_left_over = self.dimensions[self.dimensions!=d]
+            long_left_over = [rd for rd in reg_dimensions if rd!=d]
             short_left_over = np.array([sl[0:3] for sl in long_left_over])
                         
-                        
-            num_available_vals = self.sp_data.collapsed(d,iris.analysis.COUNT,function=lambda values: values>=np.min(self.sp_data.data.flatten()))
+            num_available_vals = cube.collapsed(d,iris.analysis.COUNT,function=lambda values: values>=cube.collapsed(reg_dimensions,iris.analysis.MIN).data)
             if d in ["time"]:
                 frac_available_vals = iris.analysis.maths.divide(num_available_vals,maxnumtemp)
             else:
@@ -342,7 +366,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
             try:
                 # plotting routine
-                filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
+                filename = self.__plot_dir__ + os.sep + basic_filename + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
                 list_of_plots.append(filename)
                 x=Plot2D(frac_available_vals)
                 
@@ -366,7 +390,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_overview'],
-                         str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                         str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                          '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -401,7 +425,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     ESMValMD("meta",
                              filename,
                              self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                             str('Availability plot for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                             str('Availability plot for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                              '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
                              self.__infile__,
                              self.diagname,
@@ -412,11 +436,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         del frac_available_vals
         
         # histogram plot of available measurements
-        all_data = self.sp_data.copy()
+        all_data = cube.copy()
          
         try:
             # plotting routine
-            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_hist_all_vals" + "." + self.__output_type__
+            filename = self.__plot_dir__ + os.sep + basic_filename + "_hist_all_vals" + "." + self.__output_type__
             list_of_plots.append(filename)
             x=PlotHist(all_data)
             fig = x.plot(title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
@@ -426,7 +450,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_overview'],
-                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                      '#C3S' + 'histall' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -435,7 +459,26 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             print('Something is probably wrong with the plotting routines/modules!')
         
         del all_data
+        
+        return list_of_plots
 
+    def __do_overview__(self):
+        
+        this_function = "overview"
+        
+        # TODO all the other plots
+        
+#        if self.sp_data.coords()
+        
+        if not self.var3D:
+            list_of_plots=self.__overview_procedures_2D__(cube=self.sp_data)
+        else: 
+            list_of_plots=[]
+            for lev in self.levels:
+                loc_cube=self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
+                lop=self.__overview_procedures_2D__(loc_cube,level=lev)
+                list_of_plots = list_of_plots + lop
+        
         # dimension information
         lon_range = self.sp_data.coord("longitude").points
         lat_range = self.sp_data.coord("latitude").points
@@ -463,7 +506,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             tim_range_spec_read = [origin + datetime.timedelta(weeks=dt) for dt in tim_range_spec]
         else:
             assert False, 'Wrong increment in coord("time")!'
-        print tim_range_spec_read[0]
 
         lon_freq = np.diff(lon_range)
         lat_freq = np.diff(lat_range)
@@ -472,9 +514,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         lon_freq_spec = utils.__minmeanmax__(lon_freq)
         lat_freq_spec = utils.__minmeanmax__(lat_freq)
         tim_freq_spec = utils.__minmeanmax__(tim_freq)
-        
-        print('minmeanmax')
-        print(utils.__minmeanmax__(tim_freq))
         
         overview_dict=collections.OrderedDict()
         
@@ -485,13 +524,21 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         overview_dict.update({'temporal range': collections.OrderedDict([("min",str(tim_range_spec_read[0])), ("max",str(tim_range_spec_read[2]))])})
         overview_dict.update({'temporal frequency [' + t_info.split(" ")[0] + ']': collections.OrderedDict([("min",str(tim_freq_spec[0])), ("average",str(round(tim_freq_spec[1],2))), ("max",str(tim_freq_spec[2]))])})
         
+        try:
+            lev_range = self.sp_data.coord(self.level_dim).points
+            lev_range_spec = utils.__minmeanmax__(lev_range)
+            lev_freq_spec = utils.__minmeanmax__(np.diff(lev_range))
+            overview_dict.update({'level range [' + str(self.sp_data.coord(self.level_dim).units) + ']': collections.OrderedDict([("min",str(lev_range_spec[0])), ("max",str(lev_range_spec[2]))])})
+            overview_dict.update({'level frequency [' + str(self.sp_data.coord(self.level_dim).units) + ']': collections.OrderedDict([("min",str(lev_freq_spec[0])), ("average",str(lev_freq_spec[1])), ("max",str(lev_freq_spec[2]))])})
+        except:
+            pass    
+        
         # save GCOS requirements
         self.__gcos_dict__.update({"Frequency":{"value":round(tim_freq_spec[1],2), "unit":t_info.split(" ")[0]}})
         self.__gcos_dict__.update({"Resolution":{"value":round(np.mean([lon_freq_spec[1],lat_freq_spec[1]]),2), "unit":str(self.sp_data.coord("longitude").units)}})
         
         # save values for other diagnostics
         self.__avg_timestep__ = tim_freq_spec[1]
-        
         
         # produce report
         expected_input, found = \
@@ -525,11 +572,22 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         return
     
     
-    def __do_mean_var__(self):
+    def __mean_var_procedures_2D__(self,cube=None,level=None):
         
-        this_function = "mean & variability"
+        if cube is None:
+            cube=self.sp_data
+            
+        if level is not None:
+            basic_filename = self.__basic_filename__ + "_lev" + str(level)
+            dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+        else:
+            basic_filename = self.__basic_filename__
+            dataset_id = self.__dataset_id__
         
         list_of_plots = []
+        
+        reg_dimensions =  [item for item in self.dimensions if item not in set([self.level_dim])]
+
         
         maths = ["MEAN",
                  "STD_DEV",
@@ -539,15 +597,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         percentiles = [1.,5.,10.,50.,90.,95.,99.]
         
-        for d in self.dimensions:
+        for d in reg_dimensions:
             
-            long_left_over = self.dimensions[self.dimensions!=d]
+            long_left_over = [rd for rd in reg_dimensions if rd!=d]
             short_left_over = np.array([sl[0:3] for sl in long_left_over])
         
             if d in ["time"]:
-                temp_series_1d = self.sp_data.collapsed(long_left_over, iris.analysis.MEAN)
+                temp_series_1d = cube.collapsed(long_left_over, iris.analysis.MEAN)
         
-                filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "temp_series_1d" + "." + self.__output_type__
+                filename = self.__plot_dir__ + os.sep + basic_filename + "_" + "temp_series_1d" + "." + self.__output_type__
                 list_of_plots.append(filename)
                 
                 x=Plot1D(temp_series_1d)
@@ -564,7 +622,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                         str("/".join(long_left_over).title() + ' aggregated ' + d + ' series' + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                         str("/".join(long_left_over).title() + ' aggregated ' + d + ' series' + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                          '#C3S' + d + 'series' + "".join(short_left_over) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -582,7 +640,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 if m == "PERCENTILE":
                     
                     try:
-                        perc = self.sp_data.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
+                        perc = cube.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
                         
                         for p in percentiles:
                             
@@ -592,7 +650,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             mean_std_cov.update({m + " " + str(int(round(p,0))) + " percent":loc_data})
                             
-                            
+                        del loc_data
                         del perc
                     except:
                         pass
@@ -600,7 +658,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 elif m == "CLIMATOLOGY":
                     
                     try:
-                        clim = self.sp_data.copy()
+                        clim = cube.copy()
                         iris.coord_categorisation.add_month_number(clim, d, name='month_num')
                         clim_comp = clim.aggregated_by('month_num',iris.analysis.MEAN)
                         
@@ -622,7 +680,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             mean_std_cov.update({m + " " + str(int(mon)):loc_data})
                         
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data,[5,95])]),[0,100])})
                         
                         del clim_comp
                         
@@ -634,7 +692,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             pot_min_max = np.concatenate(
                                     [disp_min_max["diff_vals"],
-                                    np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])
+                                    np.nanpercentile(loc_data.data,[5,95])
                                     ])
             
                             
@@ -649,15 +707,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 elif m == "MEAN":
                     
-                    loc_data=self.sp_data.collapsed(d, iris.analysis.__dict__[m])
+                    loc_data=cube.collapsed(d, iris.analysis.__dict__[m])
         
                     mean_std_cov.update({m:loc_data})
                     
-                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.data[np.logical_not(loc_data.data.mask)],[5,95])]),[0,100])})
+                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data,[5,95])]),[0,100])})
                     
                 elif m == "STD_DEV":
         
-                    mean_std_cov.update({m:self.sp_data.collapsed(d, iris.analysis.__dict__[m])})
+                    mean_std_cov.update({m:cube.collapsed(d, iris.analysis.__dict__[m])})
                                  
                 elif m == "LOG_COV": 
                     
@@ -685,7 +743,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 if mean_std_cov[m] is not None:
                 # this needs to be done due to an error in cartopy
-                    filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
+                    filename = self.__plot_dir__ + os.sep + basic_filename + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
                     list_of_plots.append(filename)
                     try:
                         x=Plot2D(mean_std_cov[m])
@@ -712,7 +770,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         ESMValMD("meta",
                                  filename,
                                  self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                                  '#C3S' + m + "".join(short_left_over) + self.__varname__,
                                  self.__infile__,
                                  self.diagname,
@@ -749,13 +807,28 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         ESMValMD("meta",
                                  filename,
                                  self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                                  '#C3S' + m + "".join(short_left_over) + self.__varname__,
                                  self.__infile__,
                                  self.diagname,
                                  self.authors)
                     
             del mean_std_cov
+            
+        return list_of_plots
+    
+    def __do_mean_var__(self):
+        
+        this_function = "mean & variability"
+        
+        if not self.var3D:
+            list_of_plots=self.__mean_var_procedures_2D__(cube=self.sp_data)
+        else: 
+            list_of_plots=[]
+            for lev in self.levels:
+                loc_cube=self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
+                lop=self.__mean_var_procedures_2D__(loc_cube,level=lev)
+                list_of_plots = list_of_plots + lop
 
         # produce report
         expected_input, found = \
@@ -771,23 +844,32 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         return
     
-    
-    def __do_trends__(self):
+    def __trends_procedures_2D__(self,cube=None,level=None):
         
-        this_function = "trends & stability"
+        if cube is None:
+            cube=self.sp_data
+            
+        if level is not None:
+            basic_filename = self.__basic_filename__ + "_lev" + str(level)
+            dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+        else:
+            basic_filename = self.__basic_filename__
+            dataset_id = self.__dataset_id__
         
         list_of_plots = []
         
         # simple linear trend (slope) and p-values
-        _,S,_,P = utils.__temporal_trend__(self.sp_data, pthres=1.01)        
+        _,S,_,P = utils.__temporal_trend__(cube, pthres=1.01)      
+        
+        print utils.__minmeanmax__(P.data)
         
         try:
             # plotting routines
             x=Plot2D(S)
             
-            vminmax = np.array([-1,1])*np.max(np.abs(np.nanpercentile(S.data.data[np.logical_not(S.data.mask)],[5,95])))
+            vminmax = np.array([-1,1])*np.max(np.abs(np.nanpercentile(S.data,[5,95])))
             
-            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_trend." + self.__output_type__
+            filename = self.__plot_dir__ + os.sep + basic_filename + "_trend." + self.__output_type__
             list_of_plots.append(filename)
             
             fig = plt.figure()
@@ -800,7 +882,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                      '#C3S' + 'temptrend' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -808,7 +890,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
             x=Plot2D(P)
     
-            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_pvals." + self.__output_type__
+            filename = self.__plot_dir__ + os.sep + basic_filename + "_pvals." + self.__output_type__
             list_of_plots.append(filename)
             
             fig = plt.figure()
@@ -821,7 +903,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + ' p-values for slopes of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
+                     str("Latitude/Longitude" + ' p-values for slopes of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                      '#C3S' + 'temptrend' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -846,7 +928,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     ESMValMD("meta",
                              filename,
                              self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                             str('Trend plot for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                             str('Trend plot for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                              '#C3S' + 'temptrend' + self.__varname__,
                              self.__infile__,
                              self.diagname,
@@ -854,6 +936,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         del P
         
+#        # TODO: adjust base_filename and dataset_id if turned on again!
 #        # linear trend (slope),breakpoints, and actual data after homogenization
 #        TempStab = utils.__TS_of_cube__(self.sp_data,
 #                                        dates=self.__tim_read__,
@@ -975,7 +1058,22 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 #        
 #        del TempStab
 #        
+        return list_of_plots
+
         
+    
+    def __do_trends__(self):
+        
+        this_function = "trends & stability"
+        
+        if not self.var3D:
+            list_of_plots=self.__trends_procedures_2D__(cube=self.sp_data)
+        else: 
+            list_of_plots=[]
+            for lev in self.levels:
+                loc_cube=self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
+                lop=self.__trends_procedures_2D__(loc_cube,level=lev)
+                list_of_plots = list_of_plots + lop
         
         # produce report
         expected_input, found = \

@@ -80,7 +80,7 @@ def __temporal_trend__(cube, pthres=1.01):
     if S.units in [None,'no_unit','1','unknown']:
         S.units = cf_units.Unit('0.1 year-1')
     else:
-        S.units += cf_units.Unit(str(S.units) + ' 0.1 year-1')
+        S.units = cf_units.Unit(str(S.units) + ' 0.1 year-1')
     R.units = '-'
     I.units = cube.units
     P.units = '-'

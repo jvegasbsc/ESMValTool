@@ -97,7 +97,10 @@ class PlotHist(object):
         # Create historgramm
 #        self.ax.hist(self.data, bins, density=False, facecolor=color, alpha=alpha)
 #        print self.ax.__dict__.keys()
-        hist, bins = np.histogram(self.data.data[np.logical_not(self.data.mask)], bins=bins)
+        try:
+            hist, bins = np.histogram(self.data.data[np.logical_not(self.data.mask)], bins=bins)
+        except:
+            hist, bins = np.histogram(self.data.data, bins=bins)
         hist = hist.astype(float)/hist.sum()
         binWidth = bins[1] - bins[0]
         self.ax.bar(bins[:-1]+0.5*binWidth, hist, binWidth, facecolor=color, alpha=alpha)
@@ -604,10 +607,12 @@ class Plot2D(object):
         else:
             if color_type is None or color_type not in color.keys():
                 if color_reverse:
+                    col_save=color["default"]
                     color["default"]=color["default"]+"_r"
                 brewer_cmap = mpl_cm.get_cmap(color["default"],lut=11)
             else:
                 if color_reverse:
+                    col_save=color[color_type]
                     color[color_type]=color[color_type]+"_r"
                 brewer_cmap = mpl_cm.get_cmap(color[color_type],lut=11)
                             
@@ -709,6 +714,14 @@ class Plot2D(object):
             bb=ax[1].get_position()
             bb.y0=ax[0].get_position().y0
             ax[1].set_position(bb)
+        
+        if color_type is None or color_type not in color.keys():
+            if color_reverse:
+                color["default"]=col_save
+        else:
+            if color_reverse:
+                color[color_type]=col_save
+        
         
         return
     
