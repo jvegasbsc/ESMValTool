@@ -3,7 +3,6 @@ import os
 import shutil
 import csv
 import numpy as np
-from collections import OrderedDict
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -17,15 +16,13 @@ sys.path.append(os.path.abspath("./diag_scripts"))
 from METAdata import METAdata
 #import csv
 
-def do_report(report_data, report_title, work_dir, signature="", latex_opts=False):
+def do_report(report_data, report_title, work_dir, signature=""):
     """
     - report_data  a dictionary of a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
-                   keys are in ["listtext","freetext","plots"]
     - report_title is a string used as title for the report 
     
     Updated: February 18th, 2018 (B. Mueller)
-    Updated: July 31st, 2018 (B. Mueller)
     """
 
     # define output and temporary directories for Sphinx (source, build);
@@ -35,8 +32,8 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     pid = str(os.getpgid(0))
 
     path_out = work_dir + os.sep + "reporting"    # the final pdf will be put here
-    src_dir = path_out + os.sep + "source_" + report_title.split()[0].lower() + "_" + signature + "_" + pid # Sphinx source code directory
-    bld_dir = path_out + os.sep + "build_" + report_title.split()[0].lower() + "_" + signature + "_" + pid  # Sphinx build directory
+    src_dir = path_out + os.sep + "source_" + pid # Sphinx source code directory
+    bld_dir = path_out + os.sep + "build_" + pid  # Sphinx build directory
 
     # create output and temporary directories
     if not (os.path.exists(path_out)):
@@ -51,89 +48,58 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     outfile = open(output_file, "w") 
 
     # title (headline)
-#    my_title = report_title
-#    outfile.write(my_title + "\n")
-#    outfile.write("=" * len(my_title) + "\n\n")
+    my_title = report_title
+    outfile.write(my_title + "\n")
+    outfile.write("=" * len(my_title) + "\n\n")
     
     #search for text and plots instances in report_data
     
     if isinstance(report_data, dict):
         
-        if "listtext" in report_data.keys():
+        if "text" in report_data.keys():
 
             # if the input data are a dictionary, we create a bullet point list
             # from all key value pairs
             
-            this_title = "Short Information"
+            this_title = "General Information"
             outfile.write(this_title + "\n")
-            outfile.write("=" * len(this_title) + "\n\n")
+            outfile.write("-" * len(this_title) + "\n\n")
 
-            if isinstance(report_data["listtext"], dict):
+            if isinstance(report_data["text"], dict):
         
             # if the input data are a list of filenames (plots), we simply put all
             # figures with their corresponding caption read from the plot meta data
             # into the report
         
-                for key in report_data["listtext"]:
-                    if isinstance(report_data["listtext"][key], dict):
+                for key in report_data["text"]:
+                    if isinstance(report_data["text"][key], dict):
                         outfile.write("* " + key + "\n\n")
-                        for key2 in report_data["listtext"][key]:
-                            if isinstance(report_data["listtext"][key][key2], dict):
+                        for key2 in report_data["text"][key]:
+                            if isinstance(report_data["text"][key][key2], dict):
                                 outfile.write("  * " + key2 + "\n\n")
-                                for key3 in report_data["listtext"][key][key2]:
-                                    outfile.write("    * " + key3 + ": " + report_data["listtext"][key][key2][key3] + "\n")
+                                for key3 in report_data["text"][key][key2]:
+                                    outfile.write("    * " + key3 + ": " + report_data["text"][key][key2][key3] + "\n")
                                 outfile.write("\n")
                             else:
-                                outfile.write("  * " + key2 + ": " + report_data["listtext"][key][key2] + "\n")
+                                outfile.write("  * " + key2 + ": " + report_data["text"][key][key2] + "\n")
                         outfile.write("\n")
                     else:
-                        outfile.write("* " + key + ": " + report_data["listtext"][key] + "\n")
+                        outfile.write("* " + key + ": " + report_data["text"][key] + "\n")
                         
                 outfile.write(".. raw:: latex \n")
-                outfile.write("   \clearpage \n") #does not react on this
+                outfile.write("   \clearpage \n")
                         
             else:
                 print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
                         
         else:
-            print("No writable list found! There was no 'listtext' in the dictionary!")
-            
-        if "freetext" in report_data.keys():
-            
-            this_title = "Description"
-                        
-            if isinstance(report_data["freetext"], (str,unicode)):
-                
-                if os.path.isfile(report_data["freetext"]):
-                    with open(report_data["freetext"],"r") as freetext:
-                        with open("./diag_scripts/aux/C3S_511/lib/predef/empty.txt","r") as empty:
-                            text = freetext.read()
-                            if len(set(text) - set(empty.read())):
-                                outfile.write(this_title + "\n")
-                                outfile.write("=" * len(this_title) + "\n\n")
-                                outfile.write(text)
-                                outfile.write("\n\n")
-                            else: 
-                                print("There is still the empty description from empty.txt!")
-                else:
-                    outfile.write(this_title + "\n")
-                    outfile.write("=" * len(this_title) + "\n\n")
-                    outfile.write(report_data["freetext"] + "\n\n")
-                
-            else:
-                print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
-                
-#            outfile.write(".. raw:: latex \n")
-#            outfile.write("   \clearpage \n") #does not react on this
-                
-        else:
-            print("No writable text found! There was no 'freetext' in the dictionary!")
+            print("No writable text found! There was no 'text' in the dictionary!")
             
         if "plots" in report_data.keys():
             
-            this_title = "Figure(s)"
+            this_title = "Figures"
             outfile.write(this_title + "\n")
-            outfile.write("=" * len(this_title) + "\n\n")
+            outfile.write("-" * len(this_title) + "\n\n")
 
             if isinstance(report_data["plots"], list):
                 MD = METAdata()
@@ -183,36 +149,26 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     # run Sphinx to create a pdf
     oldpath = os.getcwd()
     os.chdir("doc/reporting")
-    
-    if latex_opts is not None:
-        if not latex_opts:
-            with open(os.devnull, 'wb') as devnull:
-                subprocess.call("make latexpdf", shell=True,
-                                stdout=devnull, stderr=subprocess.STDOUT)
-        else:
-            subprocess.call("make latexpdf", shell=True)
-    else:
-        pass
-         
+    with open(os.devnull, 'wb') as devnull:
+        subprocess.call("make latexpdf", shell=True,
+                        stdout=devnull, stderr=subprocess.STDOUT)
     os.chdir(oldpath)
 
-    if latex_opts is not None:
-        # move pdf to the output directory and rename to report_xxx.pdf
-        pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
-        os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
+    # move pdf to the output directory and rename to report_xxx.pdf
+    pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
+    os.rename(bld_dir + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
 
-    
-        # clean up temporary directories
-        if os.path.exists(src_dir):
-             # remove if exists
-             shutil.rmtree(src_dir)
-             pass
-        if os.path.exists(bld_dir):
-             # remove if exists
-             shutil.rmtree(bld_dir)
-             pass
+    # clean up temporary directories
+    if os.path.exists(src_dir):
+         # remove if exists
+         shutil.rmtree(src_dir)
+         pass
+    if os.path.exists(bld_dir):
+         # remove if exists
+         shutil.rmtree(bld_dir)
+         pass
 
-        print("Successfully created " + pdfname + "!")
+    print("Successfully created " + pdfname + "!")
     
     
 def do_smm_table(csv_expert, csv_definitions):
@@ -639,36 +595,12 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     # headers or to the GCOS reference values
     contents = list()
     with open(gcos_reference, 'rb') as csvfile:
-        s = csv.reader(csvfile, delimiter = ";", skipinitialspace = True)
+        s = csv.reader(csvfile, delimiter = ",", skipinitialspace = True)
         for row in s:
             contents.append(row)
 
-    variable = varname
-    #variable = 'Water vapour'
-    
-    # convert the list into an array for easier checks for entries
-    gcos_ref_array = np.asarray(contents)
-	
-    gcos_idx = []
-    for i in range(len(gcos_ref_array[:,1])):
-        if variable.strip().upper() in gcos_ref_array[i,1].upper():
-            gcos_idx.append(i)
-
-    gcos_contents = OrderedDict()
-    gcos_contents["Frequency"] = [""]
-    gcos_contents["Resolution"] = [""]
-    gcos_contents["Accuracy"] = [""]
-    gcos_contents["Stability"] = [""]
-    
-    if len(gcos_idx) >= 1:
-        gcos_contents["Frequency"] = [gcos_ref_array[gcos_idx[0],2]]
-        gcos_contents["Resolution"] = [gcos_ref_array[gcos_idx[0],3]]
-        gcos_contents["Accuracy"] = [gcos_ref_array[gcos_idx[0],4]]
-        gcos_contents["Stability"] = [gcos_ref_array[gcos_idx[0],5]]
-
-				
     # Get the horizontal dimension of the GCOS table
-    nx = len(gcos_contents)
+    nx = len(contents[0])
     
 #    # Read in the product table and store the data. ignore the header!
 #    counter_y = 0 # Counter along rows of the CSV file
@@ -682,31 +614,30 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 #            else:
 #                contents.append(row)
 #            counter_y += 1
-     
+    
     if not isinstance(gcos_expert, dict):
         assert False, "wrong input type in gcos"
-    is_equal = np.array_equal(np.sort(np.array(gcos_expert.keys())), np.sort(np.array(gcos_contents.keys())))
-    if not is_equal:
+    elif not np.all(np.sort(gcos_expert.keys()) == np.sort(contents[0])):
         assert False, "wrong names in gcos"
     else:
-        #data_contents=[]
-        for key in gcos_contents:
+        data_contents=[]
+        for key in contents[0]:
             if gcos_expert[key]["unit"] is None:
                 this_unit = ""
             elif gcos_expert[key]["unit"] in ["1","unkown","no-unit"]:
                 this_unit = ""
             else:
                 this_unit = " " + gcos_expert[key]["unit"]
-            gcos_contents[key].append(str(gcos_expert[key]["value"]) + this_unit)
-            ny = len(gcos_contents[key]) + 1
-        #gcos_contents.append(data_contents)
-    print(gcos_contents)
-    
+            data_contents.append(str(gcos_expert[key]["value"]) + this_unit)
+        contents.append(data_contents)
+
+    ny = len(contents)
+
 
     # Check if, possibly, one of the rows of the CSV has not the same number of items
     # TO BE IMPROVED WITH NEW BACK END
-    #if sum([1.0 * (len(gcos_contents[i])==nx) for i in range(len(gcos_contents))] ) != ny:
-    #    sys.exit("(do_gcos_report) STOP: uneven number of columns in reference file")
+    if sum([1.0 * (len(contents[i])==nx) for i in range(len(contents))] ) != ny:
+        sys.exit("(do_gcos_report) STOP: uneven number of columns in reference file")
 
     # Create the figure
     fig = plt.figure(figsize = (10, 4))
@@ -721,18 +652,20 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     [plt.plot((x, x), (0, ny), color = 'k') for x in range(nx)]
 
     
-    for y in range(ny - 1):
-        for (x, key) in enumerate(gcos_contents.keys()):
-            #print(gcos_contents[key][y])
-            instring = "\n".join(gcos_contents[key][y].split("\\n")).strip()
-            #print(instring)
-            plt.text(x + 0.5, ny - y - 1.5, instring, ha = 'center', va = 'center',
-                     fontweight = "normal", fontsize = 20)
-    for (x, key) in enumerate(gcos_contents.keys()):
-        instring = "\n".join(key.split("\\n")).strip()
-        plt.text(x + 0.5, ny - 0.5, instring, ha = 'center', va = 'center',
-                 fontweight = "bold", fontsize = 20)
-      
+    for y in range(ny):
+        if y == ny - 1: # if header
+          fontweight = "bold"
+          fontsize   = 20
+        else:
+          fontweight = "normal"
+          fontsize   = 20
+        for x in range(nx):
+            # Read in the "go to line" in the csv and convert it to "go to line" instruction
+            # When \n stands in a CSV, python reads \\n
+            instring = "\n".join(contents[ny - y - 1][x].split("\\n")).strip()
+            plt.text(x + 0.5, y + 0.5, instring, ha = 'center', va = 'center',
+                     fontweight = fontweight, fontsize = fontsize)
+
     # Add legend on the left
     plt.text(-0.3, ny - 1.5, "GCOS", rotation = 90, ha = "center", va = "center", fontsize=15)
     plt.text(-0.3, ny - 2.5, "ECV\n(averages)", rotation = 90, ha = "center", va = "center", fontsize=15)
