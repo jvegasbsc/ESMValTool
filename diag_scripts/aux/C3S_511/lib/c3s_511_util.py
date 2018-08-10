@@ -220,6 +220,9 @@ def __get_valid_data__(cube, mode='all', thres=-99):
         # vectorize the data
 
         data = cube.data.reshape(n, -1)
+        
+        if not np.ma.is_masked(data):
+            data=np.ma.masked_array(data, np.full_like(data,False))
         # set pixels with NaN to invalid
         data.mask[np.isnan(data.data)] = True
 
