@@ -4,7 +4,7 @@
 levels=[30000,50000]
 
 # color setting for data
-data_colors="gnuplot"
+data_colors="binary"
 
 # latex output 
 # (options: True = Latex output, False = No Latex_outputs, None = No Pdf generation)

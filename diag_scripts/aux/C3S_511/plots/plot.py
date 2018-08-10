@@ -501,6 +501,7 @@ class Plot2D(object):
     LATS = ['latitude']     # accepted lat names
     LONS = ['longitude']    # accepted lon names
     TIME = ['time']         # accepted time names
+    LEVS = ['air_pressure'] # accepted level names
     
     
     def __init__(self, cube):
@@ -551,6 +552,12 @@ class Plot2D(object):
                 break
             else:
                 self.time_var = None
+        for dim in dim_names:
+            if (dim in self.__class__.LEVS):
+                self.lev_var = dim
+                break
+            else:
+                self.lev_var = None
                 
         # Lat/lon plot
         if (self.lat_var is not None and self.lon_var is not None):
@@ -563,6 +570,18 @@ class Plot2D(object):
         # Lon/time plot
         elif (self.lon_var is not None and self.time_var is not None):
             self.plot_type = 'lontime'
+            
+        # Lat/lon plot
+        elif (self.lat_var is not None and self.lev_var is not None):
+            self.plot_type = 'latlev'
+
+        # Lat/time plot
+        elif (self.lon_var is not None and self.lev_var is not None):
+            self.plot_type = 'lonlev'
+
+        # Lon/time plot
+        elif (self.time_var is not None and self.lev_var is not None):
+            self.plot_type = 'timelev'
 
         # Default case
         else:
@@ -651,13 +670,16 @@ class Plot2D(object):
             plt.sca(ax[1])
             
             if (self.plot_type == 'latlon'):
-                collapse = self.lon_var
+                raise ValueError("Invalid input: latlon should not have a summary plot")
+        
+            elif (self.plot_type == 'lattime'):
+                collapse = self.time_var
+
+            elif (self.plot_type == 'lontime'):
+                collapse = self.time_var
+            
             else:
-                if (self.plot_type == 'lattime'):
-                    collapse = self.time_var
-    
-                elif (self.plot_type == 'lontime'):
-                    collapse = self.time_var
+                collapse = [c.name() for c in self.cube.coords() if c.name() != self.lev_var and len(c.points)>1][0]
             
             if (collapse == self.lat_var):
                     grid_areas = iris.analysis.cartography.area_weights(self.cube)
@@ -683,7 +705,14 @@ class Plot2D(object):
                 plt.gca().set_ylim(vmin,vmax)
                 plt.gca().set_xlim(lonrange)
             else:
-                raise ValueError("Invalid input: latlon should not have a summary plot")
+                x = cube_line
+                y = cube_line.coord(self.lev_var)
+                levrange = self.cube.coords(self.lev_var).pop()
+#                print levrange
+#                lat_inc = np.diff(latrange.points).mean()
+                levrange = (np.min(levrange.points),np.max(levrange.points))
+                plt.gca().set_xlim(vmin,vmax)
+                plt.gca().set_ylim(levrange)
              
             iplt.plot(x, y)
             
@@ -701,6 +730,7 @@ class Plot2D(object):
             print(exc_type, fname, exc_tb.tb_lineno)
             qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
             plt.text(0.5, 0.5,'Data cannot be displayed as intended due to cartopy bug! \n Deviations are color levels and time axis display. \n Future updates of cartopy module may resolve this issue (#946).',horizontalalignment='center',verticalalignment='center',transform = plt.gca().transAxes)
+        
         if self.plot_type == 'latlon':
             mean= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.MEAN).data
             std= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.STD_DEV).data
@@ -710,7 +740,7 @@ class Plot2D(object):
             
         plt.tight_layout()
                        
-        if self.plot_type == 'lattime':
+        if self.plot_type not in ['lontime', 'latlon']:
             bb=ax[1].get_position()
             bb.y0=ax[0].get_position().y0
             ax[1].set_position(bb)
