@@ -393,9 +393,9 @@ def do_smm_table(csv_expert, csv_definitions):
 #    file.close()    
 
 
-def do_eval_table(varname, eval_expert, eval_data):
+def do_eval_table(varname, eval_expert, eval_data, ecv_length):
     """
-    Author  :  Arun Rana
+    Author  : Arun Rana
     Creation: July 26th, 2018
     Updated : August 08th, 2018
     
@@ -464,44 +464,34 @@ def do_eval_table(varname, eval_expert, eval_data):
     # The grades to be used as color in the Validation matrix
     grades = np.empty((ny, nx)) 
     grades[:] = np.nan
-    #grades[:] = [125,330,456] #setting reasonably high to make sure the replacement/comparison is done right - done during coding
        
     # perform the comparison with validation data and prepare the grading matrix for plotting
     # here the grades matrix is to be filled with number assigned with colors below it give it right feel
     
-    data=30 #this needs to be length of data in ECV     
-
     time_range = list()    
     with open(eval_expert, 'rb') as csvfile:
 	s = csv.reader(csvfile, delimiter = ",", skipinitialspace = True)
         for row in s:
             time_range.append(row)
     
-    time_range = time_range [1][1:]  #excluding the header for comparison with range and first element of row (name of ECV)
-    time_range =  [int(i) for i in time_range] #conversion to integer for comparison to ECV data length
+    time_range = time_range[1][:]  #excluding the header for comparison with range (was [1][1:])  
+        
+    # making sure that the conversion to integers does not crash the namelist
+    try:
+        time_range = [int(i) for i in time_range] #conversion to integer for comparison to ECV data length
+    except:
+        time_range = [np.nan for i in time_range]
     #print time_range - done during coding
     
     for i in range(len(time_range)):
-        if time_range[i] < data:
-           grades [0][i] = 1
-        elif time_range[i] > data:
-           grades [0][i] = 3
+        if time_range[i] <= ecv_length:    # it's ok if the data are just as long as the limit given by the expert user
+           grades[0][i] = 3
+        elif time_range[i] > ecv_length:
+           grades[0][i] = 1
         else:
-           grades [0][i] = 2
+           grades[0][i] = 2
         #print grades.item (i)
-   
-    # testing with single data point in expert file
-    #if int(time_range [0]) << data:
-    #   grades [0][0] = 1
-    #elif int(time_range [0]) >> data:
-    #   grades [0][0] = 3
-    #else:
-    #   grades [0][0] = 2
-
-    #print grades.item (0)
-    #print grades.item (1)
-    #print grades.item (2)
-    
+     
     # Create the figure
     fig = plt.figure(figsize = (6, 2))
     # X-Y mesh to plot the color array
@@ -515,21 +505,9 @@ def do_eval_table(varname, eval_expert, eval_data):
     # Plot the cells in color
     plt.pcolor(x_grid, y_grid, grades, cmap = cmap, vmin = -0.5, vmax = max_grade_eval + 1.5)
     
-    # Create colorbar at the bottom
-    #cb = plt.colorbar(boundaries = np.arange(0.5, max_grade_eval + 1), 
-    #                  ticks = np.arange(1, nx + 1), orientation = "horizontal", pad = 0.05)
-    # Remove ticks
-    #cb.set_ticks([])
-    # Put colorbar as the most bottom layer
-    #cb.ax.zorder = -1
- 
-    # Write legend inside colorbar
-    #[plt.text(0.5 * nx / max_grade_eval + 1.0 * (i - 1) * nx / max_grade_eval, -0.65, str(i), fontsize = 14, 
-    # fontweight = "bold", ha = "center", va = "center") for i in np.arange(1, max_grade_eval + 1)]
-
 
     # Finish polishing the figure
-    plt.title("ESM Validation Table and Grading", fontsize = 18)
+    plt.title("ESM Evaluation Table and Grading", fontsize = 18)
     # Grid lines
     [plt.plot((0, nx), (y, y), color = 'k') for y in range(ny)]
     [plt.plot((x, x), (0, ny), color = 'k') for x in range(nx)]
@@ -555,28 +533,6 @@ def do_eval_table(varname, eval_expert, eval_data):
     plt.tight_layout()
     
     return fig
-
-#    # Create output path for figure
-#    if not (os.path.exists(path_out)):
-#      os.makedirs(path_out)
-#    plt.savefig(path_out + "/" + "system_maturity_matrix.png", dpi = 400)
-#    plt.close("fig")
-#    # Create *.rst report
-#    if not (os.path.exists(path_report_out)):
-#      os.makedirs(path_report_out)
-#
-#    output_file = "report_smm.rst"
-#    file = open(path_report_out + "/" + output_file, "w")
-#
-#    my_title ="SYSTEM MATURITY MATRIX"
-#    file.write(my_title + "\n")
-#    file.write("=" * len(my_title) + "\n\n")
-#
-#    file.write(".. figure:: " + "../../../../plot_scripts/python/system_maturity_matrix/system_maturity_matrix.png" + "\n"
-#               "   :align:   center"   + "\n"
-#               "   :width:   95%" + "\n"
-#              )
-#    file.close()    
 
 
 def do_gcos_table(varname, gcos_expert, gcos_reference):

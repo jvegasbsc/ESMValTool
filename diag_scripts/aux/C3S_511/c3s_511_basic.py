@@ -115,15 +115,15 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2001-2005"]
-#        self.__do_overview__()
+        self.__do_overview__()
 #        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
-	self.__do_esm_validation__()
-#        self.__do_esm_evaluation__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
+#        self.__do_esm_validation__()
+        self.__do_esm_evaluation__()
         pass
     
     def __do_overview__(self):
@@ -161,8 +161,8 @@ class __Diagnostic_skeleton__(object):
         raise ImplementationError("__do_gcos_requirements__","This method has to be implemented.")
         return
     
-    def __do_esmvalidation__(self):
-        self.__do_report__(content={},filename="do_esmvalidation_default")
+    def __do_esmevaluation__(self):
+        self.__do_report__(content={},filename="do_esmevaluation_default")
         warnings.warn("Implementation Warning", UserWarning)
         return
 
@@ -472,6 +472,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         lon_freq_spec = utils.__minmeanmax__(lon_freq)
         lat_freq_spec = utils.__minmeanmax__(lat_freq)
         tim_freq_spec = utils.__minmeanmax__(tim_freq)
+        
+        print('minmeanmax')
+        print(utils.__minmeanmax__(tim_freq))
         
         overview_dict=collections.OrderedDict()
         
@@ -1100,41 +1103,66 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
     
-    def __do_esm_validation__(self):
+#    def __do_esm_validation__(self):
         
-        this_function = "ESM validation"
+#        this_function = "ESM validation"
 
-         # read in the ESM evaluation grading csv file
-        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_expert.csv"    
+#         # read in the ESM evaluation grading csv file
+#        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_expert.csv"    
 
-        # plotting routines
-        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
-        fig = do_eval_table(self.__varname__, esm_eval_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_data.csv")
-        fig.savefig(filename)
-        plt.close(fig)
+#        # plotting routines
+#        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
+#        fig = do_eval_table(self.__varname__, esm_eval_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_data.csv")
+#        fig.savefig(filename)
+#        plt.close(fig)
         
-        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')' + ' (Green: data set is 			recommended for this application; Red: data set is not recommended for this application; Yellow: no decision about applicability of the data set can be made (e.g. uncertainty too high))')
+#        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')' + ' (Green: data set is 			recommended for this application; Red: data set is not recommended for this application; Yellow: no decision about applicability of the data set can be made (e.g. uncertainty too high))')
 
 
-        ESMValMD("meta",
-                 filename,
-                 self.__basetags__ + ['C3S_EVAL'],
-                 caption,
-                 '#C3S' + 'EVAL' + self.__varname__,
-                 self.__infile__,
-                 self.diagname,
-                 self.authors)
+#        ESMValMD("meta",
+#                 filename,
+#                 self.__basetags__ + ['C3S_EVAL'],
+#                 caption,
+#                 '#C3S' + 'EVAL' + self.__varname__,
+#                 self.__infile__,
+#                 self.diagname,
+#                 self.authors)
         
-        # produce report
-        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+#        # produce report
+#        self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
-        return  
+#        return  
 
    
     def __do_esm_evaluation__(self):
         
         this_function = "ESM evaluation"
-		
+        
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/esmeval_input",
+                                      expfile="_esmeval_expert.csv",
+                                      protofile="empty_esmeval_expert.csv",
+                                      function=this_function)
+                                      
+        # PART 1 of ESM evaluation: table
+        # read in the ESM evaluation grading csv file
+        esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_expert.csv"    
+
+        # calculate the length of the dataset
+        ecv_length = int(self.__time_period__[5:10]) - int(self.__time_period__[0:4]) + 1
+        
+        # plotting routines
+        filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
+        fig = do_eval_table(self.__varname__, expected_input, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/example_eval_data.csv", ecv_length)
+        fig.savefig(filename)
+        plt.close(fig)
+        
+        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')' + 
+        ' (Green: data set is recommended for this application; Red: data set is not recommended for this application; Yellow: no decision about applicability of ' + 
+        'the data set can be made (e.g. uncertainty too high))')
+
+
+        # PART 2 of ESM evaluation: bullet point list		
         # read in the ESM evaluation csv file
         esm_eval_input = os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/esmeval_expert.csv"
 		
@@ -1159,10 +1187,27 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 insert_dict.update({esmeval_data[0, column]: esmeval_data[np.nonzero(esmeval_data == self.__varname__)[0][num_entries], column]}) 
             esmeval_dict.update({'R' + str(num_entries + 1):insert_dict})
 
-		              
-        # produce report
-        self.__do_report__(content={"text":esmeval_dict}, filename = this_function.upper())
+        ESMValMD("meta",
+                 filename,
+                 self.__basetags__ + ['C3S_ESMeval'],
+                 caption,
+                 '#C3S' + 'ESMeval' + self.__varname__,
+                 self.__infile__,
+                 self.diagname,
+                 self.authors)
         
+        # produce report
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/esmeval_input",
+                                      expfile="_esmeval.txt",
+                                      protofile="empty.txt",
+                                      function=this_function)
+
+        if found:    
+            self.__do_report__(content={"listtext":esmeval_dict,"plots":[filename],"freetext":expected_input}, filename=this_function.upper())
+        else:
+            self.__do_report__(content={"listtext":esmeval_dict,"plots":[filename]}, filename=this_function.upper())
+
         return 
 
 

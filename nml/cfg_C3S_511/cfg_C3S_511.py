@@ -8,6 +8,6 @@ data_colors=None
 
 # latex output 
 # (options: True = Latex output, False = No Latex outputs, None = No Pdf generation)
-show_latex=False
+show_latex=None
 
 
