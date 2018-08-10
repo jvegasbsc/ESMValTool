@@ -1307,9 +1307,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
         
         return
-
-
-
+    
+    
     def __do_gcos_requirements__(self):
         
         this_function = "GCOS requirements"

@@ -184,10 +184,9 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
 
     
     if latex_opts is not None:
-    # run Sphinx to create a pdf
-    oldpath = os.getcwd()
-    os.chdir("doc/reporting")
-
+        # run Sphinx to create a pdf
+        oldpath = os.getcwd()
+        os.chdir("doc/reporting")
         if not latex_opts:
             with open(os.devnull, 'wb') as devnull:
                 subprocess.call("make latexpdf", shell=True,
@@ -195,7 +194,7 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
         else:
             subprocess.call("make latexpdf", shell=True)
          
-    	os.chdir(oldpath)
+        os.chdir(oldpath)
 
         # move pdf to the output directory and rename to report_xxx.pdf
         pdfname = path_out + os.sep + "report_" + report_title.split()[0].lower() + "_" + signature + ".pdf"
