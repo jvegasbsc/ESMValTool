@@ -604,8 +604,8 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     gcos_ref_array = np.asarray(contents)
 	
     gcos_idx = []
-    for i in range(len(gcos_ref_array[:,1])):
-        if variable.strip().upper() in gcos_ref_array[i,1].upper():
+    for i in range(len(gcos_ref_array[:,2])):        # look into the third column of the table to find the CMOR ECV name
+        if variable.strip().upper() in gcos_ref_array[i,2].upper():
             gcos_idx.append(i)
 
     gcos_contents = OrderedDict()
@@ -615,10 +615,10 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     gcos_contents["Stability"] = [""]
     
     if len(gcos_idx) >= 1:
-        gcos_contents["Frequency"] = [gcos_ref_array[gcos_idx[0],2]]
-        gcos_contents["Resolution"] = [gcos_ref_array[gcos_idx[0],3]]
-        gcos_contents["Accuracy"] = [gcos_ref_array[gcos_idx[0],4]]
-        gcos_contents["Stability"] = [gcos_ref_array[gcos_idx[0],5]]
+        gcos_contents["Frequency"] = [gcos_ref_array[gcos_idx[0],3]]
+        gcos_contents["Resolution"] = [gcos_ref_array[gcos_idx[0],4]]
+        gcos_contents["Accuracy"] = [gcos_ref_array[gcos_idx[0],5]]
+        gcos_contents["Stability"] = [gcos_ref_array[gcos_idx[0],6]]
 
 				
     # Get the horizontal dimension of the GCOS table

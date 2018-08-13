@@ -1315,7 +1315,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         # plotting routines
         filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "_" + "".join(this_function.split()) + "." + self.__output_type__
-        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/C3S_511_specific_GCOS_BH.csv")
+        fig = do_gcos_table(self.__varname__, self.__gcos_dict__, os.path.dirname(os.path.realpath(__file__)) + "/lib/predef/GCOS_specific_info.csv")
         fig.savefig(filename)
         plt.close(fig)
         
