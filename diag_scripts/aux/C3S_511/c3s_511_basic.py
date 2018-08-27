@@ -117,11 +117,11 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
-        self.__do_mean_var__()
-        self.__do_trends__()
-        self.__do_extremes__()
-        self.__do_sectors__()
-        self.__do_maturity_matrix__()
+#        self.__do_mean_var__()
+#        self.__do_trends__()
+#        self.__do_extremes__()
+#        self.__do_sectors__()
+#        self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
         self.__do_esm_evaluation__()
         pass
@@ -215,9 +215,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         except:
             pass
 
+        # create output and temporary directories
         self.__plot_dir__ = self.__project_info__.get_plot_dir()
         self.__work_dir__ = self.__project_info__.get_work_dir()
-        
+        if not (os.path.exists(self.__plot_dir__ )):
+            os.makedirs(self.__plot_dir__ )    
+ 
         self.__varname__ = self.__project_info__.get_currVars()  # default value
         if not len(self.__varname__)==1:
             raise EmptyContentError("self.__varname__", "Element is of wrong length.")

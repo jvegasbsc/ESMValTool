@@ -8,6 +8,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import subprocess
+import re
 
 # TO DO: remove once this function is called within the ESMValTool
 #        (included automatically then)
@@ -605,7 +606,7 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 	
     gcos_idx = []
     for i in range(len(gcos_ref_array[:,2])):        # look into the third column of the table to find the CMOR ECV name
-        if variable.strip().upper() in gcos_ref_array[i,2].upper():
+        if re.search(r'\b' + variable.strip().upper() + r'\b', gcos_ref_array[i,2].upper()):
             gcos_idx.append(i)
 
     gcos_contents = OrderedDict()
@@ -663,7 +664,7 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
     #    sys.exit("(do_gcos_report) STOP: uneven number of columns in reference file")
 
     # Create the figure
-    fig = plt.figure(figsize = (10, 4))
+    fig = plt.figure(figsize = (12, 7))
     # X-Y mesh to plot the color array
     # The Y dimension is written from ny to zero as to write items in visually
     # descending order.
