@@ -7,7 +7,7 @@ Temperature (surface);Daily minimum temperature;tasmin;Hourly;Site;0.1K;0.02K/de
 Water Vapour (surface);Water vapour;rhs;Monthly\n(resolv. diurnal cycle);Site;RH 1%, DP 0.1K;0.5%/decade,\n0.02hPA/decade;Kate Willet;;WIGOS
 Surface Radiation Budget;Surface ERB longwave;rlds, rlus, rldscs, rluscs ;Monthly\n(resolv. diurnal cycle);100km/NA;1W/m2\n(global mean) ;0.2W/m2 /decade;;WGClimate;WIGOS
 Surface Radiation Budget;Surface ERB shortwave;rsds, rsus, rsdscs, rsuscs;Monthly\n(resolv. diurnal cycle);100km/NA;1W/m2\n(global mean) ;0.2W/m2 /decade;;WGClimate;WIGOS
-Earth Radiation Budget;Top-of-atmosphere ERB longwave;rlut, rlut;Monthly\n(resolv. diurnal cycle);100km/NA;1W/m2\n(global mean) ;0.2 W/m2/decade;NOAA Tech Rep. NESDIS 134;WGClimate;
+Earth Radiation Budget;Top-of-atmosphere ERB longwave;rlut;Monthly\n(resolv. diurnal cycle);100km/NA;1W/m2\n(global mean) ;0.2 W/m2/decade;NOAA Tech Rep. NESDIS 134;WGClimate;
 Earth Radiation Budget;Top-of-atmosphere ERB shortwave (reflected);rsut, rsdt;1hr;100km/NA;1W/m2\n(global mean) ;0.3W/m2 /decade;NOAA Tech Rep. NESDIS 134;WGClimate;
 Wind speed and direction (upper air) ;Upper-air wind retrievals;ua, va ;4hr;10km/0.5km;2m/s, 20deg;0.5m/s, 5deg;;WGClimate;WIGOS
 Temperature(upper air);Tropospheric Temperature profile;ta;4hr;25km/1km;0.5K;0.05K;;WGClimate;WIGOS
@@ -29,7 +29,7 @@ Aerosols properties;Aerosol-layer height;;weekly;5-10km/NA/;1km;0.5km;;WGClimate
 Aerosols properties;Aerosol-extinction coeff. profile near tropopause;;weekly;200-500 km/ 1km;10%;20%;;WGClimate;
 Aerosols properties;Aerosol-extinction coeff. profile mid stratosphere;;4hr;2km;10%;20%;;WGClimate;
 Carbon Dioxide, Methane and other Greenhouse gases;Tropospheric CO2 column;xco2;4hr;5-10km/NA;1ppm;1.5ppm/decade;ESA CCI CMUG tables (http://www.esa-cmug-cci.org/);WGClimate;
-Carbon Dioxide, Methane and other Greenhouse gases;Tropospheric CO2;vmrno2;4hr;5-10km/5km;1ppm;1.5ppm;;;GAW
+Carbon Dioxide, Methane and other Greenhouse gases;Tropospheric CO2;vmrco2;4hr;5-10km/5km;1ppm;1.5ppm;;;GAW
 Carbon Dioxide, Methane and other Greenhouse gases;Tropospheric CH4 column;xch4;4hr;5-10km/NA;10ppb;7ppb;;WGClimate;
 Carbon Dioxide, Methane and other Greenhouse gases;Tropospheric CH4;vmrch4;daily;5-10km/5km;0.5ppb;0.7ppb;;;GAW
 Carbon Dioxide, Methane and other Greenhouse gases;Stratospheric CH4;vmrch4;4hr;100-200km/2km;5%;0.3%;;;GAW
@@ -49,8 +49,8 @@ Sea State;Wave Height;;Hourly to monthly;25 km;10 cm;5 cm;See EOV specification 
 Subsurface Temperature;Interior Temperature;;Hourly to monthly ;1-10km ; 0.01K  ;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
 Subsurface Currents;Interior Currents;;Weekly; 1-10km; 0.02m/s;Not specified;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
 Sea Ice;Sea Ice Concentration;sic;Weekly;10 km to 15 km;5%\nice area fraction;5%;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
-Sea Ice;Sea Ice Extent/Edge;;Monthly;1 km to 5 km;5 km;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
-Sea Ice;Sea Ice Thickness;sithick;Weekly;25km ;0.1 m;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
+Sea Ice;Sea Ice Extent/Edge;siextentn, siextents;Monthly;1 km to 5 km;5 km;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
+Sea Ice;Sea Ice Thickness;sit;Weekly;25km ;0.1 m;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
 Sea Ice;Sea Ice Drift;sidivvel, sispeed;Annual to decadal ;5 km;1 km/day;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
 Transient Tracers;Interior ocean CFC-12;cfc12;Annual to decadal ;Every 20°;±1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
 Transient Tracers;Interior ocean CFC-11;cfc11;Annual to decadal ;Every 20°;±1%;;See http://www.ioccp.org/index.php/foo ;;GOOS

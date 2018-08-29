@@ -1,7 +1,7 @@
 # This is a dummy config file for C3S_511 diagnostics
 
 # 3D-data levels
-levels=[50000.]
+levels=[]
 
 # color setting for data
 data_colors="binary"

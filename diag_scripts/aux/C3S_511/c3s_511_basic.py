@@ -35,6 +35,7 @@ from get_metadata_to_rst import do_eval_table
 from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
+from ecv_lookup_table import ecv_lookup
 
 # All packages checked
 
@@ -117,11 +118,11 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
-#        self.__do_mean_var__()
+        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
-#        self.__do_maturity_matrix__()
+        self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
         self.__do_esm_evaluation__()
         pass
@@ -338,10 +339,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         if level is not None:
             basic_filename = self.__basic_filename__ + "_lev" + str(level)
-            dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+            #dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+            dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
-            dataset_id = self.__dataset_id__
+            dataset_id = self.__dataset_id__[0]
         
         list_of_plots=[]
         
@@ -393,7 +395,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_overview'],
-                         str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                         str('Overview on ' + "/".join(long_left_over) + ' availablility of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                          '#C3S' + 'frav' + "".join(short_left_over) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -453,7 +455,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_overview'],
-                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set "' + " ".join(dataset_id) + '" (' + self.__time_period__ + ')'),
                      '#C3S' + 'histall' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -580,7 +582,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             cube=self.sp_data
             
         basic_filename = self.__basic_filename__
-        dataset_id = self.__dataset_id__
+        dataset_id = self.__dataset_id__[0]
         
         list_of_plots = []
         
@@ -626,7 +628,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "mean" + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "mean" + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                          '#C3S' + "mean" + "".join(stat_dict[d]["slo"]) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -655,7 +657,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "mean" + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "mean" + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                          '#C3S' + "mean""mean" + "".join(stat_dict[d]["slo"]) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -682,7 +684,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "std_dev" + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "std_dev" + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                          '#C3S' + "std_dev" + "".join(stat_dict[d]["slo"]) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -711,7 +713,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "std_dev" + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                         str("/".join(stat_dict[d]["llo"]).title() + ' ' + "std_dev" + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                          '#C3S' + "std_dev" + "".join(stat_dict[d]["slo"]) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -727,10 +729,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         if level is not None:
             basic_filename = self.__basic_filename__ + "_lev" + str(level)
-            dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+            dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
-            dataset_id = self.__dataset_id__
+            dataset_id = self.__dataset_id__[0]
         
         list_of_plots = []
         
@@ -770,7 +772,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ESMValMD("meta",
                          filename,
                          self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                         str("/".join(long_left_over).title() + ' aggregated ' + d + ' series' + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                         str("/".join(long_left_over).title() + ' aggregated ' + d + ' series' + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                          '#C3S' + d + 'series' + "".join(short_left_over) + self.__varname__,
                          self.__infile__,
                          self.diagname,
@@ -918,7 +920,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         ESMValMD("meta",
                                  filename,
                                  self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                                  '#C3S' + m + "".join(short_left_over) + self.__varname__,
                                  self.__infile__,
                                  self.diagname,
@@ -955,7 +957,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         ESMValMD("meta",
                                  filename,
                                  self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + self.__varname__ + ' for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                                 str("/".join(long_left_over).title() + ' ' + m.lower() + ' values of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
                                  '#C3S' + m + "".join(short_left_over) + self.__varname__,
                                  self.__infile__,
                                  self.diagname,
@@ -1001,10 +1003,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         if level is not None:
             basic_filename = self.__basic_filename__ + "_lev" + str(level)
-            dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
+            dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
-            dataset_id = self.__dataset_id__
+            dataset_id = self.__dataset_id__[0]
         
         list_of_plots = []
         
@@ -1030,7 +1032,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + ' slope values of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                     str("Latitude/Longitude" + ' slope values of ' + ecv_lookup(self.__varname__) + ' temporal trends per decade for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                      '#C3S' + 'temptrend' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -1051,7 +1053,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + ' p-values for slopes of ' + self.__varname__ + ' temporal trends per decade for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + ')'),
+                     str("Latitude/Longitude" + ' p-values for slopes of ' + ecv_lookup(self.__varname__) + ' temporal trends per decade for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                      '#C3S' + 'temptrend' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -1285,8 +1287,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not found:
             caption = "The expected input file: " + expected_input + " was not found and an empty dummy file created, therefore this plot is blank. Please edit the expected file!"
         else:
-            caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
-
+            #caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+            caption = str(this_function + ' for the variable ' + ecv_lookup(self.__varname__) + ' in the data set "' + self.__dataset_id__[0] + '" (' + self.__time_period__ + ')')
+    
 
         ESMValMD("meta",
                  filename,
@@ -1322,7 +1325,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         fig.savefig(filename)
         plt.close(fig)
         
-        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+        #caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
+        caption = str(this_function + ' for the variable ' + ecv_lookup(self.__varname__) + ' in the data set "' + self.__dataset_id__[0] + '" (' + self.__time_period__ + ')')
         
         ESMValMD("meta",
                  filename,
@@ -1401,10 +1405,13 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         fig.savefig(filename)
         plt.close(fig)
         
-        caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')' + 
+        #caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')' + 
+        #' (Green: data set is recommended for this application; Red: data set is not recommended for this application; Yellow: no decision about applicability of ' + 
+        #'the data set can be made (e.g. uncertainty too high))')
+        caption = str(this_function + ' for the variable ' + ecv_lookup(self.__varname__) + ' in the data set "' + self.__dataset_id__[0] + '" (' + self.__time_period__ + ')' + 
         ' (Green: data set is recommended for this application; Red: data set is not recommended for this application; Yellow: no decision about applicability of ' + 
         'the data set can be made (e.g. uncertainty too high))')
-
+        
 
         # PART 2 of ESM evaluation: bullet point list		
         # read in the ESM evaluation csv file
