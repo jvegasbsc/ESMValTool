@@ -16,6 +16,7 @@ import cartopy.crs as ccrs
 #import random
 import sys
 from matplotlib.ticker import FuncFormatter
+from string import ascii_lowercase
 
 def label_in_perc(x, pos=0):
     return '%1.1f%%' % (x*100)
@@ -317,9 +318,9 @@ class Plot2D_deprecated(object):
             20180207-A_schl_ma: written
         """
 
-        
+
         if ax is None:
-            
+
             # Summary plot yes/no
             if (not summary_plot):
                 G = gridspec.GridSpec(1, 1)
@@ -332,7 +333,7 @@ class Plot2D_deprecated(object):
                 colorbar = 'vertical'
                 G = gridspec.GridSpec(2, 2, width_ratios=[8, 1],
                                       height_ratios=[4, 1])
-    
+
             # Main plot
             plt.subplot(G[0])
             if (title is not None):
@@ -372,7 +373,7 @@ class Plot2D_deprecated(object):
                     line_plot_axes = 2
                     cb_axes = 1
                 ax_main = plt.contourf(x, y, z)
-    
+
             # Line plot
             if (summary_plot):
                 ax_cb = plt.subplot(G[cb_axes])
@@ -385,7 +386,7 @@ class Plot2D_deprecated(object):
                     grid_areas = None
                 cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
                                                 weights=grid_areas)
-    
+
                 if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
                     x = cube_line
                     y = cube_line.coord(self.lat_var)
@@ -396,15 +397,15 @@ class Plot2D_deprecated(object):
             else:
                 cb = plt.colorbar(ax_main, orientation=colorbar,
                                   ticks=colorbar_ticks)
-    
+
             plt.tight_layout()
             return plt.gcf()
-        
+
         else:
-            
+
             if fig is None:
                 assert False, "fig should be provided and is missing!"
-            
+
             # Summary plot yes/no
             if (not summary_plot):
                 G = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=ax)
@@ -457,7 +458,7 @@ class Plot2D_deprecated(object):
                     cb_axes = 1
                 ax_main = plt.contourf(x, y, z)
             fig.add_subplot(ax_main)
-    
+
             # Line plot
             if (summary_plot):
                 ax_cb = plt.Subplot(fig, G[cb_axes])
@@ -471,7 +472,7 @@ class Plot2D_deprecated(object):
                     grid_areas = None
                 cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
                                                 weights=grid_areas)
-    
+
                 if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
                     x = cube_line
                     y = cube_line.coord(self.lat_var)
@@ -484,10 +485,10 @@ class Plot2D_deprecated(object):
                 cb = plt.colorbar(ax_main, orientation=colorbar,
                                   ticks=colorbar_ticks)
                 fig.add_subplot(cb)
-    
-            return 
-        
-        
+
+            return
+
+
 class Plot2D(object):
     """
     Description
@@ -502,12 +503,13 @@ class Plot2D(object):
     LONS = ['longitude']    # accepted lon names
     TIME = ['time']         # accepted time names
     LEVS = ['air_pressure'] # accepted level names
-    
-    
-    def __init__(self, cube):
+    MAX_COLUMNS = 3
+
+
+    def __init__(self, cubes):
         """
         Arguments
-            cube : iris cube
+            cubes : iris cube or a list of iris cubes
 
         Description
             Initializes the class.
@@ -519,80 +521,97 @@ class Plot2D(object):
         Modification history
             20180207-A_muel_bn: copied Plot2D and adjusted
         """
-        
+
         # Check arguments
-        if (not isinstance(cube, iris.cube.Cube)):
-            raise TypeError("Invalid input: expected iris cube")
-        self.cube = iris.util.squeeze(cube)
-        if (self.cube.ndim != 2):
-            raise TypeError("Invalid input: expected 2-dimensional iris cube")
         try:
-            self.name = cube.long_name
-        except:
-            pass
-        self.units = ' [' + str(cube.units) + ']'
-        
-        # Get dimension names
-        dim_names = [dim.standard_name for dim in self.cube.dim_coords]
-        for dim in dim_names:
-            if (dim in self.__class__.LATS):
-                self.lat_var = dim
-                break
-            else:
-                self.lat_var = None
-        for dim in dim_names:
-            if (dim in self.__class__.LONS):
-                self.lon_var = dim
-                break
-            else:
-                self.lon_var = None
-        for dim in dim_names:
-            if (dim in self.__class__.TIME):
-                self.time_var = dim
-                break
-            else:
-                self.time_var = None
-        for dim in dim_names:
-            if (dim in self.__class__.LEVS):
-                self.lev_var = dim
-                break
-            else:
-                self.lev_var = None
-                
+            self.n_cubes = len(cubes)
+        except TypeError:
+            self.n_cubes = 1
+            cubes = [cubes]
+        for (idx, cube) in enumerate(cubes):
+            if not isinstance(cube, iris.cube.Cube):
+                raise TypeError("Invalid input: expected single iris cube or "
+                                "list of iris cubes")
+            cubes[idx] = iris.util.squeeze(cube)
+            if cubes[idx].ndim != 2:
+                raise TypeError("Invalid input: expected 2-dimensional iris "
+                                "cubes at list index {}".format(idx))
+        self.cubes = cubes
+        if self.n_cubes < 1:
+            raise TypeError("Invalid input: expected at least one cube, not "
+                            "an empty list")
+
+        # Get properties of the cubes
+        self.names = [None] * self.n_cubes
+        self.units = [None] * self.n_cubes
+        self.time_vars = [None] * self.n_cubes
+        self.lev_vars = [None] * self.n_cubes
+        self.lat_vars = [None] * self.n_cubes
+        self.lon_vars = [None] * self.n_cubes
+        for (idx, cube) in enumerate(self.cubes):
+
+            # Name
+            try:
+                self.names[idx] = cube.long_name
+            except:
+                pass
+
+            # Units
+            self.units[idx] = (' [' + str(cube.units) + ']')
+
+            # Dimension names
+            dim_names = [dim.standard_name for dim in cube.dim_coords]
+            for dim in dim_names:
+                if (dim in self.__class__.TIME):
+                    self.time_vars[idx] = dim
+                elif (dim in self.__class__.LEVS):
+                    self.lev_vars[idx] = dim
+                elif (dim in self.__class__.LATS):
+                    self.lat_vars[idx] = dim
+                elif (dim in self.__class__.LONS):
+                    self.lon_vars[idx] = dim
+
         # Lat/lon plot
-        if (self.lat_var is not None and self.lon_var is not None):
+        if (all(lat is not None for lat in self.lat_vars) and
+                all(lon is not None for lon in self.lon_vars)):
             self.plot_type = 'latlon'
 
         # Lat/time plot
-        elif (self.lat_var is not None and self.time_var is not None):
+        elif (all(lat is not None for lat in self.lat_vars) and
+              all(time is not None for time in self.time_vars)):
             self.plot_type = 'lattime'
 
         # Lon/time plot
-        elif (self.lon_var is not None and self.time_var is not None):
+        elif (all(lon is not None for lon in self.lon_vars) and
+              all(time is not None for time in self.time_vars)):
             self.plot_type = 'lontime'
-            
-        # Lat/lon plot
-        elif (self.lat_var is not None and self.lev_var is not None):
+
+        # Lat/lev plot
+        elif (all(lat is not None for lat in self.lat_vars) and
+              all(lev is not None for lev in self.lev_vars)):
             self.plot_type = 'latlev'
 
-        # Lat/time plot
-        elif (self.lon_var is not None and self.lev_var is not None):
+        # Lon/lev plot
+        elif (all(lon is not None for lon in self.lon_vars) and
+              all(lev is not None for lev in self.lev_vars)):
             self.plot_type = 'lonlev'
 
-        # Lon/time plot
-        elif (self.time_var is not None and self.lev_var is not None):
+        # time/lev plot
+        elif (all(time is not None for time in self.time_vars) and
+              all(lev is not None for lev in self.lev_vars)):
             self.plot_type = 'timelev'
 
         # Default case
         else:
-            raise TypeError("Invalid input: cube does not contain supported " +
-                            "dimensions")
-        
+            raise TypeError("Invalid input: Not all cubes have the same "
+                            "dimensions or at least on of them has an "
+                            "unknown dimension name")
+
         # Setup matplotlib
         plt.style.use(MPLSTYLE)
 
 ###############################################################################
-    
+
     def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
              y_label=None, title=None, ax=None, fig=None, vminmax=None,
              color=None, color_type=None, color_reverse=False):
@@ -605,7 +624,7 @@ class Plot2D(object):
             title          : title of the plot
 
         Returns
-            Matplotlib figure instance
+            Matplotlib figure
 
         Description
             Actual plotting routine
@@ -613,14 +632,17 @@ class Plot2D(object):
         Modification history
             20180515-A_muel_bn: copied Plot2D and adjusted
         """
-        
-        # preprocessing cube information
-        self.cube.rename(title)
-        try:
-            self.cube=self.cube.intersection(longitude=(-180,180))
-        except:
-            pass
-        
+
+        # Preprocessing cube information
+        if self.n_cubes == 1:
+            self.cubes[0].rename(title)
+        for (idx, cube) in enumerate(self.cubes):
+            try:
+                self.cubes[idx] = cube.intersection(longitude=(-180, 180))
+            except:
+                pass
+
+        # Color
         if color is None:
             brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
         else:
@@ -628,134 +650,192 @@ class Plot2D(object):
                 if color_reverse:
                     col_save=color["default"]
                     color["default"]=color["default"]+"_r"
-                brewer_cmap = mpl_cm.get_cmap(color["default"],lut=11)
+                brewer_cmap = mpl_cm.get_cmap(color["default"], lut=11)
             else:
                 if color_reverse:
                     col_save=color[color_type]
                     color[color_type]=color[color_type]+"_r"
-                brewer_cmap = mpl_cm.get_cmap(color[color_type],lut=11)
-                            
-        
+                brewer_cmap = mpl_cm.get_cmap(color[color_type], lut=11)
+
+        # Vminmax
         if vminmax is None:
-            try:     
-                vmin,vmax=np.nanpercentile(self.cube.data.data[np.logical_not(self.cube.data.mask)],[5,95])
-                
-                rounder=int(np.ceil(-np.log10(vmax-vmin)+1))
-                
-                vmin,vmax=np.round([vmin,vmax],rounder)
-                
-                levels=np.round(np.linspace(vmin,vmax,num=11),rounder)
-            except:
-                vmin=vmax=levels=None
+            vmin, vmax = 1E99, -1E99
+            for cube in self.cubes:
+                try:
+                    temp_min, temp_max = np.nanpercentile(cube.data.data[
+                        np.logical_not(cube.data.mask)], [5.0, 95.0])
+                    if (temp_min < vmin):
+                        vmin = temp_min
+                    if (temp_max > vmax):
+                        vmax = temp_max
+                except:
+                    pass
+            if vmin > vmax:
+                vmin = None
+                vmax = None
+                levels = None
         else:
-            vmin,vmax=vminmax
-                
-            rounder=int(np.ceil(-np.log10(vmax-vmin)+1))
-            
-            vmin,vmax=np.round([vmin,vmax],rounder)
-            
-            levels=np.round(np.linspace(vmin,vmax,num=11),rounder)
+            vmin, vmax = vminmax
+        if vmin is not None:
+            rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
+            vmin, vmax = np.round([vmin, vmax], rounder)
+            levels = np.round(np.linspace(vmin, vmax, num=11), rounder)
 
-        
-        # check axes
+        # Check axes
         if ax is None:
-            ax = plt.gca()
-        elif len(ax) == 2:
-            summary_plot = True
-        elif len(ax)>2:
-            raise ValueError("Invalid input: axes should not be more than 2!")
-        
-        # plot summary if necessary
-        if summary_plot:
-            plt.sca(ax[1])
-            
-            if (self.plot_type == 'latlon'):
-                raise ValueError("Invalid input: latlon should not have a summary plot")
-        
-            elif (self.plot_type == 'lattime'):
-                collapse = self.time_var
+            ax = [plt.gca()]
+        try:
+            if len(ax) == 2:
+                summary_plot = True
+            elif len(ax) > 2:
+                raise ValueError("Invalid input: axes should not be more "
+                                 "than 2!")
+        except TypeError:
+            ax = [ax]
 
+        # Plot summary if necessary
+        if summary_plot:
+            if len(ax) < 2:
+                raise ValueError("Invalid input: Need 2 axes for summary plot")
+            plt.sca(ax[1])
+
+            # Latlon plot and multiple cubes not supported yet
+            if self.n_cubes > 1:
+                raise ValueError("Invalid input: summary plot for multiple "
+                                 "cubes is not supported")
+            cube = self.cubes[0]
+            time_var = self.time_vars[0]
+            lev_var = self.lev_vars[0]
+            lat_var = self.lat_vars[0]
+            lon_var = self.lon_vars[0]
+
+            # Get variable to collapse
+            if (self.plot_type == 'latlon'):
+                raise ValueError("Invalid input: latlon should not have a "
+                                 "summary plot")
+            elif (self.plot_type == 'lattime'):
+                collapse = time_var
             elif (self.plot_type == 'lontime'):
-                collapse = self.time_var
-            
+                collapse = time_var
             else:
-                collapse = [c.name() for c in self.cube.coords() if c.name() != self.lev_var and len(c.points)>1][0]
-            
-            if (collapse == self.lat_var):
-                    grid_areas = iris.analysis.cartography.area_weights(self.cube)
+                collapse = [c.name() for c in cube.coords() if c.name() !=
+                            lev_var and len(c.points) > 1][0]
+            if (collapse == lat_var):
+                grid_areas = iris.analysis.cartography.area_weights(cube)
             else:
                 grid_areas = None
-            cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
-                                            weights=grid_areas)
+            cube_line = cube.collapsed(collapse, iris.analysis.MEAN,
+                                       weights=grid_areas)
 
+            # Lattime
             if self.plot_type == 'lattime':
                 x = cube_line
-                y = cube_line.coord(self.lat_var)
-                latrange = self.cube.coords(self.lat_var).pop()
-#                lat_inc = np.diff(latrange.points).mean()
-                latrange = (np.min(latrange.points),np.max(latrange.points))
-                plt.gca().set_xlim(vmin,vmax)
+                y = cube_line.coord(lat_var)
+                latrange = cube.coords(lat_var).pop()
+                # lat_inc = np.diff(latrange.points).mean()
+                latrange = (np.min(latrange.points), np.max(latrange.points))
+                plt.gca().set_xlim(vmin, vmax)
                 plt.gca().set_ylim(latrange)
+
+            # Lontime
             elif self.plot_type == 'lontime':
-                x = cube_line.coord(self.lon_var)
+                x = cube_line.coord(lon_var)
                 y = cube_line
-                lonrange = self.cube.coords(self.lon_var).pop()
-#                lon_inc = np.diff(lonrange.points).mean()
-                lonrange = (np.min(lonrange.points),np.max(lonrange.points))
-                plt.gca().set_ylim(vmin,vmax)
+                lonrange = cube.coords(lon_var).pop()
+                # lon_inc = np.diff(lonrange.points).mean()
+                lonrange = (np.min(lonrange.points), np.max(lonrange.points))
+                plt.gca().set_ylim(vmin, vmax)
                 plt.gca().set_xlim(lonrange)
+            # Lev plots
             else:
                 x = cube_line
-                y = cube_line.coord(self.lev_var)
-                levrange = self.cube.coords(self.lev_var).pop()
-#                print levrange
-#                lat_inc = np.diff(latrange.points).mean()
-                levrange = (np.min(levrange.points),np.max(levrange.points))
-                plt.gca().set_xlim(vmin,vmax)
+                y = cube_line.coord(lev_var)
+                levrange = self.cubes.coords(lev_var).pop()
+                # lat_inc = np.diff(latrange.points).mean()
+                levrange = (np.min(levrange.points), np.max(levrange.points))
+                plt.gca().set_xlim(vmin, vmax)
                 plt.gca().set_ylim(levrange)
-             
-            iplt.plot(x, y)
-            
-        plt.sca(ax[0])
 
-        # plot map
-        # this needs to be done due to an error in cartopy
-        try:
-#            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)#,levels=levels, extend='both')
-#            qplt.contourf(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax,levels=levels, extend='both')
-            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
-            qplt.pcolormesh(self.cube,cmap=brewer_cmap,vmin=vmin,vmax=vmax)
-            plt.text(0.5, 0.5,'Data cannot be displayed as intended due to cartopy bug! \n Deviations are color levels and time axis display. \n Future updates of cartopy module may resolve this issue (#946).',horizontalalignment='center',verticalalignment='center',transform = plt.gca().transAxes)
-        
-        if self.plot_type == 'latlon':
-            mean= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.MEAN).data
-            std= self.cube.collapsed([coord.name() for coord in self.cube.coords()],iris.analysis.STD_DEV).data
-            plt.gca().coastlines()
-            plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",linestyle=':')
-            plt.gca().text(-180,-100,r'mean: {0} $\pm$ {1} '.format(str(round(mean,2)),str(round(std,2))))
-            
-        plt.tight_layout()
-                       
-        if self.plot_type not in ['lontime', 'latlon']:
-            bb=ax[1].get_position()
-            bb.y0=ax[0].get_position().y0
-            ax[1].set_position(bb)
-        
+            # Plot
+            iplt.plot(x, y)
+
+        # Setup axes for plotting multiple cubes
+        n_columns = min([self.n_cubes, self.__class__.MAX_COLUMNS])
+        n_rows = (self.n_cubes - 1) // self.__class__.MAX_COLUMNS + 1
+        gs = gridspec.GridSpec(n_rows, n_columns)
+
+        # Iterate over cubes
+        for (idx, cube) in enumerate(self.cubes):
+            column = idx % self.__class__.MAX_COLUMNS
+            row = idx // self.__class__.MAX_COLUMNS
+            if self.n_cubes > 1:
+                plt.sca(plt.subplot(gs[row, column]))
+            else:
+                plt.sca(ax[0])
+
+            # Plot map
+            # (this needs to be done due to an error in cartopy)
+            try:
+                # qplt.pcolormesh(self.cubes, cmap=brewer_cmap, vmin=vmin,
+                #                 vmax=vmax) #, levels=levels, extend='both')
+                # qplt.contourf(self.cubes, cmap=brewer_cmap, vmin=vmin,
+                #               vmax=vmax, levels=levels, extend='both')
+                qplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin,
+                                vmax=vmax)
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)
+                qplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin, vmax=vmax)
+                plt.text(0.5, 0.5,'Data cannot be displayed as intended due '
+                                  'to cartopy bug! \n Deviations are color '
+                                  'levels and time axis display. \n Future '
+                                  'updates of cartopy module may resolve '
+                                  'this issue (#946).',
+                                  horizontalalignment='center',
+                                  verticalalignment='center',
+                                  transform=plt.gca().transAxes)
+            if self.plot_type == 'latlon':
+                mean = cube.collapsed([coord.name() for coord in
+                                       cube.coords()],
+                                      iris.analysis.MEAN).data
+                std = cube.collapsed([coord.name() for coord in cube.coords()],
+                                     iris.analysis.STD_DEV).data
+                plt.gca().coastlines()
+                plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",
+                                    linestyle=':')
+                plt.gca().text(-180, -100,
+                               r'mean: {0} $\pm$ {1} '.format(
+                                   str(round(mean, 2)),str(round(std, 2))))
+
+            # Label plots (supports at most 26 figures at the moment)
+            if self.n_cubes > 1:
+                letter = '(' + ascii_lowercase[idx % 26] + ')'
+                plt.text(0.01, 0.99, letter,
+                        horizontalalignment='left',
+                        verticalalignment='top',
+                        transform=plt.gca().transAxes)
+
+        # Colors
         if color_type is None or color_type not in color.keys():
             if color_reverse:
-                color["default"]=col_save
+                color["default"] = col_save
         else:
             if color_reverse:
-                color[color_type]=col_save
-        
-        
+                color[color_type] = col_save
+
+        # Set position of summary plot
+        if summary_plot:
+            if self.plot_type not in ['lontime', 'latlon']:
+                bb = ax[1].get_position()
+                bb.y0 = ax[0].get_position().y0
+                ax[1].set_position(bb)
+
+        # Tight layout
+        plt.tight_layout()
         return
-    
-    
+
+
 class Plot2D_blank(Plot2D):
     """
     Description
@@ -781,9 +861,9 @@ class Plot2D_blank(Plot2D):
         """
         super(Plot2D_blank, self).__init__(cube)
         # erase all data
-        self.cube.data=self.cube.data*np.nan        
-        
-        
+        self.cube.data=self.cube.data*np.nan
+
+
 class Plot1D(object):
     """
     Description
@@ -797,8 +877,8 @@ class Plot1D(object):
     LATS = ['latitude']     # accepted lat names
     LONS = ['longitude']    # accepted lon names
     TIME = ['time']         # accepted time names
-    
-    
+
+
     def __init__(self, cube):
         """
         Arguments
@@ -811,7 +891,7 @@ class Plot1D(object):
         Modification history
             20180527-A_muel_bn: copied Plot2D_2 and adjusted
         """
-        
+
         # Check arguments
         if (not isinstance(cube, iris.cube.Cube)):
             raise TypeError("Invalid input: expected iris cube")
@@ -823,7 +903,7 @@ class Plot1D(object):
         except:
             pass
         self.units = ' [' + str(cube.units) + ']'
-        
+
         # Get dimension names
         dim_names = [dim.standard_name for dim in self.cube.dim_coords]
         for dim in dim_names:
@@ -844,7 +924,7 @@ class Plot1D(object):
                 break
             else:
                 self.time_var = None
-                
+
         # Lat/lon plot
         if (self.lat_var is not None):
             self.plot_type = 'lat'
@@ -861,12 +941,12 @@ class Plot1D(object):
         else:
             raise TypeError("Invalid input: cube does not contain supported " +
                             "dimensions")
-        
+
         # Setup matplotlib
         plt.style.use(MPLSTYLE)
 
 ###############################################################################
-    
+
     def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
              y_label=None, title=None, ax=None, fig=None, vminmax=None):
         """
@@ -886,15 +966,22 @@ class Plot1D(object):
         Modification history
             20180527-A_muel_bn: copied Plot2D_2 and adjusted
         """
-        
+
         # preprocessing cube information
         self.cube.rename(title)
-        
+
         #brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
-        
-        if len(ax)>=2:
-            raise ValueError("Invalid input: axes should not be more than 1!")
-            
+
+        # check axes
+        if ax is None:
+            ax = [plt.gca()]
+        try:
+            if len(ax) >= 2:
+                raise ValueError("Invalid input: axes should not be more "
+                                 "than 1!")
+        except TypeError:
+            ax = [ax]
+
         plt.sca(ax[0])
 
         # plot line
@@ -905,14 +992,13 @@ class Plot1D(object):
             plt.plot(self.cube.coords("time")[0].points,self.cube.data)
             plt.title(title)
             plt.grid()
-            
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            print 'We did not expect this to fail!'  
+            print 'We did not expect this to fail!'
             plt.plot(self.cube.coords("time").points,self.cube.data)
         plt.tight_layout()
-        
+
         return
-    
