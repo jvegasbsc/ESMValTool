@@ -750,7 +750,7 @@ class Plot2D(object):
             else:
                 x = cube_line
                 y = cube_line.coord(lev_var)
-                levrange = self.cubes.coords(lev_var).pop()
+                levrange = cube.coords(lev_var).pop()
                 # lat_inc = np.diff(latrange.points).mean()
                 levrange = (np.min(levrange.points), np.max(levrange.points))
                 plt.gca().set_xlim(vmin, vmax)
