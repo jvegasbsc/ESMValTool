@@ -592,6 +592,9 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 
     # Create a list. Each item of the list will be itself a list of strings, corresponding either to the 
     # headers or to the GCOS reference values
+    
+    print gcos_expert
+    
     contents = list()
     with open(gcos_reference, 'rb') as csvfile:
         s = csv.reader(csvfile, delimiter = ";", skipinitialspace = True)
@@ -655,7 +658,7 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
             gcos_contents[key].append(str(gcos_expert[key]["value"]) + this_unit)
             ny = len(gcos_contents[key]) + 1
         #gcos_contents.append(data_contents)
-    print(gcos_contents)
+#    print(gcos_contents)
     
 
     # Check if, possibly, one of the rows of the CSV has not the same number of items
