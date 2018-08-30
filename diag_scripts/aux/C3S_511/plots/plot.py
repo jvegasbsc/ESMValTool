@@ -521,7 +521,7 @@ class Plot2D(object):
         Modification history
             20180207-A_muel_bn: copied Plot2D and adjusted
         """
-
+        
         # Check arguments
         try:
             self.n_cubes = len(cubes)
@@ -632,7 +632,7 @@ class Plot2D(object):
         Modification history
             20180515-A_muel_bn: copied Plot2D and adjusted
         """
-
+        
         # Preprocessing cube information
         if self.n_cubes == 1:
             self.cubes[0].rename(title)
@@ -844,7 +844,7 @@ class Plot2D_blank(Plot2D):
     Contents
         method plot
     """
-    def __init__(self, cube):
+    def __init__(self, cubes):
         """
         Arguments
             cube : iris cube
@@ -859,9 +859,10 @@ class Plot2D_blank(Plot2D):
         Modification history
             20180515-A_muel_bn: written
         """
-        super(Plot2D_blank, self).__init__(cube)
+        super(Plot2D_blank, self).__init__(cubes)
         # erase all data
-        self.cube.data=self.cube.data*np.nan
+        for cube in self.cubes:
+            cube.data=cube.data*np.nan
 
 
 class Plot1D(object):
