@@ -288,7 +288,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     #                self.sp_data.add_aux_coord(long_2_coord)
     #                print self.sp_data
     #                self.sp_data.coord('longitude_2').guess_bounds()
-                import IPython; IPython.embed()
                 self.sp_data.coord('longitude').guess_bounds()
                 if self.sp_data.units == "no-unit":
                     self.sp_data.units = '1'
