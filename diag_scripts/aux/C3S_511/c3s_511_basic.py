@@ -270,7 +270,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         try:
             if os.path.isfile(self.__infile__):
                 self.sp_data = iris.load_cube(self.__infile__)
-                assert(type(self.sp_data.data)==np.ma.MaskedArray)
 #                self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
                 # get dimensions
                 sp_dimensions = [c.name() for c in self.sp_data.coords()]
@@ -289,6 +288,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     #                self.sp_data.add_aux_coord(long_2_coord)
     #                print self.sp_data
     #                self.sp_data.coord('longitude_2').guess_bounds()
+                import IPython; IPython.embed()
                 self.sp_data.coord('longitude').guess_bounds()
                 if self.sp_data.units == "no-unit":
                     self.sp_data.units = '1'
