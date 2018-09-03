@@ -574,7 +574,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         if not isinstance(filename, str):
             raise TypeError("filename", "Element is not a string.")
             
-        report(content,filename,self.__work_dir__, signature = self.CDS_ID, latex_opts=self.__latex_output__)
+        report(content,filename,self.__work_dir__, ecv = ecv_lookup(self.__varname__), dataset = "".join(str(self.__dataset_id__[0])), signature = self.CDS_ID, latex_opts=self.__latex_output__)
         return
     
     def __mean_var_procedures_3D__(self,cube=None):

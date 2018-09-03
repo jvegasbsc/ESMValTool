@@ -129,9 +129,45 @@ latex_elements = {
     #
     'preamble': r'''
 	\usepackage[section]{placeins}
+        \usepackage{ragged2e}
 	\pagestyle{fancy}
 	\extrafloats{1000}
+        \renewcommand{\familydefault}{\sfdefault}
 	''',
+
+    # title page
+    #
+    'maketitle': r'''
+        \begin{titlepage}
+            \noindent\rule{\textwidth}{1pt}
+            
+            \vspace*{10mm} %%% * is used to give space from top
+            \begin{flushright}\textbf{\Huge {ESMValTool C3S\_511 Report}}\end{flushright}
+ 	    \vspace*{10mm}
+	    \begin{flushright}\textbf{\huge {++SUBREPORTTITLE++}}\end{flushright}
+ 
+            \begin{flushright}\textbf{\huge {for ++VARIABLE++ from ++DATASET++}}\end{flushright}
+	    
+            \vspace*{25mm}
+            \begin{flushright}\textbf{\textit{\Large {Release 0.1beta}}}\end{flushright}
+
+            \vspace*{25mm}
+            \begin{flushright}\textbf{\Large {ESMValTool Development Team}}\end{flushright}
+            \vspace*{10mm}
+            \begin{flushright}\textbf{\large {Created on: \today}}\end{flushright}
+            \vspace*{10mm}
+
+            \noindent\rule{\textwidth}{1pt}
+
+            \vspace*{\fill}
+            \begin{flushleft} \large \underline{Notification:}\end{flushleft}
+ 
+            \begin{justify} \large This report was created with the ESMValTool v1.1.0$^1$ within the Copernicus Service C3S\_511 (grant number) for the Copernicus Climate Data Store. The following content must not be used for publications outside the Copernicus Service C3S\_511 or the Copernicus Climate Data Store.\end{justify}
+ 
+            \begin{flushright} \small $^1$ Eyring et al., ESMValTool (v1.0) - a community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP, Geosci. Model Dev., 9, 1747-1802, https://doi.org/10.5194/gmd-9-1747-2016, 2016.\end{flushright}
+
+        \end{titlepage}
+        ''',
 
     # Latex figure (float) alignment
     #
@@ -139,7 +175,7 @@ latex_elements = {
     
     # Additional text for front page
     #
-    'atendofbody': 'test',
+    #'atendofbody': 'test',
     #\begin{flushright}
     #\textbf{\textit{\underline{Notification:}}}\\
     #\large{This report was created with the ESMValTool v1.0\footnotemark within the Copernicus}\\
@@ -155,8 +191,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ESMValToolC3S_511Report.tex', u'ESMValTool C3S\\_511 Report',
-     u'ESMValTool Development Team', 'howto'),
+    (master_doc, 'ESMValToolC3S_511Report.tex','',
+     'Notification:\\newline This report was created with the ESMValTool v1.1.0$^1$ within the Copernicus Service C3S\\_511 (grant number) for the Copernicus Climate Data Store. The following content must not be used for publications outside the Copernicus Service C3S\\_511 or the Copernicus Climate Data Store.\\newline $^1$ Eyring et al., ESMValTool (v1.0) - a community diagnostic and performance metrics tool for routine evaluation of Earth system models in CMIP, Geosci. Model Dev., 9, 1747-1802, https://doi.org/10.5194/gmd-9-1747-2016, 2016.', 'howto'),
 ]
 
 

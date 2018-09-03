@@ -18,7 +18,7 @@ sys.path.append(os.path.abspath("./diag_scripts"))
 from METAdata import METAdata
 #import csv
 
-def do_report(report_data, report_title, work_dir, signature="", latex_opts=False):
+def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", dataset="DATASET", latex_opts=False):
     """
     - report_data  a dictionary of a list of plot file names  (.png, ...) including *full path*
                    OR a dictionary containing strings
@@ -28,7 +28,7 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     Updated: February 18th, 2018 (B. Mueller)
     Updated: July 31st, 2018 (B. Mueller)
     """
-
+    
     # define output and temporary directories for Sphinx (source, build);
     # add process id to temporary directory names to allow for
     # execution of multiple instances in parallel
@@ -176,7 +176,15 @@ def do_report(report_data, report_title, work_dir, signature="", latex_opts=Fals
     outfile.close() 
 
     # copy Sphinx configuration and index file to temporary source directory
-    shutil.copy("doc/reporting/source/conf.py", src_dir)
+    with open("doc/reporting/source/conf.py",'r') as conf_py:
+        content = conf_py.read()
+        content = content.replace("++SUBREPORTTITLE++",report_title.title())
+        content = content.replace("++VARIABLE++",ecv.title())
+        content = content.replace("++DATASET++",dataset)
+        with open(src_dir + os.sep + "conf.py",'w') as target_conf_py:
+            target_conf_py.write(content)
+        
+#    shutil.copy("doc/reporting/source/conf.py", src_dir)
     shutil.copy("doc/reporting/source/index.rst", src_dir)
 
     # set environment variables for Sphinx (source directory and build directory)
