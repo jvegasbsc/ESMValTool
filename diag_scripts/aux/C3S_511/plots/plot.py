@@ -11,6 +11,7 @@ import mpl_toolkits.basemap as bm
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
+import cf_units as unit
 import matplotlib.cm as mpl_cm
 import cartopy.crs as ccrs
 #import random
@@ -504,6 +505,8 @@ class Plot2D(object):
     TIME = ['time']         # accepted time names
     LEVS = ['air_pressure'] # accepted level names
     MAX_COLUMNS = 3
+    TIME_LABEL = 'Date'
+    TIME_FORMAT = '%Y-%m-%d'
 
 
     def __init__(self, cubes):
@@ -521,7 +524,7 @@ class Plot2D(object):
         Modification history
             20180207-A_muel_bn: copied Plot2D and adjusted
         """
-        
+
         # Check arguments
         try:
             self.n_cubes = len(cubes)
@@ -632,7 +635,7 @@ class Plot2D(object):
         Modification history
             20180515-A_muel_bn: copied Plot2D and adjusted
         """
-        
+
         # Preprocessing cube information
         if self.n_cubes == 1:
             self.cubes[0].rename(title)
@@ -782,6 +785,24 @@ class Plot2D(object):
                 #               vmax=vmax, levels=levels, extend='both')
                 qplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin,
                                 vmax=vmax)
+                if 'time' in self.plot_type:
+                    time_coord = cube.coord(self.time_vars[idx])
+                    if self.plot_type == 'lontime':
+                        (locs, _) = plt.yticks()
+                    else:
+                        (locs, _) = plt.xticks()
+                    labels = unit.num2date(locs,
+                                           time_coord.units.name,
+                                           time_coord.units.calendar)
+                    for (idx, _) in enumerate(labels):
+                        labels[idx] = labels[idx].strftime(
+                            self.__class__.TIME_FORMAT)
+                    if self.plot_type == 'lontime':
+                        plt.yticks(locs, labels)
+                        plt.ylabel(self.__class__.TIME_LABEL)
+                    else:
+                        plt.xticks(locs, labels)
+                        plt.xlabel(self.__class__.TIME_LABEL)
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

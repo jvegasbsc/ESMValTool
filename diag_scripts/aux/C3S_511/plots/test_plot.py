@@ -13,7 +13,7 @@ import plot
 
 # Settings
 NUMBER_OF_CUBES = 4
-DIR = os.path.expanduser('~/C3S_tests')
+DIR = os.path.expanduser('~/tmp/C3S_tests')
 LATLON_CUBE_PATH = os.path.join('test_datasets', 'latlon.nc')
 LATTIME_CUBE_PATH = os.path.join('test_datasets', 'lattime.nc')
 LONTIME_CUBE_PATH = os.path.join('test_datasets', 'lontime.nc')
