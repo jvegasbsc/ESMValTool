@@ -542,7 +542,7 @@ def do_eval_table(varname, eval_expert, eval_data, ecv_length):
     return fig
 
 
-def do_gcos_table(varname, gcos_expert, gcos_reference):
+def do_gcos_table(varname, gcos_expert, gcos_reference, gcos_expert_file=None):
     """
     Author  :  F. Massonnet
     Creation: February 9th, 2018
@@ -600,8 +600,45 @@ def do_gcos_table(varname, gcos_expert, gcos_reference):
 
     # Create a list. Each item of the list will be itself a list of strings, corresponding either to the 
     # headers or to the GCOS reference values
+
+    written = False
     
-    print gcos_expert
+    try:
+        gcos_expert_read=dict()
+
+        with open(gcos_expert_file, 'rb') as csv_file:
+            reader = csv.reader(csv_file)
+            gcos_expert_list = list(reader)
+            
+        for it in gcos_expert_list:
+            if it[2] in ['']:
+                it[2] = None
+            else:
+                try:
+                    it[2] = float(it[2])
+                except:
+                    pass
+            if it[0] in gcos_expert_read.keys():
+                gcos_expert_read[it[0]].update({it[1]:it[2]})
+            else:
+                gcos_expert_read.update({it[0]:{it[1]:it[2]}})
+    except Exception as e:
+        print("Calculated GCOS information written at: " + gcos_expert_file + "\nPlease consider corrections, if needed!")
+        with open(gcos_expert_file, 'wb') as csv_file:
+            writer = csv.writer(csv_file)
+            for key, value in gcos_expert.items():
+                for key2, value2 in value.items():
+                    writer.writerow([key, key2, value2])
+        written = True
+        
+    if written:
+        pass
+    elif gcos_expert != gcos_expert_read:
+        gcos_expert = gcos_expert_read
+        print("Calculated GCOS information overwritten due to differences.\nGCOS information from file: " + gcos_expert_file)
+        print("If you think this should not happen, please delete the respective file and run again!")
+    else:
+        print("No differences found in calculated and read GCOS information from: " + gcos_expert_file)
     
     contents = list()
     with open(gcos_reference, 'rb') as csvfile:
