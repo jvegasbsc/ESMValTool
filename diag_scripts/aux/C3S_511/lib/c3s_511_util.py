@@ -13,6 +13,7 @@ from scipy import stats
 import cf_units
 import matplotlib.pyplot as plt
 import time
+import iris
 
 sys.path.insert(0,
                 os.path.abspath(os.path.join(os.path.join(
@@ -48,6 +49,39 @@ def  __minmeanmax__(array):
     return (np.min(array),np.mean(array),np.max(array))
 
 
+def __temporal_trend2__(cube, *args, **kwargs):
+
+    def trend_lin_slope(array,axis,x):
+        
+        def linreg_slope(array,axis,x):
+            
+            def mylinregres_slope(mydata,mytime=None):
+                _,slope,_,_,_ = stats.mstats.linregress(mytime,mydata)
+                return(slope)
+            
+            return(np.apply_along_axis(mylinregres_slope, axis, array,mytime=x))
+        
+        return(linreg_slope(array,axis=axis,x=x))
+        
+    def trend_lin_p(array,axis,x):
+        
+        def linreg_p(array,axis,x):
+            
+            def mylinregres_p(mydata,mytime=None):
+                _,_,_,p,_ = stats.mstats.linregress(mytime,mydata)
+                return(p)
+            
+            return(np.apply_along_axis(mylinregres_p, axis, array,mytime=x))
+        
+        return(linreg_p(array,axis=axis,x=x))
+        
+    x = np.asarray(cube.coord('time').points - cube.coord('time').points[0]
+                    ).astype('float')/365.2425/10
+    slope = cube.collapsed("time",iris.analysis.Aggregator("trend",trend_lin_slope,lazy_func = trend_lin_slope,x=x))
+    p = cube.collapsed("time",iris.analysis.Aggregator("trend",trend_lin_p,lazy_func = trend_lin_p,x=x))
+    
+    return slope,slope,p,p
+    
 def __temporal_trend__(cube, pthres=1.01):
     """
     calculate temporal trend of the data over time

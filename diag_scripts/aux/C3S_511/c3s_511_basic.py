@@ -26,7 +26,7 @@ from pathos.multiprocessing import ProcessingPool
 import itertools as it
 
 [sys.path.insert(0, os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), dir)) for dir in ["lib", "plots"]]
+    os.path.dirname(os.path.abspath(__file__)), direct)) for direct in ["lib", "plots"]]
 
 import c3s_511_util as utils
 from customErrors import ImplementationError, ConfigurationError, PathError, EmptyContentError
@@ -55,6 +55,41 @@ from ecv_lookup_table import ecv_lookup
 # * write_plot_vars
 
 # * force_processing
+#import sys
+from numbers import Number
+from collections import Set, Mapping, deque
+
+try: # Python 2
+    zero_depth_bases = (basestring, Number, xrange, bytearray)
+    iteritems = 'iteritems'
+except NameError: # Python 3
+    zero_depth_bases = (str, bytes, Number, range, bytearray)
+    iteritems = 'items'
+
+def getsize(obj_0):
+    """Recursively iterate to sum size of object & members."""
+    _seen_ids = set()
+    def inner(obj):
+        obj_id = id(obj)
+        if obj_id in _seen_ids:
+            return 0
+        _seen_ids.add(obj_id)
+        size = sys.getsizeof(obj)
+        if isinstance(obj, zero_depth_bases):
+            pass # bypass remaining control flow and return
+        elif isinstance(obj, (tuple, list, Set, deque, dict)):
+            size += sum(inner(i) for i in obj)
+        elif isinstance(obj, Mapping) or hasattr(obj, iteritems):
+            print obj
+            size += sum(inner(k) + inner(v) for k, v in getattr(obj, iteritems)())
+        # Check for custom object instances - may subclass above too
+        if hasattr(obj, '__dict__'):
+            size += inner(vars(obj))
+        if hasattr(obj, '__slots__'): # can have __slots__ with __dict__
+            size += sum(inner(getattr(obj, s)) for s in obj.__slots__ if hasattr(obj, s))
+        return size
+    return inner(obj_0)
+
 
 class __Diagnostic_skeleton__(object):
     """
@@ -122,13 +157,13 @@ class __Diagnostic_skeleton__(object):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
         self.__do_mean_var__()
-        self.__do_trends__()
-        self.__do_extremes__()
-        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
+#        self.__do_trends__()
+#        self.__do_extremes__()
+#        self.__do_sectors__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
 #        self.__mann_kendall_trend__()
-        self.__do_esm_evaluation__()
+#        self.__do_esm_evaluation__()
         pass
     
     def __do_overview__(self):
@@ -271,10 +306,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         """
         reads data
         """ 
-        try:
+        for i in [1]:
             if os.path.isfile(self.__infile__):
                 self.sp_data = iris.load_cube(self.__infile__)
-#                self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
+                #self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
                 # get dimensions
                 sp_dimensions = [c.name() for c in self.sp_data.coords()]
                 extra_dimensions = [item for item in sp_dimensions if item not in set(self.dimensions)]
@@ -297,10 +332,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     self.sp_data.units = '1'
             else:
                 raise PathError(self.__infile__,"This file is not accessible.")
-        except:
+#        except:
 #            super(Basic_Diagnostic, self).read_data()
 #            print("Error in reading data- Generic data used instead.")
-            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path.")
+#            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path: " + self.__infile__)
             
         if len(extra_dimensions) == 0:
             self.var3D=False
@@ -790,6 +825,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             disp_min_max.update({"diff_vals":np.array([np.nan])})
 
             for m in maths:
+                for i in dir():
+                    print (m, i, getsize(eval(i)) )
                 
                 if m == "PERCENTILE":
                     
@@ -1042,6 +1079,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         # simple linear trend (slope) and p-values
         _,S,_,P = utils.__temporal_trend__(cube, pthres=1.01)      
         
+        signtrends=(P.data<=0.05)*np.sign(S.data)
+        ST=S.copy()
+        ST.data=signtrends
+        
         try:
             # plotting routines
             x=Plot2D(S)
@@ -1062,6 +1103,27 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
                      str("Latitude/Longitude" + ' slope values of ' + ecv_lookup(self.__varname__) + ' temporal trends per decade for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+            
+            x=Plot2D(ST)
+                        
+            filename = self.__plot_dir__ + os.sep + basic_filename + "_signtrend." + self.__output_type__
+            list_of_plots.append(filename)
+            
+            fig = plt.figure()
+            ax = [plt.subplot(1,1,1)]
+            fig.set_figheight(1.2*fig.get_figheight())
+            x.plot(ax=ax, color=self.colormaps, color_type="Diverging", vminmax=[-1.,1.], title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' significant slope signs of ' + ecv_lookup(self.__varname__) + ' temporal trends per decade for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                      '#C3S' + 'temptrend' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -1527,8 +1589,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         this_function = "mann kendall trend"
         
         save_data = self.sp_data.copy()
-        lev = self.levels[0]
-        self.sp_data = self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
+#        lev = self.levels[0]
+#        self.sp_data = self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
         
         # Set parameters
         self.record_cutoff = 10

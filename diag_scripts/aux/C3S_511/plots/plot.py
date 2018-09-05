@@ -794,15 +794,16 @@ class Plot2D(object):
                     labels = unit.num2date(locs,
                                            time_coord.units.name,
                                            time_coord.units.calendar)
-                    for (idx, _) in enumerate(labels):
-                        labels[idx] = labels[idx].strftime(
-                            self.__class__.TIME_FORMAT)
-                    if self.plot_type == 'lontime':
-                        plt.yticks(locs, labels)
-                        plt.ylabel(self.__class__.TIME_LABEL)
-                    else:
-                        plt.xticks(locs, labels)
-                        plt.xlabel(self.__class__.TIME_LABEL)
+                    print labels
+#                    for (idx, _) in enumerate(labels):
+#                        labels[idx] = labels[idx].strftime(
+#                            self.__class__.TIME_FORMAT)
+#                    if self.plot_type == 'lontime':
+#                        plt.yticks(locs, labels)
+#                        plt.ylabel(self.__class__.TIME_LABEL)
+#                    else:
+#                        plt.xticks(locs, labels)
+#                        plt.xlabel(self.__class__.TIME_LABEL)
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -853,7 +854,10 @@ class Plot2D(object):
                 ax[1].set_position(bb)
 
         # Tight layout
-        plt.tight_layout()
+        try:
+            plt.tight_layout()
+        except: 
+            pass
         return
 
 
