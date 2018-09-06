@@ -21,6 +21,7 @@ from scipy import stats
 import datetime
 import imp
 import csv
+import gc
 
 from pathos.multiprocessing import ProcessingPool
 import itertools as it
@@ -39,6 +40,8 @@ from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 from ecv_lookup_table import ecv_lookup
+
+from memory_profiler import profile
 
 # All packages checked
 
@@ -118,6 +121,7 @@ class __Diagnostic_skeleton__(object):
         warnings.warn("Implementation Warning", UserWarning)
         return
 
+    @profile
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
@@ -187,11 +191,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     global differences, RMSD etc.
     """
 
+    @profile
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
         self.diagname = "Basic_Diagnostic.py"
 
-
+    @profile
     def set_info(self, **kwargs):
         """
         gather information for diagnostic
@@ -265,7 +270,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         self.__output_type__ = self.CDS_ID + "." + self.__output_type__
         
-
+    @profile
     def read_data(self):
 
         """
@@ -336,6 +341,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
     
+    @profile
     def __overview_procedures_2D__(self,cube=None,level=None):
         
         if cube is None:
@@ -443,6 +449,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         del sp_masked_vals
         del num_available_vals
         del frac_available_vals
+        print(gc.collect()) 
         
         # histogram plot of available measurements
         all_data = cube.copy()
@@ -471,6 +478,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return list_of_plots
 
+    @profile
     def __do_overview__(self):
         
         this_function = "overview"
@@ -563,7 +571,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         
         return
-    
+
+    @profile    
     def __do_report__(self,**kwargs):
         
         # TODO specify sphinx structure
@@ -996,6 +1005,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         return list_of_plots
     
+    @profile
     def __do_mean_var__(self):
         
         this_function = "mean and variability"

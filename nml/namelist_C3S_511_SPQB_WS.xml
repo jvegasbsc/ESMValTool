@@ -79,7 +79,7 @@ This namelist is part of the ESMValTool
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Ocean					  </tags>
 	
-		<model> OBS_gridfile        NSIDC-NT				   sat				NH 	 1979 2013  @{OBSPATH}  /media/bmueller/Work/ESMVAL_res/work/Obs/OBS_NSIDC-NT-orig_sat_NH_T2Ms_sic_197811-201312.nc </model>
+		<model> OBS_gridfile        NSIDC-BT				   sat				NH 	 1999 1999 @{OBSPATH}  /media/bmueller/Work/ESMVAL_res/work/Obs/OBS_NSIDC-BT_sat_NH_T2Ms_sic_199901-199912.nc </model>
     </diag>
 
   <!--
