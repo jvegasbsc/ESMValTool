@@ -126,13 +126,13 @@ class __Diagnostic_skeleton__(object):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
         self.__do_mean_var__()
-#        self.__do_trends__()
+        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
-#        self.__do_maturity_matrix__()
-#        self.__do_gcos_requirements__()
+        self.__do_maturity_matrix__()
+        self.__do_gcos_requirements__()
 #        self.__mann_kendall_trend__()
-#        self.__do_esm_evaluation__()
+        self.__do_esm_evaluation__()
         pass
     
     def __do_overview__(self):
@@ -353,7 +353,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
-            dataset_id = self.__dataset_id__[0]
+            dataset_id = [self.__dataset_id__[0]]
         
         list_of_plots=[]
         
@@ -745,7 +745,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
-            dataset_id = self.__dataset_id__[0]
+            dataset_id = [self.__dataset_id__[0]]
         
         list_of_plots = []
         
@@ -1045,7 +1045,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
-            dataset_id = self.__dataset_id__[0]
+            dataset_id = [self.__dataset_id__[0]]
         
         list_of_plots = []
         

@@ -73,7 +73,7 @@ This namelist is part of the ESMValTool
     </diag>
    -->
 
- 
+    <!--
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -85,9 +85,9 @@ This namelist is part of the ESMValTool
 	
 		<model> OBS        ESACCI-OZONE				   sat				L3 	 1997 2010  @{OBSPATH}  </model>
     </diag>
-       
+    -->   
     
-    <!-- 
+     
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -99,7 +99,7 @@ This namelist is part of the ESMValTool
 	
 		<model> OBS        CDS-ERA5-TA				   sat				L3 	 2007 2008  @{OBSPATH}  </model>
     </diag>
-    -->   
+       
 
 <!--	
 	<diag>
