@@ -111,14 +111,7 @@ class __Diagnostic_skeleton__(object):
         return
 
     def read_data(self):
-        """
-        reads artificial data for testing uses
-        TODO: Remove after loading is tested.
-        """
-        datadir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests/testdata")
-        self.sp_data = iris.load_cube(
-            os.path.join(datadir, "test.nc"))  
-        warnings.warn("Implementation Warning", UserWarning)
+        raise ImplementationError("read_data","This method has to be implemented.")
         return
 
     @profile
@@ -126,13 +119,13 @@ class __Diagnostic_skeleton__(object):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
         self.__do_mean_var__()
-        self.__do_trends__()
+#        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
 #        self.__mann_kendall_trend__()
-        self.__do_esm_evaluation__()
+#        self.__do_esm_evaluation__()
         pass
     
     def __do_overview__(self):
@@ -191,12 +184,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
     global differences, RMSD etc.
     """
 
-    @profile
+#    @profile
     def __init__(self, **kwargs):
         super(Basic_Diagnostic, self).__init__(**kwargs)
         self.diagname = "Basic_Diagnostic.py"
 
-    @profile
+#    @profile
     def set_info(self, **kwargs):
         """
         gather information for diagnostic
@@ -270,42 +263,27 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         self.__output_type__ = self.CDS_ID + "." + self.__output_type__
         
-    @profile
+#    @profile
     def read_data(self):
 
         """
         reads data
         """ 
-        for i in [1]:
+        try:
             if os.path.isfile(self.__infile__):
                 self.sp_data = iris.load_cube(self.__infile__)
-                #self.sp_data.data = np.ma.masked_array(self.sp_data.data, mask=np.isnan(self.sp_data.data))
-                # get dimensions
+                # get dimensions and correct if needed
                 sp_dimensions = [c.name() for c in self.sp_data.coords()]
                 extra_dimensions = [item for item in sp_dimensions if item not in set(self.dimensions)]
                 self.dimensions = sp_dimensions
-#                assert False
                 self.sp_data.coord('latitude').guess_bounds()
-    #            if not self.sp_data.coords('grid_longitude'):
-    #            mima_lon=np.nanpercentile(self.sp_data.coord('longitude').points,[0,100])
-    #            if np.all(mima_lon <= 360) and np.all(mima_lon>=0):
-    #                print self.sp_data.coord('longitude')
-    #                long_2 = self.sp_data.coord('longitude').points.copy()
-    #                long_2[long_2>180]=long_2[long_2>180]-360
-    #                long_2_coord = icoords.Coord(long_2, units='degrees', long_name=u'longitude_2', var_name='lon_2')
-    #                print long_2_coord
-    #                self.sp_data.add_aux_coord(long_2_coord)
-    #                print self.sp_data
-    #                self.sp_data.coord('longitude_2').guess_bounds()
                 self.sp_data.coord('longitude').guess_bounds()
                 if self.sp_data.units == "no-unit":
                     self.sp_data.units = '1'
             else:
                 raise PathError(self.__infile__,"This file is not accessible.")
-#        except:
-#            super(Basic_Diagnostic, self).read_data()
-#            print("Error in reading data- Generic data used instead.")
-#            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path: " + self.__infile__)
+        except:
+            raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path: " + self.__infile__)
             
         if len(extra_dimensions) == 0:
             self.var3D=False
@@ -478,7 +456,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return list_of_plots
 
-    @profile
+#    @profile
     def __do_overview__(self):
         
         this_function = "overview"
@@ -572,7 +550,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
 
-    @profile    
+#    @profile    
     def __do_report__(self,**kwargs):
         
         # TODO specify sphinx structure
@@ -1005,7 +983,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         return list_of_plots
     
-    @profile
+#    @profile
     def __do_mean_var__(self):
         
         this_function = "mean and variability"

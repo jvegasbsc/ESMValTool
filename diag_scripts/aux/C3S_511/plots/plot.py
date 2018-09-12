@@ -505,7 +505,7 @@ class Plot2D(object):
     TIME = ['time']         # accepted time names
     LEVS = ['air_pressure'] # accepted level names
     MAX_COLUMNS = 3
-    TIME_LABEL = 'Date'
+    TIME_LABEL = ''
     TIME_FORMAT = '%Y-%m-%d'
 
 
@@ -772,38 +772,31 @@ class Plot2D(object):
             column = idx % self.__class__.MAX_COLUMNS
             row = idx // self.__class__.MAX_COLUMNS
             if self.n_cubes > 1:
-                plt.sca(plt.subplot(gs[row, column]))
+                plt.sca(plt.subplot(gs[row, column],transform = 'polar'))
             else:
                 plt.sca(ax[0])
 
+            
             # Plot map
             # (this needs to be done due to an error in cartopy)
             try:
-                # qplt.pcolormesh(self.cubes, cmap=brewer_cmap, vmin=vmin,
-                #                 vmax=vmax) #, levels=levels, extend='both')
-                # qplt.contourf(self.cubes, cmap=brewer_cmap, vmin=vmin,
-                #               vmax=vmax, levels=levels, extend='both')
                 qplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin,
                                 vmax=vmax)
                 if 'time' in self.plot_type:
                     time_coord = cube.coord(self.time_vars[idx])
-                    if self.plot_type == 'lontime':
-                        (locs, _) = plt.yticks()
-                    else:
-                        (locs, _) = plt.xticks()
+                    locs=[time_coord.points[ind] for (ind,_) in enumerate(time_coord.points) if ind%(np.ceil(len(time_coord.points)/5.))==0 or ind+1==len(time_coord.points)]
                     labels = unit.num2date(locs,
                                            time_coord.units.name,
                                            time_coord.units.calendar)
-                    print labels
-#                    for (idx, _) in enumerate(labels):
-#                        labels[idx] = labels[idx].strftime(
-#                            self.__class__.TIME_FORMAT)
-#                    if self.plot_type == 'lontime':
-#                        plt.yticks(locs, labels)
-#                        plt.ylabel(self.__class__.TIME_LABEL)
-#                    else:
-#                        plt.xticks(locs, labels)
-#                        plt.xlabel(self.__class__.TIME_LABEL)
+                    for (idx, _) in enumerate(labels):
+                        labels[idx] = labels[idx].strftime(
+                            self.__class__.TIME_FORMAT)
+                    if self.plot_type == 'lontime':
+                        plt.yticks(locs, labels)
+                        plt.ylabel(self.__class__.TIME_LABEL)
+                    else:
+                        plt.xticks(locs, labels)
+                        plt.xlabel(self.__class__.TIME_LABEL)
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -853,10 +846,9 @@ class Plot2D(object):
                 bb.y0 = ax[0].get_position().y0
                 ax[1].set_position(bb)
 
-        # Tight layout
         try:
             plt.tight_layout()
-        except: 
+        except:
             pass
         return
 
@@ -903,7 +895,8 @@ class Plot1D(object):
     LATS = ['latitude']     # accepted lat names
     LONS = ['longitude']    # accepted lon names
     TIME = ['time']         # accepted time names
-
+    TIME_LABEL = ''
+    TIME_FORMAT = '%Y-%m-%d'
 
     def __init__(self, cube):
         """
@@ -1025,6 +1018,25 @@ class Plot1D(object):
             print(exc_type, fname, exc_tb.tb_lineno)
             print 'We did not expect this to fail!'
             plt.plot(self.cube.coords("time").points,self.cube.data)
-        plt.tight_layout()
+            
+        if 'time' == self.plot_type:
+            time_coord = self.cube.coords("time")[0]
+            (locs, _) = plt.xticks()
+            
+            locs=[time_coord.points[ind] for (ind,_) in enumerate(time_coord.points) if ind%(np.ceil(len(time_coord.points)/5.))==0 or ind+1==len(time_coord.points)]
+            labels = unit.num2date(locs,
+                                   time_coord.units.name,
+                                   time_coord.units.calendar)
+            for (idx, _) in enumerate(labels):
+                labels[idx] = labels[idx].strftime(
+                    self.__class__.TIME_FORMAT)
+
+            plt.xticks(locs, labels)
+            plt.xlabel(self.__class__.TIME_LABEL)
+        
+        try:
+            plt.tight_layout()
+        except:
+            pass
 
         return
