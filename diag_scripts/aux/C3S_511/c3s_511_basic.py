@@ -263,7 +263,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         self.__output_type__ = self.CDS_ID + "." + self.__output_type__
         
-#    @profile
+    @profile
     def read_data(self):
 
         """
@@ -456,7 +456,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return list_of_plots
 
-#    @profile
+    @profile
     def __do_overview__(self):
         
         this_function = "overview"
@@ -712,7 +712,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return list_of_plots
     
-    
+    @profile
     def __mean_var_procedures_2D__(self,cube=None,level=None):
         
         if cube is None:
@@ -983,7 +983,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         return list_of_plots
     
-#    @profile
+    @profile
     def __do_mean_var__(self):
         
         this_function = "mean and variability"
