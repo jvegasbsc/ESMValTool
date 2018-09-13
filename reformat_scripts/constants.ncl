@@ -612,6 +612,17 @@ begin
     end if
 ; A_laue_ax-
 
+; A_muel_bn+
+    ; if present, save variable attribute "scale_factor"
+    if (isatt(var, "scale_factor")) then
+        factattr = var@scale_factor
+    end if
+    ; if present, save variable attribute "add_offset"
+    if (isatt(var, "add_offset")) then
+        offsetattr = var@add_offset
+    end if
+; A_muel_bn-
+
     ;; Remove attributes
     delete_VarAtts(var, -1)
 
@@ -636,6 +647,15 @@ begin
         out@coordinates = coordattr
     end if
 ; A_laue_ax-
+
+; A_muel_bn+
+    if (isvar("factattr")) then
+        out@scale_factor = factattr
+    end if
+    if (isvar("offsetattr")) then
+        out@add_offset = offsetattr
+    end if
+; A_muel_bn-
 
     leave_msg(scriptname, funcname, 4)
     return(out)
