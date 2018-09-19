@@ -32,7 +32,7 @@ This namelist is part of the ESMValTool
   <output_file_type>                  png                       </output_file_type>
   <verbosity  type="integer">         1                         </verbosity>
   <debuginfo type="boolean">          False                     </debuginfo>
-  <exit_on_warning  type="boolean">   True                      </exit_on_warning>
+  <exit_on_warning  type="boolean">   False                      </exit_on_warning>
   <tags>							  Testing_Namelist			</tags>
 </GLOBAL>
 
@@ -59,20 +59,20 @@ This namelist is part of the ESMValTool
     
  -->
    
-   <!--  
+     
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
-        <variable ref_model="QA4ECV">			   			fAPAR                                       </variable>
+        <variable ref_model="CDS-XCO2">			   			    xco2                                      </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">    DUMMY_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
-		<tags> 													R_Land					  </tags>
+		<tags> 													R_atmos					  </tags>
 	
-		<model> OBS        QA4ECV				   ECV				avh-geo-res050-14D 	 1992 2006  @{OBSPATH}  </model>
+		<model> OBS        CDS-XCO2		   sat				L3 	 2003 2016  @{OBSPATH}  </model>
     </diag>
-   -->
 
+    
     <!--
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
@@ -87,7 +87,7 @@ This namelist is part of the ESMValTool
     </diag>
     -->   
     
-     
+    <!-- 
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
@@ -99,8 +99,23 @@ This namelist is part of the ESMValTool
 	
 		<model> OBS        CDS-ERA5-TA				   sat				L3 	 2007 2008  @{OBSPATH}  </model>
     </diag>
-       
+    -->   
 
+    <!-- 
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ESACCI-SST">			   			tos                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Land					  </tags>
+	
+		<model> OBS        ESACCI-SST				   sat				L4-GHRSST-SSTdepth-OSTIA-GLOB 	 1992 2010  @{OBSPATH}Tier2/  </model>
+    </diag>
+    -->
+
+    
 <!--	
 	<diag>
 	     # optional 

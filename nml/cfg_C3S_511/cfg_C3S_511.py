@@ -1,10 +1,10 @@
 # This is a dummy config file for C3S_511 diagnostics
 
 # 3D-data levels
-levels=[80000.,50000.,25000.,10000.]
+levels=[80000.]
 
 # color setting for data
-data_colors="binary"
+data_colors="RdYlGn"
 
 # latex output 
 # (options: True = Latex output, False = No Latex_outputs, None = No Pdf generation; recommended: False)

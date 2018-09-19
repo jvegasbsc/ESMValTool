@@ -5,8 +5,8 @@ variable_info = True
 variable_info@derived = True
 variable_info@long_name = "Column Averaged CH4"
 variable_info@short_name = "XCH4"
-variable_info@units = "1e-9"
-variable_info@plot_units = "ppbv"
+variable_info@units = "1e-6"
+variable_info@plot_units = "ppmv"
 
 
 variable_info@colormap = "BlAqGrYeOrReVi200"
@@ -35,7 +35,7 @@ function calculate(index[1]:integer,
 ;;    data_new: logical
 ;;
 ;; Description
-;;    Calculates the average-column atmospheric CH4 [1e-9].
+;;    Calculates the average-column atmospheric CH4 [1e-6].
 ;;
 ;; Caveats
 ;;

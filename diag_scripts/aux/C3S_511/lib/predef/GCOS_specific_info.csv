@@ -65,6 +65,7 @@ Inorganic Carbon;pCO2 (to provide Air-sea flux of CO2);spco2;Daily;Every 10°\n(D
 Ocean Colour;Water Leaving Radiance;;Weekly averages;4 km;5%\n(blue & green\nwavelengths);0,50%;See http://www.ioccp.org/index.php/foo ;WGClimate;
 Ocean Colour;Chlorophyll-a Concentration;;Daily;4 km;30%;3%;See http://www.ioccp.org/index.php/foo ;WGClimate;
 Soil Moisture;Surface soil moisture;mrsos;Daily;1-25 km;0.04 m3/m3;0.01 m3/m3/year;WMO (2008b);WGClimate;ISMN
+Soil Moisture;Volumetric soil moisture;sm;;;;;;;
 Soil Moisture;Freeze/thaw;;Daily;1-25 km;90%;tbd;;WGClimate;ISMN
 Soil Moisture;Surface inundation;;Daily;1-25 km;90%;tbd;;;ISMN
 Soil Moisture;Root-zone soil moisture;;;1-25 km;0.04 m3/m3;0.01 m3/m3/year;;;ISMN
