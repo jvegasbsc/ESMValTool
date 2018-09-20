@@ -355,6 +355,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 # plotting routine
                 filename = self.__plot_dir__ + os.sep + basic_filename + "_frac_avail_" + "_".join(short_left_over) + "." + self.__output_type__
                 list_of_plots.append(filename)
+                frac_available_vals.rename("availability as a fraction")
                 x=Plot2D(frac_available_vals)
                 
                 fig = plt.figure()
