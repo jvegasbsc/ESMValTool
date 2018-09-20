@@ -442,6 +442,11 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             list_of_plots=[]
             for lev in self.levels:
                 loc_cube=self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
+                if loc_cube is None:
+                    raise ValueError("Invalid input: at least one of " + 
+                                     "the requested levels seem " + 
+                                     "not to be available in the analyzed " + 
+                                     "cube.")
                 lop=self.__overview_procedures_2D__(loc_cube,level=lev)
                 list_of_plots = list_of_plots + lop
         
@@ -576,12 +581,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 x=Plot2D(stat_dict[d]["level_dim_mean"])
                 
                 fig = plt.figure()
-
-                gs = gridspec.GridSpec(6, 5)
-                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
-                fig.set_figwidth(1.7*fig.get_figwidth())
-                fig.set_figheight(1.2*fig.get_figheight())
-                x.plot(ax=ax, color=self.colormaps, color_type="Data", title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmaxmean)
+                (fig,ax,_) = plot_setup(d="levels",fig=fig)
+                x.plot(ax=ax, color=self.colormaps, ext_cmap="both", color_type="Data", title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmaxmean)
                 fig.savefig(filename)
                 plt.close(fig.number)
             
