@@ -17,7 +17,6 @@ import cartopy.crs as ccrs
 import sys
 import string
 from matplotlib.ticker import FuncFormatter
-from string import ascii_lowercase
 
 def label_in_perc(x, pos=0):
     return '%1.1f%%' % (x*100)
@@ -545,17 +544,19 @@ class Plot2D(object):
 
             # Label plots (supports at most 26 figures at the moment)
             if self.n_cubes > 1:
-                letter = '(' + ascii_lowercase[idx % 26] + ')'
+                letter = '(' + __my_string_ascii_lc__(idx) + ')'
                 plt.text(0.01, 0.99, letter,
                         horizontalalignment='left',
                         verticalalignment='top',
                         transform=plt.gca().transAxes)
         
         if self.n_cubes >1:
-            plt.colorbar(cax=plt.subplot(gs[n_rows-1, :]), orientation='horizontal', fraction=1., extend=ext_cmap, boundaries=levels)
+            cax = plt.subplot(gs[n_rows-1, :])
         else:
-            plt.colorbar(cax=ax[len(ax)-1], orientation='horizontal', fraction=1., extend=ext_cmap, boundaries=levels)
-
+            cax = ax[len(ax)-1]
+        plt.colorbar(cax=cax, orientation='horizontal', fraction=1., extend=ext_cmap, boundaries=levels)
+        cax.set_xlabel(list(set(self.names))[0] + " [" + str(cube.units) + "]")
+        
         # Colors
         if color_type is None or color_type not in color.keys():
             if color_reverse:
@@ -711,8 +712,6 @@ class Plot1D(object):
             20180527-A_muel_bn: copied Plot2D_2 and adjusted
         """
 
-        # preprocessing cube information
-        self.cube.rename(title)
 
         #brewer_cmap = mpl_cm.get_cmap('brewer_Spectral_11')
 
@@ -734,7 +733,8 @@ class Plot1D(object):
 #            print self.cube.data
 #            print self.cube.coords("time")[0].points
             plt.plot(self.cube.coords("time")[0].points,self.cube.data)
-            plt.title(title)
+#            plt.title(title)
+            plt.gca().set_ylabel(self.cube.long_name + " [" + str(self.cube.units) + "]",rotation=90)
             plt.grid()
 
         except Exception as e:
@@ -796,6 +796,20 @@ def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
         caption = caption + ' Subplots a) - g) show percentiles 1%, 5%, 10%, 50%, 90%, 95%, and 99%.'
     if "anomalies" in m:
         fig.set_figheight(np.ceil(numfigs/10.)*fig.get_figheight())
-        caption = caption + ' Subplots ' + string.ascii_lowercase[0] + ') - ' + string.ascii_lowercase[numfigs-1] + ') show single years.'
+        caption = caption + ' Subplots ' + __my_string_ascii_lc__(0) + ') - ' + __my_string_ascii_lc__(numfigs-1) + ') show single years.'
     
     return fig, ax, caption
+
+def __my_string_ascii_lc__(n):
+    if n>701:
+        raise ValueError("You are trying to get more than 702 plots into one multiple plot. This is not possible due to limited plot numbering.")
+    numlet=n/26
+    numrest=n%26
+    
+    if n<26:
+        return string.ascii_lowercase[n]
+    else:
+        return string.ascii_lowercase[numlet-1] + string.ascii_lowercase[numrest]
+        
+        
+        
