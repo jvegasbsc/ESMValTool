@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-import mpl_toolkits.basemap as bm
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
@@ -16,6 +15,7 @@ import matplotlib.cm as mpl_cm
 import cartopy.crs as ccrs
 #import random
 import sys
+import string
 from matplotlib.ticker import FuncFormatter
 from string import ascii_lowercase
 
@@ -206,290 +206,6 @@ class PlotScatter(object):
         self.fig.tight_layout()
         return self.fig
 
-
-class Plot2D_deprecated(object):
-    """
-    Description
-        Basic class for 2-dimensional plotting
-
-    Contents
-        method plot
-    """
-
-    # Class attributes
-    LATS = ['latitude']     # accepted lat names
-    LONS = ['longitude']    # accepted lon names
-    TIME = ['time']         # accepted time names
-    GRIDSPEC_LENGTH = 5     # size of the matplotlib gridspec
-
-###############################################################################
-
-    def __init__(self, cube):
-        """
-        Arguments
-            cube : iris cube
-
-        Description
-            Initializes the class.
-
-        TODO
-            optional summary placement
-            swap x/y axis
-
-        Modification history
-            20180207-A_schl_ma: written
-        """
-
-        # Check arguments
-        if (not isinstance(cube, iris.cube.Cube)):
-            raise TypeError("Invalid input: expected iris cube")
-        self.cube = iris.util.squeeze(cube)
-        if (self.cube.ndim != 2):
-            raise TypeError("Invalid input: expected 2-dimensional iris cube")
-        try:
-            self.name = cube.long_name
-        except:
-            pass
-        self.units = ' [' + str(cube.units) + ']'
-
-
-        # Get dimension names
-        dim_names = [dim.standard_name for dim in self.cube.dim_coords]
-        for dim in dim_names:
-            if (dim in self.__class__.LATS):
-                self.lat_var = dim
-                break
-            else:
-                self.lat_var = None
-        for dim in dim_names:
-            if (dim in self.__class__.LONS):
-                self.lon_var = dim
-                break
-            else:
-                self.lon_var = None
-        for dim in dim_names:
-            if (dim in self.__class__.TIME):
-                self.time_var = dim
-                break
-            else:
-                self.time_var = None
-
-        # Lat/lon plot
-        if (self.lat_var is not None and self.lon_var is not None):
-            self.plot_type = 'latlon'
-            self.summary_location = 'right'
-
-        # Lat/time plot
-        elif (self.lat_var is not None and self.time_var is not None):
-            self.plot_type = 'lattime'
-            self.summary_location = 'right'
-
-        # Lon/time plot
-        elif (self.lon_var is not None and self.time_var is not None):
-            self.plot_type = 'lontime'
-            self.summary_location = 'bottom'
-
-        # Default case
-        else:
-            raise TypeError("Invalid input: cube does not contain supported " +
-                            "dimensions")
-
-        # Setup matplotlib
-        plt.style.use(MPLSTYLE)
-
-###############################################################################
-
-    def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
-             y_label=None, title=None, ax=None, fig=None):
-        """
-        Arguments
-            summary_plot   : Add summary line plot
-            colorbar_ticks : Ticks of the colorbar
-            x_label        : label of x-axis
-            y_label        : label of y-axis
-            title          : title of the plot
-
-        Returns
-            Matplotlib figure instance
-
-        Description
-            Actual plotting routine
-
-        Modification history
-            20180207-A_schl_ma: written
-        """
-
-
-        if ax is None:
-
-            # Summary plot yes/no
-            if (not summary_plot):
-                G = gridspec.GridSpec(1, 1)
-                colorbar = 'vertical'
-            elif (self.summary_location == 'right'):
-                colorbar = 'horizontal'
-                G = gridspec.GridSpec(2, 2, width_ratios=[4, 1],
-                                      height_ratios=[8, 1])
-            elif (self.summary_location == 'bottom'):
-                colorbar = 'vertical'
-                G = gridspec.GridSpec(2, 2, width_ratios=[8, 1],
-                                      height_ratios=[4, 1])
-
-            # Main plot
-            plt.subplot(G[0])
-            if (title is not None):
-                plt.title(title)
-            else:
-                plt.title(self.name + self.units)
-            if (x_label is not None):
-                plt.xlabel(x_label)
-            if (y_label is not None):
-                plt.ylabel(y_label)
-            if (self.plot_type == 'latlon'):
-                x = self.cube.coord(self.lon_var).points
-                y = self.cube.coord(self.lat_var).points
-                z = self.cube.data
-                collapse = self.lon_var
-                line_plot_axes = 1
-                cb_axes = 2
-                m = bm.Basemap(projection='cyl', llcrnrlat=-90.0, urcrnrlat=90.0,
-                               llcrnrlon=0.0, urcrnrlon=360.0, lat_ts=20.0,
-                               resolution='c')
-                m.drawcoastlines()
-                x, y = m(*np.meshgrid(x, y))
-                ax_main = m.contourf(x, y, z)
-            else:
-                if (self.plot_type == 'lattime'):
-                    x = self.cube.coord(self.time_var).points
-                    y = self.cube.coord(self.lat_var).points
-                    z = self.cube.data.T
-                    collapse = self.time_var
-                    line_plot_axes = 1
-                    cb_axes = 2
-                elif (self.plot_type == 'lontime'):
-                    x = self.cube.coord(self.lon_var).points
-                    y = self.cube.coord(self.time_var).points
-                    z = self.cube.data
-                    collapse = self.time_var
-                    line_plot_axes = 2
-                    cb_axes = 1
-                ax_main = plt.contourf(x, y, z)
-
-            # Line plot
-            if (summary_plot):
-                ax_cb = plt.subplot(G[cb_axes])
-                cb = plt.colorbar(ax_main, cax=ax_cb, orientation=colorbar,
-                                  ticks=colorbar_ticks)
-                plt.subplot(G[line_plot_axes])
-                if (collapse == self.lat_var):
-                    grid_areas = iris.analysis.cartography.area_weights(self.cube)
-                else:
-                    grid_areas = None
-                cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
-                                                weights=grid_areas)
-
-                if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
-                    x = cube_line
-                    y = cube_line.coord(self.lat_var)
-                else:
-                    x = cube_line.coord(self.lon_var)
-                    y = cube_line
-                ax_line = iplt.plot(x, y)
-            else:
-                cb = plt.colorbar(ax_main, orientation=colorbar,
-                                  ticks=colorbar_ticks)
-
-            plt.tight_layout()
-            return plt.gcf()
-
-        else:
-
-            if fig is None:
-                assert False, "fig should be provided and is missing!"
-
-            # Summary plot yes/no
-            if (not summary_plot):
-                G = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=ax)
-                colorbar = 'vertical'
-            elif (self.summary_location == 'right'):
-                colorbar = 'horizontal'
-                G = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=ax, width_ratios=[4, 1],
-                                      height_ratios=[8, 1])
-            elif (self.summary_location == 'bottom'):
-                colorbar = 'vertical'
-                G = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=ax, width_ratios=[8, 1],
-                                      height_ratios=[4, 1])
-            # Main plot
-            axl = plt.Subplot(fig, G[0])
-            if (title is not None):
-                plt.title(title)
-            else:
-                plt.title(self.name + self.units)
-            if (x_label is not None):
-                plt.xlabel(x_label)
-            if (y_label is not None):
-                plt.ylabel(y_label)
-            if (self.plot_type == 'latlon'):
-                x = self.cube.coord(self.lon_var).points
-                y = self.cube.coord(self.lat_var).points
-                z = self.cube.data
-                collapse = self.lon_var
-                line_plot_axes = 1
-                cb_axes = 2
-                m = bm.Basemap(projection='cyl', llcrnrlat=-90.0, urcrnrlat=90.0,
-                               llcrnrlon=0.0, urcrnrlon=360.0, lat_ts=20.0,
-                               resolution='c')
-                m.drawcoastlines()
-                x, y = m(*np.meshgrid(x, y))
-                ax_main = m.contourf(x, y, z)
-            else:
-                if (self.plot_type == 'lattime'):
-                    x = self.cube.coord(self.time_var).points
-                    y = self.cube.coord(self.lat_var).points
-                    z = self.cube.data.T
-                    collapse = self.time_var
-                    line_plot_axes = 1
-                    cb_axes = 2
-                elif (self.plot_type == 'lontime'):
-                    x = self.cube.coord(self.lon_var).points
-                    y = self.cube.coord(self.time_var).points
-                    z = self.cube.data
-                    collapse = self.time_var
-                    line_plot_axes = 2
-                    cb_axes = 1
-                ax_main = plt.contourf(x, y, z)
-            fig.add_subplot(ax_main)
-
-            # Line plot
-            if (summary_plot):
-                ax_cb = plt.Subplot(fig, G[cb_axes])
-                cb = plt.colorbar(ax_main, cax=ax_cb, orientation=colorbar,
-                                  ticks=colorbar_ticks)
-                fig.add_subplot(ax_cb)
-                axl = plt.Subplot(fig, G[line_plot_axes])
-                if (collapse == self.lat_var):
-                    grid_areas = iris.analysis.cartography.area_weights(self.cube)
-                else:
-                    grid_areas = None
-                cube_line = self.cube.collapsed(collapse, iris.analysis.MEAN,
-                                                weights=grid_areas)
-
-                if (self.plot_type == 'latlon' or self.plot_type == 'lattime'):
-                    x = cube_line
-                    y = cube_line.coord(self.lat_var)
-                else:
-                    x = cube_line.coord(self.lon_var)
-                    y = cube_line
-                ax_line = iplt.plot(x, y)
-                fig.add_subplot(axl)
-            else:
-                cb = plt.colorbar(ax_main, orientation=colorbar,
-                                  ticks=colorbar_ticks)
-                fig.add_subplot(cb)
-
-            return
-
-
 class Plot2D(object):
     """
     Description
@@ -617,7 +333,7 @@ class Plot2D(object):
 
     def plot(self, summary_plot=False, colorbar_ticks=None, x_label=None,
              y_label=None, title=None, ax=None, fig=None, vminmax=None,
-             color=None, color_type=None, color_reverse=False):
+             color=None, color_type=None, color_reverse=False, ext_cmap= 'neither' ):
         """
         Arguments
             summary_plot   : Add summary line plot
@@ -635,7 +351,6 @@ class Plot2D(object):
         Modification history
             20180515-A_muel_bn: copied Plot2D and adjusted
         """
-
         # Preprocessing cube information
         if self.n_cubes == 1:
             self.cubes[0].rename(title)
@@ -665,8 +380,8 @@ class Plot2D(object):
             vmin, vmax = 1E99, -1E99
             for cube in self.cubes:
                 try:
-                    temp_min, temp_max = np.nanpercentile(cube.data.data[
-                        np.logical_not(cube.data.mask)], [5.0, 95.0])
+                    temp_min, temp_max = np.nanpercentile(cube.data,
+                                                          [5.0, 95.0])
                     if (temp_min < vmin):
                         vmin = temp_min
                     if (temp_max > vmax):
@@ -679,26 +394,29 @@ class Plot2D(object):
                 levels = None
         else:
             vmin, vmax = vminmax
+            
         if vmin is not None:
             rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
-            vmin, vmax = np.round([vmin, vmax], rounder)
+#            vmin, vmax = np.round([vmin, vmax], rounder)
+            vmin  = np.floor(vmin*10**rounder)/10**rounder
+            vmax = np.ceil(vmax*10**rounder)/10**rounder
             levels = np.round(np.linspace(vmin, vmax, num=11), rounder)
 
         # Check axes
         if ax is None:
             ax = [plt.gca()]
         try:
-            if len(ax) == 2:
+            if len(ax) == 3:
                 summary_plot = True
-            elif len(ax) > 2:
+            elif len(ax) > 3 or len(ax)<2:
                 raise ValueError("Invalid input: axes should not be more "
-                                 "than 2!")
+                                 "than 3 or less than 2!")
         except TypeError:
             ax = [ax]
 
         # Plot summary if necessary
         if summary_plot:
-            if len(ax) < 2:
+            if len(ax) < 3:
                 raise ValueError("Invalid input: Need 2 axes for summary plot")
             plt.sca(ax[1])
 
@@ -735,7 +453,6 @@ class Plot2D(object):
                 x = cube_line
                 y = cube_line.coord(lat_var)
                 latrange = cube.coords(lat_var).pop()
-                # lat_inc = np.diff(latrange.points).mean()
                 latrange = (np.min(latrange.points), np.max(latrange.points))
                 plt.gca().set_xlim(vmin, vmax)
                 plt.gca().set_ylim(latrange)
@@ -745,7 +462,6 @@ class Plot2D(object):
                 x = cube_line.coord(lon_var)
                 y = cube_line
                 lonrange = cube.coords(lon_var).pop()
-                # lon_inc = np.diff(lonrange.points).mean()
                 lonrange = (np.min(lonrange.points), np.max(lonrange.points))
                 plt.gca().set_ylim(vmin, vmax)
                 plt.gca().set_xlim(lonrange)
@@ -754,7 +470,6 @@ class Plot2D(object):
                 x = cube_line
                 y = cube_line.coord(lev_var)
                 levrange = cube.coords(lev_var).pop()
-                # lat_inc = np.diff(latrange.points).mean()
                 levrange = (np.min(levrange.points), np.max(levrange.points))
                 plt.gca().set_xlim(vmin, vmax)
                 plt.gca().set_ylim(levrange)
@@ -764,7 +479,8 @@ class Plot2D(object):
 
         # Setup axes for plotting multiple cubes
         n_columns = min([self.n_cubes, self.__class__.MAX_COLUMNS])
-        n_rows = (self.n_cubes - 1) // self.__class__.MAX_COLUMNS + 1
+        rel_plots_cbar = 4
+        n_rows = rel_plots_cbar*((self.n_cubes - 1) // self.__class__.MAX_COLUMNS + 1) + 1
         gs = gridspec.GridSpec(n_rows, n_columns)
 
         # Iterate over cubes
@@ -772,19 +488,26 @@ class Plot2D(object):
             column = idx % self.__class__.MAX_COLUMNS
             row = idx // self.__class__.MAX_COLUMNS
             if self.n_cubes > 1:
-                plt.sca(plt.subplot(gs[row, column],transform = 'polar'))
+                curplot = gs[(rel_plots_cbar*row):(rel_plots_cbar*(row+1)), column]
+                plt.sca(plt.subplot(curplot,transform = 'robinson'))
             else:
                 plt.sca(ax[0])
-
             
             # Plot map
             # (this needs to be done due to an error in cartopy)
             try:
-                qplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin,
+                iplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin,
                                 vmax=vmax)
                 if 'time' in self.plot_type:
                     time_coord = cube.coord(self.time_vars[idx])
-                    locs=[time_coord.points[ind] for (ind,_) in enumerate(time_coord.points) if ind%(np.ceil(len(time_coord.points)/5.))==0 or ind+1==len(time_coord.points)]
+                    locs = [tp for tp in time_coord.points if 
+                            np.isclose(tp%365.2425,0,
+                                       atol=np.mean(
+                                               np.diff(time_coord.points)))]    
+                    while len(locs)>7:
+                        locs = [locs[lind] for (lind,_) in 
+                                enumerate(locs) if not lind%2]
+                    locs = locs + [time_coord.points[-1]]
                     labels = unit.num2date(locs,
                                            time_coord.units.name,
                                            time_coord.units.calendar)
@@ -803,10 +526,7 @@ class Plot2D(object):
                 print(exc_type, fname, exc_tb.tb_lineno)
                 qplt.pcolormesh(cube, cmap=brewer_cmap, vmin=vmin, vmax=vmax)
                 plt.text(0.5, 0.5,'Data cannot be displayed as intended due '
-                                  'to cartopy bug! \n Deviations are color '
-                                  'levels and time axis display. \n Future '
-                                  'updates of cartopy module may resolve '
-                                  'this issue (#946).',
+                                  'to cartopy issues with the data cube!',
                                   horizontalalignment='center',
                                   verticalalignment='center',
                                   transform=plt.gca().transAxes)
@@ -819,7 +539,7 @@ class Plot2D(object):
                 plt.gca().coastlines()
                 plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",
                                     linestyle=':')
-                plt.gca().text(-180, -100,
+                plt.gca().text(-180, -112,
                                r'mean: {0} $\pm$ {1} '.format(
                                    str(round(mean, 2)),str(round(std, 2))))
 
@@ -830,6 +550,11 @@ class Plot2D(object):
                         horizontalalignment='left',
                         verticalalignment='top',
                         transform=plt.gca().transAxes)
+        
+        if self.n_cubes >1:
+            plt.colorbar(cax=plt.subplot(gs[n_rows-1, :]), orientation='horizontal', fraction=1., extend=ext_cmap, boundaries=levels)
+        else:
+            plt.colorbar(cax=ax[len(ax)-1], orientation='horizontal', fraction=1., extend=ext_cmap, boundaries=levels)
 
         # Colors
         if color_type is None or color_type not in color.keys():
@@ -1023,7 +748,14 @@ class Plot1D(object):
             time_coord = self.cube.coords("time")[0]
             (locs, _) = plt.xticks()
             
-            locs=[time_coord.points[ind] for (ind,_) in enumerate(time_coord.points) if ind%(np.ceil(len(time_coord.points)/5.))==0 or ind+1==len(time_coord.points)]
+            locs = [tp for tp in time_coord.points if 
+                    np.isclose(tp%365.2425,0,
+                               atol=np.mean(
+                                       np.diff(time_coord.points)))]    
+            while len(locs)>7:
+                locs = [locs[lind] for (lind,_) in 
+                        enumerate(locs) if not lind%2]
+            locs = locs + [time_coord.points[-1]]            
             labels = unit.num2date(locs,
                                    time_coord.units.name,
                                    time_coord.units.calendar)
@@ -1040,3 +772,30 @@ class Plot1D(object):
             pass
 
         return
+
+def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
+    
+    if "longitude" == d:     
+        gs = gridspec.GridSpec(6, 5)
+        ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
+        fig.set_figwidth(1.7*fig.get_figwidth())
+        fig.set_figheight(1.2*fig.get_figheight())
+    elif "time" == d:
+        gs = gridspec.GridSpec(9, 1)
+        ax = np.array([plt.subplot(gs[:-2,0]),plt.subplot(gs[-1,0])])
+        fig.set_figheight(1.2*fig.get_figheight())
+    elif "latitude" == d:
+        gs = gridspec.GridSpec(11, 1)
+        ax = np.array([plt.subplot(gs[:-3,0]),plt.subplot(gs[-3:-1,0]),plt.subplot(gs[-1,0])])
+        fig.set_figheight(1.7*fig.get_figheight())
+    if "CLIMATOLOGY" == m:
+        fig.set_figheight(1.7*fig.get_figheight())
+        caption = caption + ' Subplots a) - l) show months January - December.'
+    if "PERCENTILE" == m:  
+        fig.set_figheight(1.3*fig.get_figheight())
+        caption = caption + ' Subplots a) - g) show percentiles 1%, 5%, 10%, 50%, 90%, 95%, and 99%.'
+    if "anomalies" in m:
+        fig.set_figheight(np.ceil(numfigs/10.)*fig.get_figheight())
+        caption = caption + ' Subplots ' + string.ascii_lowercase[0] + ') - ' + string.ascii_lowercase[numfigs-1] + ') show single years.'
+    
+    return fig, ax, caption

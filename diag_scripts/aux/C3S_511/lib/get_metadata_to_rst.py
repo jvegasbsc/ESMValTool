@@ -624,6 +624,7 @@ def do_gcos_table(varname, gcos_expert, gcos_reference, gcos_expert_file=None):
                 gcos_expert_read.update({it[0]:{it[1]:it[2]}})
     except Exception as e:
         print("Calculated GCOS information written at: " + gcos_expert_file + "\nPlease consider corrections, if needed!")
+        open(gcos_expert_file, 'a').close()
         with open(gcos_expert_file, 'wb') as csv_file:
             writer = csv.writer(csv_file)
             for key, value in gcos_expert.items():

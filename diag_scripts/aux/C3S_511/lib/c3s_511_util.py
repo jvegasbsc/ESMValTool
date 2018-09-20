@@ -401,3 +401,4 @@ def __TS_of_cube__(cube,**kwargs):
     version.units = cf_units.Unit("1")
     
     return({"slope": min_trend, "number_breakpts":num_bp, "version":version, "homogenized":homogenized})
+    

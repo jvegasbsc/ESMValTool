@@ -129,6 +129,7 @@ latex_elements = {
     #
     'preamble': r'''
 	\usepackage[section]{placeins}
+        \usepackage{setspace}
         \usepackage{ragged2e}
 	\pagestyle{fancy}
 	\extrafloats{1000}
@@ -144,9 +145,9 @@ latex_elements = {
             \vspace*{10mm} %%% * is used to give space from top
             \begin{flushright}\textbf{\Huge {ESMValTool C3S\_511 Report}}\end{flushright}
  	    \vspace*{10mm}
-	    \begin{flushright}\textbf{\huge {++SUBREPORTTITLE++}}\end{flushright}
+	    \begin{flushright}\textbf{\huge \onehalfspacing {++SUBREPORTTITLE++}}\end{flushright}
  
-            \begin{flushright}\textbf{\huge {for ++VARIABLE++ from ++DATASET++}}\end{flushright}
+            \begin{flushright}\textbf{\huge \onehalfspacing {for ++VARIABLE++ from ++DATASET++}}\end{flushright}
 	    
             \vspace*{25mm}
             \begin{flushright}\textbf{\textit{\Large {Release 0.1beta}}}\end{flushright}

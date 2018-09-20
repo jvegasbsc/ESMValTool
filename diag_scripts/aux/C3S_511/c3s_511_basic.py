@@ -36,7 +36,7 @@ from get_metadata_to_rst import do_report as report
 from get_metadata_to_rst import do_smm_table
 from get_metadata_to_rst import do_gcos_table
 from get_metadata_to_rst import do_eval_table
-from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D
+from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D, plot_setup
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 from ecv_lookup_table import ecv_lookup
@@ -120,12 +120,13 @@ class __Diagnostic_skeleton__(object):
         self.__do_overview__()
         self.__do_mean_var__()
         self.__do_trends__()
-#        self.__do_extremes__()
-#        self.__do_sectors__()
+        self.__do_extremes__()
+        self.__do_sectors__()
         self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
 #        self.__mann_kendall_trend__()
         self.__do_esm_evaluation__()
+        self.__do_app_perf_matrix__()
         pass
     
     def __do_overview__(self):
@@ -156,6 +157,11 @@ class __Diagnostic_skeleton__(object):
     def __do_maturity_matrix__(self):
         self.__do_report__(content={},filename="do_maturity_matrix_default")
         raise ImplementationError("__do_maturity_matrix__","This method has to be implemented.")
+        return
+    
+    def __do_app_perf_matrix__(self):
+        self.__do_report__(content={},filename="do_app_perf_matrix_default")
+        raise ImplementationError("__do_app_perf_matrix__","This method has to be implemented.")
         return
 
     def __do_gcos_requirements__(self):
@@ -364,18 +370,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 x=Plot2D(frac_available_vals)
                 
                 fig = plt.figure()
-                if "longitude" == d:     
-                    gs = gridspec.GridSpec(1, 5)
-                    ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
-                    fig.set_figwidth(1.7*fig.get_figwidth())
-                    fig.set_figheight(1.2*fig.get_figheight())
-                elif "time" == d:
-                    ax = [plt.subplot(1,1,1)]
-                    fig.set_figheight(1.2*fig.get_figheight())
-                elif "latitude" == d:
-                    gs = gridspec.GridSpec(5, 1)
-                    ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
-                    fig.set_figheight(1.7*fig.get_figheight())
+                (fig,ax,_) = plot_setup(d=d,fig=fig)
                 x.plot(ax=ax, vminmax=[0.,1.], color=self.colormaps, color_type="Sequential", title=" ".join([self.__dataset_id__[idx] for idx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                 fig.savefig(filename)
                 plt.close(fig.number)
@@ -397,20 +392,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     print('Warning: blank figure!')
                     
                     x=Plot2D_blank(frac_available_vals)
-                    
+                        
                     fig = plt.figure()
-                    if "longitude" == d:     
-                        gs = gridspec.GridSpec(1, 5)
-                        ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
-                        fig.set_figwidth(1.7*fig.get_figwidth())
-                        fig.set_figheight(1.2*fig.get_figheight())
-                    elif "time" == d:
-                        ax = [plt.subplot(1,1,1)]
-                        fig.set_figheight(1.2*fig.get_figheight())
-                    elif "latitude" == d:
-                        gs = gridspec.GridSpec(5, 1)
-                        ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
-                        fig.set_figheight(1.7*fig.get_figheight())
+                    
+                    (fig,ax,_) = plot_setup(d=d,fig=fig)
                     x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                     fig.savefig(filename)
                     plt.close(fig.number)
@@ -606,8 +591,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 fig = plt.figure()
 
-                gs = gridspec.GridSpec(1, 5)
-                ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                gs = gridspec.GridSpec(6, 5)
+                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
                 fig.set_figwidth(1.7*fig.get_figwidth())
                 fig.set_figheight(1.2*fig.get_figheight())
                 x.plot(ax=ax, color=self.colormaps, color_type="Data", title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmaxmean)
@@ -634,8 +619,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 x=Plot2D_blank(stat_dict[d]["level_dim_mean"])
                 
-                gs = gridspec.GridSpec(1, 5)
-                ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                gs = gridspec.GridSpec(6, 5)
+                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
                 fig.set_figwidth(1.7*fig.get_figwidth())
                 fig.set_figheight(1.2*fig.get_figheight())
                 
@@ -661,8 +646,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 fig = plt.figure()
 
-                gs = gridspec.GridSpec(1, 5)
-                ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                gs = gridspec.GridSpec(6, 5)
+                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
                 fig.set_figwidth(1.7*fig.get_figwidth())
                 fig.set_figheight(1.2*fig.get_figheight())
             
@@ -690,8 +675,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 x=Plot2D_blank(stat_dict[d]["level_dim_std"])
                 
-                gs = gridspec.GridSpec(1, 5)
-                ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
+                gs = gridspec.GridSpec(6, 5)
+                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
                 fig.set_figwidth(1.7*fig.get_figwidth())
                 fig.set_figheight(1.2*fig.get_figheight())
                 
@@ -899,34 +884,25 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 # this needs to be done due to an error in cartopy
                     filename = self.__plot_dir__ + os.sep + basic_filename + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
                     list_of_plots.append(filename)
+                    
                     try:
                         x=Plot2D(mean_std_cov[m])
                         
                         caption = str("/".join(long_left_over).title() + ' ' + m.lower() + ' maps of ' + ecv_lookup(self.__varname__) + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ').')
                         
+                        try:
+                            numfigs=len(mean_std_cov[m])
+                        except:
+                            numfigs=None
+                            
                         fig = plt.figure()
-                        if "longitude" == d:     
-                            gs = gridspec.GridSpec(1, 5)
-                            ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
-                            fig.set_figwidth(1.7*fig.get_figwidth())
-                            fig.set_figheight(1.2*fig.get_figheight())
-                        elif "time" == d:
-                            ax = [plt.subplot(1,1,1)]
-                            fig.set_figheight(1.2*fig.get_figheight())
-                        elif "latitude" == d:
-                            gs = gridspec.GridSpec(5, 1)
-                            ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
-                            fig.set_figheight(1.7*fig.get_figheight())
-                        if "CLIMATOLOGY" == m:
-                            fig.set_figheight(2*fig.get_figheight())
-                            caption = caption + ' Subplots a) - l) show months January - December.'
-                        if "PERCENTILE" == m:  
-                            fig.set_figheight(1.5*fig.get_figheight())
-                            caption = caption + ' Subplots a) - g) show percentiles 1%, 5%, 10%, 50%, 90%, 95%, and 99%.'
-                        if "anomalies" in m:
-                            fig.set_figheight(np.ceil(len(mean_std_cov[m])/3.)*fig.get_figheight())
-                            caption = caption + ' Subplots ' + string.ascii_lowercase[0] + ') - ' + string.ascii_lowercase[len(mean_std_cov[m])-1] + ') show single years.'
-                        x.plot(ax=ax, color=self.colormaps, color_type=ctype, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmax)
+                        
+                        (fig,ax,caption) = plot_setup(d=d,m=m,numfigs=numfigs,fig=fig,caption=caption)
+                        
+                        x.plot(ax=ax, color=self.colormaps, color_type=ctype,
+                               title=" ".join([self.__dataset_id__[indx] for 
+                                               indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",
+                               vminmax=vminmax, ext_cmap="both")
                         fig.savefig(filename)
                         plt.close(fig.number)
                     
@@ -951,19 +927,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         
                         x=Plot2D_blank(mean_std_cov[m])
                         
+                        try:
+                            numfigs=len(mean_std_cov[m])
+                        except:
+                            numfigs=None
+                            
                         fig = plt.figure()
-                        if "longitude" == d:     
-                            gs = gridspec.GridSpec(1, 5)
-                            ax = np.array([plt.subplot(gs[0, :-1]),plt.subplot(gs[0, -1])])
-                            fig.set_figwidth(1.7*fig.get_figwidth())
-                            fig.set_figheight(1.2*fig.get_figheight())
-                        elif "time" == d:
-                            ax = [plt.subplot(1,1,1)]
-                            fig.set_figheight(1.2*fig.get_figheight())
-                        elif "latitude" == d:
-                            gs = gridspec.GridSpec(5, 1)
-                            ax = np.array([plt.subplot(gs[:-1,0]),plt.subplot(gs[-1,0])])
-                            fig.set_figheight(1.7*fig.get_figheight())
+                        
+                        (fig,ax,caption) = plot_setup(d=d,m=m,numfigs=numfigs,fig=fig,caption=caption)
+                        
                         x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                         fig.savefig(filename)
                         plt.close(fig.number)
@@ -1044,9 +1016,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             list_of_plots.append(filename)
             
             fig = plt.figure()
-            ax = [plt.subplot(1,1,1)]
-            fig.set_figheight(1.2*fig.get_figheight())
-            x.plot(ax=ax, color=self.colormaps, color_type="Diverging", vminmax=vminmax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            (fig,ax,_) = plot_setup(fig=fig)
+            x.plot(ax=ax, color=self.colormaps, ext_cbar="both", color_type="Diverging", vminmax=vminmax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
             fig.savefig(filename)
             plt.close(fig.number)
             
@@ -1065,16 +1036,15 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             list_of_plots.append(filename)
             
             fig = plt.figure()
-            ax = [plt.subplot(1,1,1)]
-            fig.set_figheight(1.2*fig.get_figheight())
-            x.plot(ax=ax, color=self.colormaps, color_type="Diverging", vminmax=[-1.,1.], title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            (fig,ax,_) = plot_setup(fig=fig)
+            x.plot(ax=ax, color=self.colormaps, ext_cbar="both", color_type="Diverging", vminmax=[-1.,1.], title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
             fig.savefig(filename)
             plt.close(fig.number)
             
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + ' significant slope signs of ' + ecv_lookup(self.__varname__) + ' temporal trends per decade for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
+                     str("Latitude/Longitude" + ' significant slope signs (p<=0.05) of ' + ecv_lookup(self.__varname__) + ' temporal trends per decade for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ')'),
                      '#C3S' + 'temptrend' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -1086,9 +1056,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             list_of_plots.append(filename)
             
             fig = plt.figure()
-            ax = [plt.subplot(1,1,1)]
-            fig.set_figheight(1.2*fig.get_figheight())
-            x.plot(ax=ax, color=self.colormaps, color_type="Sequential", color_reverse=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            (fig,ax,_) = plot_setup(fig=fig)
+            x.plot(ax=ax, color=self.colormaps, ext_cbar="both", color_type="Sequential", color_reverse=True, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
             fig.savefig(filename)
             plt.close(fig.number)
             
@@ -1102,31 +1071,31 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.authors)
             
         except Exception as e:
-                    exc_type, exc_obj, exc_tb = sys.exc_info()
-                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                    print(exc_type, fname, exc_tb.tb_lineno)
-                    print("Trend")
-                    print('Warning: blank figure!')
-                    
-                    x=Plot2D_blank(S)
-                    
-                    fig = plt.figure()
-                    ax = [plt.subplot(1,1,1)]
-                    fig.set_figheight(1.2*fig.get_figheight())
-                    x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-                    fig.savefig(filename)
-                    plt.close(fig.number)
-                    
-                    ESMValMD("meta",
-                             filename,
-                             self.__basetags__ + ['DM_global', 'C3S_mean_var'],
-                             str('Trend plot for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
-                             '#C3S' + 'temptrend' + self.__varname__,
-                             self.__infile__,
-                             self.diagname,
-                             self.authors)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            print("Trend")
+            print('Warning: blank figure!')
+            
+            x=Plot2D_blank(S)
+            
+            fig = plt.figure()
+            (fig,ax,_) = plot_setup(fig=fig)
+            x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+            
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_mean_var'],
+                     str('Trend plot for the data set "' + "_".join(dataset_id) + '" (' + self.__time_period__ + '); Data can not be displayed due to cartopy error!'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
         
         del P
+        del ST
         
 #        # TODO: adjust base_filename and dataset_id if turned on again!
 #        # linear trend (slope),breakpoints, and actual data after homogenization

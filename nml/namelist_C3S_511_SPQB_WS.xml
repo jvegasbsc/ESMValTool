@@ -63,26 +63,27 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable>			   			toz                                       </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Atmos					  </tags>
 	
 		<model> OBS        ESACCI-OZONE				   sat				L3 	 1997 2010  @{OBSPATH}  </model>
     </diag>
     
+      <!--
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable>			   			sic                                       </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Ocean					  </tags>
 	
 		<model> OBS_gridfile        NSIDC-BT				   sat				NH 	 1999 1999 @{OBSPATH}  /media/bmueller/Work/ESMVAL_res/work/Obs/OBS_NSIDC-BT_sat_NH_T2Ms_sic_199901-199912.nc </model>
     </diag>
 
-  <!--
+
     <diag>
         <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
