@@ -802,7 +802,7 @@ def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
 
 def __my_string_ascii_lc__(n):
     if n>701:
-        raise ValueError("You are trying to get more than 702 plots into one multiple plot. This is not possible.")
+        raise ValueError("You are trying to get more than 702 plots into one multiple plot. This is not possible due to limited plot numbering.")
     numlet=n/26
     numrest=n%26
     
