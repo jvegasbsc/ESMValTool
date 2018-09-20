@@ -775,7 +775,7 @@ class Plot1D(object):
 
 def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
     
-    if "longitude" == d:     
+    if d in ["longitude","levels"]:     
         gs = gridspec.GridSpec(6, 5)
         ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
         fig.set_figwidth(1.7*fig.get_figwidth())

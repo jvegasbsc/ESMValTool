@@ -91,7 +91,7 @@ def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", data
                         outfile.write("* " + key + ": " + report_data["listtext"][key] + "\n")
                         
                 outfile.write(".. raw:: latex \n\n")
-                outfile.write("   \clearpage \n") #does not react on this
+                outfile.write("   \clearpage \n") #does not react to this
                         
             else:
                 print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
@@ -125,7 +125,7 @@ def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", data
                 print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
                 
             outfile.write(".. raw:: latex \n\n")
-            outfile.write("   \clearpage \n") #does not react on this
+            outfile.write("   \clearpage \n") #does not react to this
                 
         else:
             print("No writable text found! There was no 'freetext' in the dictionary!")

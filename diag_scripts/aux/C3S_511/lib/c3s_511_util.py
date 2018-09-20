@@ -11,8 +11,6 @@ import sys
 import numpy as np
 from scipy import stats
 import cf_units
-import matplotlib.pyplot as plt
-import time
 import iris
 
 sys.path.insert(0,
