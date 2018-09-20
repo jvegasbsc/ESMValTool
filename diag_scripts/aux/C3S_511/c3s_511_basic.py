@@ -4,8 +4,6 @@ Basic implementation for diagnostics into ESMValTool
 # used modules
 import iris
 import iris.coord_categorisation
-from iris.analysis import stats as cubestats
-import iris.coords as icoords
 import os
 import sys
 import shutil
@@ -17,14 +15,10 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-from scipy import stats
 import datetime
 import imp
 import csv
 import gc
-
-from pathos.multiprocessing import ProcessingPool
-import itertools as it
 
 [sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)), direct)) for direct in ["lib", "plots"]]
@@ -40,8 +34,6 @@ from plot import Plot2D, PlotHist, Plot2D_blank, Plot1D, plot_setup
 from esmval_lib import ESMValProject
 from ESMValMD import ESMValMD
 from ecv_lookup_table import ecv_lookup
-
-from memory_profiler import profile
 
 # All packages checked
 
@@ -114,7 +106,6 @@ class __Diagnostic_skeleton__(object):
         raise ImplementationError("read_data","This method has to be implemented.")
         return
 
-    @profile
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
@@ -124,7 +115,6 @@ class __Diagnostic_skeleton__(object):
         self.__do_sectors__()
         self.__do_maturity_matrix__()
         self.__do_gcos_requirements__()
-#        self.__mann_kendall_trend__()
         self.__do_esm_evaluation__()
         self.__do_app_perf_matrix__()
         pass
@@ -269,7 +259,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         self.CDS_ID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         self.__output_type__ = self.CDS_ID + "." + self.__output_type__
         
-    @profile
     def read_data(self):
 
         """
@@ -325,7 +314,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return
     
-    @profile
     def __overview_procedures_2D__(self,cube=None,level=None):
         
         if cube is None:
@@ -412,7 +400,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         del sp_masked_vals
         del num_available_vals
         del frac_available_vals
-        print(gc.collect()) 
         
         # histogram plot of available measurements
         all_data = cube.copy()
@@ -441,7 +428,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return list_of_plots
 
-    @profile
     def __do_overview__(self):
         
         this_function = "overview"
@@ -697,7 +683,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         return list_of_plots
     
-    @profile
     def __mean_var_procedures_2D__(self,cube=None,level=None):
         
         if cube is None:
@@ -955,7 +940,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         return list_of_plots
     
-    @profile
     def __do_mean_var__(self):
         
         this_function = "mean and variability"
@@ -1096,6 +1080,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
         del P
         del ST
+        del S
         
 #        # TODO: adjust base_filename and dataset_id if turned on again!
 #        # linear trend (slope),breakpoints, and actual data after homogenization
@@ -1505,243 +1490,3 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             else:
                 print "Region " + R + " specifications not specified correctly: " + str(dict_of_regions[R]) + "!"
         return subset_cubes
-
-    def __mann_kendall_trend__(self):
-        print("Calculating Mann-Kendall Trend")
-        this_function = "mann kendall trend"
-        
-        save_data = self.sp_data.copy()
-#        lev = self.levels[0]
-#        self.sp_data = self.sp_data.extract(iris.Constraint(coord_values={str(self.level_dim):lambda cell: cell==lev}))
-        
-        # Set parameters
-        self.record_cutoff = 10
-
-        # Leave out nreduce for now
-        shape2d = self.sp_data.shape[1:]
-
-        # Create tuples containing all the combinations of indices
-        indexlist = list(it.product(range(shape2d[0]),range(shape2d[1])))
-        wrapdictlist = []
-        for indices in indexlist:
-            d = {}
-            d['indices'] = indices
-            wrapdictlist.append(d)
-        
-        pool = ProcessingPool()
-        
-        pool.ncpus = 8
-        mktest_output_list = pool.map(self.__wrap_mk_test__,wrapdictlist)
-        
-        # Now create arrays for data storage
-        h = np.empty(shape2d,dtype='int')
-        p = np.empty(shape2d,dtype='float')
-        z = np.empty(shape2d,dtype='float')
-        trend = np.empty(shape2d,dtype='int')
-        recordlength = np.empty(shape2d,dtype='int')
-        mask = np.empty(shape2d,dtype='int')
-        
-        # Now start unpacking the results
-        trendtext_to_intdict = {
-                'increasing' : 1,
-                'no trend' : 0,
-                'decreasing' : -1,
-                }
-        
-        for d in mktest_output_list:
-            i,j = d['indices']
-            trend[i,j] = trendtext_to_intdict[d['trend']]
-            h[i,j] = d['h']
-            p[i,j] = d['p']
-            z[i,j] = d['z']
-            mask[i,j] = d['mask']
-            recordlength[i,j] = d['recordlength']
-
-        vardict = {
-            'trend' : trend,
-            'h' : h,
-            'p' : p,
-            'z' : z,
-            'recordlength' : recordlength,
-            'mask' : mask
-        }
-        
-        # New way of saving
-        cube2d = self.sp_data[0,:,:].copy()
-        # Add the mask
-        cube2d.data.mask = mask
-        
-        newcubes = []
-        for key in vardict:
-            thiscube = cube2d.copy()
-            thiscube.data = vardict[key]
-            thiscube.varname = key
-            thiscube.var_name = key
-            thiscube.rename(key)
-            thiscube.units=''
-            newcubes.append(thiscube)
-
-        list_of_plots=[]
-        print("Starting the plotting")
-        for key,cube in zip(vardict,newcubes):
-            # define filename
-            filename = self.__plot_dir__ + os.sep + self.__basic_filename__ + "MK_"+key+ "." + self.__output_type__
-            print("plotting: ",filename)
-            list_of_plots.append(filename)
-
-
-            # initialize the figure
-            fig = plt.figure()
-            # intialize the axis where we plot
-            ax = [plt.subplot(1,1,1)]
-
-            # Modify the coordinates
-#                x=Plot2D(cube)
-#                x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-#            except:
-            cube.coord('latitude').points = cube.coord('latitude').points-0.0001
-            cube.coord('longitude').points = cube.coord('longitude').points-0.0001
-            x=Plot2D(cube)
-            x.plot(ax=ax, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
-
-            # call the plot
-            
-            # save figure
-            fig.savefig(filename)
-            # close figure
-            plt.close(fig.number)
-    
-            ESMValMD("meta",
-                     filename,
-                     self.__basetags__ + ['DM_global', 'C3S_MannKendall'],
-                     # caption below EDIT!
-                     str("Mann Kendall trend - "+ key + ' of ' + self.__varname__ + ' for the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')'),
-                     # identifier EDIT!
-    '#C3S' + "igr" + self.__varname__,
-                     self.__infile__,
-                     self.diagname,
-                     self.authors)
-        del newcubes
-        self.__do_report__(content={"plots":list_of_plots},filename=this_function.upper())
-        self.sp_data = save_data
-
-    def __wrap_mk_test__(self,wrapdict):
-        print(str(datetime.datetime.now())+": starting new task")
-        #data = wrapdict['data']
-        indices = wrapdict['indices']
-        i,j = indices
-        data_column = self.sp_data[:,i,j]
-        data_cleaned = data_column.data.compressed() # Maybe check that it has non-zero length
-        # Create a new dict to return
-        d = {}
-        d['recordlength'] = data_cleaned.size
-        d['indices'] = indices
-        if d['recordlength'] > self.record_cutoff: 
-            d['trend'],d['h'],d['p'],d['z'] = self.__mk_test__(data_cleaned)
-            d['mask'] = 0
-        else:
-            d['trend'],d['h'],d['p'],d['z'] = 'no trend',0,1.0,0.0
-            d['mask'] = 1
-        return d
-    
-    def __mk_test__(self,x, alpha=0.05):
-        """
-        This function is derived from code originally posted by Sat Kumar Tomer
-        (satkumartomer@gmail.com)
-        See also: http://vsp.pnnl.gov/help/Vsample/Design_Trend_Mann_Kendall.htm
-        #############################################################################
-        MIT License
-        Copyright (c) 2017 Michael Schramm
-        
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-        
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-        
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-        #############################################################################    
-    
-        The purpose of the Mann-Kendall (MK) test (Mann 1945, Kendall 1975, Gilbert
-        1987) is to statistically assess if there is a monotonic upward or downward
-        trend of the variable of interest over time. A monotonic upward (downward)
-        trend means that the variable consistently increases (decreases) through
-        time, but the trend may or may not be linear. The MK test can be used in
-        place of a parametric linear regression analysis, which can be used to test
-        if the slope of the estimated linear regression line is different from
-        zero. The regression analysis requires that the residuals from the fitted
-        regression line be normally distributed; an assumption not required by the
-        MK test, that is, the MK test is a non-parametric (distribution-free) test.
-        Hirsch, Slack and Smith (1982, page 107) indicate that the MK test is best
-        viewed as an exploratory analysis and is most appropriately used to
-        identify stations where changes are significant or of large magnitude and
-        to quantify these findings.
-    
-        Input:
-            x:   a vector of data
-            alpha: significance level (0.05 default)
-    
-        Output:
-            trend: tells the trend (increasing, decreasing or no trend)
-            h: True (if trend is present) or False (if trend is absence)
-            p: p value of the significance test
-            z: normalized test statistics
-    
-        Examples
-        --------
-          >>> x = np.random.rand(100)
-          >>> trend,h,p,z = mk_test(x,0.05)
-    
-        """
-        from scipy.stats import norm
-    
-        n = len(x)
-    
-        # calculate S
-        s = 0
-        for k in range(n-1):
-            for j in range(k+1, n):
-                s += np.sign(x[j] - x[k])
-    
-        # calculate the unique data 
-        unique_x = np.unique(x)
-        g = len(unique_x)
-    
-        # calculate the var(s)
-        if n == g:  # there is no tie
-            var_s = (n*(n-1)*(2*n+5))/18
-        else:  # there are some ties in data
-            tp = np.zeros(unique_x.shape)
-            for i in range(len(unique_x)):
-                tp[i] = sum(x == unique_x[i])
-            var_s = (n*(n-1)*(2*n+5) - np.sum(tp*(tp-1)*(2*tp+5)))/18
-    
-        if s > 0:
-            z = (s - 1)/np.sqrt(var_s)
-        elif s == 0:
-            z = 0
-        elif s < 0:
-            z = (s + 1)/np.sqrt(var_s)
-    
-        # calculate the p_value
-        p = 2*(1-norm.cdf(abs(z)))  # two tail test
-        h = abs(z) > norm.ppf(1-alpha/2)
-    
-        if (z < 0) and h:
-            trend = 'decreasing'
-        elif (z > 0) and h:
-            trend = 'increasing'
-        else:
-            trend = 'no trend'
-    
-        return trend, h, p, z
