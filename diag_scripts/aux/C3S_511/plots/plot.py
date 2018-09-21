@@ -379,8 +379,12 @@ class Plot2D(object):
             vmin, vmax = 1E99, -1E99
             for cube in self.cubes:
                 try:
-                    temp_min, temp_max = np.nanpercentile(cube.data,
-                                                          [5.0, 95.0])
+                    if cube.data is np.ma.masked:
+                        temp_min, temp_max = np.nanpercentile(
+                                cube.data.compressed(),[5.0, 95.0])
+                    else:
+                        temp_min, temp_max = np.nanpercentile(
+                                cube.data,[5.0, 95.0])
                     if (temp_min < vmin):
                         vmin = temp_min
                     if (temp_max > vmax):

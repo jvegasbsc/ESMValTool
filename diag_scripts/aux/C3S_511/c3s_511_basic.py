@@ -762,9 +762,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             loc_data = perc.extract(iris.Constraint(percentile_over_time=p))
                             
                             precentile_list.append(loc_data)
+#                            print loc_data.data.compressed()
                                                         
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data,[5,95])]),[0,100])})
-                            
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.percentile(loc_data.data.compressed(),[5,95])]),[0,100])})
+#                            print disp_min_max
                         mean_std_cov.update({m:precentile_list})
                             
                         del precentile_list
@@ -799,7 +800,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             clim_comp_list.append(loc_data)
                             
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data,[5,95])]),[0,100])})
+                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.compressed(),[5,95])]),[0,100])})
                         
                         mean_std_cov.update({m:clim_comp_list})
                         
@@ -814,7 +815,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             pot_min_max = np.concatenate(
                                     [disp_min_max["diff_vals"],
-                                    np.nanpercentile(loc_data.data,[5,95])
+                                    np.nanpercentile(loc_data.data.compressed(),[5,95])
                                     ])
             
                             disp_min_max.update({"diff_vals":np.nanpercentile(
@@ -837,7 +838,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         
                     mean_std_cov.update({m:loc_data})
                     
-                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data,[5,95])]),[0,100])})
+                    disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.compressed(),[5,95])]),[0,100])})
                     
                 elif m == "STD_DEV":
         
@@ -857,7 +858,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ctype=None
                 
                 if np.any([m_typ in m for m_typ in ["MEAN","PERCENTILE", "CLIMATOLOGY"]]):
-                    vminmax=disp_min_max["abs_vals"]
+#                    vminmax=disp_min_max["abs_vals"]
                     ctype="Data"
                     
                 if np.any([m_typ in m for m_typ in ["STD_DEV"]]):
@@ -996,7 +997,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             # plotting routines
             x=Plot2D(S)
             
-            vminmax = np.array([-1,1])*np.max(np.abs(np.nanpercentile(S.data,[5,95])))
+            vminmax = np.array([-1,1])*np.max(np.abs(np.nanpercentile(S.data.compressed(),[5,95])))
             
             filename = self.__plot_dir__ + os.sep + basic_filename + "_trend." + self.__output_type__
             list_of_plots.append(filename)
