@@ -858,7 +858,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 ctype=None
                 
                 if np.any([m_typ in m for m_typ in ["MEAN","PERCENTILE", "CLIMATOLOGY"]]):
-#                    vminmax=disp_min_max["abs_vals"]
+                    vminmax=disp_min_max["abs_vals"]
                     ctype="Data"
                     
                 if np.any([m_typ in m for m_typ in ["STD_DEV"]]):
