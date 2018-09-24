@@ -131,6 +131,7 @@ latex_elements = {
 	\usepackage[section]{placeins}
         \usepackage{setspace}
         \usepackage{ragged2e}
+	\usepackage{caption}
 	\pagestyle{fancy}
 	\extrafloats{1000}
         \renewcommand{\familydefault}{\sfdefault}

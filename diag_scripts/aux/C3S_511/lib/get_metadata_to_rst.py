@@ -114,18 +114,23 @@ def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", data
                                 outfile.write("=" * len(this_title) + "\n\n")
                                 outfile.write(text)
                                 outfile.write("\n\n")
+                                
+                                outfile.write(".. raw:: latex \n\n")
+                                outfile.write("   \clearpage \n")
+                                
                             else: 
                                 print("There is still the empty description from empty.txt!")
                 else:
                     outfile.write(this_title + "\n")
                     outfile.write("=" * len(this_title) + "\n\n")
                     outfile.write(report_data["freetext"] + "\n\n")
+                    
+                    outfile.write(".. raw:: latex \n\n")
+                    outfile.write("   \clearpage \n")
                 
             else:
                 print("Wrong format in text entry, nothing can be written!") # TODO: ERROR function 
                 
-            outfile.write(".. raw:: latex \n\n")
-            outfile.write("   \clearpage \n") #does not react to this
                 
         else:
             print("No writable text found! There was no 'freetext' in the dictionary!")
