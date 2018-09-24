@@ -77,3 +77,6 @@ doc/sphinx/source/diag_scripts/**
 doc/sphinx/source/plot_scripts/**
 
 *.xml
+
+# C3S_511 config file
+nml/cfg_C3S_511/cfg_C3S_511.py
