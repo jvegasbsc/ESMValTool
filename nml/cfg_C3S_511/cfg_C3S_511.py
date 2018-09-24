@@ -8,5 +8,5 @@ data_colors="RdYlGn"
 
 # latex output 
 # (options: True = Latex output, False = No Latex_outputs, None = No Pdf generation; recommended: False)
-show_latex=None
+show_latex=False
 
