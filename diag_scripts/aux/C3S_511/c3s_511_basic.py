@@ -330,7 +330,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         list_of_plots=[]
         
         reg_dimensions =  [item for item in self.dimensions if item not in set([self.level_dim])]
-        maxnumtemp = len(cube.coord("time").points)
+        maxnumtemp = float(len(cube.coord("time").points))
 
         try:
             sp_masked_vals = cube.collapsed("time",iris.analysis.COUNT,function=lambda values: values.mask)
