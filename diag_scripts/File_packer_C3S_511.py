@@ -44,7 +44,8 @@ def main(project_info):
     print('>>>>>>>> File_packer_C3S_511.py is running! <<<<<<<<<<<<')
 
     E = ESMValProject(project_info)
-
+    
+    
     climo_files = E.get_all_clim_models().keys()
     climo_paths = [os.path.dirname(cf) for cf in climo_files]
     
@@ -71,7 +72,10 @@ def main(project_info):
     output_file = matching_file_string + s_years + '-' + e_years + '.nc'
     
     if os.path.isfile(output_file):
-        raise ValueError("The requested climo file is already existing! Please investigate: " + output_file)
+        if E.get_configfile()=="overwrite":
+            pass
+        else:
+            raise ValueError("The requested climo file is already existing! Please investigate: " + output_file)
     
     cdo = CDO()
     cdo.mergetime(input=" ".join(climo_files),output=output_file)

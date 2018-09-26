@@ -109,14 +109,14 @@ class __Diagnostic_skeleton__(object):
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
         self.__do_overview__()
-        self.__do_mean_var__()
-        self.__do_trends__()
-        self.__do_extremes__()
-        self.__do_sectors__()
-        self.__do_maturity_matrix__()
-        self.__do_gcos_requirements__()
-        self.__do_esm_evaluation__()
-        self.__do_app_perf_matrix__()
+#        self.__do_mean_var__()
+#        self.__do_trends__()
+#        self.__do_extremes__()
+#        self.__do_sectors__()
+#        self.__do_maturity_matrix__()
+#        self.__do_gcos_requirements__()
+#        self.__do_esm_evaluation__()
+#        self.__do_app_perf_matrix__()
         pass
     
     def __do_overview__(self):
@@ -321,7 +321,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
         if level is not None:
             basic_filename = self.__basic_filename__ + "_lev" + str(level)
-            #dataset_id = self.__dataset_id__ +["level",str(level),str(self.sp_data.coord(self.level_dim).units)]
             dataset_id = [self.__dataset_id__[0],"at","level",str(level),str(self.sp_data.coord(self.level_dim).units)]
         else:
             basic_filename = self.__basic_filename__
@@ -1024,7 +1023,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
             fig = plt.figure()
             (fig,ax,_) = plot_setup(fig=fig)
-            x.plot(ax=ax, color=self.colormaps, ext_cmap="both", color_type="Diverging", vminmax=[-1.,1.], title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+            x.plot(ax=ax, color=self.colormaps, color_type="Diverging", vminmax=[-1.,1.], title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
             fig.savefig(filename)
             plt.close(fig.number)
             
