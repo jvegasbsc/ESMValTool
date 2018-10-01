@@ -273,14 +273,6 @@ def do_smm_table(csv_expert, csv_definitions):
     Output: a .rst file including the System Maturity Matrix
  
     """
-
-#    # WILL HAVE TO BE DELETED
-#    # -----------------------
-#    path_out = work_dir + "/plot_scripts/python/system_maturity_matrix"
-#
-#    path_report_out = work_dir + "/reports/sphinx/source"    
-
-    # ----------------------
  
     max_grade = 6 # Maximum possible grade. Grades are integers to be given between 
                   # 1 and max_grade (1, ..., max_grade)
@@ -381,28 +373,6 @@ def do_smm_table(csv_expert, csv_definitions):
     plt.tight_layout()
     
     return fig
-
-#    # Create output path for figure
-#    if not (os.path.exists(path_out)):
-#      os.makedirs(path_out)
-#    plt.savefig(path_out + "/" + "system_maturity_matrix.png", dpi = 400)
-#    plt.close("fig")
-#    # Create *.rst report
-#    if not (os.path.exists(path_report_out)):
-#      os.makedirs(path_report_out)
-#
-#    output_file = "report_smm.rst"
-#    file = open(path_report_out + "/" + output_file, "w")
-#
-#    my_title ="SYSTEM MATURITY MATRIX"
-#    file.write(my_title + "\n")
-#    file.write("=" * len(my_title) + "\n\n")
-#
-#    file.write(".. figure:: " + "../../../../plot_scripts/python/system_maturity_matrix/system_maturity_matrix.png" + "\n"
-#               "   :align:   center"   + "\n"
-#               "   :width:   95%" + "\n"
-#              )
-#    file.close()    
 
 
 def do_eval_table(varname, eval_expert, eval_data, ecv_length):

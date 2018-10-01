@@ -108,12 +108,12 @@ class __Diagnostic_skeleton__(object):
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__()["Germany_2000-2005"]
-        self.__do_overview__()
+#        self.__do_overview__()
 #        self.__do_mean_var__()
 #        self.__do_trends__()
 #        self.__do_extremes__()
 #        self.__do_sectors__()
-#        self.__do_maturity_matrix__()
+        self.__do_maturity_matrix__()
 #        self.__do_gcos_requirements__()
 #        self.__do_esm_evaluation__()
 #        self.__do_app_perf_matrix__()
@@ -1272,6 +1272,19 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
 
         expected_input, found = \
             self.__file_anouncement__(subdir="c3s_511/smm_input",
+                                      expfile="_SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx",
+                                      protofile="SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx",
+                                      function=this_function)
+        
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/smm_input",
+                                      expfile="_SMM_Guide_for_USERS_C3S_511_v1.pdf",
+                                      protofile="SMM_Guide_for_USERS_C3S_511_v1.pdf",
+                                      function=this_function)
+
+
+        expected_input, found = \
+            self.__file_anouncement__(subdir="c3s_511/smm_input",
                                       expfile="_smm_expert.csv",
                                       protofile="empty_smm_expert.csv",
                                       function=this_function)
@@ -1282,11 +1295,20 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         fig.savefig(filename)
         plt.close(fig)
         
+        suggestion = "Please make use of " + "SMM_Guide_for_USERS_C3S_511_v1.pdf" + " and " + "SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx" + " for producing the requested file!"
+        
         if not found:
             caption = "The expected input file: " + expected_input + " was not found and an empty dummy file created, therefore this plot is blank. Please edit the expected file!"
+            print suggestion
         else:
             #caption = str(this_function + ' for the variable ' + self.__varname__ + ' in the data set "' + "_".join(self.__dataset_id__) + '" (' + self.__time_period__ + ')')
-            caption = str(this_function + ' for the variable ' + ecv_lookup(self.__varname__) + ' in the data set "' + self.__dataset_id__[0] + '" (' + self.__time_period__ + ')')
+            with open(expected_input,"r") as file_read: 
+                if not any([lit.isdigit() for lit in list(file_read.read())]):
+                    caption = "The expected input file: " + expected_input + " was found but empty, therefore this plot is blank. Please edit the expected file!"
+                    print caption
+                    print suggestion
+                else:
+                    caption = str(this_function + ' for the variable ' + ecv_lookup(self.__varname__) + ' in the data set "' + self.__dataset_id__[0] + '" (' + self.__time_period__ + ')')
     
 
         ESMValMD("meta",
