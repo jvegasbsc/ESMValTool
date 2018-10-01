@@ -33,8 +33,6 @@ for source in source_list:
         parent_dir =  os.path.dirname(os.path.normpath(source))
         report_title = "report_" + ("_").join(source.split("_")[-3:-1])
         pdfname = parent_dir + os.sep + report_title + ".pdf"
-        print parent_dir
-	print pdfname.strip("/")
         shutil.move(build + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname.strip("/"))
     #except:
         #print "processing "+ source + " not possible. Please investigate!"    

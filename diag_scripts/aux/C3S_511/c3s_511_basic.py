@@ -1502,14 +1502,20 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 for dim in dict_of_regions[R].keys():
                     if dim=='latitude':
                         r_min,r_max=np.sort(dict_of_regions[R]['latitude'])
-                        loc_subset=loc_subset.extract(iris.Constraint(latitude=lambda point: r_min <= point <= r_max))
+                        try: #iris v2
+                            loc_subset=loc_subset.extract(iris.Constraint(latitude=lambda cell: r_min <= cell.point  <= r_max))
+                        except: #iris v1
+                            loc_subset=loc_subset.extract(iris.Constraint(latitude=lambda point: r_min <= point <= r_max))
                     if dim=='longitude':
                         r_min,r_max=np.sort(dict_of_regions[R]['longitude'])
                         loc_subset=loc_subset.intersection(longitude=(r_min,r_max))
                         loc_subset=loc_subset.intersection(longitude=(-180,180))
                     if dim=='time':
                         r_min,r_max=np.sort(dict_of_regions[R]['time'])
-                        loc_subset=loc_subset.extract(iris.Constraint(time=lambda cell: r_min <= cell.point  <= r_max))
+                        try: #iris v2
+                            loc_subset=loc_subset.extract(iris.Constraint(time=lambda cell: r_min <= cell.point  <= r_max))
+                        except: #iris v1
+                            loc_subset=loc_subset.extract(iris.Constraint(time=lambda point: (r_min-datetime.datetime(1950,1,1)).total_seconds()/60./60./24. <= point <= (r_max-datetime.datetime(1950,1,1)).total_seconds()/60./60./24.))
                 subset_cubes.update({R:loc_subset})
             else:
                 print "Region " + R + " specifications not specified correctly: " + str(dict_of_regions[R]) + "!"
