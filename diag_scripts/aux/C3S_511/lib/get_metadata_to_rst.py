@@ -181,7 +181,7 @@ def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", data
     outfile.close() 
 
     # copy Sphinx configuration and index file to temporary source directory
-    with open("doc/reporting/source/conf.py",'r') as conf_py:
+    with open("diag_scripts/aux/C3S_511/lib/produce_pdf/source/conf.py",'r') as conf_py:
         content = conf_py.read()
         content = content.replace("++SUBREPORTTITLE++",report_title.title())
         content = content.replace("++VARIABLE++",ecv.title())
@@ -189,18 +189,16 @@ def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", data
         with open(src_dir + os.sep + "conf.py",'w') as target_conf_py:
             target_conf_py.write(content)
         
-#    shutil.copy("doc/reporting/source/conf.py", src_dir)
-    shutil.copy("doc/reporting/source/index.rst", src_dir)
+    shutil.copy("diag_scripts/aux/C3S_511/lib/produce_pdf/source/index.rst", src_dir)
 
     # set environment variables for Sphinx (source directory and build directory)
     os.environ['SOURCEDIR'] = src_dir
     os.environ['BUILDDIR'] = bld_dir
-
     
     if latex_opts is not None:
         # run Sphinx to create a pdf
         oldpath = os.getcwd()
-        os.chdir("doc/reporting")
+        os.chdir("diag_scripts/aux/C3S_511/lib/produce_pdf")
         if not latex_opts:
             with open(os.devnull, 'wb') as devnull:
                 subprocess.call("make latexpdf", shell=True,
@@ -225,6 +223,13 @@ def do_report(report_data, report_title, work_dir, signature="", ecv="ECV", data
              pass
     
         print("Successfully created " + pdfname + "!")
+        
+    else:
+        shutil.copy("diag_scripts/aux/C3S_511/lib/produce_pdf/PDF_producer.py", path_out)
+        shutil.copy("diag_scripts/aux/C3S_511/lib/produce_pdf/make.bat", path_out)
+        shutil.copy("diag_scripts/aux/C3S_511/lib/produce_pdf/Makefile", path_out)
+        print("Successfully created PDF_producer.py in " + path_out + "! For report production, please port this directory including all files to a suitable machine.")
+
     
     
 def do_smm_table(csv_expert, csv_definitions):

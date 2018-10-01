@@ -8,8 +8,9 @@ Created on Wed Sep 26 14:49:51 2018
 
 import subprocess
 import os
+import shutil
 
-dir2sources = "/media/bmueller/Work/ESMVAL_res/work/reporting"
+dir2sources = "./"
 
 source_list = [x[0] for x in os.walk(dir2sources) if "source" in x[0]]
 
@@ -24,15 +25,18 @@ for source in source_list:
     os.environ['SOURCEDIR'] = source
     os.environ['BUILDDIR'] = build  
 
-    try:
+    #try:
+    if True:
         subprocess.call("make latexpdf", shell=True)
         
         # move pdf to the parent directory and rename to report_xxx.pdf
         parent_dir =  os.path.dirname(os.path.normpath(source))
         report_title = "report_" + ("_").join(source.split("_")[-3:-1])
         pdfname = parent_dir + os.sep + report_title + ".pdf"
-        os.rename(build + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname)
-    except:
-        print "processing "+ source + " not possible. Please investigate!"    
+        print parent_dir
+	print pdfname.strip("/")
+        shutil.move(build + os.sep + "latex" + os.sep + "ESMValToolC3S_511Report.pdf", pdfname.strip("/"))
+    #except:
+        #print "processing "+ source + " not possible. Please investigate!"    
 
 print("PDF production finished.")
