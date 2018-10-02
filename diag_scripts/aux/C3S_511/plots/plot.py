@@ -373,6 +373,8 @@ class Plot2D(object):
                     col_save=color[color_type]
                     color[color_type]=color[color_type]+"_r"
                 brewer_cmap = mpl_cm.get_cmap(color[color_type], lut=11)
+                
+        brewer_cmap.set_bad("grey",0.1)
 
         # Vminmax
         if vminmax is None:
@@ -733,11 +735,7 @@ class Plot1D(object):
 
         # plot line
         try:
-#            print self.cube
-#            print self.cube.data
-#            print self.cube.coords("time")[0].points
             plt.plot(self.cube.coords("time")[0].points,self.cube.data)
-#            plt.title(title)
             plt.gca().set_ylabel(self.cube.long_name + " [" + str(self.cube.units) + "]",rotation=90)
             plt.grid()
 
