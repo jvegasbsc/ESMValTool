@@ -816,14 +816,17 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                                     np.nanpercentile(loc_data.data.compressed(),[5,95])
                                     ])
             
-                            disp_min_max.update({"diff_vals":np.nanpercentile(
+                            disp_min_max.update({"diff_vals":list(set(np.nanpercentile(
                                     np.concatenate([pot_min_max,-1.*pot_min_max])
-                                    ,[0,100])})
+                                    ,[0,100])))})
+
+                            if len(disp_min_max["diff_vals"])==1:
+                                disp_min_max["diff_vals"]=[np.nan]
     
                             clim_anom_list.append(loc_data)
                             
                         mean_std_cov.update({"mean anomalies from " + m:clim_anom_list})
-                                                        
+                                                            
                         del clim_anom
                         del clim_anom_list
                             
@@ -879,7 +882,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         try:
                             numfigs=len(mean_std_cov[m])
                         except:
-                            numfigs=None
+                            numfigs=1
                             
                         fig = plt.figure()
                         
@@ -916,7 +919,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         try:
                             numfigs=len(mean_std_cov[m])
                         except:
-                            numfigs=None
+                            numfigs=1
                             
                         fig = plt.figure()
                         

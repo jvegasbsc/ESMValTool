@@ -258,7 +258,7 @@ class Plot2D(object):
         if self.n_cubes < 1:
             raise TypeError("Invalid input: expected at least one cube, not "
                             "an empty list")
-
+        
         # Get properties of the cubes
         self.names = [None] * self.n_cubes
         self.units = [None] * self.n_cubes
@@ -398,10 +398,16 @@ class Plot2D(object):
                 vmax = None
                 levels = None
         else:
-            vmin, vmax = vminmax
+            if len(vminmax)==2:
+                vmin, vmax = vminmax
+            else:
+                vmin=vmax=vminmax[0]
             
         if vmin is not None:
-            rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
+            if vmax==vmin or (np.isnan(vmin) and np.isnan(vmax)):
+                rounder=1
+            else:
+                rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
 #            vmin, vmax = np.round([vmin, vmax], rounder)
             vmin  = np.floor(vmin*10**rounder)/10**rounder
             vmax = np.ceil(vmax*10**rounder)/10**rounder
@@ -561,7 +567,7 @@ class Plot2D(object):
         else:
             cax = ax[len(ax)-1]
         plt.colorbar(cax=cax, orientation='horizontal', fraction=1., extend=ext_cmap, boundaries=levels)
-        cax.set_xlabel(list(set(self.names))[0] + " [" + str(cube.units) + "]")
+        cax.set_xlabel((list(set(self.names))[0] if list(set(self.names))[0] else "") + list(set(self.units))[0])
         
         # Colors
         if color_type is None or color_type not in color.keys():
