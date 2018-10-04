@@ -807,7 +807,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                         
                         clim_anom_list=list()
                         
-                        for y in np.sort(clim_anom.coord('year').points):
+                        year_list = np.sort(clim_anom.coord('year').points)
+                        
+                        for y in year_list:
                             
                             loc_data=clim_anom.extract(iris.Constraint(year=y))
                             

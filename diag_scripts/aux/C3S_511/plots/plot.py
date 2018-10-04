@@ -258,6 +258,8 @@ class Plot2D(object):
         if self.n_cubes < 1:
             raise TypeError("Invalid input: expected at least one cube, not "
                             "an empty list")
+            
+        self.cubes = cubes[-21:] #TODO break images instead of just plotting the last 21
         
         # Get properties of the cubes
         self.names = [None] * self.n_cubes
@@ -804,7 +806,7 @@ def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
         caption = caption + ' Subplots a) - g) show percentiles 1%, 5%, 10%, 50%, 90%, 95%, and 99%.'
     if "anomalies" in m:
         fig.set_figheight(np.ceil(numfigs/10.)*fig.get_figheight())
-        caption = caption + ' Subplots ' + __my_string_ascii_lc__(0) + ') - ' + __my_string_ascii_lc__(numfigs-1) + ') show single years.'
+        caption = caption + ' Subplots ' + __my_string_ascii_lc__(0) + ') - ' + __my_string_ascii_lc__(numfigs-1) + ') show single years (max. last 21 years only).'
     
     return fig, ax, caption
 
