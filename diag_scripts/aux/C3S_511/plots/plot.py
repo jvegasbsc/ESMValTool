@@ -407,7 +407,7 @@ class Plot2D(object):
             
         if vmin is not None:
             if vmax==vmin or (np.isnan(vmin) and np.isnan(vmax)):
-                rounder=1
+                rounder = 0
             else:
                 rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
 #            vmin, vmax = np.round([vmin, vmax], rounder)
@@ -498,6 +498,7 @@ class Plot2D(object):
 
         # Iterate over cubes
         for (idx, cube) in enumerate(self.cubes):
+            print cube.data.compressed()
             column = idx % self.__class__.MAX_COLUMNS
             row = idx // self.__class__.MAX_COLUMNS
             if self.n_cubes > 1:
@@ -619,7 +620,7 @@ class Plot2D_blank(Plot2D):
         super(Plot2D_blank, self).__init__(cubes)
         # erase all data
         for cube in self.cubes:
-            cube.data=cube.data*np.nan
+            cube.data=cube.data*0.
 
 
 class Plot1D(object):

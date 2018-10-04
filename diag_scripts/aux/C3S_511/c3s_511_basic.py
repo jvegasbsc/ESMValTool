@@ -224,6 +224,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             raise EmptyContentError("self.__varname__", "Element is of wrong length.")
         else:
             self.__varname__ = str(self.__varname__[0])
+        
+        try:
+            ecv_lookup(self.__varname__)
+        except Exception as e:
+            raise ValueError("variable " + self.__varname__ + " is not included in the list of expected ECVs: " + repr(e))
+            
         self.__output_type__ = 'png'  # default ouput file type for the basic diagnostics
         self.__regions__ = {'Germany_2000-2005':{'latitude':(47,56),'longitude':(5,16),'time':(datetime.datetime(2000,01,01),datetime.datetime(2005,12,31))}}  # default regions
 
@@ -278,6 +284,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 raise PathError(self.__infile__,"This file is not accessible.")
         except:
             raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path: " + self.__infile__)
+            
+        
+            
             
         if len(extra_dimensions) == 0:
             self.var3D=False
