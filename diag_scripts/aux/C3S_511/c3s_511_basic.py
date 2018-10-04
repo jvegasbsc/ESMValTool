@@ -832,7 +832,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                                     ,[0,100])))})
 
                             if len(disp_min_max["diff_vals"])==1:
-                                disp_min_max["diff_vals"]=[np.nan]
+                                disp_min_max["diff_vals"]*=2
     
                             clim_anom_list.append(loc_data)
                             

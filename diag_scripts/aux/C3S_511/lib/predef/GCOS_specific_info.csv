@@ -9,7 +9,7 @@ Surface Radiation Budget;Surface ERB longwave;rlds, rlus, rldscs, rluscs ;Monthl
 Surface Radiation Budget;Surface ERB shortwave;rsds, rsus, rsdscs, rsuscs;Monthly\n(resolv. diurnal cycle);100km/NA;1W/m2\n(global mean) ;0.2W/m2 /decade;;WGClimate;WIGOS
 Earth Radiation Budget;Top-of-atmosphere ERB longwave;rlut;Monthly\n(resolv. diurnal cycle);100km/NA;1W/m2\n(global mean) ;0.2 W/m2/decade;NOAA Tech Rep. NESDIS 134;WGClimate;
 Earth Radiation Budget;Top-of-atmosphere ERB shortwave (reflected);rsut, rsdt;1hr;100km/NA;1W/m2\n(global mean) ;0.3W/m2 /decade;NOAA Tech Rep. NESDIS 134;WGClimate;
-Wind speed and direction (upper air) ;Upper-air wind retrievals;ua, va ;4hr;10km/0.5km;2m/s, 20deg;0.5m/s, 5deg;;WGClimate;WIGOS
+Wind speed and direction (upper air) ;Upper-air wind retrievals;ua, va ;4hr;10km/0.5km;2m/s, 20deg;0.5m/s, 5deg;;WGClimate;WIGOS
 Temperature(upper air);Tropospheric Temperature profile;ta;4hr;25km/1km;0.5K;0.05K;;WGClimate;WIGOS
 Temperature(upper air);Stratospheric Temperature profile;ta;Monthly ;100km/2km;0.5K;0.05K;;WGClimate;WIGOS
 Temperature(upper air);Temperature of deep atmospheric layers;ta;4hr;100km/5km;0.2K;0.02K;;WGClimate;WIGOS
@@ -37,31 +37,31 @@ Ozone;Total column ozone;toz;4hr;20-50km/NA;Max(2%, 5DU);1%;;WGClimate;
 Ozone;Troposphere Ozone;vmro3;4hr;20-50km/5km;10-15%;2%;;WGClimate;GAW
 Ozone;Ozone profile in upper and lower stratosphere;vmrstrato3;daily;100-200km/1-2km;10%;2%;;WGClimate;
 Ozone;Ozone profile in upper strato-and mesosphere;vmrstrato3;Hourly to weekly;100-200km/3km/;5-20%;2%;;WGClimate;
-Sea Surface Temperature;Sea Surface Temperature;tos;Hourly to monthly ;1-100 km;0.1 K over\n100 km scales;< 0.03 K over\n100 km scales;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;JCOMM
-Subsurface Salinity;Interior Salinity;so;Hourly to weekly  ;1-10km;0.01psu;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
-Subsurface Curents;Interior Currents;;hourly to monthly ;1-10km;0.02m/s;Not specified;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
-Surface Stress;Surface Stress;tauvo, tauuo;hourly to monthly;10-100km ;0.001-4Nm2 ;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
-Ocean Surface Heat Flux;Latent Heat Flux;hfds;hourly to monthly;1-25km ;10-15Wm-2 ;1-2Wm-2;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
-Ocean Surface Heat Flux;Sensible Heat Flux;hfds;Weekly to monthly;1-25km ;10-15Wm-2 ;1-2Wm-2;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Sea Surface Temperature;Sea Surface Temperature;tos;Hourly to monthly ;1-100 km;0.1 K over\n100 km scales;< 0.03 K over\n100 km scales;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;JCOMM
+Subsurface Salinity;Interior Salinity;so;Hourly to weekly  ;1-10km;0.01psu;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Subsurface Curents;Interior Currents;;hourly to monthly ;1-10km;0.02m/s;Not specified;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Surface Stress;Surface Stress;tauvo, tauuo;hourly to monthly;10-100km ;0.001-4Nm2 ;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Ocean Surface Heat Flux;Latent Heat Flux;hfds;hourly to monthly;1-25km ;10-15Wm-2 ;1-2Wm-2;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Ocean Surface Heat Flux;Sensible Heat Flux;hfds;Weekly to monthly;1-25km ;10-15Wm-2 ;1-2Wm-2;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
 Sea Level;Global Mean Sea Level;zos;Hourly to weekly;10-100 km;2-4 mm\n(global mean),\n1 cm (grid mesh);< 0.3 mm/yr\n(global mean);See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;JCOMM
 Sea Level;Regional Sea Level;zos;3 hourly;10 km;1 cm\n(grid mesh\nof 50-100 km);< 1 mm/yr\n(grid mesh\nof 50-100 km);See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;JCOMM
 Sea State;Wave Height;;Hourly to monthly;25 km;10 cm;5 cm;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;JCOMM
-Subsurface Temperature;Interior Temperature;;Hourly to monthly ;1-10km ; 0.01K  ;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
-Subsurface Currents;Interior Currents;;Weekly; 1-10km; 0.02m/s;Not specified;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Subsurface Temperature;Interior Temperature;;Hourly to monthly ;1-10km ; 0.01K  ;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
+Subsurface Currents;Interior Currents;;Weekly; 1-10km; 0.02m/s;Not specified;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;;JCOMM
 Sea Ice;Sea Ice Concentration;sic;Weekly;10 km to 15 km;5%\nice area fraction;5%;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
-Sea Ice;Sea Ice Extent/Edge;siextentn, siextents;Monthly;1 km to 5 km;5 km;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
-Sea Ice;Sea Ice Thickness;sit;Weekly;25km ;0.1 m;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
-Sea Ice;Sea Ice Drift;sidivvel, sispeed;Annual to decadal ;5 km;1 km/day;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
-Transient Tracers;Interior ocean CFC-12;cfc12;Annual to decadal ;Every 20°;±1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Transient Tracers;Interior ocean CFC-11;cfc11;Annual to decadal ;Every 20°;±1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Transient Tracers;Interior ocean SF6;sf6;Annual to decadal ;Every 20°;±1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Transient Tracers;Interior ocean tritium ;;Annual to decadal ;Every 20°;±0.5%, 0.005 TU;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Transient Tracers;Interior ocean 3He;;Annual to decadal ;Every 20°;3He ± 0.15%;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Transient Tracers;Interior ocean 14C;;Annual to decadal ;Every 20°;14C ± 0.4%;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Transient Tracers;Interior ocean 39Ar;;decadal ;Every 20°;14C ± 0.4%;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Inorganic Carbon;Interior ocean carbon storage. Dissolved Inorganic Carbon (DIC), Total Alkalinity (TA) ;talknat, intdic;Weekly to decadal;Every 20°;TA/DIC ± 2 ?M;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Inorganic Carbon;Interior ocean carbon storage. pH;phnat ;Weekly to decadal;Every 20°;pH ± 0.005;;See http://www.ioccp.org/index.php/foo ;;GOOS
-Inorganic Carbon;pCO2 (to provide Air-sea flux of CO2);spco2;Daily;Every 10°\n(Denser in coastal\ndomain, surface);± 2 atm;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Sea Ice;Sea Ice Extent/Edge;siextentn, siextents;Monthly;1 km to 5 km;5 km;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
+Sea Ice;Sea Ice Thickness;sit;Weekly;25km ;0.1 m;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
+Sea Ice;Sea Ice Drift;sidivvel, sispeed;Annual to decadal ;5 km;1 km/day;Not specified ;See EOV specification sheets at www.ioc-goos-oopc/obs/ecv.php;WGClimate;
+Transient Tracers;Interior ocean CFC-12;cfc12;Annual to decadal ;Every 20 degree;+/- 1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Transient Tracers;Interior ocean CFC-11;cfc11;Annual to decadal ;Every 20 degree;+/- 1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Transient Tracers;Interior ocean SF6;sf6;Annual to decadal ;Every 20 degree;+/- 1%;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Transient Tracers;Interior ocean tritium ;;Annual to decadal ;Every 20 degree;+/- 0.5%, 0.005 TU;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Transient Tracers;Interior ocean 3He;;Annual to decadal ;Every 20 degree;3He +/- 0.15%;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Transient Tracers;Interior ocean 14C;;Annual to decadal ;Every 20 degree;14C +/- 0.4%;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Transient Tracers;Interior ocean 39Ar;;decadal ;Every 20 degree;14C +/- 0.4%;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Inorganic Carbon;Interior ocean carbon storage. Dissolved Inorganic Carbon (DIC), Total Alkalinity (TA) ;talknat, intdic;Weekly to decadal;Every 20 degree;TA/DIC +/- 2 ?M;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Inorganic Carbon;Interior ocean carbon storage. pH;phnat ;Weekly to decadal;Every 20 degree;pH +/- 0.005;;See http://www.ioccp.org/index.php/foo ;;GOOS
+Inorganic Carbon;pCO2 (to provide Air-sea flux of CO2);spco2;Daily;Every 10 degree\n(Denser in coastal\ndomain, surface);+/- 2 atm;;See http://www.ioccp.org/index.php/foo ;;GOOS
 Ocean Colour;Water Leaving Radiance;;Weekly averages;4 km;5%\n(blue & green\nwavelengths);0,50%;See http://www.ioccp.org/index.php/foo ;WGClimate;
 Ocean Colour;Chlorophyll-a Concentration;;Daily;4 km;30%;3%;See http://www.ioccp.org/index.php/foo ;WGClimate;
 Soil Moisture;Surface soil moisture;mrsos;Daily;1-25 km;0.04 m3/m3;0.01 m3/m3/year;WMO (2008b);WGClimate;ISMN
@@ -99,7 +99,7 @@ Fraction of Absorbed Photosynthetically Active Radiation (FAPAR);maps of FAPAR f
 Fraction of Absorbed Photosynthetically Active Radiation (FAPAR);maps of FAPAR for adaptation;;Daily;50m;max(10%, 0.05);max(3%, 0.02);;WGClimate;
 Leaf Area Index (LAI);maps of LAI for modelling;lai;;250m;max(15%);max(10%, 0.25);;WGClimate;
 Leaf Area Index (LAI);maps of LAI for adaptation;lai;24 hours;50m;;;;WGClimate;
-Fire;Burnt Areas;burntArea;6 hours (Polar-Orbiting)\n1 hour (Geostationary);30m;15% (error of omission and commission), compared to 30 m observations;; None;WGClimate;
-Fire;Active fire maps ;;6 hours (Polar-Orbiting)\n1 hour (Geostationary);0.25-1 km (Polar), 1-3 km (Geo);5% error of commission. 10% error of omission. Based on per-fire comparisons for fires above target threshold of 5 MW/km^2 equivalent integrated FRP per pixel (i.e. for a 0.5 km^2 pixel the target threshold would be 2.5 MW, for a 9 km^2 pixel it would be 45 MW).;; None;WGClimate;
-Fire;Fire radiative power;;;0.25-1 km (Polar), 1-3 km (Geo);10% integrated over pixel. Based on target detection threshold of 5 MW/km^2 equivalent integrated FRP per pixel (i.e. for a 0.5 km^2 pixel the target threshold would be 2.5 MW, for a 9 km^2 pixel it would be 45 MW). and with the same detection accuracy as the Active Fire Maps.;; None;WGClimate;
+Fire;Burnt Areas;burntArea;6 hours (Polar-Orbiting)\n1 hour (Geostationary);30m;15% (error of omission and commission), compared to 30 m observations;; None;WGClimate;
+Fire;Active fire maps ;;6 hours (Polar-Orbiting)\n1 hour (Geostationary);0.25-1 km (Polar), 1-3 km (Geo);5% error of commission. 10% error of omission. Based on per-fire comparisons for fires above target threshold of 5 MW/km^2 equivalent integrated FRP per pixel (i.e. for a 0.5 km^2 pixel the target threshold would be 2.5 MW, for a 9 km^2 pixel it would be 45 MW).;; None;WGClimate;
+Fire;Fire radiative power;;;0.25-1 km (Polar), 1-3 km (Geo);10% integrated over pixel. Based on target detection threshold of 5 MW/km^2 equivalent integrated FRP per pixel (i.e. for a 0.5 km^2 pixel the target threshold would be 2.5 MW, for a 9 km^2 pixel it would be 45 MW). and with the same detection accuracy as the Active Fire Maps.;; None;WGClimate;
 Ice Caps;;;;;;;;;

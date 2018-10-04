@@ -406,15 +406,16 @@ class Plot2D(object):
                 vmin=vmax=vminmax[0]
             
         if vmin is not None:
-            if vmax==vmin or (np.isnan(vmin) and np.isnan(vmax)):
-                rounder = 0
-            else:
-                rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
+            if vmax==vmin:
+                vmin = vmin-1.
+                vmax = vmax+1.
+                
+            rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
 #            vmin, vmax = np.round([vmin, vmax], rounder)
             vmin  = np.floor(vmin*10**rounder)/10**rounder
             vmax = np.ceil(vmax*10**rounder)/10**rounder
             levels = np.round(np.linspace(vmin, vmax, num=11), rounder)
-
+            
         # Check axes
         if ax is None:
             ax = [plt.gca()]

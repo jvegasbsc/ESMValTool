@@ -71,7 +71,7 @@ This namelist is part of the ESMValTool
     <diag>
         <description>  		Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
         <variable_def_dir>                								./variable_defs/      	      	</variable_def_dir>
-        <variable>			   												ts                             </variable>
+        <variable>			   												tos                             </variable>
         <field_type>                      								T2Ms                             </field_type>
         <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">  DUMMY_C3S_511.py                 </diag_script>
         <launcher_arguments>               						      [('execute_as_shell', False)]    </launcher_arguments>
