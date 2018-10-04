@@ -49,7 +49,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable>			   	                      		ta                                       </variable>
         <field_type>                      						T3Ds                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_SPQB_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Land					  </tags>
 	
@@ -62,7 +62,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable>			   			toz                                       </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_SPQB_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Atmos					  </tags>
 	
@@ -75,7 +75,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable>			   			sic                                       </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_SPQB_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Ocean					  </tags>
 	
@@ -88,7 +88,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable ref_model="ESACCI-OZONE">			   			tos                                       </variable>
         <field_type>                      						T2Ds                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_SPQB_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Ocean					  </tags>
 	
@@ -102,7 +102,7 @@ This namelist is part of the ESMValTool
         <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
         <variable ref_model="ECDS-XCO2">			   			xco2                                       </variable>
         <field_type>                      						T2Ms                                      </field_type>
-        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_SPQB_C3S_511.py                      </diag_script>
         <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
 		<tags> 													R_Atmos					  </tags>
 	
