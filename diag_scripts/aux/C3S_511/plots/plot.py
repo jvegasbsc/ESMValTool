@@ -498,7 +498,6 @@ class Plot2D(object):
 
         # Iterate over cubes
         for (idx, cube) in enumerate(self.cubes):
-            print cube.data.compressed()
             column = idx % self.__class__.MAX_COLUMNS
             row = idx // self.__class__.MAX_COLUMNS
             if self.n_cubes > 1:
