@@ -409,6 +409,8 @@ class Plot2D(object):
             if vmax==vmin:
                 vmin = vmin-1.
                 vmax = vmax+1.
+            elif vmin > vmax:
+                vmin,vmax=[vmax,vmin]
                 
             rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
 #            vmin, vmax = np.round([vmin, vmax], rounder)
