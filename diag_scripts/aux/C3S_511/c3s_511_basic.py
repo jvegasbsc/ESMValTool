@@ -424,7 +424,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             ESMValMD("meta",
                      filename,
                      self.__basetags__ + ['DM_global', 'C3S_overview'],
-                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set "' + " ".join(dataset_id) + '" (' + self.__time_period__ + ').'),
+                     str('Full spatio-temporal histogram of ' + self.__varname__ + ' for the data set ' + " ".join(dataset_id) + ' (' + self.__time_period__ + ').'),
                      '#C3S' + 'histall' + self.__varname__,
                      self.__infile__,
                      self.diagname,
@@ -614,12 +614,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 x=Plot2D_blank(stat_dict[d]["level_dim_mean"])
                 
-                gs = gridspec.GridSpec(6, 5)
-                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
+                gs = gridspec.GridSpec(10, 5)
+                ax = np.array([plt.subplot(gs[:-2, :-1]),plt.subplot(gs[:-2, -1]),plt.subplot(gs[-2:, :])])
                 fig.set_figwidth(1.7*fig.get_figwidth())
                 fig.set_figheight(1.2*fig.get_figheight())
                 
-                x.plot(ax=ax, color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
+                x.plot(ax=ax, ext_cmap="both", color=self.colormaps, title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")")
                 fig.savefig(filename)
                 plt.close(fig.number)
             
@@ -641,12 +641,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 fig = plt.figure()
 
-                gs = gridspec.GridSpec(6, 5)
-                ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
+                gs = gridspec.GridSpec(10, 5)
+                ax = np.array([plt.subplot(gs[:-2, :-1]),plt.subplot(gs[:-2, -1]),plt.subplot(gs[-2:, :])])
                 fig.set_figwidth(1.7*fig.get_figwidth())
                 fig.set_figheight(1.2*fig.get_figheight())
             
-                x.plot(ax=ax, color=self.colormaps, color_type="Sequential", title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmaxstd)
+                x.plot(ax=ax, ext_cmap="both", color=self.colormaps, color_type="Sequential", title=" ".join([self.__dataset_id__[indx] for indx in [0,2,1,3]]) + " (" + self.__time_period__ + ")",vminmax=vminmaxstd)
                 fig.savefig(filename)
                 plt.close(fig.number)
             

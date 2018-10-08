@@ -811,6 +811,8 @@ def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
         fig.set_figheight(np.ceil(numfigs/9.)*fig.get_figheight())
         caption = caption + ' Subplots ' + __my_string_ascii_lc__(0) + ') - ' + __my_string_ascii_lc__(numfigs-1) + ') show single years (max. last 21 years only).'
     
+#    caption = caption + " : " + m + " / " + d
+    
     return fig, ax, caption
 
 def __my_string_ascii_lc__(n):
