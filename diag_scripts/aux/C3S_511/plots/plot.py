@@ -531,10 +531,10 @@ class Plot2D(object):
                         labels[idx] = labels[idx].strftime(
                             self.__class__.TIME_FORMAT)
                     if self.plot_type == 'lontime':
-                        plt.yticks(locs, labels)
+                        plt.yticks(locs, labels,rotation=25)
                         plt.ylabel(self.__class__.TIME_LABEL)
                     else:
-                        plt.xticks(locs, labels)
+                        plt.xticks(locs, labels,rotation=25)
                         plt.xlabel(self.__class__.TIME_LABEL)
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -776,7 +776,7 @@ class Plot1D(object):
                 labels[idx] = labels[idx].strftime(
                     self.__class__.TIME_FORMAT)
 
-            plt.xticks(locs, labels)
+            plt.xticks(locs, labels,rotation=25)
             plt.xlabel(self.__class__.TIME_LABEL)
         
         try:
@@ -789,8 +789,8 @@ class Plot1D(object):
 def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
     
     if d in ["longitude","levels"]:     
-        gs = gridspec.GridSpec(6, 5)
-        ax = np.array([plt.subplot(gs[:-1, :-1]),plt.subplot(gs[:-1, -1]),plt.subplot(gs[-1, :])])
+        gs = gridspec.GridSpec(10, 5)
+        ax = np.array([plt.subplot(gs[:-2, :-1]),plt.subplot(gs[:-2, -1]),plt.subplot(gs[-2:, :])])
         fig.set_figwidth(1.7*fig.get_figwidth())
         fig.set_figheight(1.2*fig.get_figheight())
     elif "time" == d:
@@ -798,8 +798,8 @@ def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
         ax = np.array([plt.subplot(gs[:-2,0]),plt.subplot(gs[-1,0])])
         fig.set_figheight(1.2*fig.get_figheight())
     elif "latitude" == d:
-        gs = gridspec.GridSpec(11, 1)
-        ax = np.array([plt.subplot(gs[:-3,0]),plt.subplot(gs[-3:-1,0]),plt.subplot(gs[-1,0])])
+        gs = gridspec.GridSpec(16, 1)
+        ax = np.array([plt.subplot(gs[:-5,0]),plt.subplot(gs[-5:-2,0]),plt.subplot(gs[-2:,0])])
         fig.set_figheight(1.7*fig.get_figheight())
     if "CLIMATOLOGY" == m:
         fig.set_figheight(1.7*fig.get_figheight())
@@ -808,7 +808,7 @@ def plot_setup(d="time", m="module",numfigs=1, fig=plt.figure(), caption =''):
         fig.set_figheight(1.3*fig.get_figheight())
         caption = caption + ' Subplots a) - g) show percentiles 1%, 5%, 10%, 50%, 90%, 95%, and 99%.'
     if "anomalies" in m:
-        fig.set_figheight(np.ceil(numfigs/10.)*fig.get_figheight())
+        fig.set_figheight(np.ceil(numfigs/9.)*fig.get_figheight())
         caption = caption + ' Subplots ' + __my_string_ascii_lc__(0) + ') - ' + __my_string_ascii_lc__(numfigs-1) + ') show single years (max. last 21 years only).'
     
     return fig, ax, caption
