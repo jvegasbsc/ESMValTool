@@ -13,6 +13,8 @@ import random, string
 import collections
 import matplotlib
 matplotlib.use('Agg')
+if matplotlib.__version__=='2.2.3':
+    raise ValueError("Wrong matplotlib version. Should be 2.2.2 or older: " + matplotlib.__version__)
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import datetime
