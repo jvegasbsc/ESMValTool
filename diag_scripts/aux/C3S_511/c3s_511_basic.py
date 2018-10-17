@@ -1341,9 +1341,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                                       function=this_function)
             
         if found:    
-            self.__do_report__(content={"plots":[filename],"freetext":expected_input}, filename="".join(this_function.upper().split()))
+            self.__do_report__(content={"plots":[filename],"freetext":expected_input}, filename=this_function.upper())
         else:
-            self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+            self.__do_report__(content={"plots":[filename]}, filename=this_function.upper())
         
         return
     
@@ -1381,9 +1381,9 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                                       function=this_function)
             
         if found:    
-            self.__do_report__(content={"plots":[filename],"freetext":expected_input}, filename="".join(this_function.upper().split()))
+            self.__do_report__(content={"plots":[filename],"freetext":expected_input}, filename=this_function.upper())
         else:
-            self.__do_report__(content={"plots":[filename]}, filename="".join(this_function.upper().split()))
+            self.__do_report__(content={"plots":[filename]}, filename=this_function.upper())
         
         return
     
