@@ -287,9 +287,6 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         except:
             raise PathError("Basic_Diagnostic.__init__", "self.__infile__ is not set to valid path: " + self.__infile__)
             
-        
-            
-            
         if len(extra_dimensions) == 0:
             self.var3D=False
             self.level_dim = None
@@ -577,7 +574,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
             stat_dict[d].update({"slo":short_left_over,"llo":long_left_over})
             
-            stat_dict[d].update({"level_dim_mean":cube.collapsed(long_agg,iris.analysis.MEAN)})
+            stat_dict[d].update({"level_dim_mean":cube.collapsed(long_agg,iris.analysis.MEAN,weights=iris.analysis.cartography.area_weights(cube))})
             vminmaxmean=np.nanpercentile(np.concatenate([vminmaxmean,np.nanpercentile(stat_dict[d]["level_dim_mean"].data,[5,95])]),[0,100])
             stat_dict[d].update({"level_dim_std":cube.collapsed(long_agg,iris.analysis.STD_DEV)})
             vminmaxstd=np.nanpercentile(np.concatenate([vminmaxstd,np.nanpercentile(stat_dict[d]["level_dim_std"].data,[5,95])]),[0,100])
@@ -695,7 +692,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
         return list_of_plots
     
     def __mean_var_procedures_2D__(self,cube=None,level=None):
-        
+                
         if cube is None:
             cube=self.sp_data
             
@@ -725,7 +722,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             short_left_over = np.array([sl[0:3] for sl in long_left_over])
         
             if d in ["time"]:
-                temp_series_1d = cube.collapsed(long_left_over, iris.analysis.MEAN)
+                temp_series_1d = cube.collapsed(long_left_over, iris.analysis.MEAN, weights=iris.analysis.cartography.area_weights(cube))
         
                 filename = self.__plot_dir__ + os.sep + basic_filename + "_" + "temp_series_1d" + "." + self.__output_type__
                 list_of_plots.append(filename)
@@ -762,7 +759,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 if m == "PERCENTILE":
                     
                     try:
-                        perc = cube.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
+                        perc = cube.collapsed(d, iris.analysis.__dict__[m], percent=percentiles,weights=iris.analysis.cartography.area_weights(cube))
                         
                         precentile_list=list()
                         
@@ -848,7 +845,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 
                 elif m == "MEAN":
                     
-                    loc_data=cube.collapsed(d, iris.analysis.__dict__[m])
+                    loc_data=cube.collapsed(d, iris.analysis.__dict__[m],weights=iris.analysis.cartography.area_weights(cube))
         
                     mean_std_cov.update({m:loc_data})
                     

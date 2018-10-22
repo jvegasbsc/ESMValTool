@@ -549,7 +549,7 @@ class Plot2D(object):
             if self.plot_type == 'latlon':
                 mean = cube.collapsed([coord.name() for coord in
                                        cube.coords()],
-                                      iris.analysis.MEAN).data
+                                      iris.analysis.MEAN, weights=iris.analysis.cartography.area_weights(cube)).data
                 std = cube.collapsed([coord.name() for coord in cube.coords()],
                                      iris.analysis.STD_DEV).data
                 plt.gca().coastlines()
