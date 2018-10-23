@@ -759,7 +759,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 if m == "PERCENTILE":
                     
                     try:
-                        perc = cube.collapsed(d, iris.analysis.__dict__[m], percent=percentiles,weights=iris.analysis.cartography.area_weights(cube))
+                        perc = cube.collapsed(d, iris.analysis.__dict__[m], percent=percentiles)
                         
                         precentile_list=list()
                         
@@ -768,10 +768,12 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             loc_data = perc.extract(iris.Constraint(percentile_over_time=p))
                             
                             precentile_list.append(loc_data)
-#                            print loc_data.data.compressed()
                                                         
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.percentile(loc_data.data.compressed(),[5,95])]),[0,100])})
-#                            print disp_min_max
+                            try:
+                                disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.percentile(loc_data.data.compressed(),[5,95])]),[0,100])})
+                            except:
+                                disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.percentile(loc_data.data,[5,95])]),[0,100])})
+                                
                         mean_std_cov.update({m:precentile_list})
                             
                         del precentile_list
@@ -806,7 +808,10 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             clim_comp_list.append(loc_data)
                             
-                            disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.compressed(),[5,95])]),[0,100])})
+                            try:
+                                disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data.compressed(),[5,95])]),[0,100])})
+                            except:
+                                disp_min_max.update({"abs_vals":np.nanpercentile(np.concatenate([disp_min_max["abs_vals"],np.nanpercentile(loc_data.data,[5,95])]),[0,100])})
                         
                         mean_std_cov.update({m:clim_comp_list})
                         
@@ -821,10 +826,16 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                             
                             loc_data=clim_anom.extract(iris.Constraint(year=y))
                             
-                            pot_min_max = np.concatenate(
-                                    [disp_min_max["diff_vals"],
-                                    np.nanpercentile(loc_data.data.compressed(),[5,95])
-                                    ])
+                            try:
+                                pot_min_max = np.concatenate(
+                                        [disp_min_max["diff_vals"],
+                                        np.nanpercentile(loc_data.data.compressed(),[5,95])
+                                        ])
+                            except:
+                                pot_min_max = np.concatenate(
+                                        [disp_min_max["diff_vals"],
+                                        np.nanpercentile(loc_data.data,[5,95])
+                                        ])
             
                             disp_min_max.update({"diff_vals":list(set(np.nanpercentile(
                                     np.concatenate([pot_min_max,-1.*pot_min_max])
@@ -879,7 +890,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                 if np.any([m_typ in m for m_typ in ["anomalies"]]):
                     vminmax=disp_min_max["diff_vals"]
                     ctype="Diverging"
-                
+                    
                 if mean_std_cov[m] is not None:
                 # this needs to be done due to an error in cartopy
                     filename = self.__plot_dir__ + os.sep + basic_filename + "_" + "_".join(m.split(" ") )+ "_" + "_".join(short_left_over) + "." + self.__output_type__
@@ -1050,7 +1061,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                      self.authors)
             
             x=Plot2D(P)
-    
+            
             filename = self.__plot_dir__ + os.sep + basic_filename + "_pvals." + self.__output_type__
             list_of_plots.append(filename)
             

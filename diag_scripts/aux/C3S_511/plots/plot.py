@@ -384,7 +384,7 @@ class Plot2D(object):
             vmin, vmax = 1E99, -1E99
             for cube in self.cubes:
                 try:
-                    if cube.data is np.ma.masked:
+                    if np.ma.is_masked(cube.data):
                         temp_min, temp_max = np.nanpercentile(
                                 cube.data.compressed(),[5.0, 95.0])
                     else:
@@ -414,7 +414,7 @@ class Plot2D(object):
                 vmin,vmax=[vmax,vmin]
                 
             rounder = int(np.ceil(-np.log10(vmax - vmin) + 1))
-#            vmin, vmax = np.round([vmin, vmax], rounder)
+        #            vmin, vmax = np.round([vmin, vmax], rounder)
             vmin  = np.floor(vmin*10**rounder)/10**rounder
             vmax = np.ceil(vmax*10**rounder)/10**rounder
             levels = np.round(np.linspace(vmin, vmax, num=11), rounder)

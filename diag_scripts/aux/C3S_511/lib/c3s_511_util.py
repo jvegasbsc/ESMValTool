@@ -115,7 +115,7 @@ def __temporal_trend__(cube, pthres=1.01):
         S.units = cf_units.Unit(str(S.units) + ' 0.1 year-1')
     R.units = '-'
     I.units = cube.units
-    P.units = '-'
+    P.units = '1'
     return R, S, I, P
     
 
@@ -404,9 +404,15 @@ def __TS_of_cube__(cube,**kwargs):
 def weighted_STD_DEV(cube,dim,weights = None):
     
     if weights is None:
-        return (cube.collapsed(dim,iris.analysis.RMS)**2 - cube.collapsed(dim,iris.analysis.MEAN)**2)**0.5
+        res = (cube.collapsed(dim,iris.analysis.RMS)**2 - cube.collapsed(dim,iris.analysis.MEAN)**2)**0.5
     else:
-        return (cube.collapsed(dim,iris.analysis.RMS,weights=weights)**2 - cube.collapsed(dim,iris.analysis.MEAN,weights=weights)**2)**0.5
+        res = (cube.collapsed(dim,iris.analysis.RMS,weights=weights)**2 - cube.collapsed(dim,iris.analysis.MEAN,weights=weights)**2)**0.5
+        
+    res.long_name=cube.name()
+    res.units = cube.units 
+    res.data = np.ma.masked_invalid(res.data)
+        
+    return res
     
     
     
