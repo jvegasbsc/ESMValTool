@@ -259,9 +259,11 @@ class Plot2D(object):
         if self.n_cubes < 1:
             raise TypeError("Invalid input: expected at least one cube, not "
                             "an empty list")
+        elif self.n_cubes>21: #TODO break images instead of just plotting the last 21
             
-        self.cubes = cubes[-21:] #TODO break images instead of just plotting the last 21
-        
+            self.cubes = self.cubes[-21:] 
+            self.n_cubes=21
+            
         # Get properties of the cubes
         self.names = [None] * self.n_cubes
         self.units = [None] * self.n_cubes
@@ -325,7 +327,7 @@ class Plot2D(object):
         # Default case
         else:
             raise TypeError("Invalid input: Not all cubes have the same "
-                            "dimensions or at least on of them has an "
+                            "dimensions or at least one of them has an "
                             "unknown dimension name")
 
         # Setup matplotlib
