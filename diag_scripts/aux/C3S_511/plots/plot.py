@@ -13,6 +13,7 @@ import iris.quickplot as qplt
 import cf_units as unit
 import matplotlib.cm as mpl_cm
 import cartopy.crs as ccrs
+import c3s_511_util as utils
 #import random
 import sys
 import string
@@ -550,8 +551,7 @@ class Plot2D(object):
                 mean = cube.collapsed([coord.name() for coord in
                                        cube.coords()],
                                       iris.analysis.MEAN, weights=iris.analysis.cartography.area_weights(cube)).data
-                std = cube.collapsed([coord.name() for coord in cube.coords()],
-                                     iris.analysis.STD_DEV).data
+                std = utils.weighted_STD_DEV(cube,[coord.name() for coord in cube.coords()],weights=iris.analysis.cartography.area_weights(cube)).data
                 plt.gca().coastlines()
                 plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",
                                     linestyle=':')

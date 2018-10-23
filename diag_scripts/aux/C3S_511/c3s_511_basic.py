@@ -576,7 +576,7 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
             
             stat_dict[d].update({"level_dim_mean":cube.collapsed(long_agg,iris.analysis.MEAN,weights=iris.analysis.cartography.area_weights(cube))})
             vminmaxmean=np.nanpercentile(np.concatenate([vminmaxmean,np.nanpercentile(stat_dict[d]["level_dim_mean"].data,[5,95])]),[0,100])
-            stat_dict[d].update({"level_dim_std":cube.collapsed(long_agg,iris.analysis.STD_DEV)})
+            stat_dict[d].update({"level_dim_std":utils.weighted_STD_DEV(cube,long_agg,weights=iris.analysis.cartography.area_weights(cube))})
             vminmaxstd=np.nanpercentile(np.concatenate([vminmaxstd,np.nanpercentile(stat_dict[d]["level_dim_std"].data,[5,95])]),[0,100])
             
         for d in reg_dimensions:
@@ -853,7 +853,8 @@ class Basic_Diagnostic(__Diagnostic_skeleton__):
                     
                 elif m == "STD_DEV":
         
-                    mean_std_cov.update({m:cube.collapsed(d, iris.analysis.__dict__[m])})
+#                    mean_std_cov.update({m:cube.collapsed(d, iris.analysis.__dict__[m])})
+                    mean_std_cov.update({m:utils.weighted_STD_DEV(cube,d,weights=iris.analysis.cartography.area_weights(cube))})
                                  
                 elif m == "LOG_COV": 
                     
