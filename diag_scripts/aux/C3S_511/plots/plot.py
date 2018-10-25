@@ -259,10 +259,10 @@ class Plot2D(object):
         if self.n_cubes < 1:
             raise TypeError("Invalid input: expected at least one cube, not "
                             "an empty list")
-        elif self.n_cubes>21: #TODO break images instead of just plotting the last 21
+        elif self.n_cubes > 21: #TODO break images instead of just plotting the last 21
             
             self.cubes = self.cubes[-21:] 
-            self.n_cubes=21
+            self.n_cubes = 21
             
         # Get properties of the cubes
         self.names = [None] * self.n_cubes
