@@ -100,9 +100,9 @@ class PlotHist(object):
 #        self.ax.hist(self.data, bins, density=False, facecolor=color, alpha=alpha)
 #        print self.ax.__dict__.keys()
         try:
-            hist, bins = np.histogram(self.data.data[np.logical_not(self.data.mask)], bins=bins)
+            hist, bins = np.histogram(self.data[np.logical_not(self.data.mask)], bins=bins)
         except:
-            hist, bins = np.histogram(self.data.data, bins=bins)
+            hist, bins = np.histogram(self.data, bins=bins)
         hist = hist.astype(float)/hist.sum()
         binWidth = bins[1] - bins[0]
         self.ax.bar(bins[:-1]+0.5*binWidth, hist, binWidth, facecolor=color, alpha=alpha)
