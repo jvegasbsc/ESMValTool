@@ -1,0 +1,152 @@
+<namelist>
+<include href="./config_private_BH_local.xml"/>
+<namelist_summary>
+###############################################################################
+namelist_C3S_511_SPQB.xml
+
+Description
+
+Author
+Benjamin Mueller (LMU, Germany - b.mueller@iggf.geo.uni-muenchen.de)
+Birgit Hassler (DLR, Germany - birgit.hassler@dlr.de)
+
+Project
+C3S_511
+
+References
+
+This namelist is part of the ESMValTool
+###############################################################################
+</namelist_summary>
+
+<GLOBAL>
+  <write_plots type="boolean">        True                      </write_plots>
+  <write_netcdf type="boolean">       True                      </write_netcdf>
+  <force_processing type="boolean">   False                     </force_processing>
+  <wrk_dir type="path">               @{WORKPATH}               </wrk_dir>
+  <plot_dir type="path">              @{PLOTPATH}/test/  		</plot_dir>
+  <climo_dir type="path">             @{CLIMOPATH}       		</climo_dir>
+  <write_plot_vars type="boolean">    True                      </write_plot_vars>
+  <max_data_filesize type="integer">  100                       </max_data_filesize>
+  <max_data_blocksize type="integer"> 500                       </max_data_blocksize>
+  <output_file_type>                  png                       </output_file_type>
+  <verbosity  type="integer">         1                         </verbosity>
+  <debuginfo type="boolean">          False                     </debuginfo>
+  <exit_on_warning  type="boolean">   False                      </exit_on_warning>
+  <tags>							  Testing_Namelist			</tags>
+</GLOBAL>
+
+
+<MODELS>
+</MODELS>
+
+
+<DIAGNOSTICS>
+    
+ <!--   
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="QA4ECV">			   			fAPAR                                       </variable>
+        <field_type>                      						T2Ds                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_land 					  </tags>
+		
+		<model> OBS        QA4ECV				   ECV				avh-geo-res050 	 1982 2016  @{OBSPATH} </model>
+		<model> OBS        QA4ECV				   ECV				L3-Mosaic-Albedo-Merge-05 	 1982 2016  @{OBSPATH}  </model>
+    </diag>
+    
+ -->
+   
+     
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="CDS-XCO2">			   			    xco2                                      </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">    DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_atmos					  </tags>
+	
+		<model> OBS        CDS-XCO2		   sat				L3 	 2003 2016  @{OBSPATH}  </model>
+    </diag>
+
+    
+    <!--
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ESACCI-OZONE">			   			toz                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Land					  </tags>
+	
+		<model> OBS        ESACCI-OZONE				   sat				L3 	 1997 2010  @{OBSPATH}  </model>
+    </diag>
+    -->   
+    
+    <!-- 
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ECDS-XCO2">			   			ta                                       </variable>
+        <field_type>                      						T3I                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Land					  </tags>
+	
+		<model> OBS        CDS-ERA5-TA				   sat				L3 	 2007 2008  @{OBSPATH}  </model>
+    </diag>
+    -->   
+
+    <!-- 
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ESACCI-SST">			   			tos                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Land					  </tags>
+	
+		<model> OBS        ESACCI-SST				   sat				L4-GHRSST-SSTdepth-OSTIA-GLOB 	 1992 2010  @{OBSPATH}Tier2/  </model>
+    </diag>
+    -->
+
+    
+<!--	
+	<diag>
+	     # optional 
+        <description>  											Cross comparison with ensemble. 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   					                VAR                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+    </diag>    
+    
+    <diag>
+        <description>  											Producing maturity matrices and GCOS. 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   					                VAR                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+    </diag>
+    
+
+    <diag>
+        <description>  											Producing assessment report. 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   					                VAR                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   	DUMMY_VAR_PROJECT.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+    </diag>
+-->
+
+</DIAGNOSTICS>
+
+</namelist>
