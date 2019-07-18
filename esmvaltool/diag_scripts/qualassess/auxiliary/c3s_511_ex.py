@@ -31,14 +31,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         super(ex_Diagnostic_SP, self).set_info(**kwargs)
         
         # add a region to the regions object
-#        self.__regions__ = dict({
-#            'MAR_region_Jul/Sept': {
-#                'latitude': (-60, 50),
-#                'longitude': (-60, 0),
-#                'time': (datetime.datetime(2000, 7, 1),
-#                         datetime.datetime(2000, 9, 30)
-#                         )
-#                }})
+        self.__regions__ = dict({
+            'MAR_region_Jul/Sept': {
+                'latitude': (-60, 50),
+                'longitude': (-60, 0),
+                'time': (datetime.datetime(2000, 7, 1),
+                         datetime.datetime(2000, 9, 30)
+                         )
+                }})
     
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -234,7 +234,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
             self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
             self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
-            self.__logger__.info("mean duration: {:.2f} {}".format(extent.data, extent.units))
+            self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
             
             # plotting for trials
             import iris.quickplot as qplt
