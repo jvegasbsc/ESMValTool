@@ -30,7 +30,8 @@ documentation:
 
 
 datasets:
-  - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1999,  end_year: 2000}
+#  - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1999,  end_year: 2000}
+  - {dataset: CDS-SATELLITE-ALBEDO, type: sat, project: OBS, mip: Lmon, version: L3, tier: 3, start_year: 1999,  end_year: 2013}
 #  - {dataset: XCH4, type: sat, project: OBS,  level: L3, version: CDS, start_year: 2003,  end_year: 2016}
 # looks for: [project]_[obssystem]_[dataset]_[level]_[field]_[short_name]*
 preprocessors:
@@ -44,10 +45,10 @@ diagnostics:
   SPQB:
     description: Single product quality brief.
     variables:
-      ta:
+      bdalb:
 #      xch4:
-#        preprocessor: noop
-        preprocessor: regrid_ex
+        preprocessor: noop
+#        preprocessor: regrid_ex
 #        field: T2Ms
         field: T3Ms
         derive: False
