@@ -31,14 +31,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         super(ex_Diagnostic_SP, self).set_info(**kwargs)
         
         # add a region to the regions object
-        self.__regions__ = dict({
-            'MAR_region_Jul/Sept': {
-                'latitude': (-60, 50),
-                'longitude': (-60, 0),
-                'time': (datetime.datetime(2000, 7, 1),
-                         datetime.datetime(2000, 9, 30)
-                         )
-                }})
+#        self.__regions__ = dict({
+#            'MAR_region_Jul/Sept': {
+#                'latitude': (-60, 50),
+#                'longitude': (-60, 0),
+#                'time': (datetime.datetime(2000, 7, 1),
+#                         datetime.datetime(2000, 9, 30)
+#                         )
+#                }})
     
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -127,8 +127,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     
                     list_of_sub_cubes.append(loc_slice)
                     
-                t_cube = iris.cube.CubeList(list_of_sub_cubes).merge()[0]
-                    
+                t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
+                
                 iris.util.promote_aux_coord_to_dim_coord(t_cube, "time")
                 iris.util.new_axis(t_cube, "latitude")
                 iris.util.new_axis(t_cube, "longitude")
@@ -138,6 +138,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             clim_cube = iris.cube.CubeList(list_of_cubes).merge()[0]
             
             clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), masked_val)
+            
+            cc_dim_order = [c.name() for c in clim_cube.coords()][:len(clim_cube.shape)]
+            lc_dim_order = [c.name() for c in loc_cube[r].coords()][:len(loc_cube[r].shape)]
+            
+            clim_cube.transpose([cc_dim_order.index(i) for i in lc_dim_order])
             
             incident_data = loc_cube[r]-clim_cube
             incident_data.data = np.ma.masked_where(incident_data.core_data() <= 0, incident_data.core_data(), copy = True)
@@ -242,7 +247,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             for dat in ["severity", "magnitude", "duration"]:
                 self.__logger__.info(locals()[dat])
             
-                qplt.pcolormesh(locals()[dat])
+                qplt.pcolormesh(locals()[dat])#, vmin = 250, vmax = 300)
                 
                 # Add coastlines to the map created by contourf.
                 plt.gca().coastlines()
