@@ -51,7 +51,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         this_function =  "extremes example"
         
         which_percentile = 90
-        window_size = 5 # one directional 5 => 11
+        window_size = 30 # one directional 5 => 11
         masked_val = None
         
         # this the extremes example
@@ -75,14 +75,19 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             dataset_id = [self.__dataset_id__[0]]
         ##################
         
+        # BAS: what do you mean with spatio-temporally buffered?
         # we assume the regions to be spatio-temporally buffered.
         list_of_plots = []
         
+        # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__regions__.items():
+            # Select this specific region, note that loc_cube is a dictionary with loc_cube[key]
+            # holding the actual cubes.
             loc_cube = self.__spatiotemp_subsets__(cube,{r:def_r})
             
             list_of_cubes = []
             
+            # BAS: why is this needed? It removes these coords on loc_cube
             for (entry,ecube) in loc_cube.items():
                 for rcoord in ["day_of_month", "month_number", "year"]:
                     if rcoord in [coord.name() for coord in ecube.coords()]:
@@ -91,10 +96,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             latbnds = ecube.coord("latitude").bounds
             lonbnds = ecube.coord("longitude").bounds
             
+
+            # Now loop over each time step
             for yx_slice in loc_cube[r].slices(['time']):
+                # Prepare for calculating extremes climatology
                 agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN) 
                 list_of_sub_cubes=[]
-                for doy in np.sort(agg_cube.coords("day_of_year")[0].points):
+                
+                for doy in np.sort(agg_cube.coord("day_of_year").points):
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
                     tmax = (doy + window_size) % 366
@@ -111,19 +120,23 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
                                     lambda cell: tmin <= cell <= tmax}))
-                    try:
-                        perc = doy_sel.collapsed("time",
-                                                 iris.analysis.PERCENTILE,
-                                                 percent=[which_percentile]
-                                                 ).core_data()
-                    except:
-                        perc = doy_sel.core_data()
+                    # BAS: this try except statement should be improved. 
+                    # when does an exception occur, and why? these statements
+                    # are terrible for debugging
+#                    try:
+                    perc = doy_sel.collapsed("time",
+                                             iris.analysis.PERCENTILE,
+                                             percent=[which_percentile]
+                                             ).core_data()
+#                    except:
+                    #perc = doy_sel.core_data()
+                    # BAS: when does this happen?
                     if np.ma.is_masked(perc):
                         masked_val = perc.data
                         perc = perc.data
                             
                     loc_slice.data = perc
-#                    loc_slice.remove_coord("day_of_year")
+                    loc_slice.remove_coord("day_of_year")
                     
                     list_of_sub_cubes.append(loc_slice)
                     
@@ -135,6 +148,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 list_of_cubes.append(t_cube)
                 
                 
+            # BAS: Maybe build some assertions in, to check that data has 
+            # coordinates as expected before moving on.
+
             clim_cube = iris.cube.CubeList(list_of_cubes).merge()[0]
             
             clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), masked_val)
@@ -143,7 +159,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             lc_dim_order = [c.name() for c in loc_cube[r].coords()][:len(loc_cube[r].shape)]
             
             clim_cube.transpose([cc_dim_order.index(i) for i in lc_dim_order])
-            
+            # At this point, loc_cube[r] still has aux coord day_of_year, even when removing it above
             incident_data = loc_cube[r]-clim_cube
             incident_data.data = np.ma.masked_where(incident_data.core_data() <= 0, incident_data.core_data(), copy = True)
             
