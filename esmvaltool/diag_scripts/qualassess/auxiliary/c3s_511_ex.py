@@ -75,8 +75,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             dataset_id = [self.__dataset_id__[0]]
         ##################
         
-        # BAS: what do you mean with spatio-temporally buffered?
-        # we assume the regions to be spatio-temporally buffered.
+        # we assume that the regions fully cover the event in space and time (TODO: build in a check for this)
         list_of_plots = []
         
         # Loop over the different regions (i.e. the different events)
@@ -87,12 +86,16 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             
             list_of_cubes = []
             
-            # BAS: why is this needed? It removes these coords on loc_cube
+            # Slicing and merging cubes sometimes leads to the wrong dimensions
+            # being propagated to coordinates instead of being auxiliary coordinates.
+            # Therefore they are removed. 
+            # TODO: handle this more specifically, in certain cases this might fail.
             for (entry,ecube) in loc_cube.items():
                 for rcoord in ["day_of_month", "month_number", "year"]:
                     if rcoord in [coord.name() for coord in ecube.coords()]:
                         ecube.remove_coord(rcoord)
-                        
+            
+            # Save the bounds
             latbnds = ecube.coord("latitude").bounds
             lonbnds = ecube.coord("longitude").bounds
             
@@ -103,6 +106,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN) 
                 list_of_sub_cubes=[]
                 
+                # Now loop over each doy and extract a temporal window surrounding this doy
                 for doy in np.sort(agg_cube.coord("day_of_year").points):
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
@@ -267,7 +271,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 
                 # Add coastlines to the map created by contourf.
                 plt.gca().coastlines()
-                
+                plt.colorbar()
                 plt.savefig(self.__plot_dir__ + os.sep + dat + ".png")
                 
                 plt.close()
