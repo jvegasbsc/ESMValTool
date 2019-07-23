@@ -100,14 +100,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             lonbnds = ecube.coord("longitude").bounds
             
 
-            # Now loop over each time step
+            # Now loop over each gridpoint in the selected region
             for yx_slice in loc_cube[r].slices(['time']):
                 # Prepare for calculating extremes climatology
-                agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN) 
+                agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN)
                 list_of_sub_cubes=[]
-                
+                #import IPython;IPython.embed()
                 # Now loop over each doy and extract a temporal window surrounding this doy
                 for doy in np.sort(agg_cube.coord("day_of_year").points):
+
                     # loc_slice is created here for carrying on the metadata
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
@@ -128,18 +129,29 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     # BAS: this try except statement should be improved. 
                     # when does an exception occur, and why? these statements
                     # are terrible for debugging
-#                    try:
-                    perc = doy_sel.collapsed("time",
+                    # If the selected data is empty, the climatology is not defined, so set to nan
+
+                    if len(doy_sel.shape)==0:
+                        # If the data is masked, we have to mimic this
+
+                        print("For these values, the climatology is undefined: ")
+                        print('doy={0};tmin={1};tmax={2}'.format(doy,tmin,tmax))
+                        if np.ma.is_masked(loc_slice):
+                            perc = np.ma.masked_array(data=[np.nan],mask=[True])
+                        else:
+                            perc = np.array([np.nan])
+                    else:
+                        perc = doy_sel.collapsed("time",
                                              iris.analysis.PERCENTILE,
                                              percent=[which_percentile]
                                              ).core_data()
-#                    except:
                     #perc = doy_sel.core_data()
-                    # BAS: when does this happen?
+                    #TODO this should be handled better
                     if np.ma.is_masked(perc):
                         masked_val = perc.mask
                         perc = perc.data
                             
+                    # Now the data is inserted back into a cube
                     loc_slice.data = perc
                     loc_slice.remove_coord("day_of_year")
                     
