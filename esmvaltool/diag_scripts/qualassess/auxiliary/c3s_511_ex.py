@@ -107,6 +107,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 
                 # Now loop over each doy and extract a temporal window surrounding this doy
                 for doy in np.sort(agg_cube.coord("day_of_year").points):
+                    # loc_slice is created here for carrying on the metadata
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
                     tmax = (doy + window_size) % 366
@@ -123,7 +124,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
                                     lambda cell: tmin <= cell <= tmax}))
-                    # BAS: this try except statement should be improextent.units = cf_units.Unit("km2")ved. 
+                    # BAS: this try except statement should be improved. 
                     # when does an exception occur, and why? these statements
                     # are terrible for debugging
                     if len(doy_sel.coord("time").points)>1:
@@ -135,41 +136,47 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         perc = doy_sel.core_data()
                     # BAS: when does this happen?
                     if np.ma.is_masked(perc):
-                        masked_val = perc.data
+                        masked_val = perc.mask
                         perc = perc.data
                             
                     loc_slice.data = perc
                     loc_slice.remove_coord("day_of_year")
                     
-                    list_of_sub_cubes.append(iris.util.squeeze(loc_slice))
-                
+                    list_of_sub_cubes.append(loc_slice)
+                    
+                # TODO: make make more explicit, merge('time')
+                # t_cube can be interpreted as a timeseries of one pixel 
                 t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
                 
-                
                 iris.util.promote_aux_coord_to_dim_coord(t_cube, "time")
+                # Since there is no promote_scalar_coord_to_dim_coord, do it like this:
                 iris.util.new_axis(t_cube, "latitude")
                 iris.util.new_axis(t_cube, "longitude")
                 list_of_cubes.append(t_cube)
                 
                 
-            # BAS: Maybe build some assertions in, to check that data has 
-            # coordinates as expected before moving on.
+            # BAS: Maybe assertions are not needed, since Iris handles data quite strict
 
-            clim_cube = iris.cube.CubeList(list_of_cubes).merge()[0]
+            # Here Iris puts back the list of individual gridpoint timeseries 
+            # on a 'lat lon grid'
+            list_of_cubes_merged = iris.cube.CubeList(list_of_cubes).merge()
+            assert(len(list_of_cubes_merged)==1)
+            clim_cube = list_of_cubes_merged[0]
             
             clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), masked_val)
             
+            # This is needed to have the same order of dim_coords on both cubes
             cc_dim_order = [c.name() for c in clim_cube.coords()][:len(clim_cube.shape)]
             lc_dim_order = [c.name() for c in loc_cube[r].coords()][:len(loc_cube[r].shape)]
-            
             clim_cube.transpose([cc_dim_order.index(i) for i in lc_dim_order])
-            
-            # At this point, loc_cube[r] still has aux coord day_of_year, even when removing it above
-            loc_cube[r].remove_coord("day_of_year")
-            
+
+            # BAS: check issue. At this point, loc_cube[r] still has aux coord day_of_year, even when removing it above
+            # Here the actual exceedance of the extreme climatology is calculated
             incident_data = loc_cube[r]-clim_cube
             incident_data.data = np.ma.masked_where(incident_data.core_data() <= 0, incident_data.core_data(), copy = True)
-            
+            # Sidenote: 
+            # TODO: Insert a check that incident_data cube does not have two or more dims with the same shape 
+            # otherwise broadcast could fail and produce erroneous results without notice
             severity = incident_data * np.atleast_3d(np.array([np.diff(bds) for bds in incident_data.coord("time").bounds]))
             severity.units = cf_units.Unit(str(severity.units) + 
                                            " " + 
