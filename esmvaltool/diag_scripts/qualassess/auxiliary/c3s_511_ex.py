@@ -51,7 +51,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         this_function =  "extremes example"
         
         which_percentile = 90
-        window_size = 30 # one directional 5 => 11
+        window_size = 40 # one directional 5 => 11
         masked_val = None
         
         # this the extremes example
@@ -91,7 +91,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Therefore they are removed. 
             # TODO: handle this more specifically, in certain cases this might fail.
             for (entry,ecube) in loc_cube.items():
-                for rcoord in ["day_of_month", "month_number", "year"]:
+                for rcoord in ["day_of_month", "month_number", "year", self.level_dim]:
                     if rcoord in [coord.name() for coord in ecube.coords()]:
                         ecube.remove_coord(rcoord)
             
@@ -99,7 +99,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             latbnds = ecube.coord("latitude").bounds
             lonbnds = ecube.coord("longitude").bounds
             
-
             # Now loop over each time step
             for yx_slice in loc_cube[r].slices(['time']):
                 # Prepare for calculating extremes climatology
@@ -124,16 +123,16 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
                                     lambda cell: tmin <= cell <= tmax}))
-                    # BAS: this try except statement should be improved. 
+                    # BAS: this try except statement should be improextent.units = cf_units.Unit("km2")ved. 
                     # when does an exception occur, and why? these statements
                     # are terrible for debugging
-#                    try:
-                    perc = doy_sel.collapsed("time",
-                                             iris.analysis.PERCENTILE,
-                                             percent=[which_percentile]
-                                             ).core_data()
-#                    except:
-                    #perc = doy_sel.core_data()
+                    if len(doy_sel.coord("time").points)>1:
+                        perc = doy_sel.collapsed("time",
+                                                 iris.analysis.PERCENTILE,
+                                                 percent=[which_percentile]
+                                                 ).core_data()
+                    else:
+                        perc = doy_sel.core_data()
                     # BAS: when does this happen?
                     if np.ma.is_masked(perc):
                         masked_val = perc.data
@@ -142,9 +141,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     loc_slice.data = perc
                     loc_slice.remove_coord("day_of_year")
                     
-                    list_of_sub_cubes.append(loc_slice)
-                    
+                    list_of_sub_cubes.append(iris.util.squeeze(loc_slice))
+                
                 t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
+                
                 
                 iris.util.promote_aux_coord_to_dim_coord(t_cube, "time")
                 iris.util.new_axis(t_cube, "latitude")
@@ -163,7 +163,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             lc_dim_order = [c.name() for c in loc_cube[r].coords()][:len(loc_cube[r].shape)]
             
             clim_cube.transpose([cc_dim_order.index(i) for i in lc_dim_order])
+            
             # At this point, loc_cube[r] still has aux coord day_of_year, even when removing it above
+            loc_cube[r].remove_coord("day_of_year")
+            
             incident_data = loc_cube[r]-clim_cube
             incident_data.data = np.ma.masked_where(incident_data.core_data() <= 0, incident_data.core_data(), copy = True)
             
@@ -255,11 +258,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             extent = (extent * np.array(pix_sizes_km2)).collapsed("latitude", iris.analysis.SUM)
             extent.units = cf_units.Unit("km2")
             
+            extent2 = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/10e6
+            extent2.units = cf_units.Unit("km2")
+            
             self.__logger__.info("Extremes table")
             self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
             self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
             self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
             self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
+            self.__logger__.info("extent2: {:.2f} {}".format(extent2.data, extent2.units))
             
             # plotting for trials
             import iris.quickplot as qplt

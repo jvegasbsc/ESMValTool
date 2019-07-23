@@ -48,12 +48,12 @@ diagnostics:
       ta:
 #      xch4:
 #      bdalb:
-        preprocessor: noop
-#        preprocessor: regrid_ex
+#        preprocessor: noop
+        preprocessor: regrid_ex
 #        field: T2Ms
         field: T3Ms
         derive: False
-        mip: Amon
+#        mip: Amon
     scripts:
       SPQB_basic_report:
         script: qualassess/ex_C3S_511_SPQB.py
