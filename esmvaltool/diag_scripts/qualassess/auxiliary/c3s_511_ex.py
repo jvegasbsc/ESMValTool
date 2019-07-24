@@ -125,9 +125,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
                                     lambda cell: tmin <= cell <= tmax}))
-                    # BAS: this try except statement should be improved. 
-                    # when does an exception occur, and why? these statements
-                    # are terrible for debugging
+
                     if len(doy_sel.coord("time").points)>1:
                         perc = doy_sel.collapsed("time",
                                                  iris.analysis.PERCENTILE,
@@ -135,38 +133,22 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                                  ).core_data()
                     else:
                         perc = doy_sel.core_data()
-                    # BAS: when does this happen?
+                        
                     if np.ma.is_masked(perc):
                         masked_val = perc.mask
                         perc = perc.data
                             
                     loc_slice.data = perc
-#                    loc_slice.remove_coord("day_of_year")
                     
                     list_of_sub_cubes.append(loc_slice)
                     
-                # TODO: make make more explicit, merge('time')
+                # TODO: make make more explicit, merge('day_of_year')
+                
                 # t_cube can be interpreted as a timeseries of one pixel 
                 t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
-                
                 t_cube = cube_sorted(t_cube,"day_of_year")
-#                
-#                doy = t_cube.coord('day_of_year')
-#                doy_dims = t_cube.coord_dims(doy)
-#                
-#                self.__logger__.info(doy)
-#                    
-#                # Create a new coordinate which is a DimCoord.
-#                dim_doy = iris.coords.DimCoord.from_coord(doy)
-#                    
-#                # Remove the AuxCoord and add the DimCoord.
-#                t_cube.remove_coord(doy)
-#                t_cube.add_dim_coord(dim_doy, doy_dims)
-#                
-#                self.__logger__.info(t_cube)
-#                self.__logger__.info(t_cube.coords("day_of_year"))
-#                
                 iris.util.promote_aux_coord_to_dim_coord(t_cube, "day_of_year")
+                
                 # Since there is no promote_scalar_coord_to_dim_coord, do it like this:
                 iris.util.new_axis(t_cube, "latitude")
                 iris.util.new_axis(t_cube, "longitude")
