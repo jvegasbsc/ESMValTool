@@ -18,6 +18,7 @@ from scipy import sin, cos, tan, arctan, arctan2, arccos, pi, deg2rad
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
 from .libs.predef.ecv_lookup_table import ecv_lookup
+from .libs.c3s_511_util import cube_sorted
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
 
@@ -83,6 +84,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Select this specific region, note that loc_cube is a dictionary with loc_cube[key]
             # holding the actual cubes.
             loc_cube = self.__spatiotemp_subsets__(cube,{r:def_r})
+            spatial_def = def_r.copy()
+            spatial_def.pop("time")
+            spatial_loc_cube = self.__spatiotemp_subsets__(cube,{r:spatial_def})
             
             list_of_cubes = []
             
@@ -90,17 +94,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # being propagated to coordinates instead of being auxiliary coordinates.
             # Therefore they are removed. 
             # TODO: handle this more specifically, in certain cases this might fail.
-            for (entry,ecube) in loc_cube.items():
+            for (entry,ecube) in spatial_loc_cube.items():
                 for rcoord in ["day_of_month", "month_number", "year", self.level_dim]:
                     if rcoord in [coord.name() for coord in ecube.coords()]:
                         ecube.remove_coord(rcoord)
-            
-            # Save the bounds
-            latbnds = ecube.coord("latitude").bounds
-            lonbnds = ecube.coord("longitude").bounds
+                        loc_cube[r].remove_coord(rcoord)
             
             # Now loop over each time step
-            for yx_slice in loc_cube[r].slices(['time']):
+            for yx_slice in spatial_loc_cube[r].slices(['time']):
                 # Prepare for calculating extremes climatology
                 agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN) 
                 list_of_sub_cubes=[]
@@ -140,7 +141,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         perc = perc.data
                             
                     loc_slice.data = perc
-                    loc_slice.remove_coord("day_of_year")
+#                    loc_slice.remove_coord("day_of_year")
                     
                     list_of_sub_cubes.append(loc_slice)
                     
@@ -148,7 +149,24 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 # t_cube can be interpreted as a timeseries of one pixel 
                 t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
                 
-                iris.util.promote_aux_coord_to_dim_coord(t_cube, "time")
+                t_cube = cube_sorted(t_cube,"day_of_year")
+#                
+#                doy = t_cube.coord('day_of_year')
+#                doy_dims = t_cube.coord_dims(doy)
+#                
+#                self.__logger__.info(doy)
+#                    
+#                # Create a new coordinate which is a DimCoord.
+#                dim_doy = iris.coords.DimCoord.from_coord(doy)
+#                    
+#                # Remove the AuxCoord and add the DimCoord.
+#                t_cube.remove_coord(doy)
+#                t_cube.add_dim_coord(dim_doy, doy_dims)
+#                
+#                self.__logger__.info(t_cube)
+#                self.__logger__.info(t_cube.coords("day_of_year"))
+#                
+                iris.util.promote_aux_coord_to_dim_coord(t_cube, "day_of_year")
                 # Since there is no promote_scalar_coord_to_dim_coord, do it like this:
                 iris.util.new_axis(t_cube, "latitude")
                 iris.util.new_axis(t_cube, "longitude")
@@ -165,115 +183,61 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             
             clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), masked_val)
             
-            # This is needed to have the same order of dim_coords on both cubes
+            # This is needed to have the same order and names of dim_coords on both cubes
             cc_dim_order = [c.name() for c in clim_cube.coords()][:len(clim_cube.shape)]
-            lc_dim_order = [c.name() for c in loc_cube[r].coords()][:len(loc_cube[r].shape)]
+            loc_cube_doy = loc_cube[r].copy()
+            iris.util.promote_aux_coord_to_dim_coord(loc_cube_doy, "day_of_year")
+            lc_dim_order = [c.name() for c in loc_cube_doy.coords()][:len(loc_cube_doy.shape)]
             clim_cube.transpose([cc_dim_order.index(i) for i in lc_dim_order])
 
             # BAS: check issue. At this point, loc_cube[r] still has aux coord day_of_year, even when removing it above
             # Here the actual exceedance of the extreme climatology is calculated
-            incident_data = loc_cube[r]-clim_cube
+            loc_cube_doy.remove_coord("time")
+            clim_cube.remove_coord("time")
+            doy_subset = [clim_cube.coord("day_of_year").points.tolist().index(i) for i in loc_cube_doy.coord("day_of_year").points.tolist()]
+            
+            incident_data = loc_cube_doy-clim_cube[doy_subset,:,:]
             incident_data.data = np.ma.masked_where(incident_data.core_data() <= 0, incident_data.core_data(), copy = True)
+            
             # Sidenote: 
             # TODO: Insert a check that incident_data cube does not have two or more dims with the same shape 
             # otherwise broadcast could fail and produce erroneous results without notice
-            severity = incident_data * np.atleast_3d(np.array([np.diff(bds) for bds in incident_data.coord("time").bounds]))
-            severity.units = cf_units.Unit(str(severity.units) + 
+            
+            # calculate severity
+            severity = incident_data * np.atleast_3d(np.array([np.diff(bds) for bds in loc_cube[r].coord("time").bounds]))
+            severity.units = cf_units.Unit(str(cube.units) + 
                                            " " + 
-                                           str(severity.coord("time").units).split(" ")[0])
-            severity = severity.collapsed("time", iris.analysis.SUM) 
+                                           str(cube.coord("time").units).split(" ")[0])
+            severity = severity.collapsed("day_of_year", iris.analysis.SUM) 
             severity.long_name = "severity"
             
-            magnitude = incident_data.collapsed("time", iris.analysis.MAX)
+            # calculate magnitude
+            magnitude = incident_data.collapsed("day_of_year", iris.analysis.MAX)
             magnitude.long_name = "magnitude"
             
-            duration = (incident_data * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in incident_data.coord("time").bounds]))
-            duration.units = (str(duration.coord("time").units).split(" ")[0])
-            duration = duration.collapsed("time", iris.analysis.SUM)
+            # calculate duration
+            duration = (incident_data * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in loc_cube[r].coord("time").bounds]))
+            duration.units = (str(cube.coord("time").units).split(" ")[0])
+            duration = duration.collapsed("day_of_year", iris.analysis.SUM)
             duration.long_name = "duration"
             
+            # calculate spatial averages
             grid_areas = iris.analysis.cartography.area_weights(severity)
             severity_av = severity.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)             
             magnitude_av = magnitude.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
             duration_av = duration.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
             
-            
-            def ellipsoidal_distance(lat1, long1, lat2, long2):
-                # https://www.johndcook.com/blog/2018/11/24/spheroid-distance/
-
-                a = 6378137.0 # equatorial radius in meters 
-                f = 1/298.257223563 # ellipsoid flattening 
-                b = (1 - f)*a 
-                tolerance = 1e-11 # to stop iteration
-            
-                phi1, phi2 = lat1, lat2
-                U1 = arctan((1-f)*tan(phi1))
-                U2 = arctan((1-f)*tan(phi2))
-                L1, L2 = long1, long2
-                L = L2 - L1
-            
-                lambda_old = L + 0
-            
-                while True:
-                
-                    t = (cos(U2)*sin(lambda_old))**2
-                    t += (cos(U1)*sin(U2) - sin(U1)*cos(U2)*cos(lambda_old))**2
-                    sin_sigma = t**0.5
-                    cos_sigma = sin(U1)*sin(U2) + cos(U1)*cos(U2)*cos(lambda_old)
-                    sigma = arctan2(sin_sigma, cos_sigma) 
-                
-                    sin_alpha = cos(U1)*cos(U2)*sin(lambda_old) / sin_sigma
-                    cos_sq_alpha = 1 - sin_alpha**2
-                    if cos_sq_alpha == 0: # for 0 there is no solution (=>nan)
-                        cos_sq_alpha = tolerance/100
-                    cos_2sigma_m = cos_sigma - 2*sin(U1)*sin(U2)/cos_sq_alpha
-                    C = f*cos_sq_alpha*(4 + f*(4-3*cos_sq_alpha))/16
-                
-                    t = sigma + C*sin_sigma*(cos_2sigma_m + C*cos_sigma*(-1 + 2*cos_2sigma_m**2))
-                    lambda_new = L + (1 - C)*f*sin_alpha*t
-                    
-                    if abs(lambda_new - lambda_old) <= tolerance:
-                        break
-                    else:
-                        lambda_old = lambda_new
-            
-                u2 = cos_sq_alpha*((a**2 - b**2)/b**2)
-                A = 1 + (u2/16384)*(4096 + u2*(-768+u2*(320 - 175*u2)))
-                B = (u2/1024)*(256 + u2*(-128 + u2*(74 - 47*u2)))
-                t = cos_2sigma_m + 0.25*B*(cos_sigma*(-1 + 2*cos_2sigma_m**2))
-                t -= (B/6)*cos_2sigma_m*(-3 + 4*sin_sigma**2)*(-3 + 4*cos_2sigma_m**2)
-                delta_sigma = B * sin_sigma * t
-                s = b*A*(sigma - delta_sigma)
-            
-                return s
-            
-            extent = (duration * 0 + 1.).collapsed("longitude", iris.analysis.SUM)
-            
-            pix_sizes_km2 = []
-            for labs in latbnds:
-                lobs = lonbnds[0] # nominally equal for all longitude bounds
-                
-                #approximated pixel side lengths (lat is the same for both sides)
-                e1lon = ellipsoidal_distance(deg2rad(labs[1]), deg2rad(lobs[0]), deg2rad(labs[1]), deg2rad(lobs[1]))
-                e2lon = ellipsoidal_distance(deg2rad(labs[0]), deg2rad(lobs[0]), deg2rad(labs[0]), deg2rad(lobs[1]))
-                e0lat = ellipsoidal_distance(deg2rad(labs[0]), deg2rad(lobs[0]), deg2rad(labs[1]), deg2rad(lobs[0]))
-                
-                pix_size = round(e0lat * (e1lon + e2lon) / 2) #size rounded to m**2 assuming trapezoid
-                
-                pix_sizes_km2.append(pix_size/10e6)
-            
-            extent = (extent * np.array(pix_sizes_km2)).collapsed("latitude", iris.analysis.SUM)
+            # calculate extent
+            extent = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/1e6
             extent.units = cf_units.Unit("km2")
             
-            extent2 = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/10e6
-            extent2.units = cf_units.Unit("km2")
-            
+            # set up table
+            # TODO export csv
             self.__logger__.info("Extremes table")
             self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
             self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
             self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
             self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
-            self.__logger__.info("extent2: {:.2f} {}".format(extent2.data, extent2.units))
             
             # plotting for trials
             import iris.quickplot as qplt
