@@ -611,3 +611,11 @@ def lazy_percentiles(cube, percentiles, dims="time"):
         perc_dict.update({act_p:sub_cube})
         
     return perc_dict
+
+def cube_sorted(cube, coord):
+    coord_to_sort = cube.coord(coord)
+    assert coord_to_sort.ndim == 1, 'One dim coords only please.'
+    dim, = cube.coord_dims(coord_to_sort)
+    index = [slice(None)] * cube.ndim
+    index[dim] = np.argsort(coord_to_sort.points)
+    return cube[tuple(index)]
