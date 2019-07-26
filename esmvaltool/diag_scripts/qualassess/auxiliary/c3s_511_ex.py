@@ -67,7 +67,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     coord_values={str(self.level_dim): lambda cell: cell == max(self.levels)}))
 
         # adjustment to ids and filenames
-        if self.var3D is not None:
+        if self.var3D:
             basic_filename = self.__basic_filename__ + "_lev" + str(max(self.levels))
             dataset_id = [self.__dataset_id__[0], "at", "level", str(
                 max(self.levels)), str(self.sp_data.coord(self.level_dim).units)]
@@ -100,14 +100,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         ecube.remove_coord(rcoord)
                         loc_cube[r].remove_coord(rcoord)
             
-            # Now loop over each time step
+            # Now loop over each gridpoint in the selected region
             for yx_slice in spatial_loc_cube[r].slices(['time']):
                 # Prepare for calculating extremes climatology
-                agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN) 
+                agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN)
                 list_of_sub_cubes=[]
-                
+                #import IPython;IPython.embed()
                 # Now loop over each doy and extract a temporal window surrounding this doy
                 for doy in np.sort(agg_cube.coord("day_of_year").points):
+
                     # loc_slice is created here for carrying on the metadata
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
@@ -125,9 +126,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
                                     lambda cell: tmin <= cell <= tmax}))
-                    # BAS: this try except statement should be improved. 
-                    # when does an exception occur, and why? these statements
-                    # are terrible for debugging
+                    # Do a check if there is actually data
                     if len(doy_sel.coord("time").points)>1:
                         perc = doy_sel.collapsed("time",
                                                  iris.analysis.PERCENTILE,
@@ -135,11 +134,12 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                                  ).core_data()
                     else:
                         perc = doy_sel.core_data()
-                    # BAS: when does this happen?
+                    # Catch the case of a masked array
                     if np.ma.is_masked(perc):
                         masked_val = perc.mask
                         perc = perc.data
                             
+                    # Now the data is inserted back into a cube
                     loc_slice.data = perc
 #                    loc_slice.remove_coord("day_of_year")
                     
@@ -173,8 +173,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 list_of_cubes.append(t_cube)
                 
                 
-            # BAS: Maybe assertions are not needed, since Iris handles data quite strict
-
             # Here Iris puts back the list of individual gridpoint timeseries 
             # on a 'lat lon grid'
             list_of_cubes_merged = iris.cube.CubeList(list_of_cubes).merge()
