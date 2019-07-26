@@ -67,7 +67,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     coord_values={str(self.level_dim): lambda cell: cell == max(self.levels)}))
 
         # adjustment to ids and filenames
-        if self.var3D is not None:
+        if self.var3D is not None and self.var3D:
             basic_filename = self.__basic_filename__ + "_lev" + str(max(self.levels))
             dataset_id = [self.__dataset_id__[0], "at", "level", str(
                 max(self.levels)), str(self.sp_data.coord(self.level_dim).units)]
