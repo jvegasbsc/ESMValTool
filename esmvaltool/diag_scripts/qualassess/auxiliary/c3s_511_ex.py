@@ -84,19 +84,19 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         for r,def_r in self.__regions__.items():
             # Now define the three cubes. Note that now they are really cubes,
             # not dictionaries that contain cubes.
+
+            # The event cube spans the event in space and time
             event_cube = self.__spatiotemp_subsets__(cube,{r:def_r})[r]
 
+            # The clim cube spans the event in space, with the time
+            # spanning all available timesteps in the dataset
             spatial_def = def_r.copy()
             spatial_def.pop("time")
             clim_cube = self.__spatiotemp_subsets__(cube,{r:spatial_def})[r]
+
+            # The ex cube is created here, and used later for saving the extreme
+            # climatology, it has the same shape as the event_cube
             ex_cube = event_cube.copy()
-
-            # Select this specific region, note that loc_cube is a dictionary with loc_cube[key]
-            # holding the actual cubes.
-            loc_cube = self.__spatiotemp_subsets__(cube,{r:def_r})
-
-            
-            list_of_cubes = []
             
             # Now loop over each gridpoint in the selected region
             counter_gridpoints = 0
@@ -104,12 +104,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("Start calculation of extreme climatology \
                                  for %s gridpoints",n_gridpoints)
 
+            # Now loop over the data
             for ii in range(event_cube.shape[1]):
                 for jj in range(event_cube.shape[2]):
-                    # Get doy
+                    # Convert this gridpoint to a pandas timeseries object
                     gridpoint_ts = ipd.as_series(event_cube[:,ii,jj])
+                    # Get the doys that need to be processed
                     doy_to_process = event_cube.coord('day_of_year').points
                     n_doy = len(doy_to_process)
+                    #TODO implement the case that doy_start < doy_end (e.g. dec to jan event)
                     for n,doy in enumerate(event_cube.coord('day_of_year').points):
                         doy_window = (doy - window_size < gridpoint_ts.index.dayofyear) &\
                                      (gridpoint_ts.index.dayofyear < doy + window_size)
@@ -134,12 +137,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # therefore mask negative values
             incident_cube.data = np.ma.masked_where(incident_cube.core_data() <= 0, incident_cube.core_data(), copy = True)
             
-            # Sidenote:
-            # TODO: Insert a check that incident_cube does not have two or more dims with the same shape
-            # otherwise broadcast could fail and produce erroneous results without notice
+            # This check assures that the dimensions differ in size, otherwise
+            # broadcasting in np.atleast_3d could fail and produce erroneous 
+            # results without notice
+            assert(list(set(incident_cube.shape))==list(incident_cube.shape))
             
             # calculate severity
-            severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in loc_cube[r].coord("time").bounds]))
+            severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
             severity.units = cf_units.Unit(str(cube.units) + 
                                            " " + 
                                            str(cube.coord("time").units).split(" ")[0])
@@ -151,7 +155,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             magnitude.long_name = "magnitude"
             
             # calculate duration
-            duration = (incident_cube * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in loc_cube[r].coord("time").bounds]))
+            duration = (incident_cube * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
             duration.units = (str(cube.coord("time").units).split(" ")[0])
             duration = duration.collapsed("day_of_year", iris.analysis.SUM)
             duration.long_name = "duration"
