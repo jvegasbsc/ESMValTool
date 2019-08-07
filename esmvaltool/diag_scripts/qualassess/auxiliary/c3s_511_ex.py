@@ -52,6 +52,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         
         this_function =  "extremes example"
         
+        
+        min_measurements = 30 # minimal amount of measurements needed for calculating xclim
         which_percentile = 10
         window_size = 5 # one directional 5 => 11
         masked_val = None
@@ -116,7 +118,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     for n,doy in enumerate(event_cube.coord('day_of_year').points):
                         doy_window = (doy - window_size < gridpoint_ts.index.dayofyear) &\
                                      (gridpoint_ts.index.dayofyear < doy + window_size)
-                        perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
+                        # Extract the right data points
+                        gridpoint_sample = gridpoint_ts[doy_window]
+                        # Check if there are enough valid measurements in the sample
+                        if np.isfinite(gridpoint_sample).sum() > min_measurements:
+                            perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
+                        else:
+                            perc_val = np.nan
                         ex_cube.data[n,ii,jj] = perc_val
                     self.__logger__.info("Progress of xclim: %s percent",\
                                          np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
