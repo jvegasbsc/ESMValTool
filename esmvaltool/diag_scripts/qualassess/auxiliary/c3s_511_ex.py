@@ -84,32 +84,42 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Select this specific region, note that loc_cube is a dictionary with loc_cube[key]
             # holding the actual cubes.
             loc_cube = self.__spatiotemp_subsets__(cube,{r:def_r})
+
             spatial_def = def_r.copy()
             spatial_def.pop("time")
             spatial_loc_cube = self.__spatiotemp_subsets__(cube,{r:spatial_def})
             
             list_of_cubes = []
             
+            #import IPython;IPython.embed()
             # Slicing and merging cubes sometimes leads to the wrong dimensions
             # being propagated to coordinates instead of being auxiliary coordinates.
             # Therefore they are removed. 
             # TODO: handle this more specifically, in certain cases this might fail.
             for (entry,ecube) in spatial_loc_cube.items():
+                # Realize the data at this stage
+                ecube.data
                 for rcoord in ["day_of_month", "month_number", "year", self.level_dim]:
                     if rcoord in [coord.name() for coord in ecube.coords()]:
                         ecube.remove_coord(rcoord)
                         loc_cube[r].remove_coord(rcoord)
             
+
+            n_gridpoints = spatial_loc_cube[r].coord('latitude').shape[0] *\
+                spatial_loc_cube[r].coord('longitude').shape[0]
+            self.__logger__.info("Start calculation of extreme climatology \
+                                 for %s gridpoints",n_gridpoints)
             # Now loop over each gridpoint in the selected region
-            for yx_slice in spatial_loc_cube[r].slices(['time']):
+            for nn,yx_slice in enumerate(spatial_loc_cube[r].slices(['time'])):
                 # Prepare for calculating extremes climatology
+                self.__logger__.info("Progress of xclim: %s percent",np.round(100.*(nn/n_gridpoints),decimals=1))
                 agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN)
                 list_of_sub_cubes=[]
-                #import IPython;IPython.embed()
+
                 # Now loop over each doy and extract a temporal window surrounding this doy
                 for doy in np.sort(agg_cube.coord("day_of_year").points):
-
                     # loc_slice is created here for carrying on the metadata
+                    self.__logger__.info("#")
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
                     tmax = (doy + window_size) % 366
@@ -147,32 +157,38 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     list_of_sub_cubes.append(loc_slice)
                     
                 # TODO: make make more explicit, merge('day_of_year')
-                
                 # t_cube can be interpreted as a timeseries of one pixel 
+
                 t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
                 t_cube = cube_sorted(t_cube,"day_of_year")
                 iris.util.promote_aux_coord_to_dim_coord(t_cube, "day_of_year")
-                
+
                 # Since there is no promote_scalar_coord_to_dim_coord, do it like this:
                 iris.util.new_axis(t_cube, "latitude")
                 iris.util.new_axis(t_cube, "longitude")
                 list_of_cubes.append(t_cube)
-                
+
+            self.__logger__.info("Finished calculation of extreme climatology")
+
                 
             # Here Iris puts back the list of individual gridpoint timeseries 
             # on a 'lat lon grid'
+            self.__logger__.info("Start merging of gridpoints back to grid")
             list_of_cubes_merged = iris.cube.CubeList(list_of_cubes).merge()
+            self.__logger__.info("Finished merging of gridpoints back to grid")
             assert(len(list_of_cubes_merged)==1)
             clim_cube = list_of_cubes_merged[0]
             
             clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), masked_val)
             
             # This is needed to have the same order and names of dim_coords on both cubes
+            self.__logger__.info("Reordering dimensions")
             cc_dim_order = [c.name() for c in clim_cube.coords()][:len(clim_cube.shape)]
             loc_cube_doy = loc_cube[r].copy()
             iris.util.promote_aux_coord_to_dim_coord(loc_cube_doy, "day_of_year")
             lc_dim_order = [c.name() for c in loc_cube_doy.coords()][:len(loc_cube_doy.shape)]
             clim_cube.transpose([cc_dim_order.index(i) for i in lc_dim_order])
+            self.__logger__.info("Finished dimensions")
 
             # BAS: check issue. At this point, loc_cube[r] still has aux coord day_of_year, even when removing it above
             # Here the actual exceedance of the extreme climatology is calculated
