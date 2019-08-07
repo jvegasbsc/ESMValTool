@@ -33,14 +33,23 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         super(ex_Diagnostic_SP, self).set_info(**kwargs)
         
         # add a region to the regions object
+#        self.__regions__ = dict({
+#            'CE_drought_2003': {  # https://en.wikipedia.org/wiki/2003_European_heat_wave
+#                'latitude': (43, 47),
+#                'longitude': (-2, 4),
+#                'time': (datetime.datetime(2003, 7, 20),
+#                         datetime.datetime(2003, 8, 20)
+#                         )
+#                }})
         self.__regions__ = dict({
-            'CE_JJA_2003': {  # https://en.wikipedia.org/wiki/2003_European_heat_wave
-                'latitude': (43, 47),
-                'longitude': (-2, 4),
-                'time': (datetime.datetime(2003, 7, 20),
-                         datetime.datetime(2003, 8, 20)
+            'CE_flooding_2003': {  # https://en.wikipedia.org/wiki/2013_European_floods
+                'latitude': (41, 51),
+                'longitude': (7, 16),
+                'time': (datetime.datetime(2003, 5, 30),
+                         datetime.datetime(2003, 6, 5)
                          )
                 }})
+
     
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -53,9 +62,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         this_function =  "extremes example"
         
         
-        min_measurements = 30 # minimal amount of measurements needed for calculating xclim
+        min_measurements = 5 # minimal amount of measurements needed for calculating xclim
         which_percentile = 10
-        window_size = 5 # one directional 5 => 11
+        window_size = 30 # one directional 5 => 11
         masked_val = None
         
         # this the extremes example
@@ -148,7 +157,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # This check assures that the dimensions differ in size, otherwise
             # broadcasting in np.atleast_3d could fail and produce erroneous 
             # results without notice
-            assert(list(set(incident_cube.shape))==sorted(list(incident_cube.shape)))
+            import IPython;IPython.embed()
+            assert(sorted(list(set(incident_cube.shape)))==sorted(list(incident_cube.shape)))
             
             # calculate severity
             severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
