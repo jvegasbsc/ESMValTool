@@ -140,7 +140,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # This check assures that the dimensions differ in size, otherwise
             # broadcasting in np.atleast_3d could fail and produce erroneous 
             # results without notice
-            assert(list(set(incident_cube.shape))==list(incident_cube.shape))
+            assert(list(set(incident_cube.shape))==sorted(list(incident_cube.shape)))
             
             # calculate severity
             severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
