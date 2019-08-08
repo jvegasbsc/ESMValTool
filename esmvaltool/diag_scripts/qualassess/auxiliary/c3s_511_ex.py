@@ -3,11 +3,12 @@
 """
 Created on Wed Dec  5 13:59:59 2018
 
-@author: bmueller
+@authors: bmueller, bcrezee
 """
 
 import iris
 import iris.pandas as ipd
+import iris.quickplot as qplt
 import os
 import sys
 import matplotlib.pyplot as plt
@@ -152,27 +153,29 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
             # Calculate exceedance of the extremes climatology
             if which_percentile > 50: # we are interested in over threshold values
-                incident_cube = event_cube - ex_cube
+                amplitude = event_cube - ex_cube
             elif which_percentile < 50: # we are interested in under threshold values
-                incident_cube = ex_cube - event_cube
+                amplitude = ex_cube - event_cube
             else:
                 self.__loger__.error("Percentile can not be 50, that wouldn't be an extreme climatology")
                 raise ValueError
-            # Note that due to the above check, incident_cube values of the event are always positive
+            # Note that due to the above check, amplitude values of the event are always positive
             # therefore mask negative values
-            incident_cube.data = np.ma.masked_where(incident_cube.core_data() <= 0, incident_cube.core_data(), copy = True)
+            amplitude.data = np.ma.masked_where(amplitude.core_data() <= 0, amplitude.core_data(), copy = True)
+            # Set long name
+            amplitude.long_name = 'Amplitude of '+event_cube.long_name
             
             # This check assures that the dimensions differ in size, otherwise
             # broadcasting in np.atleast_3d could fail and produce erroneous 
             # results without notice
-            assert(sorted(list(set(incident_cube.shape)))==sorted(list(incident_cube.shape)))
+            assert(sorted(list(set(amplitude.shape)))==sorted(list(amplitude.shape)))
 
 
             #####################################
             ###  calculate the three metrics  ###
             #####################################
             # severity
-            severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
+            severity = amplitude * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
             severity.data = np.ma.masked_where(~np.isfinite(severity.core_data()),\
                                                severity.core_data(), copy = True)
             severity.units = cf_units.Unit(str(cube.units) + 
@@ -182,19 +185,18 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             severity.long_name = "severity"
 
             # magnitude
-            magnitude = incident_cube.collapsed("day_of_year", iris.analysis.MAX)
+            magnitude = amplitude.collapsed("day_of_year", iris.analysis.MAX)
             magnitude.data = np.ma.masked_where(~np.isfinite(magnitude.core_data()),\
                                                magnitude.core_data(), copy = True)
             magnitude.long_name = "magnitude"
 
             # duration
-            duration = (incident_cube * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
+            duration = (amplitude * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
             duration.data = np.ma.masked_where(~np.isfinite(duration.core_data()),\
                                                duration.core_data(), copy = True)
             duration.units = (str(cube.coord("time").units).split(" ")[0])
             duration = duration.collapsed("day_of_year", iris.analysis.SUM)
             duration.long_name = "duration"
-
 
             # Now calculate the spatial event mask from the severity as outlined in 
             # section 3.2 of the Extreme Catalogue C3S_D511.1.5_Extreme_Catalogue_V1.pdf
@@ -204,17 +206,46 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Here we move from a masked array to one single bool array 
             # where True values occur if threshold exceeded and input data (severity) 
             # was not masked.
-            event_mask = event_mask.data & ~event_mask.mask
+            event_mask2d = event_mask.data & ~event_mask.mask
+
+            # Now expand it over time
+            event_mask3d = np.broadcast_to(event_mask2d,event_cube.shape)
+
+            # Now create copies of the different event metrics and mask them with the event mask
+            severity_masked = severity.copy()
+            magnitude_masked = magnitude.copy()
+            duration_masked = duration.copy()
+
+            # Set the event_mask as mask for each of the three above
+            severity_masked.mask = event_mask2d
+            magnitude_masked.mask = event_mask2d
+            duration_masked.mask = event_mask2d
+
+            # calculate spatial averages 
+            grid_areas = iris.analysis.cartography.area_weights(severity_masked)
+            severity_av = severity_masked.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)             
+            magnitude_av = magnitude_masked.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
+            duration_av = duration_masked.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
+
+            # now calculate time evolution of amplitude within defined event_mask
+            amplitude_time = amplitude.copy()
+            amplitude_time.mask = event_mask3d
+
+            # Note that collapsing needs to be done in two steps, otherwise masked values
+            # are propagated over the full array, which is not the preferred behaviour.
+            amplitude_time = amplitude_time.collapsed(["latitude"],\
+                                         iris.analysis.MEAN)
+            amplitude_time = amplitude_time.collapsed(["longitude"],\
+                                         iris.analysis.MEAN)
+
+            # Plot time evolution
+            plt.clf()
+            qplt.plot(amplitude_time)
+            plt.xticks(rotation=45)
+            plt.savefig(self.__plot_dir__ + os.sep + "amplitude_time_" + ".png")
 
             import IPython;IPython.embed()
-            # calculate spatial averages
-            grid_areas = iris.analysis.cartography.area_weights(severity)
-            #TODO: a mask needs to be set properly on the data, below aggregator instances
-            # handle masked data 
-            severity_av = severity.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)             
-            magnitude_av = magnitude.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
-            duration_av = duration.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
-            
+
             # calculate extent
             extent = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/1e6
             extent.units = cf_units.Unit("km2")
@@ -227,9 +258,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
             self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
             # plotting for trials
-            import iris.quickplot as qplt
             
             for dat in ["severity", "magnitude", "duration"]:
+                #TODO add event_mask_2d to the plots. 
+
                 #self.__logger__.info(locals()[dat])
             
                 qplt.pcolormesh(locals()[dat])#, vmin = 250, vmax = 300)
