@@ -51,8 +51,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 #                }})
         self.__regions__ = dict({
             'CE_drought_2015': {  # taken from our EX catalogue
-                'latitude': (45, 55),
-                'longitude': (0, 35),
+                'latitude': (45, 50),#55),
+                'longitude': (0, 6),#35),
                 'time': (datetime.datetime(2015, 6, 1),
                          datetime.datetime(2015, 7, 31)
                          )
@@ -71,10 +71,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         this_function =  "extremes example"
         
         
-        min_measurements = 10 # minimal amount of measurements needed for calculating xclim
+        min_measurements = 1 # minimal amount of measurements needed for calculating xclim
         which_percentile = 10
-        window_size = 30 # one directional 5 => 11
-        masked_val = None
+        window_size = 5 # one directional 5 => 11
         
         # this the extremes example
         
@@ -170,26 +169,41 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             
             # calculate severity
             severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
+            # add mask
+            severity.data = np.ma.masked_where(~np.isfinite(severity.core_data()),\
+                                               severity.core_data(), copy = True)
             severity.units = cf_units.Unit(str(cube.units) + 
                                            " " + 
                                            str(cube.coord("time").units).split(" ")[0])
             severity = severity.collapsed("day_of_year", iris.analysis.SUM) 
             severity.long_name = "severity"
-            
+
             # calculate magnitude
             magnitude = incident_cube.collapsed("day_of_year", iris.analysis.MAX)
+            # add mask
+            magnitude.data = np.ma.masked_where(~np.isfinite(magnitude.core_data()),\
+                                               magnitude.core_data(), copy = True)
             magnitude.long_name = "magnitude"
             
             # calculate duration
             duration = (incident_cube * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
+            # add mask
+            duration.data = np.ma.masked_where(~np.isfinite(duration.core_data()),\
+                                               duration.core_data(), copy = True)
+
             duration.units = (str(cube.coord("time").units).split(" ")[0])
             duration = duration.collapsed("day_of_year", iris.analysis.SUM)
             duration.long_name = "duration"
             
+            # Now calculate the spatial event mask from the severity as outlined in 
+            # section 3.2 of the Extreme Catalogue C3S_D511.1.5_Extreme_Catalogue_V1.pdf
+            
+#            event_mask = 
+
             # calculate spatial averages
             grid_areas = iris.analysis.cartography.area_weights(severity)
-            #TODO: below three lines should be changed to 
-            # a nanmean (i.e. taking the mean over the not-nan values)
+            #TODO: a mask needs to be set properly on the data, below aggregator instances
+            # handle masked data 
             severity_av = severity.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)             
             magnitude_av = magnitude.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
             duration_av = duration.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
