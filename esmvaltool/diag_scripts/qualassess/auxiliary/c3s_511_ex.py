@@ -41,16 +41,25 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 #                         datetime.datetime(2003, 8, 20)
 #                         )
 #                }})
+#        self.__regions__ = dict({
+#            'CE_flooding_2003': {  # https://en.wikipedia.org/wiki/2013_European_floods
+#                'latitude': (41, 51),
+#                'longitude': (7, 16),
+#                'time': (datetime.datetime(2003, 5, 30),
+#                         datetime.datetime(2003, 6, 10)
+#                         )
+#                }})
         self.__regions__ = dict({
-            'CE_flooding_2003': {  # https://en.wikipedia.org/wiki/2013_European_floods
-                'latitude': (41, 51),
-                'longitude': (7, 16),
-                'time': (datetime.datetime(2003, 5, 30),
-                         datetime.datetime(2003, 6, 5)
+            'CE_drought_2015': {  # taken from our EX catalogue
+                'latitude': (45, 55),
+                'longitude': (0, 35),
+                'time': (datetime.datetime(2015, 6, 1),
+                         datetime.datetime(2015, 7, 31)
                          )
                 }})
 
-    
+
+
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
         self.__do_extremes__()
@@ -62,7 +71,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         this_function =  "extremes example"
         
         
-        min_measurements = 5 # minimal amount of measurements needed for calculating xclim
+        min_measurements = 10 # minimal amount of measurements needed for calculating xclim
         which_percentile = 10
         window_size = 30 # one directional 5 => 11
         masked_val = None
@@ -157,7 +166,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # This check assures that the dimensions differ in size, otherwise
             # broadcasting in np.atleast_3d could fail and produce erroneous 
             # results without notice
-            import IPython;IPython.embed()
             assert(sorted(list(set(incident_cube.shape)))==sorted(list(incident_cube.shape)))
             
             # calculate severity
