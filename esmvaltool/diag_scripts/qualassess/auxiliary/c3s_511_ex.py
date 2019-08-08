@@ -244,7 +244,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             plt.xticks(rotation=45)
             plt.savefig(self.__plot_dir__ + os.sep + "amplitude_time_" + ".png")
 
-            import IPython;IPython.embed()
 
             # calculate extent
             extent = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/1e6
@@ -273,7 +272,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 
                 plt.close()
 
-            import IPython;IPython.embed()
 
         # produce report
         expected_input, found = \
