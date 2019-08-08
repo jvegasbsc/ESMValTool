@@ -166,10 +166,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # broadcasting in np.atleast_3d could fail and produce erroneous 
             # results without notice
             assert(sorted(list(set(incident_cube.shape)))==sorted(list(incident_cube.shape)))
-            
-            # calculate severity
+
+
+            #####################################
+            ###  calculate the three metrics  ###
+            #####################################
+            # severity
             severity = incident_cube * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
-            # add mask
             severity.data = np.ma.masked_where(~np.isfinite(severity.core_data()),\
                                                severity.core_data(), copy = True)
             severity.units = cf_units.Unit(str(cube.units) + 
@@ -178,35 +181,39 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             severity = severity.collapsed("day_of_year", iris.analysis.SUM) 
             severity.long_name = "severity"
 
-            # calculate magnitude
+            # magnitude
             magnitude = incident_cube.collapsed("day_of_year", iris.analysis.MAX)
-            # add mask
             magnitude.data = np.ma.masked_where(~np.isfinite(magnitude.core_data()),\
                                                magnitude.core_data(), copy = True)
             magnitude.long_name = "magnitude"
-            
-            # calculate duration
+
+            # duration
             duration = (incident_cube * 0 + 1) * np.atleast_3d(np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
-            # add mask
             duration.data = np.ma.masked_where(~np.isfinite(duration.core_data()),\
                                                duration.core_data(), copy = True)
-
             duration.units = (str(cube.coord("time").units).split(" ")[0])
             duration = duration.collapsed("day_of_year", iris.analysis.SUM)
             duration.long_name = "duration"
-            
+
+
             # Now calculate the spatial event mask from the severity as outlined in 
             # section 3.2 of the Extreme Catalogue C3S_D511.1.5_Extreme_Catalogue_V1.pdf
-            
-#            event_mask = 
+            event_mask_threshold = float(severity.collapsed(["latitude", "longitude"],\
+                                         iris.analysis.MEDIAN).data)
+            event_mask = severity.data > event_mask_threshold
+            # Here we move from a masked array to one single bool array 
+            # where True values occur if threshold exceeded and input data (severity) 
+            # was not masked.
+            event_mask = event_mask.data & ~event_mask.mask
 
+            import IPython;IPython.embed()
             # calculate spatial averages
             grid_areas = iris.analysis.cartography.area_weights(severity)
             #TODO: a mask needs to be set properly on the data, below aggregator instances
             # handle masked data 
             severity_av = severity.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)             
             magnitude_av = magnitude.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
-            duration_av = duration.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas) 
+            duration_av = duration.collapsed(["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
             
             # calculate extent
             extent = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/1e6
