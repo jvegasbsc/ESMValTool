@@ -116,72 +116,54 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Now loop over each gridpoint in the selected region
             for nn,yx_slice in enumerate(spatial_loc_cube[r].slices(['time'])):
                 # Prepare for calculating extremes climatology
-                self.__logger__.info("Progress of xclim: %s percent",np.round(100.*(nn/n_gridpoints),decimals=1))
+                self.__logger__.info("Progress of xclim: %s percent",np.round(100.*((nn+1)/n_gridpoints),decimals=1))
                 agg_cube = yx_slice.aggregated_by("day_of_year",iris.analysis.MEAN)
                 list_of_sub_cubes=[]
                 
-                masked_vals=[]
+                # Now loop over each doy and extract a temporal window surrounding this doy
+                for doy in np.sort(agg_cube.coord("day_of_year").points):
+                    # loc_slice is created here for carrying on the metadata
+                    self.__logger__.info("#")
+                    loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
+                    tmin = (doy - window_size) % 366
+                    tmax = (doy + window_size) % 366
+                    if not tmin:
+                        tmin = 366
+                    if not tmax:
+                        tmax = 366
+                    if tmin > tmax:
+                        doy_sel = yx_slice.extract(
+                                iris.Constraint(coord_values={'day_of_year':
+                                    lambda cell: 1 <= cell <= tmin or
+                                                 tmax <= cell <= 366}))
+                    else:
+                        doy_sel = yx_slice.extract(
+                                iris.Constraint(coord_values={'day_of_year':
+                                    lambda cell: tmin <= cell <= tmax}))
 
-                pool = Pool() # default to os.cpu_count()
-#                pool = Pool(processes = 5)
-                
-                # sliced_extremes, see below
-                mp_list = pool.starmap(sliced_extremes, 
-                                        zip(
-                                            np.sort(agg_cube.coord("day_of_year").points),
-                                            repeat(yx_slice),
-                                            repeat(agg_cube),
-                                            repeat(self.__logger__),
-                                            repeat(window_size),
-                                            repeat(which_percentile))
-                                        ) 
-                
-                
-                list_of_sub_cubes = [el[0] for el in mp_list]
-                masked_vals.append(list(set([el[1] for el in mp_list]))[0])
-#
-#                # Now loop over each doy and extract a temporal window surrounding this doy
-#                for doy in np.sort(agg_cube.coord("day_of_year").points):
-#                    # loc_slice is created here for carrying on the metadata
-#                    self.__logger__.info("#")
-#                    loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
-#                    tmin = (doy - window_size) % 366
-#                    tmax = (doy + window_size) % 366
-#                    if not tmin:
-#                        tmin = 366
-#                    if not tmax:
-#                        tmax = 366
-#                    if tmin > tmax:
-#                        doy_sel = yx_slice.extract(
-#                                iris.Constraint(coord_values={'day_of_year':
-#                                    lambda cell: 1 <= cell <= tmin or
-#                                                 tmax <= cell <= 366}))
-#                    else:
-#                        doy_sel = yx_slice.extract(
-#                                iris.Constraint(coord_values={'day_of_year':
-#                                    lambda cell: tmin <= cell <= tmax}))
-#
-#                    # Do a check if there is actually data
-#                    if len(doy_sel.coord("time").points)>1:
-#                        perc = doy_sel.collapsed("time",
-#                                                 iris.analysis.PERCENTILE,
-#                                                 percent=[which_percentile]
-#                                                 ).core_data()
-#                    else:
-#                        perc = doy_sel.core_data()
-#
-#                    # Catch the case of a masked array
-#                    if np.ma.is_masked(perc):
-#                        masked_val = perc.mask
-#                        perc = perc.data
-#                            
-#                    # Now the data is inserted back into a cube
-#                    loc_slice.data = perc
-#                    
-#                    list_of_sub_cubes.append(loc_slice)
-#                    
-                # TODO: make make more explicit, merge('day_of_year')
-                # t_cube can be interpreted as a timeseries of one pixel 
+                    # Do a check if there is actually data
+                    if len(doy_sel.coord("time").points)>1:
+                        self.__logger__.info(doy_sel.data)
+                        self.__logger__.info(doy_sel.coord("time"))
+                        perc = doy_sel.collapsed("time",
+                                                 iris.analysis.PERCENTILE,
+                                                 percent=[which_percentile]
+                                                 ).core_data()
+                    else:
+                        perc = doy_sel.core_data()
+
+                    # Catch the case of a masked array
+                    if np.ma.is_masked(perc):
+                        masked_val = perc.mask
+                        perc = perc.data
+                            
+                    # Now the data is inserted back into a cube
+                    loc_slice.data = perc
+                    
+                    list_of_sub_cubes.append(loc_slice)
+                    
+#                 TODO: make make more explicit, merge('day_of_year')
+#                 t_cube can be interpreted as a timeseries of one pixel 
 
                 t_cube = iris.util.squeeze(iris.cube.CubeList(list_of_sub_cubes).merge()[0])
                 t_cube = cube_sorted(t_cube,"day_of_year")
@@ -203,7 +185,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             assert(len(list_of_cubes_merged)==1)
             clim_cube = list_of_cubes_merged[0]
             
-            clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), list(set(masked_vals))[0])
+            clim_cube.data = np.ma.masked_equal(clim_cube.core_data(), masked_val)
             
             # This is needed to have the same order and names of dim_coords on both cubes
             self.__logger__.info("Reordering dimensions")
@@ -296,43 +278,3 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots}})
-    
-def sliced_extremes(doy, yx_slice, agg_cube, this_logger, window_size, which_percentile):
-    masked_val = None
-    this_logger.info("#")
-    loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
-    tmin = (doy - window_size) % 366
-    tmax = (doy + window_size) % 366
-    if not tmin:
-        tmin = 366
-    if not tmax:
-        tmax = 366
-    if tmin > tmax:
-        doy_sel = yx_slice.extract(
-                iris.Constraint(coord_values={'day_of_year':
-                    lambda cell: 1 <= cell <= tmin or
-                                 tmax <= cell <= 366}))
-    else:
-        doy_sel = yx_slice.extract(
-                iris.Constraint(coord_values={'day_of_year':
-                    lambda cell: tmin <= cell <= tmax}))
-
-    # Do a check if there is actually data
-    if len(doy_sel.coord("time").points)>1:
-        perc = doy_sel.collapsed("time",
-                                 iris.analysis.PERCENTILE,
-                                 percent=[which_percentile]
-                                 ).core_data()
-    else:
-        perc = doy_sel.core_data()
-
-    # Catch the case of a masked array
-    if np.ma.is_masked(perc):
-        masked_val = perc.mask
-        perc = perc.data
-            
-    # Now the data is inserted back into a cube
-    loc_slice.data = perc
-    
-    return loc_slice, masked_val
-
