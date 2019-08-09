@@ -50,14 +50,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 #                         datetime.datetime(2003, 6, 10)
 #                         )
 #                }})
-        self.__regions__ = dict({
-            'CE_drought_2015': {  # taken from our EX catalogue
-                'latitude': (45, 50),#55),
-                'longitude': (0, 6),#35),
-                'time': (datetime.datetime(2015, 6, 1),
-                         datetime.datetime(2015, 7, 31)
-                         )
-                }})
+#        self.__regions__ = dict({
+#            'CE_drought_2015': {  # taken from our EX catalogue
+#                'latitude': (45, 50),#55),
+#                'longitude': (0, 6),#35),
+#                'time': (datetime.datetime(2015, 6, 1),
+#                         datetime.datetime(2015, 7, 31)
+#                         )
+#                }})
 
 
 
@@ -73,8 +73,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         
         
         min_measurements = 1 # minimal amount of measurements needed for calculating xclim
-        which_percentile = 10
-        window_size = 5 # one directional 5 => 11
+        which_percentile = 90
+        window_size = 40 # one directional 5 => 11
         
         # this the extremes example
         
@@ -138,6 +138,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                      (gridpoint_ts.index.dayofyear < doy + window_size)
                         # Extract the right data points
                         gridpoint_sample = gridpoint_ts[doy_window]
+                        self.__logger__.info(gridpoint_sample)
                         # Check if there are enough valid measurements in the sample
                         if np.isfinite(gridpoint_sample).sum() > min_measurements:
                             perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
