@@ -34,6 +34,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         super(ex_Diagnostic_SP, self).set_info(**kwargs)
         
         # add a region to the regions object
+        
+        # all required input can be extracted from the extremes dictionary
+        self.__logger__.info(self.__extremes__)
+        
+        ## example regions below
 #        self.__regions__ = dict({
 #            'CE_drought_2003': {  # https://en.wikipedia.org/wiki/2003_European_heat_wave
 #                'latitude': (43, 47),
@@ -71,10 +76,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         
         this_function =  "extremes example"
         
-        
-        min_measurements = 1 # minimal amount of measurements needed for calculating xclim
-        which_percentile = 90
-        window_size = 40 # one directional 5 => 11
+        min_measurements = self.__extremes__["min_measurements"] # minimal amount of measurements needed for calculating xclim
+        which_percentile = self.__extremes__["which_percentile"]
+        window_size = self.__extremes__["window_size"] # one directional 5 => 11
         
         # this the extremes example
         
@@ -121,8 +125,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Now loop over each gridpoint in the selected region
             counter_gridpoints = 1
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
-            self.__logger__.info("Start calculation of extreme climatology \
-                                 for %s gridpoints",n_gridpoints)
+            self.__logger__.info("Start calculation of extreme climatology " +
+                                 "for %s gridpoints",n_gridpoints)
 
             # Now loop over the data
             for ii in range(event_cube.shape[1]):
@@ -136,6 +140,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     for n,doy in enumerate(event_cube.coord('day_of_year').points):
                         doy_window = (doy - window_size < gridpoint_ts.index.dayofyear) &\
                                      (gridpoint_ts.index.dayofyear < doy + window_size)
+                        self.__logger__.info(doy_window)
                         # Extract the right data points
                         gridpoint_sample = gridpoint_ts[doy_window]
                         self.__logger__.info(gridpoint_sample)

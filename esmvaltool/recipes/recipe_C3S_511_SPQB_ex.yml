@@ -58,6 +58,12 @@ diagnostics:
       SPQB_basic_report:
         script: qualassess/ex_C3S_511_SPQB.py
         requests: [custom]
+        minimal_number_measurements: 1 # minimal amount of measurements needed for calculating climatologies
+        which_percentile: 90 # per default assuming exceeding extremes for percentiles > 50 and vice versa
+        window_size: 40 # one directional window size, i.e. 5 => 11
+        extreme_type: heat
+        extreme_region: Europe
+        extreme_eventtime: 2014
 #        levels: None
         levels: [8.50e+04]#[1.00e+02]
         

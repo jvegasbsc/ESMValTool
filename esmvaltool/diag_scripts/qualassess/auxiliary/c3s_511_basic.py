@@ -107,6 +107,8 @@ class __Diagnostic_skeleton__(object):
         self.__report_directories__ = None
         self.__report_order__ = []
         
+        self.__extremes__ = {}
+        
         self.reporting_structure = collections.OrderedDict()
 
     def set_info(self, **kwargs):
@@ -513,6 +515,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 ##        self.__logger__.info(np.sort([*self.li1]))
         #######################################################################
 
+        # TODO use self.__cfg__.pop() here!!!
         if not isinstance(self.__cfg__, dict) or len(self.__cfg__) == 0:
             raise EmptyContentError("__cfg__", "Element is empty.")
 
@@ -545,7 +548,17 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__report_order__ = self.__cfg__['order']
         except BaseException:
             self.__report_order__ = self.__cfg__["input_files"]
-
+            
+        try:
+            self.__extremes__ = dict({"min_measurements": self.__cfg__["minimal_number_measurements"],
+                                      "which_percentile": self.__cfg__["which_percentile"],
+                                      "window_size": self.__cfg__["window_size"],
+                                      "type": self.__cfg__["extreme_type"],
+                                      "region": self.__cfg__["extreme_region"],
+                                      "eventtime": self.__cfg__["extreme_eventtime"]})
+        except BaseException:
+            pass
+            
         self.__plot_dir__ = self.__cfg__['plot_dir']
         self.__work_dir__ = self.__cfg__['work_dir']
         self.__report_dir__ = self.__work_dir__ + os.sep + "c3s_511" + os.sep
