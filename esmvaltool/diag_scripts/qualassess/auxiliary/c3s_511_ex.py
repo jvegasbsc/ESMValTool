@@ -127,6 +127,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     loc_slice = agg_cube.extract(iris.Constraint(day_of_year=doy))
                     tmin = (doy - window_size) % 366
                     tmax = (doy + window_size) % 366
+                    self.__logger__.info([tmin,tmax])
                     if not tmin:
                         tmin = 366
                     if not tmax:
@@ -134,12 +135,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     if tmin > tmax:
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
-                                    lambda cell: 1 <= cell <= tmin or
-                                                 tmax <= cell <= 366}))
+                                    lambda cell: 1 <= cell <= tmax or
+                                                 tmin <= cell <= 366}))
                     else:
                         doy_sel = yx_slice.extract(
                                 iris.Constraint(coord_values={'day_of_year':
                                     lambda cell: tmin <= cell <= tmax}))
+    
+                    self.__logger__.info(doy_sel)
 
                     # Do a check if there is actually data
                     if len(doy_sel.coord("time").points)>1:
