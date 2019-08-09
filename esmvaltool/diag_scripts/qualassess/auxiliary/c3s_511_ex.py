@@ -23,6 +23,9 @@ from .libs.predef.ecv_lookup_table import ecv_lookup
 from .libs.c3s_511_util import cube_sorted
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
+    
+from multiprocessing import Pool
+from itertools import repeat, product
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     """
@@ -128,41 +131,67 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("Start calculation of extreme climatology " +
                                  "for %s gridpoints",n_gridpoints)
 
-            # Now loop over the data
-            for ii in range(event_cube.shape[1]):
-                for jj in range(event_cube.shape[2]):
-                    # Convert this gridpoint to a pandas timeseries object
-                    gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
-                    # Get the doys that need to be processed
-                    doy_to_process = event_cube.coord('day_of_year').points
-                    n_doy = len(doy_to_process)
-                    #TODO implement the case that doy_start < doy_end (e.g. dec to jan event)
-                    for n,doy in enumerate(event_cube.coord('day_of_year').points):
-                        tmin = (doy - window_size) % 366
-                        tmax = (doy + window_size) % 366
-                        if not tmin:
-                            tmin = 366
-                        if not tmax:
-                            tmax = 366
-                        if tmin <= tmax:
-                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
-                                         (gridpoint_ts.index.dayofyear <= tmax)
-                        else:
-                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
-                                         (gridpoint_ts.index.dayofyear <= tmax)
-                        # Extract the right data points
-                        gridpoint_sample = gridpoint_ts[doy_window]
-                        # Check if there are enough valid measurements in the sample
-                        if np.isfinite(gridpoint_sample).sum() > min_measurements:
-                            perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
-                        else:
-                            perc_val = np.nan
-                        ex_cube.data[n,ii,jj] = perc_val
-                    self.__logger__.info("Progress of xclim: %s percent",\
-                                         np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
-                    counter_gridpoints += 1
+
+            # setting up a pool
+            # TODO make sure that this is machine compatiple
+            pool = Pool()
+            
+            # get an iterator for the the positions
+            positions = list(product(range(event_cube.shape[1]), range(event_cube.shape[2])))
+            # Now loop in a processor distributed manner over the positions in the data
+            # returns ex_list as percentile values with the number in the timeseries
+            ex_list = pool.starmap(extremes_1D, 
+                                        zip(positions,
+                                            repeat(event_cube),
+                                            repeat(clim_cube),
+                                            repeat(ex_cube),
+                                            repeat(window_size),
+                                            repeat(which_percentile),
+                                            repeat(min_measurements),
+                                            )
+                                    )
+                        
+            # map the positions and the results back to the cube
+            extremes_1d_redistribute(ex_cube,
+                                     ex_list,
+                                     positions)
+            
+#            # Now loop over the data
+#            for ii in range(event_cube.shape[1]):
+#                for jj in range(event_cube.shape[2]):
+#                    # Convert this gridpoint to a pandas timeseries object
+#                    gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
+#                    # Get the doys that need to be processed
+##                    doy_to_process = event_cube.coord('day_of_year').points # simple development purpose?
+##                    n_doy = len(doy_to_process) # simple development purpose?
+#                    for n,doy in enumerate(event_cube.coord('day_of_year').points):
+#                        tmin = (doy - window_size) % 366
+#                        tmax = (doy + window_size) % 366
+#                        if not tmin:
+#                            tmin = 366
+#                        if not tmax:
+#                            tmax = 366
+#                        if tmin <= tmax:
+#                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
+#                                         (gridpoint_ts.index.dayofyear <= tmax)
+#                        else:
+#                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
+#                                         (gridpoint_ts.index.dayofyear <= tmax)
+#                        # Extract the right data points
+#                        gridpoint_sample = gridpoint_ts[doy_window]
+#                        # Check if there are enough valid measurements in the sample
+#                        if np.isfinite(gridpoint_sample).sum() > min_measurements:
+#                            perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
+#                        else:
+#                            perc_val = np.nan
+#                        ex_cube.data[n,ii,jj] = perc_val
+#                    self.__logger__.info("Progress of xclim: %s percent",\
+#                                         np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
+#                    counter_gridpoints += 1
+                    
             #TODO think about propagation of nan values
             ex_cube.data = np.ma.masked_equal(ex_cube.core_data(), np.nan)
+            
             self.__logger__.info("Finished calculation of extreme climatology")
 
             # Calculate exceedance of the extremes climatology
@@ -305,3 +334,46 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots}})
+    
+def extremes_1D(ind, event_cube,  clim_cube, ex_cube, window_size, which_percentile, min_measurements):
+    ii = ind[0]
+    jj = ind[1]
+    # Convert this gridpoint to a pandas timeseries object
+    gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
+    # Get the doys that need to be processed
+    perc_val_ts = []
+    for n,doy in enumerate(event_cube.coord('day_of_year').points):
+        tmin = (doy - window_size) % 366
+        tmax = (doy + window_size) % 366
+        if not tmin:
+            tmin = 366
+        if not tmax:
+            tmax = 366
+        if tmin <= tmax:
+            doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
+                         (gridpoint_ts.index.dayofyear <= tmax)
+        else:
+            doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
+                         (gridpoint_ts.index.dayofyear <= tmax)
+        # Extract the right data points
+        gridpoint_sample = gridpoint_ts[doy_window]
+        # Check if there are enough valid measurements in the sample
+        if np.isfinite(gridpoint_sample).sum() > min_measurements:
+            perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
+        else:
+            perc_val = np.nan
+        
+        # convert the individual values to a list of tuples providing percentiles and number in the time series
+        perc_val_ts.append((perc_val,n))
+        
+    return perc_val_ts
+
+def extremes_1d_redistribute(ex_cube, extrems_1D, positions):
+    # puts back the data into the specific coordinates
+    for ind,(ii,jj) in enumerate(positions):
+        for perc_val, n in extrems_1D[ind]:
+            ex_cube.data[n,ii,jj] = perc_val
+    return
+
+    
+    
