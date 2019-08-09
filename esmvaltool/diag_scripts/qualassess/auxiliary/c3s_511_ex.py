@@ -138,12 +138,20 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     n_doy = len(doy_to_process)
                     #TODO implement the case that doy_start < doy_end (e.g. dec to jan event)
                     for n,doy in enumerate(event_cube.coord('day_of_year').points):
-                        doy_window = (doy - window_size < gridpoint_ts.index.dayofyear) &\
-                                     (gridpoint_ts.index.dayofyear < doy + window_size)
-                        self.__logger__.info(doy_window)
+                        tmin = (doy - window_size) % 366
+                        tmax = (doy + window_size) % 366
+                        if not tmin:
+                            tmin = 366
+                        if not tmax:
+                            tmax = 366
+                        if tmin <= tmax:
+                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
+                                         (gridpoint_ts.index.dayofyear <= tmax)
+                        else:
+                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
+                                         (gridpoint_ts.index.dayofyear <= tmax)
                         # Extract the right data points
                         gridpoint_sample = gridpoint_ts[doy_window]
-                        self.__logger__.info(gridpoint_sample)
                         # Check if there are enough valid measurements in the sample
                         if np.isfinite(gridpoint_sample).sum() > min_measurements:
                             perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
