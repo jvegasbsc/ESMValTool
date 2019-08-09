@@ -119,7 +119,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             ex_cube = event_cube.copy()
             
             # Now loop over each gridpoint in the selected region
-            counter_gridpoints = 0
+            counter_gridpoints = 1
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
             self.__logger__.info("Start calculation of extreme climatology \
                                  for %s gridpoints",n_gridpoints)
@@ -128,7 +128,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             for ii in range(event_cube.shape[1]):
                 for jj in range(event_cube.shape[2]):
                     # Convert this gridpoint to a pandas timeseries object
-                    gridpoint_ts = ipd.as_series(event_cube[:,ii,jj])
+                    gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
                     # Get the doys that need to be processed
                     doy_to_process = event_cube.coord('day_of_year').points
                     n_doy = len(doy_to_process)
