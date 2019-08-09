@@ -38,7 +38,7 @@ preprocessors:
   noop: {}
   regrid_ex:
       regrid:
-        target_grid: 10x10
+        target_grid: 0.25x0.25
         scheme: nearest
 
 diagnostics:
@@ -48,8 +48,8 @@ diagnostics:
       ta:
 #      xch4:
 #      bdalb:
-#        preprocessor: noop
-        preprocessor: regrid_ex
+        preprocessor: noop
+#        preprocessor: regrid_ex
 #        field: T2Ms
         field: T3Ms
         derive: False
@@ -61,9 +61,7 @@ diagnostics:
         minimal_number_measurements: 1 # minimal amount of measurements needed for calculating climatologies
         which_percentile: 90 # per default assuming exceeding extremes for percentiles > 50 and vice versa
         window_size: 40 # one directional window size, i.e. 5 => 11
-        extreme_type: heat
-        extreme_region: Europe
-        extreme_eventtime: 2014
+        extreme_event_id: heat_Europe_2014
 #        levels: None
         levels: [8.50e+04]#[1.00e+02]
         

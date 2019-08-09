@@ -553,9 +553,8 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__extremes__ = dict({"min_measurements": self.__cfg__["minimal_number_measurements"],
                                       "which_percentile": self.__cfg__["which_percentile"],
                                       "window_size": self.__cfg__["window_size"],
-                                      "type": self.__cfg__["extreme_type"],
-                                      "region": self.__cfg__["extreme_region"],
-                                      "eventtime": self.__cfg__["extreme_eventtime"]})
+                                      "event": self.__cfg__["extreme_event_id"],
+                                      })
         except BaseException:
             pass
             
