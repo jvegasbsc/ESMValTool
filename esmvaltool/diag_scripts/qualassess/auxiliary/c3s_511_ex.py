@@ -60,14 +60,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 #                         datetime.datetime(2003, 6, 10)
 #                         )
 #                }})
-        self.__regions__ = dict({
-            'CE_drought_2015': {  # taken from our EX catalogue
-                'latitude': (45, 50),#55),
-                'longitude': (0, 6),#35),
-                'time': (datetime.datetime(2015, 6, 1),
-                         datetime.datetime(2015, 7, 31)
-                         )
-                }})
+#        self.__regions__ = dict({
+#            'CE_drought_2015': {  # taken from our EX catalogue
+#                'latitude': (45, 50),#55),
+#                'longitude': (0, 6),#35),
+#                'time': (datetime.datetime(2015, 6, 1),
+#                         datetime.datetime(2015, 7, 31)
+#                         )
+#                }})
+        self.__regions__ = dict()
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -142,23 +143,32 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
         self.__logger__.info("Finished parsing extreme event table")
 
-
-
-
         # Loop through the events
         self.__logger__.info("Adding selected events to list for processing: ")
         # Now start adding the events to the dictionary for further processing
-        if type(extreme_event_id) is not list:
-            extreme_event_id = list(extreme_event_id)
-        for xid in extreme_event_id:
+        if type(extreme_events) is not list:
+            extreme_events = [extreme_events]
+        for extreme_event_id in extreme_events:
             self.__logger__.info("%s",extreme_event_id)
             try:
-                single_event = ex_table.loc[extreme_event_id]
+                single_event = ex_table.loc[extreme_event_id].to_dict()
+                # Now prepare dictionary to be added to regions
+                single_event_as_region = {}
+                single_event_as_region['latitude'] = (single_event['Lat_from'],\
+                                                      single_event['Lat_to'])
+                single_event_as_region['longitude'] = (single_event['Lon_from'],\
+                                                      single_event['Lon_to'])
+                single_event_as_region['time'] = (single_event['Time_start'].to_pydatetime(),\
+                                                      single_event['Time_stop'].to_pydatetime())
+                self.__regions__.update({extreme_event_id : single_event_as_region})
+
+
+
             except KeyError:
                 self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
                 raise
 
-        import IPython;IPython.embed()
+#        import IPython;IPython.embed()
         
         # this the extremes example
         
