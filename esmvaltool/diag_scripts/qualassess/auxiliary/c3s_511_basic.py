@@ -554,6 +554,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                                       "which_percentile": self.__cfg__["which_percentile"],
                                       "window_size": self.__cfg__["window_size"],
                                       "extreme_events": self.__cfg__["extreme_events"],
+                                      "multiprocessing": self.__cfg__["multiprocessing"],
                                       })
         except BaseException:
             pass
