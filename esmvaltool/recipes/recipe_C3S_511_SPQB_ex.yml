@@ -1,77 +1,47 @@
-###############################################################################
-# recipe_C3S_51_SPQB.yml
-#
-# Description
-# Independent assessment of single products for the C3S_511 quality brief
-#
-# Author
-# Benjamin Mueller (LMU, Germany - b.mueller@iggf.geo.uni-muenchen.de)
-# Birgit Hassler (DLR, Germany - birgit.hassler@dlr.de)
-#
-# Project
-# C3S_511
-#
-# Reference
-
-#
-# This namelist is part of the ESMValTool
-###############################################################################
 documentation:
   description: |
-    Independent assessment of single products for the C3S_511 quality brief
+    Independent assessment of extremes of single products for the C3S_511 quality brief
 
   authors:
     - muel_bn
-    - hass_bg
+    - crez_ba
 
   maintainer:
     - muel_bn
-    - hass_bg
+    - crez_ba
 
 
 datasets:
   - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1999,  end_year: 2000}
 #  - {dataset: CDS-SATELLITE-ALBEDO, type: sat, project: OBS, mip: Lmon, version: L3, tier: 3, start_year: 1999,  end_year: 2013}
 #  - {dataset: XCH4, type: sat, project: OBS,  level: L3, version: CDS, start_year: 2003,  end_year: 2016}
-# looks for: [project]_[obssystem]_[dataset]_[level]_[field]_[short_name]*
+
 preprocessors:
+
   noop: {}
+  
   regrid_ex:
       regrid:
-        target_grid: 10x10
+        target_grid: 0.25x0.25
         scheme: nearest
 
 diagnostics:
   SPQB:
-    description: Single product quality brief.
+    description: Single product quality brief extremes section.
     variables:
       ta:
 #      xch4:
 #      bdalb:
-#        preprocessor: noop
-        preprocessor: regrid_ex
-#        field: T2Ms
-        field: T3Ms
+        preprocessor: noop
+#        preprocessor: regrid_ex
         derive: False
-#        mip: Amon
     scripts:
       SPQB_basic_report:
         script: qualassess/ex_C3S_511_SPQB.py
         requests: [custom]
-#        levels: None
-        levels: [8.50e+04]#[1.00e+02]
+        minimal_number_measurements: 1 # minimal amount of measurements needed for calculating climatologies
+        which_percentile: 90 # per default assuming exceeding extremes for percentiles > 50 and vice versa
+        window_size: 40 # one directional window size, i.e. 5 => 11
+        extreme_event_id: heat_Europe_2014
+        levels: [8.50e+04]
         
-#  diagnostic1:
-#    description: Multi-product quality brief.
-#    variables:
-#      additional_datasets:
-#        - {dataset: ATSR,  project: obs4mips,  level: L3,  version: ARC-v1.1.1,  start_year: 2001,  end_year: 2003, tier: 3}
-#      ta:
-#        preprocessor: noop
-#        field: T3Ms
-#    scripts:
-#      script0:
-#        script: qualassess/DUMMY_C3S_511_MPQB.py
-#        data_colors: RdYlGn
-#        levels: [30000.,10000.]
-#        show_latex: False
