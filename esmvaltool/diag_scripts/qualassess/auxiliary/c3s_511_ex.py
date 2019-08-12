@@ -27,7 +27,8 @@ from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
     
 from multiprocessing import Pool
-from itertools import repeat, product
+import itertools as it
+
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     """
@@ -224,17 +225,17 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 #            pool = Pool()
 #            
 #            # get an iterator for the the positions
-#            positions = list(product(range(event_cube.shape[1]), range(event_cube.shape[2])))
+#            positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
 #            # Now loop in a processor distributed manner over the positions in the data
 #            # returns ex_list as percentile values with the number in the timeseries
 #            ex_list = pool.starmap(extremes_1D, 
 #                                        zip(positions,
-#                                            repeat(event_cube),
-#                                            repeat(clim_cube),
-#                                            repeat(ex_cube),
-#                                            repeat(window_size),
-#                                            repeat(which_percentile),
-#                                            repeat(min_measurements),
+#                                            it.repeat(event_cube),
+#                                            it.repeat(clim_cube),
+#                                            it.repeat(ex_cube),
+#                                            it.repeat(window_size),
+#                                            it.repeat(which_percentile),
+#                                            it.repeat(min_measurements),
 #                                            )
 #                                    )
 #                        
