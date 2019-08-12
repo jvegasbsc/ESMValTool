@@ -221,7 +221,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
 
 #            # setting up a pool
-#            # TODO make sure that this is machine compatiple
+#            # TODO make sure that this is machine compatible
 #            pool = Pool()
 #            
 #            # get an iterator for the the positions
@@ -412,13 +412,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                       function=this_function)
 
         if found:
-
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots,
                          "freetext": expected_input}})
         else:
-
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots}})
@@ -478,7 +476,8 @@ def extremes_1D(ind, event_cube,  clim_cube, ex_cube, window_size, which_percent
         else:
             perc_val = np.nan
         
-        # convert the individual values to a list of tuples providing percentiles and number in the time series
+        # convert the individual values to a list of tuples 
+        # providing percentiles and number in the time series
         perc_val_ts.append((perc_val,n))
         
     return perc_val_ts
