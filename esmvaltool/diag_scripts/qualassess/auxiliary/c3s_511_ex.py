@@ -62,7 +62,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         which_percentile = self.__extremes__["which_percentile"]
         window_size = self.__extremes__["window_size"]
         extreme_events = self.__extremes__["extreme_events"]
-        do_multiprocessing = self.__extremes__["multiprocessing"]
+        num_processors = self.__extremes__["multiprocessing"]
 
         ex_table_dir = './libs/predef/extremes_catalogue/'
         #TODO move ex_table_file to the recipe (default value that can
@@ -190,12 +190,12 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             counter_gridpoints = 1
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
 
-            if do_multiprocessing:
+            if num_processors>1:
                 self.__logger__.info("Start calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
                 # setting up a pool
                 # TODO make sure that this is machine compatiple
-                pool = Pool()
+                pool = Pool(processors = num_processors)
                 
                 # get an iterator for the the positions
                 positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
