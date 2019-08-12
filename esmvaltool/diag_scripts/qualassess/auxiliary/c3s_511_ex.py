@@ -44,31 +44,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # all required input can be extracted from the extremes dictionary
         self.__logger__.info(self.__extremes__)
         
-        ## example regions below
-#        self.__regions__ = dict({
-#            'CE_drought_2003': {  # https://en.wikipedia.org/wiki/2003_European_heat_wave
-#                'latitude': (43, 47),
-#                'longitude': (-2, 4),
-#                'time': (datetime.datetime(2003, 7, 20),
-#                         datetime.datetime(2003, 8, 20)
-#                         )
-#                }})
-#        self.__regions__ = dict({
-#            'CE_flooding_2003': {  # https://en.wikipedia.org/wiki/2013_European_floods
-#                'latitude': (41, 51),
-#                'longitude': (7, 16),
-#                'time': (datetime.datetime(2003, 5, 30),
-#                         datetime.datetime(2003, 6, 10)
-#                         )
-#                }})
-#        self.__regions__ = dict({
-#            'CE_drought_2015': {  # taken from our EX catalogue
-#                'latitude': (45, 50),#55),
-#                'longitude': (0, 6),#35),
-#                'time': (datetime.datetime(2015, 6, 1),
-#                         datetime.datetime(2015, 7, 31)
-#                         )
-#                }})
+        # Initialize regions as empty, since it will be read from catalogue
         self.__regions__ = dict()
 
     def run_diagnostic(self):
@@ -169,7 +145,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
                 raise
 
-#        import IPython;IPython.embed()
         
         # this the extremes example
         
