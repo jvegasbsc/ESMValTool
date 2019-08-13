@@ -266,7 +266,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             event_mask2d = event_mask.data & ~event_mask.mask
 
             # Now expand it over time
-            # TODO: check if this is not memory intense (seems so)
             event_mask3d = np.broadcast_to(event_mask2d, event_cube.shape)
 
             # Now create copies of the different event metrics and mask them with the event mask
@@ -291,7 +290,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
             # Note that collapsing needs to be done in two steps, otherwise masked values
             # are propagated over the full array, which is not the preferred behaviour.
-            # TODO: Do we need area weighting?
             amplitude_time = amplitude_time.collapsed(["latitude"],\
                                          iris.analysis.MEAN)
             amplitude_time = amplitude_time.collapsed(["longitude"],\
@@ -317,7 +315,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
             # Note that collapsing needs to be done in two steps, otherwise masked values
             # are propagated over the full array, which is not the preferred behaviour.
-            # TODO: Do we need area weighting?
             extent_time = extent_time.collapsed(["latitude"],\
                                          iris.analysis.MEAN)
             extent_time = extent_time.collapsed(["longitude"],\
