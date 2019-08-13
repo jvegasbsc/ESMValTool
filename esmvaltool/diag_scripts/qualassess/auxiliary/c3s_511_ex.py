@@ -44,8 +44,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # all required input can be extracted from the extremes dictionary
         self.__logger__.info(self.__extremes__)
         
-        # Initialize regions as empty, since it will be read from catalogue
-        self.__regions__ = dict()
+        # Initialize extremes regions as empty
+        self.__extremes_regions__ = dict()
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -53,48 +53,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
         self.__do_full_report__()
 
-
-
     def __do_extremes__(self):
         
         this_function =  "extremes example"
-        
-        # Read settings from recipe
-        min_measurements = self.__extremes__["min_measurements"]
-        which_percentile = self.__extremes__["which_percentile"]
-        window_size = self.__extremes__["window_size"]
-        extreme_events = self.__extremes__["extreme_events"]
-        num_processors = self.__extremes__["multiprocessing"]
 
-        self.__logger__.info("Reading extreme event table")
-        ex_table,raw_table = read_extreme_event_catalogue()
-        self.__logger__.info("Finished parsing extreme event table")
-
-        # Loop through the events
-        self.__logger__.info("Adding selected events to list for processing: ")
-        # Now start adding the events to the dictionary for further processing
-        if type(extreme_events) is not list:
-            extreme_events = [extreme_events]
-        for extreme_event_id in extreme_events:
-            self.__logger__.info("%s",extreme_event_id)
-            try:
-                single_event = ex_table.loc[extreme_event_id].to_dict()
-                # Now prepare dictionary to be added to regions
-                single_event_as_region = {}
-                single_event_as_region['latitude'] = (single_event['Lat_from'],\
-                                                      single_event['Lat_to'])
-                single_event_as_region['longitude'] = (single_event['Lon_from'],\
-                                                      single_event['Lon_to'])
-                single_event_as_region['time'] = (single_event['Time_start'].to_pydatetime(),\
-                                                      single_event['Time_stop'].to_pydatetime())
-                self.__regions__.update({extreme_event_id : single_event_as_region})
-
-            except KeyError:
-                self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
-                raise
-                
-        self.__logger__.info(self.__regions__)
-        
         # this the extremes example
         
         # handling of the cube restrictions copied from the basic diagnostic
@@ -116,14 +78,56 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             dataset_id = [self.__dataset_id__[0]]
         ##################
         
-        # we assume that the regions fully cover the event in space and time (TODO: build in a check for this)
         list_of_plots = []
+        
+        # end of standard handling
+                
+        # Read settings from recipe
+        min_measurements = self.__extremes__["min_measurements"]
+        which_percentile = self.__extremes__["which_percentile"]
+        window_size = self.__extremes__["window_size"]
+        extreme_events = self.__extremes__["extreme_events"]
+        num_processors = self.__extremes__["multiprocessing"]
+        
+        self.__logger__.info("Reading extreme event table")
+        ex_table,raw_table = read_extreme_event_catalogue()
+        self.__logger__.info("Finished parsing extreme event table")
+
+        # Loop through the events
+        self.__logger__.info("Adding selected events to list for processing: ")
+        # Now start adding the events to the dictionary for further processing
+        if type(extreme_events) is not list:
+            extreme_events = [extreme_events]
+        for extreme_event_id in extreme_events:
+            self.__logger__.info("%s",extreme_event_id)
+            try:
+                single_event = ex_table.loc[extreme_event_id].to_dict()
+                # Now prepare dictionary to be added to regions
+                single_event_as_region = {}
+                single_event_as_region['latitude'] = (single_event['Lat_from'],\
+                                                      single_event['Lat_to'])
+                single_event_as_region['longitude'] = (single_event['Lon_from'],\
+                                                      single_event['Lon_to'])
+                single_event_as_region['time'] = (single_event['Time_start'].to_pydatetime(),\
+                                                      single_event['Time_stop'].to_pydatetime())
+                self.__extremes_regions__.update({extreme_event_id : single_event_as_region})
+
+            except KeyError:
+                self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
+                raise
+                
+        # we assume that the read in regions fully cover the event in space and time (TODO: build in a check for this)
+        # TODO: still needed?
+                
+        self.__logger__.info(self.__extremes_regions__)
         
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
 
+#        self.__extremes_regions__ = self.__regions__
+
         # Loop over the different regions (i.e. the different events)
-        for r,def_r in self.__regions__.items():
+        for r,def_r in self.__extremes_regions__.items():
             # Now define the three cubes. Note that now they are really cubes,
             # not dictionaries that contain cubes.
 
@@ -145,11 +149,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
 
             if num_processors>1:
-                self.__logger__.info("Start calculation of extreme climatology " +
+                self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
                 # setting up a pool
-                # TODO make sure that this is machine compatiple
-                pool = Pool(processors = num_processors)
+                # TODO make sure that this is machine compatiple (or leave it to the user)
+                pool = Pool(processes = num_processors)
                 
                 # get an iterator for the the positions
                 positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
@@ -171,7 +175,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                          positions)
                 pool.close()
             else:
-                self.__logger__.info("Start calculation of extreme climatology " +
+                self.__logger__.info("Start single process calculation of extreme climatology " +
                                      "for %s gridpoints without multiprocessing",n_gridpoints)
                 # Now loop over the data
                 for ii in range(event_cube.shape[1]):
@@ -257,7 +261,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
             # Now calculate the spatial event mask from the severity as outlined in 
             # section 3.2 of the Extreme Catalogue C3S_D511.1.5_Extreme_Catalogue_V1.pdf
-            event_mask_threshold = float(severity.collapsed(["latitude", "longitude"],\
+            event_mask_threshold = float(severity.collapsed(["latitude", "longitude"],
                                          iris.analysis.MEDIAN).data)
             event_mask = severity.data > event_mask_threshold
             # Here we move from a masked array to one single bool array 
@@ -266,7 +270,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             event_mask2d = event_mask.data & ~event_mask.mask
 
             # Now expand it over time
-            event_mask3d = np.broadcast_to(event_mask2d,event_cube.shape)
+            event_mask3d = np.broadcast_to(event_mask2d, event_cube.shape)
 
             # Now create copies of the different event metrics and mask them with the event mask
             severity_masked = severity.copy()
@@ -308,6 +312,26 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # calculate extent
             extent = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/1e6
             extent.units = cf_units.Unit("km2")
+            
+            # now calculate time evolution of amplitude within defined event_mask
+            extent_time = amplitude.copy()
+            extent_time = (extent_time * 0 + 1.) * np.broadcast_to(grid_areas, extent_time.shape)/1e6
+            extent_time.units = cf_units.Unit("km2")
+            extent_time.long_name = "Extent (based on grid resolution)"
+            extent_time.mask = event_mask3d
+
+            # Note that collapsing needs to be done in two steps, otherwise masked values
+            # are propagated over the full array, which is not the preferred behaviour.
+            extent_time = extent_time.collapsed(["latitude"],\
+                                         iris.analysis.MEAN)
+            extent_time = extent_time.collapsed(["longitude"],\
+                                         iris.analysis.SUM)
+
+            # Plot time evolution
+            plt.clf()
+            qplt.plot(extent_time)
+            plt.xticks(rotation=45)
+            plt.savefig(self.__plot_dir__ + os.sep + r + "_extent_time_" + ".png")
             
             # set up table
             self.__logger__.info("Extremes table")
