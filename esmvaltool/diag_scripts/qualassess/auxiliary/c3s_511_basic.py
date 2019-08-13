@@ -403,7 +403,8 @@ class __Diagnostic_skeleton__(object):
                 logger.error("Region " + R +
                              " specifications not specified correctly: " +
                              str(dict_of_regions[R]) + "!")
-
+        #BAS: TODO the warning below can be made more helpfull, printing the 
+        # key of the empty subsets.
         if any([subset_cubes[sc] is None for sc in subset_cubes]):
             raise ValueError(
                 "Could not calculate all subsets. " + 
@@ -553,7 +554,8 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__extremes__ = dict({"min_measurements": self.__cfg__["minimal_number_measurements"],
                                       "which_percentile": self.__cfg__["which_percentile"],
                                       "window_size": self.__cfg__["window_size"],
-                                      "event": self.__cfg__["extreme_event_id"],
+                                      "extreme_events": self.__cfg__["extreme_events"],
+                                      "multiprocessing": self.__cfg__["multiprocessing"],
                                       })
         except BaseException:
             pass

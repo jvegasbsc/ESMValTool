@@ -6,10 +6,12 @@ Created on Wed Dec  5 13:59:59 2018
 @authors: bmueller, bcrezee
 """
 
+import pandas as pd
 import iris
 import iris.pandas as ipd
 import iris.quickplot as qplt
 import os
+import re
 import sys
 import matplotlib.pyplot as plt
 import datetime
@@ -20,12 +22,13 @@ from scipy import sin, cos, tan, arctan, arctan2, arccos, pi, deg2rad
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
 from .libs.predef.ecv_lookup_table import ecv_lookup
-from .libs.c3s_511_util import cube_sorted
+from .libs.c3s_511_util import cube_sorted, read_extreme_event_catalogue
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
     
 from multiprocessing import Pool
-from itertools import repeat, product
+import itertools as it
+
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     """
@@ -41,33 +44,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # all required input can be extracted from the extremes dictionary
         self.__logger__.info(self.__extremes__)
         
-        ## example regions below
-#        self.__regions__ = dict({
-#            'CE_drought_2003': {  # https://en.wikipedia.org/wiki/2003_European_heat_wave
-#                'latitude': (43, 47),
-#                'longitude': (-2, 4),
-#                'time': (datetime.datetime(2003, 7, 20),
-#                         datetime.datetime(2003, 8, 20)
-#                         )
-#                }})
-#        self.__regions__ = dict({
-#            'CE_flooding_2003': {  # https://en.wikipedia.org/wiki/2013_European_floods
-#                'latitude': (41, 51),
-#                'longitude': (7, 16),
-#                'time': (datetime.datetime(2003, 5, 30),
-#                         datetime.datetime(2003, 6, 10)
-#                         )
-#                }})
-        self.__regions__ = dict({
-            'CE_drought_2015': {  # taken from our EX catalogue
-                'latitude': (45, 50),#55),
-                'longitude': (0, 6),#35),
-                'time': (datetime.datetime(2015, 6, 1),
-                         datetime.datetime(2015, 7, 31)
-                         )
-                }})
-
-
+        # Initialize regions as empty, since it will be read from catalogue
+        self.__regions__ = dict()
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -75,13 +53,47 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
         self.__do_full_report__()
 
+
+
     def __do_extremes__(self):
         
         this_function =  "extremes example"
         
-        min_measurements = self.__extremes__["min_measurements"] # minimal amount of measurements needed for calculating xclim
+        # Read settings from recipe
+        min_measurements = self.__extremes__["min_measurements"]
         which_percentile = self.__extremes__["which_percentile"]
-        window_size = self.__extremes__["window_size"] # one directional 5 => 11
+        window_size = self.__extremes__["window_size"]
+        extreme_events = self.__extremes__["extreme_events"]
+        num_processors = self.__extremes__["multiprocessing"]
+
+        self.__logger__.info("Reading extreme event table")
+        ex_table,raw_table = read_extreme_event_catalogue()
+        self.__logger__.info("Finished parsing extreme event table")
+
+        # Loop through the events
+        self.__logger__.info("Adding selected events to list for processing: ")
+        # Now start adding the events to the dictionary for further processing
+        if type(extreme_events) is not list:
+            extreme_events = [extreme_events]
+        for extreme_event_id in extreme_events:
+            self.__logger__.info("%s",extreme_event_id)
+            try:
+                single_event = ex_table.loc[extreme_event_id].to_dict()
+                # Now prepare dictionary to be added to regions
+                single_event_as_region = {}
+                single_event_as_region['latitude'] = (single_event['Lat_from'],\
+                                                      single_event['Lat_to'])
+                single_event_as_region['longitude'] = (single_event['Lon_from'],\
+                                                      single_event['Lon_to'])
+                single_event_as_region['time'] = (single_event['Time_start'].to_pydatetime(),\
+                                                      single_event['Time_stop'].to_pydatetime())
+                self.__regions__.update({extreme_event_id : single_event_as_region})
+
+            except KeyError:
+                self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
+                raise
+                
+        self.__logger__.info(self.__regions__)
         
         # this the extremes example
         
@@ -128,67 +140,66 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Now loop over each gridpoint in the selected region
             counter_gridpoints = 1
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
-            self.__logger__.info("Start calculation of extreme climatology " +
-                                 "for %s gridpoints",n_gridpoints)
 
+            if num_processors>1:
+                self.__logger__.info("Start calculation of extreme climatology " +
+                                     "for %s gridpoints using multiprocessing",n_gridpoints)
+                # setting up a pool
+                # TODO make sure that this is machine compatiple
+                pool = Pool(processors = num_processors)
+                
+                # get an iterator for the the positions
+                positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
+                # Now loop in a processor distributed manner over the positions in the data
+                # returns ex_list as percentile values with the number in the timeseries
+                ex_list = pool.starmap(extremes_1D, 
+                                            zip(positions,
+                                                it.repeat(event_cube),
+                                                it.repeat(clim_cube),
+                                                it.repeat(ex_cube),
+                                                it.repeat(window_size),
+                                                it.repeat(which_percentile),
+                                                it.repeat(min_measurements),
+                                                )
+                                        )
+                # map the positions and the results back to the cube
+                extremes_1d_redistribute(ex_cube,
+                                         ex_list,
+                                         positions)
+                pool.close()
+            else:
+                self.__logger__.info("Start calculation of extreme climatology " +
+                                     "for %s gridpoints without multiprocessing",n_gridpoints)
+                # Now loop over the data
+                for ii in range(event_cube.shape[1]):
+                    for jj in range(event_cube.shape[2]):
+                        # Convert this gridpoint to a pandas timeseries object
+                        gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
+                        for n,doy in enumerate(event_cube.coord('day_of_year').points):
+                            tmin = (doy - window_size) % 366
+                            tmax = (doy + window_size) % 366
+                            if not tmin:
+                                tmin = 366
+                            if not tmax:
+                                tmax = 366
+                            if tmin <= tmax:
+                                doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
+                                             (gridpoint_ts.index.dayofyear <= tmax)
+                            else:
+                                doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
+                                             (gridpoint_ts.index.dayofyear <= tmax)
+                            # Extract the right data points
+                            gridpoint_sample = gridpoint_ts[doy_window]
+                            # Check if there are enough valid measurements in the sample
+                            if np.isfinite(gridpoint_sample).sum() > min_measurements:
+                                perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
+                            else:
+                                perc_val = np.nan
+                            ex_cube.data[n,ii,jj] = perc_val
+                        self.__logger__.info("Progress of xclim: %s percent",\
+                                             np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
+                        counter_gridpoints += 1
 
-#            # setting up a pool
-#            # TODO make sure that this is machine compatiple
-#            pool = Pool()
-#            
-#            # get an iterator for the the positions
-#            positions = list(product(range(event_cube.shape[1]), range(event_cube.shape[2])))
-#            # Now loop in a processor distributed manner over the positions in the data
-#            # returns ex_list as percentile values with the number in the timeseries
-#            ex_list = pool.starmap(extremes_1D, 
-#                                        zip(positions,
-#                                            repeat(event_cube),
-#                                            repeat(clim_cube),
-#                                            repeat(ex_cube),
-#                                            repeat(window_size),
-#                                            repeat(which_percentile),
-#                                            repeat(min_measurements),
-#                                            )
-#                                    )
-#                        
-#            # map the positions and the results back to the cube
-#            extremes_1d_redistribute(ex_cube,
-#                                     ex_list,
-#                                     positions)
-            
-            # Now loop over the data
-            for ii in range(event_cube.shape[1]):
-                for jj in range(event_cube.shape[2]):
-                    # Convert this gridpoint to a pandas timeseries object
-                    gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
-                    # Get the doys that need to be processed
-#                    doy_to_process = event_cube.coord('day_of_year').points # simple development purpose?
-#                    n_doy = len(doy_to_process) # simple development purpose?
-                    for n,doy in enumerate(event_cube.coord('day_of_year').points):
-                        tmin = (doy - window_size) % 366
-                        tmax = (doy + window_size) % 366
-                        if not tmin:
-                            tmin = 366
-                        if not tmax:
-                            tmax = 366
-                        if tmin <= tmax:
-                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
-                                         (gridpoint_ts.index.dayofyear <= tmax)
-                        else:
-                            doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
-                                         (gridpoint_ts.index.dayofyear <= tmax)
-                        # Extract the right data points
-                        gridpoint_sample = gridpoint_ts[doy_window]
-                        # Check if there are enough valid measurements in the sample
-                        if np.isfinite(gridpoint_sample).sum() > min_measurements:
-                            perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
-                        else:
-                            perc_val = np.nan
-                        ex_cube.data[n,ii,jj] = perc_val
-                    self.__logger__.info("Progress of xclim: %s percent",\
-                                         np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
-                    counter_gridpoints += 1
-                    
             #TODO think about propagation of nan values
             ex_cube.data = np.ma.masked_equal(ex_cube.core_data(), np.nan)
             
@@ -285,7 +296,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             plt.clf()
             qplt.plot(amplitude_time)
             plt.xticks(rotation=45)
-            plt.savefig(self.__plot_dir__ + os.sep + "amplitude_time_" + ".png")
+            plt.savefig(self.__plot_dir__ + os.sep + r + "_amplitude_time_" + ".png")
 
 
             # calculate extent
@@ -311,7 +322,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 # Add coastlines to the map created by contourf.
                 plt.gca().coastlines("10m")
                 plt.colorbar()
-                plt.savefig(self.__plot_dir__ + os.sep + dat + ".png")
+                plt.savefig(self.__plot_dir__ + os.sep + r + '_' + dat + ".png")
                 
                 plt.close()
 
@@ -324,17 +335,18 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                       function=this_function)
 
         if found:
-
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots,
                          "freetext": expected_input}})
         else:
-
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots}})
     
+
+
+
 def extremes_1D(ind, event_cube,  clim_cube, ex_cube, window_size, which_percentile, min_measurements):
     ii = ind[0]
     jj = ind[1]
@@ -363,7 +375,8 @@ def extremes_1D(ind, event_cube,  clim_cube, ex_cube, window_size, which_percent
         else:
             perc_val = np.nan
         
-        # convert the individual values to a list of tuples providing percentiles and number in the time series
+        # convert the individual values to a list of tuples 
+        # providing percentiles and number in the time series
         perc_val_ts.append((perc_val,n))
         
     return perc_val_ts

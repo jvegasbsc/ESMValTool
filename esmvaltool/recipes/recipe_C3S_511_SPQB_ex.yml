@@ -22,7 +22,7 @@ preprocessors:
   
   regrid_ex:
       regrid:
-        target_grid: 0.25x0.25
+        target_grid: 10x10
         scheme: nearest
 
 diagnostics:
@@ -42,6 +42,7 @@ diagnostics:
         minimal_number_measurements: 1 # minimal amount of measurements needed for calculating climatologies
         which_percentile: 90 # per default assuming exceeding extremes for percentiles > 50 and vice versa
         window_size: 40 # one directional window size, i.e. 5 => 11
-        extreme_event_id: heat_Europe_2014
+        extreme_events: MarineHeatwave_MediterraneanSea_2003
+        multiprocessing: 4
         levels: [8.50e+04]
         

@@ -1,0 +1,6 @@
+This directory contains the extreme event catalogue. Instructions for updating the catalogue (this is needed only if changes have been made):
+ - switch to a new branch
+ - open the extreme event catalogue source online:  https://docs.google.com/spreadsheets/d/1tWaNPgva8eqfgEvSSnijyX1CUTYGl0gWPcbpOiqSg_4/
+ - open the relevant tab (e.g. V1_Apr19)
+ - click File -> Download as (.csv current sheet)
+ - add the file in this directory with the following naming convention: {version}_accessed{date_of_access_as_YYYYMMDD}.csv
