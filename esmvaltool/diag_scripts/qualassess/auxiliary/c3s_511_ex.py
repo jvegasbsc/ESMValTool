@@ -122,7 +122,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         self.__logger__.info(self.__extremes_regions__)
         
 #        self.__extremes_regions__ = self.__regions__
-        
         # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__extremes_regions__.items():
             # Now define the three cubes. Note that now they are really cubes,
