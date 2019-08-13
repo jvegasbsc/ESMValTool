@@ -22,7 +22,7 @@ from scipy import sin, cos, tan, arctan, arctan2, arccos, pi, deg2rad
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
 from .libs.predef.ecv_lookup_table import ecv_lookup
-from .libs.c3s_511_util import cube_sorted
+from .libs.c3s_511_util import cube_sorted, read_extreme_event_catalogue
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
     
@@ -66,10 +66,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         extreme_events = self.__extremes__["extreme_events"]
         num_processors = self.__extremes__["multiprocessing"]
 
-        self.__logger__.info("Reading extreme event table from %s",ex_table_loc)
-        # TODO call function here
-
-
+        self.__logger__.info("Reading extreme event table")
+        ex_table,raw_table = read_extreme_event_catalogue()
         self.__logger__.info("Finished parsing extreme event table")
 
         # Loop through the events
@@ -347,30 +345,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                         {"plots": list_of_plots}})
     
 
-def convert_human_readable_coords_to_iso(coord_in):
-    '''
-    # This function converts human readable single coords of latitude or longitude 
-    # to iso-6709 standard
-    
-    parameters
-    ----------
-       
-       coord_in : str
-        the input coordinate (e.g. 53°N)
-        
-    returns
-    -------
-       coord_iso : float
-        iso-6709 formatted coordinate
-    '''
-    val,compass = re.split('[deg]+', coord_in)
-    if compass in ['N','E']:
-        result = float(val)
-    elif compass in ['S','W']:
-        result = float(val)*-1.
-    else:
-        result = float(val)
-    return result
 
 
 def extremes_1D(ind, event_cube,  clim_cube, ex_cube, window_size, which_percentile, min_measurements):

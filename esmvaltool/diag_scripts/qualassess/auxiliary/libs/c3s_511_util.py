@@ -5,6 +5,8 @@ Created on Wed Feb  7 12:17:48 2018
 
 """
 
+import pandas as pd
+import datetime
 import imp
 import os
 import sys
@@ -17,6 +19,7 @@ import cf_units
 #import time
 import iris
 import collections
+import re
 #from memory_profiler import profile
 
 # sys.path.insert(0,
@@ -38,6 +41,32 @@ class HiddenPrints:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
+
+def convert_human_readable_coords_to_iso(coord_in):
+    '''
+    # This function converts human readable single coords of latitude or longitude 
+    # to iso-6709 standard
+    
+    parameters
+    ----------
+       
+       coord_in : str
+        the input coordinate (e.g. 53°N)
+        
+    returns
+    -------
+       coord_iso : float
+        iso-6709 formatted coordinate
+    '''
+    val,compass = re.split('[deg]+', coord_in)
+    if compass in ['N','E']:
+        result = float(val)
+    elif compass in ['S','W']:
+        result = float(val)*-1.
+    else:
+        result = float(val)
+    return result
+
 
 def read_extreme_event_catalogue():
     ''' This function reads the extreme event catalogue
