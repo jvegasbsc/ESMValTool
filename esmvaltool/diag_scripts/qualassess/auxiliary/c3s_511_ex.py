@@ -119,11 +119,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # we assume that the regions fully cover the event in space and time (TODO: build in a check for this)
         list_of_plots = []
         
-
         # Initialize a pandas dataframe for saving the table of metrics
-#        import IPython;IPython.embed()
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
-
 
         # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__regions__.items():
@@ -325,9 +322,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # plotting for trials
             for dat in ["severity", "magnitude", "duration"]:
                 #TODO add event_mask_2d to the plots. 
-
-                #self.__logger__.info(locals()[dat])
-
                 qplt.pcolormesh(locals()[dat])#, vmin = 250, vmax = 300)
                 
                 # Add coastlines to the map created by contourf.
