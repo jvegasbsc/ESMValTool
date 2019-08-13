@@ -67,7 +67,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         ex_table_dir = './libs/predef/extremes_catalogue/'
         #TODO move ex_table_file to the recipe (default value that can
         # be over written if specified)
-        ex_table_file = 'V1_Apr19_accessed20190812.csv'
+        ex_table_file = 'V1_Apr19_accessed20190813.csv'
         ex_table_loc = os.path.join(os.path.dirname(__file__),ex_table_dir,ex_table_file)
 
         ############################################
@@ -143,6 +143,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             except KeyError:
                 self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
                 raise
+                
+        self.__logger__.info(self.__regions__)
         
         # this the extremes example
         
@@ -410,7 +412,7 @@ def convert_human_readable_coords_to_iso(coord_in):
        coord_iso : float
         iso-6709 formatted coordinate
     '''
-    val,compass = re.split('[°\'"]+', coord_in)
+    val,compass = re.split('[deg]+', coord_in)
     if compass in ['N','E']:
         result = float(val)
     elif compass in ['S','W']:
