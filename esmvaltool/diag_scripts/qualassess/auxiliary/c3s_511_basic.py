@@ -108,6 +108,7 @@ class __Diagnostic_skeleton__(object):
         self.__report_order__ = []
         
         self.__extremes__ = {}
+        self.__extremes_regions__ = {}
         
         self.reporting_structure = collections.OrderedDict()
 
@@ -1359,7 +1360,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                          ('NA-values and values of 0 and below are shown ' + 
                           'in grey.' if self.log_data else
                           'NA-values are shown in grey.'),
-                         '#C3S' + "mymean" + "".join(
+                         '#C3S' + "mean_var" + "".join(
                              np.array([sl[0:3] for sl in di["llo"]])) + \
                          self.__varname__,
                          self.__infile__,
@@ -1404,7 +1405,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                              ' (' + self.__time_period__ + 
                              '); Data can ' +
                              'not be displayed due to cartopy error!'),
-                         '#C3S' + "mymean" + "".join(
+                         '#C3S' + "mean_var" + "".join(
                              np.array([sl[0:3] for sl in di["llo"]])) +
                          self.__varname__,
                          self.__infile__, 

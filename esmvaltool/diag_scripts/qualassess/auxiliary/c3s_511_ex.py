@@ -22,7 +22,7 @@ from scipy import sin, cos, tan, arctan, arctan2, arccos, pi, deg2rad
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
 from .libs.predef.ecv_lookup_table import ecv_lookup
-from .libs.c3s_511_util import cube_sorted, read_extreme_event_catalogue
+from .libs.c3s_511_util import cube_sorted, read_extreme_event_catalogue, minmax_cubelist
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
     
@@ -340,19 +340,105 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
             # plotting for trials
             
+            self.__logger__.info(self.colormaps)
+            
             for dat in ["severity", "magnitude", "duration"]:
                 #TODO add event_mask_2d to the plots. 
+                # This should already be included in lines 279 to 281
+                
+                filename = self.__plot_dir__ + os.sep + \
+                    basic_filename + \
+                    "_" + r + "_" + dat + \
+                    "." + self.__output_type__
+                list_of_plots.append(filename)
+    
+                try:
+    #            for i in [0]:
+                    x = Plot2D(locals()[dat])
+    
+                    caption = str(dat.title() +
+                                  ' maps of ' +
+                                  ecv_lookup(self.__varname__) +
+                                  ' for the extreme event ' + r +
+                                  ' for the data set ' +
+                                  " ".join(dataset_id) + ' (' +
+                                  self.__time_period__ + ').')
+    
+                    fig = plt.figure()
+    
+                    (fig, ax, caption) = plot_setup(d="time",
+                                                    numfigs=1,
+                                                    fig=fig,
+                                                    caption=caption)
 
-                #self.__logger__.info(locals()[dat])
-            
-                qplt.pcolormesh(locals()[dat])#, vmin = 250, vmax = 300)
-                
-                # Add coastlines to the map created by contourf.
-                plt.gca().coastlines("10m")
-                plt.colorbar()
-                plt.savefig(self.__plot_dir__ + os.sep + r + '_' + dat + ".png")
-                
-                plt.close()
+                    vminmax = locals()[dat]
+                    vminmax = np.nanpercentile(vminmax.data.compressed(),[5, 95])
+    
+                    x.plot(ax=ax,
+                           color={"Extremes": "YlOrRd"},
+                           color_type="Extremes",
+                           title=" ".join([self.__dataset_id__[indx] for
+                                           indx in [0, 2, 1, 3]]) + \
+                                 " (" + self.__time_period__ + ")",
+                           vminmax=vminmax,
+                           ext_cmap="both",
+                           dat_log = self.log_data)
+                    fig.savefig(filename)
+                    plt.close(fig.number)
+    
+                    ESMValMD("meta",
+                             filename,
+                             self.__basetags__ + 
+                             ['DM_regional', 'C3S_extremes'],
+                             caption +  
+                             ('NA-values and values of 0 and below are shown ' + 
+                              'in grey.' if self.log_data else
+                              'NA-values are shown in grey.'),
+                             '#C3S' + "extremes" + dat + \
+                             self.__varname__,
+                             self.__infile__,
+                             self.diagname,
+                             self.authors)
+    
+                except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(
+                        exc_tb.tb_frame.f_code.co_filename)[1]
+                    self.__logger__.error(
+                        exc_type, fname, exc_tb.tb_lineno)
+                    self.__logger__.error(dat)
+                    self.__logger__.error('Warning: blank figure!')
+    
+                    x = Plot2D_blank(locals()[dat])
+    
+                    fig = plt.figure()
+    
+                    (fig, ax, caption) = plot_setup(d="time", 
+                                                    numfigs=1,
+                                                    fig=fig,
+                                                    caption=caption)
+    
+                    x.plot(ax=ax,
+                           color={"Extremes": "YlOrRd"},
+                           color_type="Extremes",
+                           title=" ".join([self.__dataset_id__[indx] for 
+                                           indx in [0, 2, 1, 3]]) + \
+                                 " (" + self.__time_period__ + ")")
+                    fig.savefig(filename)
+                    plt.close(fig.number)
+    
+                    ESMValMD("meta",
+                             filename,
+                             self.__basetags__ +
+                             ['DM_global', 'C3S_extremes'],
+                             caption +
+                             '; Data can ' +
+                             'not be displayed due to cartopy error!',
+                             '#C3S' + "extrenes" + dat +
+                             self.__varname__,
+                             self.__infile__, 
+                             self.diagname, 
+                             self.authors)
 
 
         # produce report
