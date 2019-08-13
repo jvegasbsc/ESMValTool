@@ -119,6 +119,12 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # we assume that the regions fully cover the event in space and time (TODO: build in a check for this)
         list_of_plots = []
         
+
+        # Initialize a pandas dataframe for saving the table of metrics
+#        import IPython;IPython.embed()
+        df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
+
+
         # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__regions__.items():
             # Now define the three cubes. Note that now they are really cubes,
@@ -293,10 +299,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                          iris.analysis.MEAN)
 
             # Plot time evolution
-            plt.clf()
-            qplt.plot(amplitude_time)
-            plt.xticks(rotation=45)
-            plt.savefig(self.__plot_dir__ + os.sep + r + "_amplitude_time_" + ".png")
+            try:
+                plt.clf()
+                qplt.plot(amplitude_time)
+                plt.xticks(rotation=45)
+                plt.savefig(self.__plot_dir__ + os.sep + r + "_amplitude_time_" + ".png")
+            except ValueError:
+                self.__logger__.warning("Failed in creating line plot")
 
 
             # calculate extent
@@ -304,19 +313,21 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             extent.units = cf_units.Unit("km2")
             
             # set up table
-            # TODO export csv
             self.__logger__.info("Extremes table")
             self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
             self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
             self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
             self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
-            # plotting for trials
             
+            # Add metrics to pd dataframe
+            df_metrics.loc[r] = pd.Series({'severity': severity_av.data, 'magnitude':magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
+
+            # plotting for trials
             for dat in ["severity", "magnitude", "duration"]:
                 #TODO add event_mask_2d to the plots. 
 
                 #self.__logger__.info(locals()[dat])
-            
+
                 qplt.pcolormesh(locals()[dat])#, vmin = 250, vmax = 300)
                 
                 # Add coastlines to the map created by contourf.
@@ -326,6 +337,23 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 
                 plt.close()
 
+        # Add units to column names
+        column_rename_dict = {'severity': 'severity [{0}]'.format(severity_av.units), 'magnitude': 'magnitude [{0}]'.format(magnitude_av.units), 'duration': 'duration [{0}]'.format(duration_av.units), 'extent': 'extent [{0}]'.format(extent.units)}
+        df_metrics = df_metrics.rename(columns=column_rename_dict)
+
+        # Saving of the table to csv and html
+        savename_csv = self.__plot_dir__ + os.sep +  "extreme_event_metrics.csv"
+        savename_html = self.__plot_dir__ + os.sep +  "extreme_event_metrics.html"
+
+        # Save to csv (keeping full precision)
+        self.__logger__.info("Saving metric csv-table as: {0}".format(savename_csv))
+        df_metrics.to_csv(savename_csv)
+
+        # Save to html with specified precision
+        html_metrics = df_metrics.style.set_precision(2).render()
+        self.__logger__.info("Saving metric html-table as: {0}".format(savename_html))
+        with open(savename_html,mode='w+') as handle:
+            handle.write(html_metrics)
 
         # produce report
         expected_input, found = \
