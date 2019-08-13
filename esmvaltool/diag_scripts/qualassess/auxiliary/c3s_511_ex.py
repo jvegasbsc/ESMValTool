@@ -321,7 +321,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             extent_time = extent_time.collapsed(["latitude"],\
                                          iris.analysis.MEAN)
             extent_time = extent_time.collapsed(["longitude"],\
-                                         iris.analysis.MEAN)
+                                         iris.analysis.SUM)
 
             # Plot time evolution
             plt.clf()
