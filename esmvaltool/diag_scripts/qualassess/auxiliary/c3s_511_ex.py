@@ -358,6 +358,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # Add units to column names
         column_rename_dict = {'severity': 'severity [{0}]'.format(severity_av.units), 'magnitude': 'magnitude [{0}]'.format(magnitude_av.units), 'duration': 'duration [{0}]'.format(duration_av.units), 'extent': 'extent [{0}]'.format(extent.units)}
         df_metrics = df_metrics.rename(columns=column_rename_dict)
+        df_metrics = df_metrics.astype(float)
 
         # Saving of the table to csv and html
         savename_csv = self.__plot_dir__ + os.sep +  "extreme_event_metrics.csv"
