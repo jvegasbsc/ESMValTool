@@ -310,7 +310,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             
             # now calculate time evolution of amplitude within defined event_mask
             extent_time = amplitude.copy()
-            # TODO: check if this is not memory intense (seems so)
             extent_time = (extent_time * 0 + 1.) * np.broadcast_to(grid_areas, extent_time.shape)/1e6
             extent_time.units = cf_units.Unit("km2")
             extent_time.long_name = "Extent (based on grid resolution)"
