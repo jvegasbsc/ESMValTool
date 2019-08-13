@@ -64,7 +64,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         which_percentile = self.__extremes__["which_percentile"]
         window_size = self.__extremes__["window_size"]
         extreme_events = self.__extremes__["extreme_events"]
-        do_multiprocessing = self.__extremes__["multiprocessing"]
+        num_processors = self.__extremes__["multiprocessing"]
 
         self.__logger__.info("Reading extreme event table from %s",ex_table_loc)
         # TODO call function here
@@ -94,6 +94,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             except KeyError:
                 self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
                 raise
+                
+        self.__logger__.info(self.__regions__)
         
         # this the extremes example
         
@@ -141,12 +143,12 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             counter_gridpoints = 1
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
 
-            if do_multiprocessing:
+            if num_processors>1:
                 self.__logger__.info("Start calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
                 # setting up a pool
                 # TODO make sure that this is machine compatiple
-                pool = Pool()
+                pool = Pool(processors = num_processors)
                 
                 # get an iterator for the the positions
                 positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
@@ -361,7 +363,7 @@ def convert_human_readable_coords_to_iso(coord_in):
        coord_iso : float
         iso-6709 formatted coordinate
     '''
-    val,compass = re.split('[°\'"]+', coord_in)
+    val,compass = re.split('[deg]+', coord_in)
     if compass in ['N','E']:
         result = float(val)
     elif compass in ['S','W']:
