@@ -121,8 +121,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 
         self.__logger__.info(self.__extremes_regions__)
         
+        # Initialize a pandas dataframe for saving the table of metrics
+        df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
+
 #        self.__extremes_regions__ = self.__regions__
-        
+
         # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__extremes_regions__.items():
             # Now define the three cubes. Note that now they are really cubes,
@@ -267,7 +270,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             event_mask2d = event_mask.data & ~event_mask.mask
 
             # Now expand it over time
-            # TODO: check if this is not memory intense (seems so)
             event_mask3d = np.broadcast_to(event_mask2d, event_cube.shape)
 
             # Now create copies of the different event metrics and mask them with the event mask
@@ -292,17 +294,19 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
             # Note that collapsing needs to be done in two steps, otherwise masked values
             # are propagated over the full array, which is not the preferred behaviour.
-            # TODO: Do we need area weighting?
             amplitude_time = amplitude_time.collapsed(["latitude"],\
                                          iris.analysis.MEAN)
             amplitude_time = amplitude_time.collapsed(["longitude"],\
                                          iris.analysis.MEAN)
 
             # Plot time evolution
-            plt.clf()
-            qplt.plot(amplitude_time)
-            plt.xticks(rotation=45)
-            plt.savefig(self.__plot_dir__ + os.sep + r + "_amplitude_time_" + ".png")
+            try:
+                plt.clf()
+                qplt.plot(amplitude_time)
+                plt.xticks(rotation=45)
+                plt.savefig(self.__plot_dir__ + os.sep + r + "_amplitude_time_" + ".png")
+            except ValueError:
+                self.__logger__.warning("Failed in creating line plot")
 
 
             # calculate extent
@@ -311,7 +315,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             
             # now calculate time evolution of amplitude within defined event_mask
             extent_time = amplitude.copy()
-            # TODO: check if this is not memory intense (seems so)
             extent_time = (extent_time * 0 + 1.) * np.broadcast_to(grid_areas, extent_time.shape)/1e6
             extent_time.units = cf_units.Unit("km2")
             extent_time.long_name = "Extent (based on grid resolution)"
@@ -319,11 +322,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
             # Note that collapsing needs to be done in two steps, otherwise masked values
             # are propagated over the full array, which is not the preferred behaviour.
-            # TODO: Do we need area weighting?
             extent_time = extent_time.collapsed(["latitude"],\
                                          iris.analysis.MEAN)
             extent_time = extent_time.collapsed(["longitude"],\
-                                         iris.analysis.MEAN)
+                                         iris.analysis.SUM)
 
             # Plot time evolution
             plt.clf()
@@ -332,19 +334,18 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             plt.savefig(self.__plot_dir__ + os.sep + r + "_extent_time_" + ".png")
             
             # set up table
-            # TODO export csv
             self.__logger__.info("Extremes table")
             self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
             self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
             self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
             self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
+
+            # Add metrics to pd dataframe
+            df_metrics.loc[r] = pd.Series({'severity': severity_av.data, 'magnitude':magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
+
             # plotting for trials
-            
-            self.__logger__.info(self.colormaps)
-            
             for dat in ["severity", "magnitude", "duration"]:
-                #TODO add event_mask_2d to the plots. 
-                # This should already be included in lines 279 to 281
+                #TODO add event_mask_2d to the plots.
                 
                 filename = self.__plot_dir__ + os.sep + \
                     basic_filename + \
@@ -440,6 +441,23 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                              self.diagname, 
                              self.authors)
 
+        # Add units to column names
+        column_rename_dict = {'severity': 'severity [{0}]'.format(severity_av.units), 'magnitude': 'magnitude [{0}]'.format(magnitude_av.units), 'duration': 'duration [{0}]'.format(duration_av.units), 'extent': 'extent [{0}]'.format(extent.units)}
+        df_metrics = df_metrics.rename(columns=column_rename_dict)
+
+        # Saving of the table to csv and html
+        savename_csv = self.__plot_dir__ + os.sep +  "extreme_event_metrics.csv"
+        savename_html = self.__plot_dir__ + os.sep +  "extreme_event_metrics.html"
+
+        # Save to csv (keeping full precision)
+        self.__logger__.info("Saving metric csv-table as: {0}".format(savename_csv))
+        df_metrics.to_csv(savename_csv)
+
+        # Save to html with specified precision
+        html_metrics = df_metrics.style.set_precision(2).render()
+        self.__logger__.info("Saving metric html-table as: {0}".format(savename_html))
+        with open(savename_html,mode='w+') as handle:
+            handle.write(html_metrics)
 
         # produce report
         expected_input, found = \
