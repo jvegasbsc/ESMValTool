@@ -64,6 +64,7 @@ class __Diagnostic_skeleton__(object):
         self.diagname = "Diagnostic_skeleton.py"
 
         # config
+        # TODO explain all attributes
         self.__cfg__ = None
         self.__logger__ = logging.getLogger(os.path.basename(__file__))
 
@@ -552,6 +553,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__report_order__ = self.__cfg__["input_files"]
             
         try:
+            # reads extremes setup from recipe
             self.__extremes__ = dict({"min_measurements": self.__cfg__["minimal_number_measurements"],
                                       "which_percentile": self.__cfg__["which_percentile"],
                                       "window_size": self.__cfg__["window_size"],
@@ -590,8 +592,8 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             'Europe_2000': {
                 'latitude': (30, 75),
                 'longitude': (-10, 35),
-                'time': (datetime.datetime(2000, 1, 1),
-                         datetime.datetime(2000, 12, 31)
+                'time': (datetime.datetime(2000, 5, 1),
+                         datetime.datetime(2000, 9, 30)
                          )}}  # default region
 #
 #        # for metadata

@@ -44,6 +44,14 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # all required input can be extracted from the extremes dictionary
         self.__logger__.info(self.__extremes__)
         
+        self.__regions__.update({
+            'Europe_1999': {
+                'latitude': (30, 75),
+                'longitude': (-10, 35),
+                'time': (datetime.datetime(1999, 5, 1),
+                         datetime.datetime(1999, 9, 30)
+                         )}})  # default region
+        
         # Initialize extremes regions as empty
         self.__extremes_regions__ = dict()
 
@@ -81,13 +89,20 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         list_of_plots = []
         
         # end of standard handling
-                
+        
         # Read settings from recipe
+        # self.__extremes__ provides the information given in the recipe as a dictionary
         min_measurements = self.__extremes__["min_measurements"]
         which_percentile = self.__extremes__["which_percentile"]
         window_size = self.__extremes__["window_size"]
         extreme_events = self.__extremes__["extreme_events"]
         num_processors = self.__extremes__["multiprocessing"]
+        
+        # set up multiprocessing
+        if num_processors>1:
+            # setting up a pool
+            # TODO make sure that this is machine compatiple (or leave it to the user)
+            pool = Pool(processes = num_processors)
         
         self.__logger__.info("Reading extreme event table")
         ex_table,raw_table = read_extreme_event_catalogue()
@@ -110,6 +125,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                                       single_event['Lon_to'])
                 single_event_as_region['time'] = (single_event['Time_start'].to_pydatetime(),\
                                                       single_event['Time_stop'].to_pydatetime())
+                # self.__extremes_regions__ provides the regions for the events given in the recipe as a dictionary (read from respective catalogue)
                 self.__extremes_regions__.update({extreme_event_id : single_event_as_region})
 
             except KeyError:
@@ -121,13 +137,16 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 
         self.__logger__.info(self.__extremes_regions__)
         
+        self.__extremes_regions__ = self.__regions__
+        
+        self.__logger__.info(self.__extremes_regions__)
+        
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
 
-#        self.__extremes_regions__ = self.__regions__
-
         # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__extremes_regions__.items():
+            self.__logger__.info("Handling region {}".format(r))
             # Now define the three cubes. Note that now they are really cubes,
             # not dictionaries that contain cubes.
 
@@ -151,9 +170,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             if num_processors>1:
                 self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
-                # setting up a pool
-                # TODO make sure that this is machine compatiple (or leave it to the user)
-                pool = Pool(processes = num_processors)
                 
                 # get an iterator for the the positions
                 positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
@@ -173,7 +189,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 extremes_1d_redistribute(ex_cube,
                                          ex_list,
                                          positions)
-                pool.close()
             else:
                 self.__logger__.info("Start single process calculation of extreme climatology " +
                                      "for %s gridpoints without multiprocessing",n_gridpoints)
@@ -459,6 +474,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         self.__logger__.info("Saving metric html-table as: {0}".format(savename_html))
         with open(savename_html,mode='w+') as handle:
             handle.write(html_metrics)
+            
+        # end multiprocessing
+        if num_processors>1:
+        # closing the pool
+            pool.close()
 
         # produce report
         expected_input, found = \
