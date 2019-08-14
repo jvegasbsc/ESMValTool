@@ -33,14 +33,19 @@ diagnostics:
 #        derive: False
     scripts:
       SPQB_basic_report:
-        script: qualassess/ex_C3S_511_SPQB.py # no need to change for evaluator
-        requests: [custom]                    # no need to change for evaluator
+        script: qualassess/ex_C3S_511_SPQB.py # 
+        requests: [custom]                    # ++++++++++ Extreme parameters follow below +++++++
         minimal_number_measurements: 10       # if for a certain gridpoint there are less
                                               # valid data points than specified here
                                               # this gridpoint is masked
         which_percentile: 10                  # per default assuming exceeding extremes 
                                               # for percentiles > 50 and vice versa
         window_size: 5                        # size of the window
+                                              # List below the extreme events as in the Google
+                                              # Drive document. Note that identifiers 
+                                              # of the event refer to the columns 'Event Category', 
+                                              # 'Region/Country' and 'Year' joined by '_' and any
+                                              # whitespace removed.
         extreme_events: [Drought_MiddleEast_2014, Drought-Heat_Europe_2013, Drought-Heat_Europe_2015, Drought-Heat_Europe_2003]
         multiprocessing: 1                    # the number of cores used
                                               # use 1 for no multiprocessing
