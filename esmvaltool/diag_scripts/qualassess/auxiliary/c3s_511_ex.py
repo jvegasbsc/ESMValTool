@@ -10,21 +10,20 @@ import pandas as pd
 import iris
 import iris.pandas as ipd
 import iris.quickplot as qplt
+import iris.plot as iplt
 import os
-import re
 import sys
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import datetime
 import numpy as np
 import cf_units
-from scipy import sin, cos, tan, arctan, arctan2, arccos, pi, deg2rad
 
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
 from .libs.predef.ecv_lookup_table import ecv_lookup
-from .libs.c3s_511_util import cube_sorted, read_extreme_event_catalogue, minmax_cubelist
-from .plots.basicplot import \
-    Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
+from .libs.c3s_511_util import read_extreme_event_catalogue
+from .plots.basicplot import Plot2D, Plot2D_blank, plot_setup
     
 from multiprocessing import Pool
 import itertools as it
@@ -44,13 +43,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # all required input can be extracted from the extremes dictionary
         self.__logger__.info(self.__extremes__)
         
-        self.__regions__.update({
-            'Europe_1999': {
-                'latitude': (30, 75),
-                'longitude': (-10, 35),
-                'time': (datetime.datetime(1999, 5, 1),
-                         datetime.datetime(1999, 9, 30)
-                         )}})  # default region
+#        self.__regions__.update({
+#            'Europe_1999': {
+#                'latitude': (30, 75),
+#                'longitude': (-10, 35),
+#                'time': (datetime.datetime(1999, 5, 1),
+#                         datetime.datetime(1999, 9, 30)
+#                         )}})  # default region
         
         # Initialize extremes regions as empty
         self.__extremes_regions__ = dict()
@@ -135,11 +134,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # we assume that the read in regions fully cover the event in space and time (TODO: build in a check for this)
         # TODO: still needed?
                 
-        self.__logger__.info(self.__extremes_regions__)
-        
-        self.__extremes_regions__ = self.__regions__
-        
-        self.__logger__.info(self.__extremes_regions__)
+#        self.__extremes_regions__ = self.__regions__
         
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
@@ -314,16 +309,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             amplitude_time = amplitude_time.collapsed(["longitude"],\
                                          iris.analysis.MEAN)
 
-            # Plot time evolution
-            try:
-                plt.clf()
-                qplt.plot(amplitude_time)
-                plt.xticks(rotation=45)
-                plt.savefig(self.__plot_dir__ + os.sep + r + "_amplitude_time_" + ".png")
-            except ValueError:
-                self.__logger__.warning("Failed in creating line plot")
-
-
             # calculate extent
             extent = ((duration * 0 + 1.) * grid_areas).collapsed(["latitude","longitude"], iris.analysis.SUM)/1e6
             extent.units = cf_units.Unit("km2")
@@ -342,12 +327,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             extent_time = extent_time.collapsed(["longitude"],\
                                          iris.analysis.SUM)
 
-            # Plot time evolution
-            plt.clf()
-            qplt.plot(extent_time)
-            plt.xticks(rotation=45)
-            plt.savefig(self.__plot_dir__ + os.sep + r + "_extent_time_" + ".png")
-            
             # set up table
             self.__logger__.info("Extremes table")
             self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
@@ -358,7 +337,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Add metrics to pd dataframe
             df_metrics.loc[r] = pd.Series({'severity': severity_av.data, 'magnitude':magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
 
-            # plotting for trials
+            # plotting maps
             for dat in ["severity", "magnitude", "duration"]:
                 #TODO add event_mask_2d to the plots.
                 
@@ -369,7 +348,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 list_of_plots.append(filename)
     
                 try:
-    #            for i in [0]:
                     x = Plot2D(locals()[dat])
     
                     caption = str(dat.title() +
@@ -455,6 +433,67 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                              self.__infile__, 
                              self.diagname, 
                              self.authors)
+                    
+                    
+            # plotting lineplots
+            filename = self.__plot_dir__ + os.sep + \
+                basic_filename + \
+                "_" + r + "_" + "temp_extent_amplitude" + \
+                "." + self.__output_type__
+            list_of_plots.append(filename)
+
+            caption = str('Temporal progress of amplitude and extent of ' +
+                          ecv_lookup(self.__varname__) +
+                          ' for the extreme event ' + r +
+                          ' for the data set ' +
+                          " ".join(dataset_id) + ' (' +
+                          self.__time_period__ + ').')
+
+            fig = plt.figure()
+            fig.set_figwidth(1.7 * fig.get_figwidth())
+            fig.set_figheight(2.2 * fig.get_figheight())
+
+            gs = gridspec.GridSpec(8, 1)
+            ax = np.array([plt.subplot(gs[0:4,:]),plt.subplot(gs[4:8,:])])
+            plt.sca(ax[0])
+            iplt.plot(amplitude_time)
+            plt.ylabel(amplitude_time.long_name + " [{}]".format(amplitude_time.units))
+            plt.tick_params(axis='x',
+                            which='both',      
+                            bottom=False,      
+                            top=True,         
+                            labelbottom=False) 
+            plt.grid(color="k", linestyle=':')
+            plt.sca(ax[1])
+            iplt.plot(extent_time)
+            plt.ylabel(extent_time.long_name + " [{}]".format(extent_time.units))
+            plt.xticks(rotation=45)
+            plt.grid(color="k", linestyle=':')
+            fig.align_ylabels()
+            plt.tight_layout()
+
+#                x.plot(ax=ax,
+#                       color={"Extremes": "YlOrRd"},
+#                       color_type="Extremes",
+#                       title=" ".join([self.__dataset_id__[indx] for
+#                                       indx in [0, 2, 1, 3]]) + \
+#                             " (" + self.__time_period__ + ")",
+#                       vminmax=vminmax,
+#                       ext_cmap="both",
+#                       dat_log = self.log_data)
+            fig.savefig(filename)
+            plt.close(fig.number)
+
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + 
+                     ['DM_regional', 'C3S_extremes'],
+                     caption,
+                     '#C3S' + "extremes" + "ExtAmp" + \
+                     self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
 
         # Add units to column names
         column_rename_dict = {'severity': 'severity [{0}]'.format(severity_av.units), 'magnitude': 'magnitude [{0}]'.format(magnitude_av.units), 'duration': 'duration [{0}]'.format(duration_av.units), 'extent': 'extent [{0}]'.format(extent.units)}
