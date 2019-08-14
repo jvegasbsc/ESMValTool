@@ -9,7 +9,6 @@ Created on Wed Dec  5 13:59:59 2018
 import pandas as pd
 import iris
 import iris.pandas as ipd
-import iris.quickplot as qplt
 import iris.plot as iplt
 import os
 import sys
@@ -41,15 +40,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # add a region to the regions object
         
         # all required input can be extracted from the extremes dictionary
-        self.__logger__.info(self.__extremes__)
+#        self.__logger__.info(self.__extremes__)
         
-        self.__regions__.update({
-            'Europe_1999': {
-                'latitude': (30, 75),
-                'longitude': (-10, 35),
-                'time': (datetime.datetime(1999, 5, 1),
-                         datetime.datetime(1999, 9, 30)
-                         )}})  # default region
+#        self.__regions__.update({
+#            'Europe_1999': {
+#                'latitude': (30, 75),
+#                'longitude': (-10, 35),
+#                'time': (datetime.datetime(1999, 5, 1),
+#                         datetime.datetime(1999, 9, 30)
+#                         )}})  # default region
         
         # Initialize extremes regions as empty
         self.__extremes_regions__ = dict()
@@ -139,9 +138,12 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
 
+        # initialize a dict for the multiple data sets from regions
+        extremes_measures = {}
+
         # Loop over the different regions (i.e. the different events)
         for r,def_r in self.__extremes_regions__.items():
-            self.__logger__.info("Handling region {}".format(r))
+            self.__logger__.info("Handling event {}".format(r))
             # Now define the three cubes. Note that now they are really cubes,
             # not dictionaries that contain cubes.
 
@@ -326,17 +328,42 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                          iris.analysis.MEAN)
             extent_time = extent_time.collapsed(["longitude"],\
                                          iris.analysis.SUM)
-
-            # set up table
-            self.__logger__.info("Extremes table")
-            self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
-            self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
-            self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
-            self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
+            
+            # log all results in a dictionary
+            extremes_measures.update({r:
+                {"severity":severity,
+                 "magnitude":magnitude,
+                 "duration":duration,
+                 "time_series":{"amplitude":amplitude_time,
+                                "extent":extent_time}}
+                    }
+                    )
+            
+            # TODO: delete as no need i for logging if output is written
+#            # set up table
+#            self.__logger__.info("Extremes table")
+#            self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
+#            self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
+#            self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
+#            self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
 
             # Add metrics to pd dataframe
             df_metrics.loc[r] = pd.Series({'severity': severity_av.data, 'magnitude':magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
 
+        self.__logger__.info(extremes_measures)
+        
+        # calculate the common minimum and maximum for the plots
+        common_minmax = {}
+        
+        for dat in ["severity", "magnitude", "duration"]:
+            loc_list = []
+            for reg,m in extremes_measures.items():
+                loc_list.append(np.nanpercentile(m[dat].data.compressed(),[5, 95]))
+            allmin = np.nanmin([np.nanmin(loc_el) for loc_el in loc_list])
+            allmax = np.nanmax([np.nanmax(loc_el) for loc_el in loc_list])
+            common_minmax.update({dat:[allmin,allmax]})
+            
+        for r,m in extremes_measures.items():  
             # plotting maps
             for dat in ["severity", "magnitude", "duration"]:
                 #TODO add event_mask_2d to the plots.
@@ -348,7 +375,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 list_of_plots.append(filename)
     
                 try:
-                    x = Plot2D(locals()[dat])
+                    x = Plot2D(m[dat])
     
                     caption = str(dat.title() +
                                   ' maps of ' +
@@ -365,8 +392,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                                     fig=fig,
                                                     caption=caption)
 
-                    vminmax = locals()[dat]
-                    vminmax = np.nanpercentile(vminmax.data.compressed(),[5, 95])
+                    vminmax = common_minmax[dat]
     
                     x.plot(ax=ax,
                            color={"Extremes": "YlOrRd"},
@@ -403,7 +429,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     self.__logger__.error(dat)
                     self.__logger__.error('Warning: blank figure!')
     
-                    x = Plot2D_blank(locals()[dat])
+                    x = Plot2D_blank(m[dat])
     
                     fig = plt.figure()
     
@@ -434,68 +460,72 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                              self.diagname, 
                              self.authors)
                     
-            if all(amplitude_time.data.mask) or all(extent_time.data.mask):
-                self.__logger__.warning("Extremes: spatially aggregated amplitude or extent are all masked! No lineplots produced.")
-            else:
-                # plotting lineplots
-                filename = self.__plot_dir__ + os.sep + \
-                    basic_filename + \
-                    "_" + r + "_" + "temp_extent_amplitude" + \
-                    "." + self.__output_type__
-                list_of_plots.append(filename)
-    
-                caption = str('Temporal progress of amplitude and extent of ' +
-                              ecv_lookup(self.__varname__) +
-                              ' for the extreme event ' + r +
-                              ' for the data set ' +
-                              " ".join(dataset_id) + ' (' +
-                              self.__time_period__ + ').')
-    
-                fig = plt.figure()
-                fig.set_figwidth(1.7 * fig.get_figwidth())
-                fig.set_figheight(2.2 * fig.get_figheight())
-    
-                gs = gridspec.GridSpec(8, 1)
-                ax = np.array([plt.subplot(gs[0:4,:]),plt.subplot(gs[4:8,:])])
-                plt.sca(ax[0])
-                iplt.plot(amplitude_time)
-                plt.ylabel(amplitude_time.long_name + " [{}]".format(amplitude_time.units))
-                plt.tick_params(axis='x',
-                                which='both',      
-                                bottom=False,      
-                                top=True,         
-                                labelbottom=False) 
-                plt.grid(color="k", linestyle=':')
-                plt.sca(ax[1])
-                iplt.plot(extent_time)
-                plt.ylabel(extent_time.long_name + " [{}]".format(extent_time.units))
-                plt.xticks(rotation=45)
-                plt.grid(color="k", linestyle=':')
-                fig.align_ylabels()
-                plt.tight_layout()
-    
-                fig.savefig(filename)
-                plt.close(fig.number)
-    
-                ESMValMD("meta",
-                         filename,
-                         self.__basetags__ + 
-                         ['DM_regional', 'C3S_extremes'],
-                         caption,
-                         '#C3S' + "extremes" + "ExtAmp" + \
-                         self.__varname__,
-                         self.__infile__,
-                         self.diagname,
-                         self.authors)
+            for dat in ["time_series"]: 
+                amplitude_time = m[dat]["amplitude"]
+                extent_time = m[dat]["extent"]
+                if all(amplitude_time.data.mask) or all(extent_time.data.mask):
+                    self.__logger__.warning("Extremes: spatially aggregated amplitude or extent are all masked! No lineplots produced.")
+                else:
+                    # plotting lineplots
+                    filename = self.__plot_dir__ + os.sep + \
+                        basic_filename + \
+                        "_" + r + "_" + "temp_extent_amplitude" + \
+                        "." + self.__output_type__
+                    list_of_plots.append(filename)
+        
+                    caption = str('Temporal progress of amplitude and extent of ' +
+                                  ecv_lookup(self.__varname__) +
+                                  ' for the extreme event ' + r +
+                                  ' for the data set ' +
+                                  " ".join(dataset_id) + ' (' +
+                                  self.__time_period__ + ').')
+        
+                    fig = plt.figure()
+                    fig.set_figwidth(1.7 * fig.get_figwidth())
+                    fig.set_figheight(2.2 * fig.get_figheight())
+        
+                    gs = gridspec.GridSpec(8, 1)
+                    ax = np.array([plt.subplot(gs[0:4,:]),plt.subplot(gs[4:8,:])])
+                    plt.sca(ax[0])
+                    iplt.plot(amplitude_time)
+                    plt.ylabel(amplitude_time.long_name + " [{}]".format(amplitude_time.units))
+                    plt.tick_params(axis='x',
+                                    which='both',      
+                                    bottom=False,      
+                                    top=True,         
+                                    labelbottom=False) 
+                    plt.grid(color="k", linestyle=':')
+                    plt.sca(ax[1])
+                    iplt.plot(extent_time)
+                    plt.ylabel(extent_time.long_name + " [{}]".format(extent_time.units))
+                    plt.xticks(rotation=45)
+                    plt.grid(color="k", linestyle=':')
+                    fig.align_ylabels()
+                    plt.tight_layout()
+        
+                    fig.savefig(filename)
+                    plt.close(fig.number)
+        
+                    ESMValMD("meta",
+                             filename,
+                             self.__basetags__ + 
+                             ['DM_regional', 'C3S_extremes'],
+                             caption,
+                             '#C3S' + "extremes" + "ExtAmp" + \
+                             self.__varname__,
+                             self.__infile__,
+                             self.diagname,
+                             self.authors)
 
         # Add units to column names
         column_rename_dict = {'severity': 'severity [{0}]'.format(severity_av.units), 'magnitude': 'magnitude [{0}]'.format(magnitude_av.units), 'duration': 'duration [{0}]'.format(duration_av.units), 'extent': 'extent [{0}]'.format(extent.units)}
         df_metrics = df_metrics.rename(columns=column_rename_dict)
         df_metrics = df_metrics.astype(float)
 
-        # Saving of the table to csv and html
-        savename_csv = self.__plot_dir__ + os.sep +  "extreme_event_metrics.csv"
-        savename_html = self.__plot_dir__ + os.sep +  "extreme_event_metrics.html"
+        # Saving of the table to csv and html (saved to work. plot_dir only contains plots)}
+        savename = self.__work_dir__ + os.sep + basic_filename + "_extreme_event_metrics."
+        savename_csv = savename + "csv"
+        savename_html = savename + "html"
 
         # Save to csv (keeping full precision)
         self.__logger__.info("Saving metric csv-table as: {0}".format(savename_csv))

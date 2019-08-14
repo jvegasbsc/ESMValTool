@@ -410,7 +410,7 @@ class __Diagnostic_skeleton__(object):
         if any([subset_cubes[sc] is None for sc in subset_cubes]):
             raise ValueError(
                 "Could not calculate all subsets. " + 
-                "Some are none overlapping! " +
+                "Some are non-overlapping! " +
                 str(subset_cubes))
 
         return subset_cubes
