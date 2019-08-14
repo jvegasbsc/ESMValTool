@@ -132,7 +132,12 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # not dictionaries that contain cubes.
 
             # The event cube spans the event in space and time
-            event_cube = self.__spatiotemp_subsets__(cube,{r:def_r})[r]
+            try:
+                event_cube = self.__spatiotemp_subsets__(cube,{r:def_r})[r]
+            except ValueError:
+                self.__logger__.warning("The following extreme event was not \
+                                        found in this dataset: {0}".format(r))
+                continue
 
             # The clim cube spans the event in space, with the time
             # spanning all available timesteps in the dataset
@@ -218,7 +223,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             elif which_percentile < 50: # we are interested in under threshold values
                 amplitude = ex_cube - event_cube
             else:
-                self.__loger__.error("Percentile can not be 50, that wouldn't be an extreme climatology")
+                self.__logger__.error("Percentile can not be 50, that wouldn't be an extreme climatology")
                 raise ValueError
             # Note that due to the above check, amplitude values of the event are always positive
             # therefore mask negative values
@@ -226,11 +231,16 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Set long name
             amplitude.long_name = 'Amplitude of '+event_cube.long_name
             
-            # This check assures that the dimensions differ in size, otherwise
+            # The below check assures that the dimensions differ in size, otherwise
             # broadcasting in np.atleast_3d could fail and produce erroneous 
             # results without notice
-            assert(sorted(list(set(amplitude.shape)))==sorted(list(amplitude.shape)))
-
+            #TODO fix the below
+            try:
+                assert(sorted(list(set(amplitude.shape)))==sorted(list(amplitude.shape)))
+            except AssertionError:
+                self.__logger__.error("Can not safely broadcast, since not all dimensions \
+                                       of cube differ in size. Therefore skipping this event.")
+                continue
 
             #####################################
             ###  calculate the three metrics  ###
