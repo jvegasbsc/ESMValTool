@@ -12,9 +12,12 @@ import sys
 import matplotlib.pyplot as plt
 import datetime
 import numpy as np
+import xarray
+import cartopy.crs as ccrs
 
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
+from .libs.trends.trends_core3d import linear_trend, theilsen_trend, mannkendall
 from .libs.predef.ecv_lookup_table import ecv_lookup
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
@@ -48,7 +51,7 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
         
         this_function =  "trends example"
         
-        # this the extremes example
+        # this the trends example
         
         # handling of the cube restrictions copied from the basic diagnostic
         # needs to be set locally
@@ -71,7 +74,57 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
         
         list_of_plots = []
         
-        self.__logger__.warning(cube)
+#        for rcoord in ["day_of_month", "day_of_year", "month_number", "year"]:
+#            if rcoord in [coord.name() for coord in cube.coords()]:
+#                try:
+#                    cube.remove_coord(rcoord)
+#                except:
+#                    cube.remove_aux_factory(rcoord)
+        
+        # basic calculations
+        lintrend,linpvalue = linear_trend(xarray.DataArray.from_iris(cube))
+        theilsen_slope = theilsen_trend(xarray.DataArray.from_iris(cube))
+        mk_result = mannkendall(xarray.DataArray.from_iris(cube))
+        
+        self.__logger__.info(lintrend)
+        self.__logger__.info(linpvalue)
+        self.__logger__.info(theilsen_slope)
+        self.__logger__.info(mk_result)
+        
+        fig = plt.figure(figsize=(15, 7))
+        ax = fig.add_subplot(111, projection=ccrs.Robinson())
+        lintrend.plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
+        ax.coastlines()
+        plt.tight_layout()
+        fig.savefig(self.__plot_dir__ + os.sep + "lintrend.png")
+        
+        fig = plt.figure(figsize=(15, 7))
+        ax = fig.add_subplot(111, projection=ccrs.Robinson())
+        linpvalue.plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
+        ax.coastlines()
+        plt.tight_layout()
+        fig.savefig(self.__plot_dir__ + os.sep + "pval.png")
+        
+        fig = plt.figure(figsize=(15, 7))
+        ax = fig.add_subplot(111, projection=ccrs.Robinson())
+        theilsen_slope.plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
+        ax.coastlines()
+        plt.tight_layout()
+        fig.savefig(self.__plot_dir__ + os.sep + "theilsen.png")
+        
+        fig = plt.figure(figsize=(15, 7))
+        ax = fig.add_subplot(111, projection=ccrs.Robinson())
+        ((theilsen_slope-lintrend)/theilsen_slope).plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
+        ax.coastlines()
+        plt.tight_layout()
+        fig.savefig(self.__plot_dir__ + os.sep + "trenddiff.png")
+        
+        fig = plt.figure(figsize=(15, 7))
+        ax = fig.add_subplot(111, projection=ccrs.Robinson())
+        mk_result.plot(ax=ax, transform=ccrs.PlateCarree(),robust=True, vmin=-1, vmax=1) # Note that computation takes place at this place
+        ax.coastlines()
+        plt.tight_layout()
+        fig.savefig(self.__plot_dir__ + os.sep + "mankendall.png")
         
         
         # produce report
