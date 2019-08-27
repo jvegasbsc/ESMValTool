@@ -1,21 +1,14 @@
-###############################################################################
-# recipe_C3S_51_SPQB.yml
-#
-# Description
-# Independent assessment of single products for the C3S_511 quality brief
-#
-# Author
-# Benjamin Mueller (LMU, Germany - b.mueller@iggf.geo.uni-muenchen.de)
-# Birgit Hassler (DLR, Germany - birgit.hassler@dlr.de)
-#
-# Project
-# C3S_511
-#
-# Reference
+documentation:
+  description: |
+    Independent assessment of single products for the C3S_511 quality brief - trends
 
-#
-# This namelist is part of the ESMValTool
-###############################################################################
+  authors:
+    - muel_bn
+    - hass_bg
+
+  maintainer:
+    - muel_bn
+    - hass_bg
 
 datasets:
   - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1999,  end_year: 2000}
@@ -37,7 +30,7 @@ diagnostics:
         mip: Amon
     scripts:
       SPQB_basic_report:
-        script: qualassess/ex_C3S_511_SPQB.py
+        script: qualassess/trnd_C3S_511_SPQB.py
 #        levels: None
         levels: [3.00e+04,8.50e+04,1.00e+02]
         show_latex: False #options are: True/False/no_latex
