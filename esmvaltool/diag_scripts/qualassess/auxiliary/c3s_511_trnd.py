@@ -53,6 +53,8 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
         
         # this the trends example
         
+        self.__logger__.info(self.var3D)
+        
         # handling of the cube restrictions copied from the basic diagnostic
         # needs to be set locally
         #################
@@ -63,10 +65,11 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
                     coord_values={str(self.level_dim): lambda cell: cell == max(self.levels)}))
 
         # adjustment to ids and filenames
-        if self.var3D is not None:
+        if self.var3D not in [None, False]:
             basic_filename = self.__basic_filename__ + "_lev" + str(max(self.levels))
             dataset_id = [self.__dataset_id__[0], "at", "level", str(
                 max(self.levels)), str(self.sp_data.coord(self.level_dim).units)]
+    
         else:
             basic_filename = self.__basic_filename__
             dataset_id = [self.__dataset_id__[0]]
@@ -83,8 +86,8 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
         
         # basic calculations
         lintrend,linpvalue = linear_trend(xarray.DataArray.from_iris(cube))
-        theilsen_slope = theilsen_trend(xarray.DataArray.from_iris(cube))
-        mk_result = mannkendall(xarray.DataArray.from_iris(cube))
+        theilsen_slope = theilsen_trend(xarray.DataArray.from_iris(cube)).compute()
+        mk_result = mannkendall(xarray.DataArray.from_iris(cube)).compute()
         
         self.__logger__.info(lintrend)
         self.__logger__.info(linpvalue)
