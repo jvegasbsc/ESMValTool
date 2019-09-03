@@ -11,10 +11,9 @@ documentation:
     - hass_bg
 
 datasets:
-#  - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1999,  end_year: 2000}
-  - {dataset: CDS-ERA5-SNOWDEPTH, type: reanalysis, project: OBS, mip: LImon, version: L3, tier: 3, start_year: 1990,  end_year: 2018}
-#  - {dataset: XCH4, type: sat, project: OBS,  level: L3, version: CDS, start_year: 2003,  end_year: 2016}
-# looks for: [project]_[obssystem]_[dataset]_[level]_[field]_[short_name]*
+  - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1991,  end_year: 2000}
+#  - {dataset: CDS-ERA5-SNOWDEPTH, type: reanalysis, project: OBS, mip: LImon, version: L3, tier: 3, start_year: 1990,  end_year: 2018}
+#  - {dataset: CDS-XCH4, type: sat, project: OBS, mip: Amon,  version: L3, start_year: 2003,  end_year: 2016}
 preprocessors:
   noop: {}
 
@@ -22,29 +21,16 @@ diagnostics:
   SPQB:
     description: Single product quality brief.
     variables:
-#      ta:
-      snd:
+      ta:
+#      snd:
 #      xch4:
         preprocessor: noop
-#        field: T2Ms
         derive: False
     scripts:
-      SPQB_basic_report:
+      trend_framework:
         script: qualassess/trnd_C3S_511_SPQB.py
-#        levels: None
-#        levels: [3.00e+04,8.50e+04,1.00e+02]
-        
-#  diagnostic1:
-#    description: Multi-product quality brief.
-#    variables:
-#      additional_datasets:
-#        - {dataset: ATSR,  project: obs4mips,  level: L3,  version: ARC-v1.1.1,  start_year: 2001,  end_year: 2003, tier: 3}
-#      ta:
-#        preprocessor: noop
-#        field: T3Ms
-#    scripts:
-#      script0:
-#        script: qualassess/DUMMY_C3S_511_MPQB.py
-#        data_colors: RdYlGn
-#        levels: [30000.,10000.]
-#        show_latex: False
+        levels: [8.50e+04]#,1.00e+02]
+      diag_T_trend: #worst for memory
+        script: qualassess/DUMMY_C3S_511_SPQB.py
+        requests: [lintrend]
+        levels: [8.50e+04]
