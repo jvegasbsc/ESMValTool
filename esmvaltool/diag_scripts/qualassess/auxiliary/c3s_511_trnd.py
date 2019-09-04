@@ -17,7 +17,7 @@ import cartopy.crs as ccrs
 
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
-from .libs.trend_framework.trends_core3d import linear_trend, theilsen_trend, mannkendall
+from .libs.trend_framework.c3s_511_trends import TrendLims1D
 from .libs.predef.ecv_lookup_table import ecv_lookup
 from .plots.basicplot import \
     Plot2D, PlotHist, Plot2D_blank, Plot1D, PlotScales, plot_setup
@@ -84,99 +84,33 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
 #                except:
 #                    cube.remove_aux_factory(rcoord)
         
-        xcube = xarray.DataArray.from_iris(cube)
+#        xcube = xarray.DataArray.from_iris(cube)
         
-        # basic calculations
-        lintrend,linpvalue = linear_trend(xcube)
-        theilsen_slope = theilsen_trend(xcube)
-        mk_result = mannkendall(xcube)
+        for ts_cube in cube.slices(["time"]):
+            ts_cube = iris.util.new_axis(ts_cube, "latitude")
+            ts_cube = iris.util.new_axis(ts_cube, "longitude")
+            ts_cube.transpose([2,1,0])
+            self.__logger__.info(ts_cube)
+            trend_obj = TrendLims1D("local")
+            trend_obj.initialize_through_realization_of_cube(ts_cube,0,0)
+            trend_obj.resample('Y')
+            trend_obj.do_trends()
+            self.__logger__.info(trend_obj.data_ts)
+            assert False, "development"
         
-        # prepare cube conversion linear trend
-        if (" " in lintrend.name):
-            lintrend.name = lintrend.name.strip(" ")[0]
-        lintrend.attrs['units'] = lintrend.attrs['units'].replace("timestep", "({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
-        lintrend.attrs.update({'standard_name': None})
-        lintrend.attrs.update({'long_name': "Linear Trend of {}".format(xcube.attrs["long_name"])})
-        lintrend.attrs.update({'cell_methods': 'time: linear trend'})
-        
-        # prepare cube conversion pvalue
-        if (" " in linpvalue.name):
-            linpvalue.name = linpvalue.name.strip(" ")[0]
-        linpvalue.attrs.update({'standard_name': None})
-        linpvalue.attrs.update({'long_name': "Linear Trend of {} (p-value)".format(xcube.attrs["long_name"])})
-        linpvalue.attrs.update({'cell_methods': 'time: linear trend (pvalue)'})
-        
-        # prepare cube conversion theilsen
-        if (" " in theilsen_slope.name):
-            theilsen_slope.name = theilsen_slope.name.strip(" ")[0]
-        theilsen_slope.attrs['units'] = theilsen_slope.attrs['units'].replace("per timestep", "/ ({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
-        theilsen_slope.attrs.update({'standard_name': None})
-        theilsen_slope.attrs.update({'long_name': "Theil-Sen Trend of {}".format(xcube.attrs["long_name"])})
-        theilsen_slope.attrs.update({'cell_methods': 'time: Theil-Sen trend (pvalue)'})
-        
-        # prepare cube conversion mankendall
-        if (" " in mk_result.name):
-            mk_result.name = mk_result.name.strip(" ")[0]
-        mk_result.attrs.update({'standard_name': None})
-        mk_result.attrs.update({'long_name': "Sign of Significant Trend of {}".format(xcube.attrs["long_name"])})
-        mk_result.attrs.update({'cell_methods': 'time: mankendall'})
-        
-        # adjust attributes
-        for key,val in xcube.attrs.items():
-            if key not in lintrend.attrs.keys():
-                lintrend.attrs.update({key: val})
-            if key not in linpvalue.attrs.keys():
-                linpvalue.attrs.update({key: val})
-            if key not in theilsen_slope.attrs.keys():
-                theilsen_slope.attrs.update({key: val})
-            if key not in mk_result.attrs.keys():
-                mk_result.attrs.update({key: val})
-                
-        #conversions to cubes
-        lintrend_cube = lintrend.to_iris()
-        lintrend_cube.convert_units('{} / (10 years)'.format(cube.units))
-        
-        linpvalue_cube = linpvalue.to_iris()
-        
-        theilsen_slope_cube = theilsen_slope.to_iris()
-        theilsen_slope_cube.convert_units('{} / (10 years)'.format(cube.units))
-        
-        mk_result_cube = mk_result.to_iris()
-                
-        fig = plt.figure(figsize=(15, 7))
-        ax = fig.add_subplot(111, projection=ccrs.Robinson())
-        xarray.DataArray.from_iris(lintrend_cube).plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
-        ax.coastlines()
-        plt.tight_layout()
-        fig.savefig(self.__plot_dir__ + os.sep + "lintrend.png")
-        
-        fig = plt.figure(figsize=(15, 7))
-        ax = fig.add_subplot(111, projection=ccrs.Robinson())
-        xarray.DataArray.from_iris(linpvalue_cube).plot(ax=ax, transform=ccrs.PlateCarree(),robust=True, vmin=0, vmax=1) # Note that computation takes place at this place
-        ax.coastlines()
-        plt.tight_layout()
-        fig.savefig(self.__plot_dir__ + os.sep + "pval.png")
-        
-        fig = plt.figure(figsize=(15, 7))
-        ax = fig.add_subplot(111, projection=ccrs.Robinson())
-        xarray.DataArray.from_iris(theilsen_slope_cube).plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
-        ax.coastlines()
-        plt.tight_layout()
-        fig.savefig(self.__plot_dir__ + os.sep + "theilsen.png")
-        
-        fig = plt.figure(figsize=(15, 7))
-        ax = fig.add_subplot(111, projection=ccrs.Robinson())
-        xarray.DataArray.from_iris(mk_result_cube).plot(ax=ax, transform=ccrs.PlateCarree(),robust=True, vmin=-1, vmax=1) # Note that computation takes place at this place
-        ax.coastlines()
-        plt.tight_layout()
-        fig.savefig(self.__plot_dir__ + os.sep + "mankendall.png")
-        
+#        fig = plt.figure(figsize=(15, 7))
+#        ax = fig.add_subplot(111, projection=ccrs.Robinson())
+#        xarray.DataArray.from_iris(mk_result_cube).plot(ax=ax, transform=ccrs.PlateCarree(),robust=True) # Note that computation takes place at this place
+#        ax.coastlines()
+#        plt.tight_layout()
+#        fig.savefig(self.__plot_dir__ + os.sep + "mankendall.png")
+#        
 
         
         # produce report
         expected_input, found = \
-            self.__file_anouncement__(subdir="c3s_511/single_trends_input",
-                                      expfile="_trends.txt",
+            self.__file_anouncement__(subdir="c3s_511/single_mytrends_input",
+                                      expfile="_mytrends.txt",
                                       protofile="empty.txt",
                                       function=this_function)
 

@@ -30,7 +30,7 @@ diagnostics:
       trend_framework:
         script: qualassess/trnd_C3S_511_SPQB.py
         levels: [8.50e+04]#,1.00e+02]
-      diag_T_trend: #worst for memory
-        script: qualassess/DUMMY_C3S_511_SPQB.py
-        requests: [lintrend]
-        levels: [8.50e+04]
+#      diag_T_trend: #worst for memory
+#        script: qualassess/DUMMY_C3S_511_SPQB.py
+#        requests: [lintrend]
+#        levels: [8.50e+04]
