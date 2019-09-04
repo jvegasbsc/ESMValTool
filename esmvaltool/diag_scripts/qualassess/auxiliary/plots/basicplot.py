@@ -306,12 +306,24 @@ class PlotHist(object):
         vmax = np.ceil(vmax * 10**rounder) / 10**rounder
         levels = np.round(np.linspace(vmin, vmax, num=nbins), rounder)
         
+        self.logger.info(self.data.core_data())
+        self.logger.info(self.data.core_data().compute())
         hist, bins = da.histogram(self.data.core_data(), bins=levels, range=[vmin, vmax])
+        self.logger.info(hist)
         hist = hist/da.sum(hist)
+        self.logger.info(hist)
         
         x = 0.5 * (bins[1:] + bins[:-1])
         width = np.diff(bins)
         
+        x.compute()
+#        hist.compute()
+        width.compute()
+        
+        self.logger.info(x)
+        self.logger.info(hist)
+        self.logger.info(width)
+        self.logger.info(color)
         self.ax.bar(x,
                     hist,
                     width,
