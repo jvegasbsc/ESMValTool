@@ -1010,8 +1010,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         if "histogram" in self.__requested_diags__:
             # histogram plot of available measurements
     
-#            try:
-            for i in [0]:
+            try:
                 # plotting routine
                 filename = self.__plot_dir__ + os.sep + basic_filename + \
                     "_hist_all_vals" + "." + self.__output_type__
@@ -1034,9 +1033,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                          self.diagname,
                          self.authors)
                          
-#            except BaseException:
-#                self.__logger__.error('Something is probably wrong with the ' + 
-#                                      'plotting routines/modules!')
+            except BaseException:
+                self.__logger__.error('Something is probably wrong with the ' + 
+                                      'plotting routines/modules!')
     
         return list_of_plots
     
