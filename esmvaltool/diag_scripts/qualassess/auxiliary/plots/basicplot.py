@@ -299,31 +299,20 @@ class PlotHist(object):
         if (y_label is None):
             y_label = 'frequency'
             
-        vmin = np.min(self.data.core_data())
-        vmax = np.max(self.data.core_data())
+        vmin = np.min(self.data.core_data().compute())
+        vmax = np.max(self.data.core_data().compute())
         rounder = int(np.ceil(-np.log10((vmax - vmin) / 2) + 5))
         vmin = np.floor(vmin * 10**rounder) / 10**rounder
         vmax = np.ceil(vmax * 10**rounder) / 10**rounder
         levels = np.round(np.linspace(vmin, vmax, num=nbins), rounder)
         
-        self.logger.info(self.data.core_data())
-        self.logger.info(self.data.core_data().compute())
         hist, bins = da.histogram(self.data.core_data(), bins=levels, range=[vmin, vmax])
-        self.logger.info(hist)
-        hist = hist/da.sum(hist)
-        self.logger.info(hist)
+        hist = hist.compute()
+        hist = hist/np.sum(hist)
         
         x = 0.5 * (bins[1:] + bins[:-1])
         width = np.diff(bins)
         
-        x.compute()
-#        hist.compute()
-        width.compute()
-        
-        self.logger.info(x)
-        self.logger.info(hist)
-        self.logger.info(width)
-        self.logger.info(color)
         self.ax.bar(x,
                     hist,
                     width,
