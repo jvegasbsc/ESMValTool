@@ -9,11 +9,18 @@ Created on Wed Dec  5 13:59:59 2018
 import iris
 import os
 import sys
+import subprocess
 import matplotlib.pyplot as plt
 import datetime
 import numpy as np
 import xarray
 import cartopy.crs as ccrs
+
+LD_Lib_Path = os.environ.pop("LD_LIBRARY_PATH","")
+with open(os.devnull) as devnull:
+    which_R = subprocess.check_output(["which", "R"], stderr=devnull)
+    which_R = which_R.decode("utf-8").replace("\n","/lib")
+os.environ["LD_LIBRARY_PATH"] = "{}:{}".format(which_R,LD_Lib_Path)
 
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
@@ -91,11 +98,11 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
             ts_cube = iris.util.new_axis(ts_cube, "longitude")
             ts_cube.transpose([2,1,0])
             self.__logger__.info(ts_cube)
-            trend_obj = TrendLims1D("local")
-            trend_obj.initialize_through_realization_of_cube(ts_cube,0,0)
-            trend_obj.resample('Y')
-            trend_obj.do_trends()
-            self.__logger__.info(trend_obj.data_ts)
+#            trend_obj = TrendLims1D("local")
+#            trend_obj.initialize_through_realization_of_cube(ts_cube,0,0)
+#            trend_obj.resample('Y')
+#            trend_obj.do_trends()
+#            self.__logger__.info(trend_obj.data_ts)
             assert False, "development"
         
 #        fig = plt.figure(figsize=(15, 7))
