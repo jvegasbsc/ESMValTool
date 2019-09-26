@@ -10,7 +10,7 @@ documentation:
 
 
 datasets:
-  - {dataset: cds-satellite-lai-fapar, type: sat, project: OBS, mip: Lmon, version: V1, tier: 3, start_year: 2001,  end_year: 2010}
+  - {dataset: cds-satellite-lai-fapar, type: sat, project: OBS, mip: Lmon, version: V1, tier: 3, start_year: 1999,  end_year: 2013}
 #  - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: 1pctCO2-bgc, project: CMIP6, mip: Lmon,  start_year: 1850,  end_year: 1870}#1989}
 #  - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: amip, project: CMIP6, mip: Lmon,  start_year: 1979,  end_year: 2014}
 preprocessors:
