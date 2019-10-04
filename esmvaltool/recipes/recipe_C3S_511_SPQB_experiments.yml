@@ -113,7 +113,7 @@ diagnostics:
 #        order: [diag_tables, diag_MV_mean]
 #        order: [diag_MV_ts, iag_MV_mean, diag_MV_std_dev]
         show_latex: False #options are: True/False/no_latex
-##        
+#        
 
 #diagnostics:
 #  SPQB:

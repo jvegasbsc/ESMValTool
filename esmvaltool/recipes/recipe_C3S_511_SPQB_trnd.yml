@@ -1,0 +1,36 @@
+documentation:
+  description: |
+    Independent assessment of single products for the C3S_511 quality brief - trends
+
+  authors:
+    - muel_bn
+    - hass_bg
+
+  maintainer:
+    - muel_bn
+    - hass_bg
+
+datasets:
+  - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1991,  end_year: 2000}
+#  - {dataset: CDS-ERA5-SNOWDEPTH, type: reanalysis, project: OBS, mip: LImon, version: L3, tier: 3, start_year: 1990,  end_year: 2018}
+#  - {dataset: CDS-XCH4, type: sat, project: OBS, mip: Amon,  version: L3, start_year: 2003,  end_year: 2016}
+preprocessors:
+  noop: {}
+
+diagnostics:
+  SPQB:
+    description: Single product quality brief.
+    variables:
+      ta:
+#      snd:
+#      xch4:
+        preprocessor: noop
+        derive: False
+    scripts:
+      trend_framework:
+        script: qualassess/trnd_C3S_511_SPQB.py
+        levels: [8.50e+04]#,1.00e+02]
+#      diag_T_trend: #worst for memory
+#        script: qualassess/DUMMY_C3S_511_SPQB.py
+#        requests: [lintrend]
+#        levels: [8.50e+04]
