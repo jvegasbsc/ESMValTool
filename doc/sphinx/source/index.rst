@@ -6,17 +6,7 @@
 Preface
 #######
 
-.. toctree::
-   :maxdepth: 2
-
-   preface/index
-   gallery
-   getting_started/index
-   esmvalcore/index
-   esmvaldiag/index
-   recipes/index
-   codedoc2/esmvaltool
-
+.. include:: _sidebar.rst.inc
 
 Indices and tables
 ==================

@@ -85,6 +85,7 @@ doc/sphinx/build
 
 # Build folder
 doc/sphinx/build
+doc/sphinx/source/_sidebar.rst.inc
 doc/sphinx/source/gallery.rst
 
 # Data files
