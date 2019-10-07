@@ -1148,6 +1148,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 long_left_over = [rd for rd in reg_dimensions if rd != d]
 
                 plotcube = utils.dask_weighted_stddev_wrapper(cube,self.map_area_frac,dims=d)
+                plotcube.units = cube.units
                 
                 vminmax = utils.minmax_cubelist([plotcube], [5, 95]) 
                 
@@ -1266,6 +1267,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 fig.set_figheight(1.2 * fig.get_figheight())
                 x.plot(ax=ax,
                        title=["{}%".format(p) for p in percentiles],
+                       dat_log=self.log_data,
                        colors=["skyblue",
                                "blue",
                                "darkorchid",
