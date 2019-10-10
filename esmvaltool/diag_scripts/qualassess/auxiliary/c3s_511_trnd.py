@@ -103,7 +103,7 @@ class trnd_Diagnostic_SP(Basic_Diagnostic_SP):
 #            trend_obj.resample('Y')
 #            trend_obj.do_trends()
 #            self.__logger__.info(trend_obj.data_ts)
-            assert False, "development"
+#            assert False, "development"
         
 #        fig = plt.figure(figsize=(15, 7))
 #        ax = fig.add_subplot(111, projection=ccrs.Robinson())

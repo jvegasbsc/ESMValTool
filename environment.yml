@@ -21,6 +21,7 @@ dependencies:
   - nco
   - statsmodels
   - rpy2
+  - pathos
 
   # Multi language support:
   - python>=3.6
