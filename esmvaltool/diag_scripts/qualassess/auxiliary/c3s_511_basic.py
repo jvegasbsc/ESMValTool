@@ -18,11 +18,14 @@ import string
 import collections
 import csv
 import matplotlib
+import itertools
 #matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import dask
 import xarray
+from multiprocessing import Pool
+import pathos.pools as pp
 #from scipy import stats
 import datetime
 from json import load,dump
@@ -1654,7 +1657,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 
     def __trends_procedures_2D__(self, cube=None, level=None):
 
-        import resource
+#        import resource
         
         if cube is None:
             cube = self.sp_data
@@ -1668,13 +1671,65 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             dataset_id = [self.__dataset_id__[1]]
 
         list_of_plots = []
-
-        xcube = xarray.DataArray.from_iris(cube)
         
-        # basic calculations
-        lintrend,linpvalue = linear_trend(xcube)
-        theilsen_slope = theilsen_trend(xcube)
-        mk_result = mannkendall(xcube)
+        lintrend_list = []
+        linpvalue_list = []
+        theilsen_slope_list = []
+        mk_result_list = []
+        
+        pool_num =  self.__cfg__.pop('num_processors',1)
+        
+        if pool_num > 1:
+            
+            self.__logger__.info("Multiprocessing trends framework with {} parallel processes.".format(pool_num))
+            
+            pool = pp.ProcessPool(pool_num)
+            
+#            pool = Pool(processes=pool_num)
+            
+            def pool_linear_trend(ts_cube):
+                xcube = xarray.DataArray.from_iris(ts_cube)
+                lintrend,linpvalue = linear_trend(xcube)
+                theilsen_slope = theilsen_trend(xcube)
+                mk_result = theilsen_slope.copy()
+#                mk_result = mannkendall(xcube)
+                return {"lintrend":lintrend,
+                        "linpvalue":linpvalue,
+                        "theilsen_slope":theilsen_slope,
+                        "mk_result":mk_result}
+            
+            res = pool.map(pool_linear_trend, cube.slices(['time']))
+            
+            lintrend = [r["lintrend"] for r in res]
+            linpvalue = [r["linpvalue"] for r in res]
+            theilsen_slope = [r["theilsen_slope"] for r in res]
+            mk_result = [r["mk_result"] for r in res]
+            
+            def xarray_reconcatenate(lat_lon_list):
+                sublists = []
+                for _, groups in itertools.groupby(lat_lon_list, lambda x: x.lat):
+                    sublists.append(list(groups))
+               
+                lonagg = [xarray.concat(sl, dim = "lon") for sl in sublists]
+                
+                fullagg = xarray.concat(lonagg, dim = "lat")
+                
+                return fullagg
+            
+            lintrend = xarray_reconcatenate(lintrend)
+            linpvalue = xarray_reconcatenate(linpvalue)
+            theilsen_slope = xarray_reconcatenate(theilsen_slope)
+            mk_result = xarray_reconcatenate(mk_result)
+            xcube = xarray.DataArray.from_iris(cube)
+            
+        else:
+                
+            xcube = xarray.DataArray.from_iris(cube)
+            
+            # basic calculations
+            lintrend,linpvalue = linear_trend(xcube)
+            theilsen_slope = theilsen_trend(xcube)
+            mk_result = mannkendall(xcube)
         
         # prepare cube conversion linear trend
         if (" " in lintrend.name):
@@ -1703,6 +1758,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         if (" " in mk_result.name):
             mk_result.name = mk_result.name.strip(" ")[0]
         mk_result.attrs.update({'standard_name': None})
+        #### DELETE ####
+        mk_result.attrs['units'] = mk_result.attrs['units'].replace("per timestep", "/ ({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        #### DELETE ####
         mk_result.attrs.update({'long_name': "Sign of Significant Trend of {}".format(xcube.attrs["long_name"])})
         mk_result.attrs.update({'cell_methods': 'time: mankendall'})
         
@@ -1735,6 +1793,11 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             if not c.coord('longitude').has_bounds():
                 c.coord('longitude').guess_bounds()
         
+        self.__logger__.info(lintrend_cube)
+        self.__logger__.info(linpvalue_cube)
+        self.__logger__.info(theilsen_slope_cube)
+        self.__logger__.info(mk_result_cube)
+
         try:
             
             vminmax_ts = np.array([-1, 1]) * np.max(np.abs(

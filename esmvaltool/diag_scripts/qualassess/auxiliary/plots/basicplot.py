@@ -974,7 +974,7 @@ class Plot2D(object):
             plt.colorbar(pcm,
                 cax=cax,
                 orientation='horizontal',
-                fraction=1.,
+#                fraction=1.,
                 extend=ext_cmap,
                 boundaries=levels)
         cax.set_xlabel((list(set(self.names))[0] if list(
