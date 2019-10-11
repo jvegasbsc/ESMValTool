@@ -1691,7 +1691,8 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 xcube = xarray.DataArray.from_iris(ts_cube)
                 lintrend,linpvalue = linear_trend(xcube)
                 theilsen_slope = theilsen_trend(xcube)
-                mk_result = mannkendall(xcube)
+                mk_result = theilsen_slope.copy()
+#                mk_result = mannkendall(xcube)
                 return {"lintrend":lintrend,
                         "linpvalue":linpvalue,
                         "theilsen_slope":theilsen_slope,
@@ -1757,6 +1758,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         if (" " in mk_result.name):
             mk_result.name = mk_result.name.strip(" ")[0]
         mk_result.attrs.update({'standard_name': None})
+        #### DELETE ####
+        mk_result.attrs['units'] = mk_result.attrs['units'].replace("per timestep", "/ ({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        #### DELETE ####
         mk_result.attrs.update({'long_name': "Sign of Significant Trend of {}".format(xcube.attrs["long_name"])})
         mk_result.attrs.update({'cell_methods': 'time: mankendall'})
         
