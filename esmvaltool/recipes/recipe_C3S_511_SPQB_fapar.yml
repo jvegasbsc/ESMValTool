@@ -17,7 +17,7 @@ preprocessors:
   noop: {}
   regrid_ex:
     regrid:
-      target_grid: 20x20
+      target_grid: 0.2x0.2
       scheme: nearest
 
 diagnostics:
@@ -64,6 +64,7 @@ diagnostics:
       diag_fapar_T_trend: #worst for memory
         script: qualassess/fapar_C3S_511_SPQB.py
         requests: [lintrend]
+        num_processors: 7
 #      diag_fapar_custom:
 #        script: qualassess/fapar_C3S_511_SPQB.py
 #        requests: [custom]
