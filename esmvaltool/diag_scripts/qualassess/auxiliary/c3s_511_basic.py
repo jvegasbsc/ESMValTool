@@ -1672,11 +1672,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 
         list_of_plots = []
         
-        lintrend_list = []
-        linpvalue_list = []
-        theilsen_slope_list = []
-        mk_result_list = []
-        
         pool_num =  self.__cfg__.pop('num_processors',1)
         
         if pool_num > 1:
@@ -1691,19 +1686,16 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 xcube = xarray.DataArray.from_iris(ts_cube)
                 lintrend,linpvalue = linear_trend(xcube)
                 theilsen_slope = theilsen_trend(xcube)
-                mk_result = theilsen_slope.copy()
-#                mk_result = mannkendall(xcube)
                 return {"lintrend":lintrend,
                         "linpvalue":linpvalue,
                         "theilsen_slope":theilsen_slope,
-                        "mk_result":mk_result}
+                        }
             
             res = pool.map(pool_linear_trend, cube.slices(['time']))
             
             lintrend = [r["lintrend"] for r in res]
             linpvalue = [r["linpvalue"] for r in res]
             theilsen_slope = [r["theilsen_slope"] for r in res]
-            mk_result = [r["mk_result"] for r in res]
             
             def xarray_reconcatenate(lat_lon_list):
                 sublists = []
@@ -1719,7 +1711,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             lintrend = xarray_reconcatenate(lintrend)
             linpvalue = xarray_reconcatenate(linpvalue)
             theilsen_slope = xarray_reconcatenate(theilsen_slope)
-            mk_result = xarray_reconcatenate(mk_result)
             xcube = xarray.DataArray.from_iris(cube)
             
         else:
@@ -1729,7 +1720,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             # basic calculations
             lintrend,linpvalue = linear_trend(xcube)
             theilsen_slope = theilsen_trend(xcube)
-            mk_result = mannkendall(xcube)
         
         # prepare cube conversion linear trend
         if (" " in lintrend.name):
@@ -1754,16 +1744,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         theilsen_slope.attrs.update({'long_name': "Linear Trend of {}".format(xcube.attrs["long_name"])})
         theilsen_slope.attrs.update({'cell_methods': 'time: Theil-Sen trend (pvalue)'})
         
-        # prepare cube conversion mankendall
-        if (" " in mk_result.name):
-            mk_result.name = mk_result.name.strip(" ")[0]
-        mk_result.attrs.update({'standard_name': None})
-        #### DELETE ####
-        mk_result.attrs['units'] = mk_result.attrs['units'].replace("per timestep", "/ ({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
-        #### DELETE ####
-        mk_result.attrs.update({'long_name': "Sign of Significant Trend of {}".format(xcube.attrs["long_name"])})
-        mk_result.attrs.update({'cell_methods': 'time: mankendall'})
-        
         # adjust attributes
         for key,val in xcube.attrs.items():
             if key not in lintrend.attrs.keys():
@@ -1772,8 +1752,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 linpvalue.attrs.update({key: val})
             if key not in theilsen_slope.attrs.keys():
                 theilsen_slope.attrs.update({key: val})
-            if key not in mk_result.attrs.keys():
-                mk_result.attrs.update({key: val})
                 
         #conversions to cubes
         lintrend_cube = lintrend.to_iris()
@@ -1784,10 +1762,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         theilsen_slope_cube = theilsen_slope.to_iris()
         theilsen_slope_cube.convert_units('{} / (10 years)'.format(cube.units))
         
-        mk_result_cube = mk_result.to_iris()
-        
-        
-        for c in [lintrend_cube, linpvalue_cube, theilsen_slope_cube, mk_result_cube]:
+        for c in [lintrend_cube, linpvalue_cube, theilsen_slope_cube]:
             if not c.coord('latitude').has_bounds():
                 c.coord('latitude').guess_bounds()
             if not c.coord('longitude').has_bounds():
@@ -1796,7 +1771,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         self.__logger__.info(lintrend_cube)
         self.__logger__.info(linpvalue_cube)
         self.__logger__.info(theilsen_slope_cube)
-        self.__logger__.info(mk_result_cube)
 
         try:
             
@@ -1874,38 +1848,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
 
-            x = Plot2D(mk_result_cube)
-
-            filename = self.__plot_dir__ + os.sep + \
-                basic_filename + "_signtrend." + self.__output_type__
-            list_of_plots.append(filename)
-
-            fig = plt.figure()
-            (fig, ax, _) = plot_setup(fig=fig)
-            x.plot(ax=ax,
-                   color=self.colormaps,
-                   color_type="Diverging",
-                   vminmax=[-1.,1.],
-                   title=" ".join([self.__dataset_id__[indx] for 
-                                   indx in [0, 2, 1, 3]]) + " (" + 
-                     self.__time_period__ + ")")
-            fig.savefig(filename)
-            plt.close(fig.number)
-
-            ESMValMD("meta",
-                     filename,
-                     self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + 
-                         ' significant slope signs (Mankendall) of ' +
-                         ecv_lookup(self.__varname__) +
-                         ' temporal trends per decade for the data set ' +
-                         " ".join(dataset_id) + ' (' + self.__time_period__ +
-                         ')'),
-                     '#C3S' + 'temptrend' + self.__varname__,
-                     self.__infile__,
-                     self.diagname,
-                     self.authors)
-
             x = Plot2D(linpvalue_cube)
 
             filename = self.__plot_dir__ + os.sep + \
@@ -1973,7 +1915,6 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 
         del lintrend_cube
         del linpvalue_cube
-        del mk_result_cube
         del theilsen_slope
 
         return list_of_plots
