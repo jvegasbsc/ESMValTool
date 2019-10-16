@@ -8,6 +8,7 @@ matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 #from matplotlib.ticker import LogFormatterMathtext
+from matplotlib.ticker import StrMethodFormatter
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
@@ -971,12 +972,14 @@ class Plot2D(object):
             cbar.ax.set_xticklabels([('{:.'+str(2)+'g}').format(x) for x in ticks])
 #            pass
         else:
-            plt.colorbar(pcm,
+            cbar = plt.colorbar(pcm,
                 cax=cax,
                 orientation='horizontal',
 #                fraction=1.,
                 extend=ext_cmap,
-                boundaries=levels)
+                boundaries=levels,
+                format='%.4g'
+                               )
         cax.set_xlabel((list(set(self.names))[0] if list(
             set(self.names))[0] else "") + list(set(self.units))[0])
 
