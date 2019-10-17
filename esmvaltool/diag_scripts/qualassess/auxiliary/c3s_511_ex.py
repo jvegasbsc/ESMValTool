@@ -4,6 +4,11 @@
 Created on Wed Dec  5 13:59:59 2018
 
 @authors: bmueller, bcrezee
+
+Caveat: 
+
+  - does not work yet on events that are symmetric in lat/lon (can not safely broadcast ERROR will be raised)
+
 """
 
 import pandas as pd
@@ -367,7 +372,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         
         for dat in ["severity", "magnitude", "duration"]:
             loc_list = []
-            for reg,m in extremes_measures.items():
+            for reg, m in extremes_measures.items():
                 loc_list.append(np.nanpercentile(m[dat].data.compressed(),[5, 95]))
             allmin = np.nanmin([np.nanmin(loc_el) for loc_el in loc_list])
             allmax = np.nanmax([np.nanmax(loc_el) for loc_el in loc_list])
