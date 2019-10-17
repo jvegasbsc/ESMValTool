@@ -102,6 +102,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         num_processors = self.__extremes__["multiprocessing"]
         
         # set up multiprocessing
+        num_processors = 5
         if num_processors>1:
             # setting up a pool
             # TODO make sure that this is machine compatiple (or leave it to the user)
@@ -173,7 +174,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             # Now loop over each gridpoint in the selected region
             counter_gridpoints = 1
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
-
+            clim_cube.data
+            self.__logger__.info("Data has been read into memory")
             if num_processors>1:
                 self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
@@ -203,7 +205,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                 for ii in range(event_cube.shape[1]):
                     for jj in range(event_cube.shape[2]):
                         # Convert this gridpoint to a pandas timeseries object
+                        print('a')
                         gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
+                        print('b')
                         for n,doy in enumerate(event_cube.coord('day_of_year').points):
                             tmin = (doy - window_size) % 366
                             tmax = (doy + window_size) % 366
@@ -225,6 +229,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                             else:
                                 perc_val = np.nan
                             ex_cube.data[n,ii,jj] = perc_val
+                        print('c')
                         self.__logger__.info("Progress of xclim: %s percent",\
                                              np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
                         counter_gridpoints += 1
@@ -354,14 +359,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     }
                     )
             
-            # TODO: delete as no need i for logging if output is written
-#            # set up table
-#            self.__logger__.info("Extremes table")
-#            self.__logger__.info("mean severity: {:.2f} {}".format(severity_av.data, severity_av.units))
-#            self.__logger__.info("mean magnitude: {:.2f} {}".format(magnitude_av.data, magnitude_av.units))
-#            self.__logger__.info("mean duration: {:.2f} {}".format(duration_av.data, duration_av.units))
-#            self.__logger__.info("extent: {:.2f} {}".format(extent.data, extent.units))
-
             # Add metrics to pd dataframe
             df_metrics.loc[r] = pd.Series({'severity': severity_av.data, 'magnitude':magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
 
@@ -378,7 +375,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             allmax = np.nanmax([np.nanmax(loc_el) for loc_el in loc_list])
             common_minmax.update({dat:[allmin,allmax]})
             
-        for r,m in extremes_measures.items():  
+        for r,m in extremes_measures.items():
             # plotting maps
             for dat in ["severity", "magnitude", "duration"]:
                 #TODO add event_mask_2d to the plots.
