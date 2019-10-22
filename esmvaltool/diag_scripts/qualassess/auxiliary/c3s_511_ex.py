@@ -31,6 +31,8 @@ from .plots.basicplot import Plot2D, Plot2D_blank, plot_setup
     
 from multiprocessing import Pool
 import itertools as it
+import esmvalcore.preprocessor as pp
+
 
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
@@ -57,6 +59,15 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         
         # Initialize extremes regions as empty
         self.__extremes_regions__ = dict()
+
+    def _extremes_preprocessing(self, cube):
+        regridres = '1x1'
+        self.__logger__.info('Calculating daily means')
+        cube = pp.daily_statistics(cube)
+        self.__logger__.info('Regridding to %s',regridres)
+        cube = pp.regrid(cube,regridres, scheme='area_weighted')
+        return cube
+
 
     def run_diagnostic(self):
 #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
@@ -166,6 +177,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             spatial_def = def_r.copy()
             spatial_def.pop("time")
             clim_cube = self.__spatiotemp_subsets__(cube,{r:spatial_def})[r]
+
+            # Now apply common preprocessing steps to get to daily data at 1x1 degree resolution
+            clim_cube = self._extremes_preprocessing(clim_cube)
+            event_cube = self._extremes_preprocessing(event_cube)
 
             # The ex cube is created here, and used later for saving the extreme
             # climatology, it has the same shape as the event_cube
