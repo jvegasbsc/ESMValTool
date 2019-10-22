@@ -621,6 +621,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 fileinfo["version"],
                 fileinfo["short_name"]]
 
+        #quickfix @BEN: change somewhere else
+        # version for my dataset is 1 --> this gets as integer type
+        self.__dataset_id__ = [str(el) for el in self.__dataset_id__]
         self.__basic_filename__ = "_".join(
             self.__dataset_id__ + [self.__time_period__])
 
