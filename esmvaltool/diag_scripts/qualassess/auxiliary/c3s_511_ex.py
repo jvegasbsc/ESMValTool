@@ -22,6 +22,7 @@ import matplotlib.gridspec as gridspec
 import datetime
 import numpy as np
 import cf_units
+from sharedutils import parallel_apply_along_axis
 
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
@@ -33,7 +34,63 @@ from multiprocessing import Pool
 import itertools as it
 import esmvalcore.preprocessor as pp
 
+def get_doy_mask(cube, doy_range, window_size):
+    sample = cube[:,0,0]
+    try:
+        iris.coord_categorisation.add_day_of_year(sample, 'time', name='day_of_year')
+    except ValueError:
+        pass
+    doys = sample.coord('day_of_year').points
+    
+    half_window = (window_size - 1) / 2
+    
+    doymask = np.empty((len(doy_range),)+doys.shape,dtype=bool)
+    
+    for n,doy in enumerate(doy_range):
+        tmin = (doy - half_window) % 366
+        tmax = (doy + half_window) % 366
+        if not tmin:
+            tmin = 366
+        if not tmax:
+            tmax = 366
+        if tmin <= tmax:
+            doy_window = (tmin <= doys) &\
+                         (doys <= tmax)
+        else:
+            doy_window = (tmin <= doys) |\
+                         (doys <= tmax)
+        doymask[n,:] = doy_window
+    return doymask
 
+#doymask = get_doy_mask(cube) # shape (366, ntimesteps)
+
+def get_xclim(cube, percentile, doy_range, window_size=11):
+    print("Getting mask for day of year")
+    doymask = get_doy_mask(cube, doy_range, window_size) # shape (366, ntimesteps)
+    #IPython.embed()
+    result = np.empty(doymask.shape[:1] + cube.shape[1:])
+    print(result.shape)
+    for n,doy in enumerate(doy_range):
+        print("Reading data into memory for day-of-year {0}".format(doy))
+        doy_data = cube[doymask[n, :], :, :].data.filled(np.nan)
+        print("Calculating clim...")
+        result[n,:,:] = parallel_apply_along_axis(np.nanpercentile, 0, doy_data, percentile)
+    return result
+
+def subtract_xclim(cube, percentile=90, refcube=None):
+    if not refcube:
+        cube = refcube
+    try:
+        iris.coord_categorisation.add_day_of_year(cube, 'time', name='day_of_year')
+    except ValueError:
+        pass
+    xclim_array = get_xclim(cube, percentile, cube.coord('day_of_year').points)
+    # Now repeat
+    if percentile >= 50:
+        cube.data = cube.data - np.ma.masked_invalid(xclim_array)
+    elif percentile < 50:
+        cube.data = np.ma.masked_invalid(xclim_array) - cube.data
+    return cube
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     """
@@ -63,9 +120,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     def _extremes_preprocessing(self, cube):
         regridres = '1x1'
         self.__logger__.info('Calculating daily means')
-        cube = pp.daily_statistics(cube)
+        #cube = pp.daily_statistics(cube)
         self.__logger__.info('Regridding to %s',regridres)
-        cube = pp.regrid(cube,regridres, scheme='area_weighted')
+        #cube = pp.regrid(cube,regridres, scheme='area_weighted')
         return cube
 
 
@@ -111,14 +168,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         window_size = self.__extremes__["window_size"]
         extreme_events = self.__extremes__["extreme_events"]
         num_processors = self.__extremes__["multiprocessing"]
-        
-        # set up multiprocessing
-        num_processors = 5
-        if num_processors>1:
-            # setting up a pool
-            # TODO make sure that this is machine compatiple (or leave it to the user)
-            pool = Pool(processes = num_processors)
-        
+                
         self.__logger__.info("Reading extreme event table")
         ex_table,raw_table = read_extreme_event_catalogue()
         self.__logger__.info("Finished parsing extreme event table")
@@ -142,16 +192,10 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                                                       single_event['Time_stop'].to_pydatetime())
                 # self.__extremes_regions__ provides the regions for the events given in the recipe as a dictionary (read from respective catalogue)
                 self.__extremes_regions__.update({extreme_event_id : single_event_as_region})
-
             except KeyError:
                 self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
                 raise
-                
-        # we assume that the read in regions fully cover the event in space and time (TODO: build in a check for this)
-        # TODO: still needed?
-                
-#        self.__extremes_regions__ = self.__regions__
-        
+                        
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
 
@@ -191,77 +235,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
             clim_cube.data
             self.__logger__.info("Data has been read into memory")
-            if num_processors>1:
-                self.__logger__.info("Start multi process calculation of extreme climatology " +
+            self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
-                
-                # get an iterator for the the positions
-                positions = list(it.product(range(event_cube.shape[1]), range(event_cube.shape[2])))
-                # Now loop in a processor distributed manner over the positions in the data
-                # returns ex_list as percentile values with the number in the timeseries
-                ex_list = pool.starmap(extremes_1D, 
-                                            zip(positions,
-                                                it.repeat(event_cube),
-                                                it.repeat(clim_cube),
-                                                it.repeat(ex_cube),
-                                                it.repeat(window_size),
-                                                it.repeat(which_percentile),
-                                                it.repeat(min_measurements),
-                                                )
-                                        )
-                # map the positions and the results back to the cube
-                extremes_1d_redistribute(ex_cube,
-                                         ex_list,
-                                         positions)
-            else:
-                self.__logger__.info("Start single process calculation of extreme climatology " +
-                                     "for %s gridpoints without multiprocessing",n_gridpoints)
-                # Now loop over the data
-                for ii in range(event_cube.shape[1]):
-                    for jj in range(event_cube.shape[2]):
-                        # Convert this gridpoint to a pandas timeseries object
-                        print('a')
-                        gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
-                        print('b')
-                        for n,doy in enumerate(event_cube.coord('day_of_year').points):
-                            tmin = (doy - window_size) % 366
-                            tmax = (doy + window_size) % 366
-                            if not tmin:
-                                tmin = 366
-                            if not tmax:
-                                tmax = 366
-                            if tmin <= tmax:
-                                doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
-                                             (gridpoint_ts.index.dayofyear <= tmax)
-                            else:
-                                doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
-                                             (gridpoint_ts.index.dayofyear <= tmax)
-                            # Extract the right data points
-                            gridpoint_sample = gridpoint_ts[doy_window]
-                            # Check if there are enough valid measurements in the sample
-                            if np.isfinite(gridpoint_sample).sum() > min_measurements:
-                                perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
-                            else:
-                                perc_val = np.nan
-                            ex_cube.data[n,ii,jj] = perc_val
-                        print('c')
-                        self.__logger__.info("Progress of xclim: %s percent",\
-                                             np.round(100.*(counter_gridpoints/n_gridpoints),decimals=1))
-                        counter_gridpoints += 1
-
-            #TODO think about propagation of nan values
-            ex_cube.data = np.ma.masked_equal(ex_cube.core_data(), np.nan)
-            
+            # Now loop over the data
+            # Convert this gridpoint to a pandas timeseries object
+            amplitude = subtract_xclim(event_cube, percentile=10, ref_cube=clim_cube)
             self.__logger__.info("Finished calculation of extreme climatology")
 
-            # Calculate exceedance of the extremes climatology
-            if which_percentile > 50: # we are interested in over threshold values
-                amplitude = event_cube - ex_cube
-            elif which_percentile < 50: # we are interested in under threshold values
-                amplitude = ex_cube - event_cube
-            else:
-                self.__logger__.error("Percentile can not be 50, that wouldn't be an extreme climatology")
-                raise ValueError
             # Note that due to the above check, amplitude values of the event are always positive
             # therefore mask negative values
             amplitude.data = np.ma.masked_where(amplitude.core_data() <= 0, amplitude.core_data(), copy = True)
