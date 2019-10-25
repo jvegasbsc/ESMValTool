@@ -35,6 +35,8 @@ import itertools as it
 import esmvalcore.preprocessor as pp
 
 def get_doy_mask(cube, doy_range, window_size):
+    if window_size%2==0:
+        raise ValueError("Window size should be an uneven number")
     sample = cube[:,0,0]
     try:
         iris.coord_categorisation.add_day_of_year(sample, 'time', name='day_of_year')
@@ -63,7 +65,7 @@ def get_doy_mask(cube, doy_range, window_size):
     return doymask
 
 
-def get_xclim(cube, percentile, doy_range, window_size=11):
+def get_xclim(cube, percentile, doy_range, window_size=None):
     print("Getting mask for day of year")
     doymask = get_doy_mask(cube, doy_range, window_size) # shape (len(doy_range), ntimesteps)
     result = np.empty(doymask.shape[:1] + cube.shape[1:])
@@ -75,7 +77,8 @@ def get_xclim(cube, percentile, doy_range, window_size=11):
         result[n,:,:] = parallel_apply_along_axis(np.nanpercentile, 0, doy_data, percentile)
     return result
 
-def subtract_xclim(cube, percentile=90, refcube=None):
+
+def subtract_xclim(cube, percentile=None, refcube=None):
     if not refcube:
         cube = refcube
     try:
@@ -89,6 +92,7 @@ def subtract_xclim(cube, percentile=90, refcube=None):
     elif percentile < 50:
         cube.data = np.ma.masked_invalid(xclim_array) - cube.data
     return cube
+
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     """
@@ -235,9 +239,9 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("Data has been read into memory")
             self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
-            # Now subtract the xclim
+            # Now calculate the xclim from clim_cube and subtract it from the event_cube.
             amplitude = subtract_xclim(event_cube, percentile=which_percentile, refcube=clim_cube)
-            self.__logger__.info("Finished calculation of extreme climatology")
+            self.__logger__.info("Finished calculating amplitude")
 
             # Note that due to the above check, amplitude values of the event are always positive
             # therefore mask negative values
@@ -562,50 +566,3 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.reporting_structure.update(
                     {"Extremes": 
                         {"plots": list_of_plots}})
-    
-
-
-
-def extremes_1D(ind, event_cube,  clim_cube, ex_cube, window_size, which_percentile, min_measurements):
-    ii = ind[0]
-    jj = ind[1]
-    # Convert this gridpoint to a pandas timeseries object
-    gridpoint_ts = ipd.as_series(clim_cube[:,ii,jj])
-    # Get the doys that need to be processed
-    perc_val_ts = []
-    for n,doy in enumerate(event_cube.coord('day_of_year').points):
-        tmin = (doy - window_size) % 366
-        tmax = (doy + window_size) % 366
-        if not tmin:
-            tmin = 366
-        if not tmax:
-            tmax = 366
-        if tmin <= tmax:
-            doy_window = (tmin <= gridpoint_ts.index.dayofyear) &\
-                         (gridpoint_ts.index.dayofyear <= tmax)
-        else:
-            doy_window = (tmin <= gridpoint_ts.index.dayofyear) |\
-                         (gridpoint_ts.index.dayofyear <= tmax)
-        # Extract the right data points
-        gridpoint_sample = gridpoint_ts[doy_window]
-        # Check if there are enough valid measurements in the sample
-        if np.isfinite(gridpoint_sample).sum() > min_measurements:
-            perc_val = np.nanpercentile(gridpoint_ts[doy_window],which_percentile)
-        else:
-            perc_val = np.nan
-        
-        # convert the individual values to a list of tuples 
-        # providing percentiles and number in the time series
-        perc_val_ts.append((perc_val,n))
-        
-    return perc_val_ts
-
-def extremes_1d_redistribute(ex_cube, extrems_1D, positions):
-    # puts back the data into the specific coordinates
-    for ind,(ii,jj) in enumerate(positions):
-        for perc_val, n in extrems_1D[ind]:
-            ex_cube.data[n,ii,jj] = perc_val
-    return
-
-    
-    
