@@ -62,16 +62,14 @@ def get_doy_mask(cube, doy_range, window_size):
         doymask[n,:] = doy_window
     return doymask
 
-#doymask = get_doy_mask(cube) # shape (366, ntimesteps)
 
 def get_xclim(cube, percentile, doy_range, window_size=11):
     print("Getting mask for day of year")
-    doymask = get_doy_mask(cube, doy_range, window_size) # shape (366, ntimesteps)
-    #IPython.embed()
+    doymask = get_doy_mask(cube, doy_range, window_size) # shape (len(doy_range), ntimesteps)
     result = np.empty(doymask.shape[:1] + cube.shape[1:])
     print(result.shape)
     for n,doy in enumerate(doy_range):
-        print("Reading data into memory for day-of-year {0}".format(doy))
+        print("Reading data into memory for window around day-of-year {0}".format(doy))
         doy_data = cube[doymask[n, :], :, :].data.filled(np.nan)
         print("Calculating clim...")
         result[n,:,:] = parallel_apply_along_axis(np.nanpercentile, 0, doy_data, percentile)
@@ -195,7 +193,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             except KeyError:
                 self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format('\n'.join(list(ex_table.index.values))))
                 raise
-                        
+
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=['severity','magnitude','duration','extent'],index=self.__regions__.keys(),dtype=float)
 
@@ -237,9 +235,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("Data has been read into memory")
             self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
-            # Now loop over the data
-            # Convert this gridpoint to a pandas timeseries object
-            amplitude = subtract_xclim(event_cube, percentile=10, ref_cube=clim_cube)
+            # Now subtract the xclim
+            amplitude = subtract_xclim(event_cube, percentile=which_percentile, refcube=clim_cube)
             self.__logger__.info("Finished calculation of extreme climatology")
 
             # Note that due to the above check, amplitude values of the event are always positive
