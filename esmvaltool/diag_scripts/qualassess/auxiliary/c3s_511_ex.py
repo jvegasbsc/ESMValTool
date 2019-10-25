@@ -169,7 +169,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         which_percentile = self.__extremes__["which_percentile"]
         window_size = self.__extremes__["window_size"]
         extreme_events = self.__extremes__["extreme_events"]
-        num_processors = self.__extremes__["multiprocessing"]
                 
         self.__logger__.info("Reading extreme event table")
         ex_table,raw_table = read_extreme_event_catalogue()
@@ -545,11 +544,6 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         with open(savename_html,mode='w+') as handle:
             handle.write(html_metrics)
             
-        # end multiprocessing
-        if num_processors>1:
-        # closing the pool
-            pool.close()
-
         # produce report
         expected_input, found = \
             self.__file_anouncement__(subdir="c3s_511/single_extremes_input",
