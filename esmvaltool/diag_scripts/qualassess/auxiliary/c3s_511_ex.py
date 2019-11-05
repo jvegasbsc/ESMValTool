@@ -30,7 +30,6 @@ from .libs.predef.ecv_lookup_table import ecv_lookup
 from .libs.c3s_511_util import read_extreme_event_catalogue
 from .plots.basicplot import Plot2D, Plot2D_blank, plot_setup
 
-from multiprocessing import Pool
 import itertools as it
 import esmvalcore.preprocessor as pp
 
@@ -100,6 +99,23 @@ def subtract_xclim(cube, percentile=None, refcube=None, window_size=None):
         cube.data = np.ma.masked_invalid(xclim_array) - cube.data
     return cube
 
+def write_table_to_yaml(ex_table):
+    name_mapping = {
+        'Lat_from': 'start_latitude',
+        'Lat_to': 'end_latitude',
+        'Lon_from': 'start_longitude',
+        'Lon_to': 'end_longitude',
+    }
+    ex_table = ex_table.rename(columns=name_mapping)
+    preprocessor_instructions = ex_table[name_mapping.values()]
+    preprocessor_instructions = preprocessor_instructions.to_dict('index')
+    for key in preprocessor_instructions:
+        preprocessor_instructions[key] = {'extract_region' : preprocessor_instructions[key]}
+    filepath = os.path.join(self.__cfg__['work_dir'],'extreme_events.yaml')
+    with open(filepath, 'w') as handle:
+       self.__logger__.info(f"Writing to disk: {filepath}")
+       yaml.safe_dump(preprocessor_instructions, handle)
+
 
 class ex_Diagnostic_SP(Basic_Diagnostic_SP):
     """
@@ -110,32 +126,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
         super(ex_Diagnostic_SP, self).set_info(**kwargs)
 
-        # add a region to the regions object
-
-        # all required input can be extracted from the extremes dictionary
-#        self.__logger__.info(self.__extremes__)
-
-#        self.__regions__.update({
-#            'Europe_1999': {
-#                'latitude': (30, 75),
-#                'longitude': (-10, 35),
-#                'time': (datetime.datetime(1999, 5, 1),
-#                         datetime.datetime(1999, 9, 30)
-#                         )}})  # default region
-
-        # Initialize extremes regions as empty
-        self.__extremes_regions__ = dict()
-
-    def _extremes_preprocessing(self, cube):
-        regridres = '1x1'
-        self.__logger__.info('Calculating daily means')
-        #cube = pp.daily_statistics(cube)
-        self.__logger__.info('Regridding to %s', regridres)
-        #cube = pp.regrid(cube,regridres, scheme='area_weighted')
-        return cube
-
     def run_diagnostic(self):
-        #        self.sp_data = self.__spatiotemp_subsets__(self.sp_data)['Europe_2000']
         self.__do_extremes__()
 
         self.__do_full_report__()
@@ -171,215 +162,181 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # end of standard handling
 
         # Read settings from recipe
-        # self.__extremes__ provides the information given in the recipe as a dictionary
         min_measurements = self.__cfg__["minimal_number_measurements"]
         which_percentile = self.__cfg__["which_percentile"]
         window_size = self.__cfg__["window_size"]
-        extreme_events = self.__cfg__["extreme_events"]
+        # Read the eventname from the preprocessor name
+        eventname = self.__cfg__['input_data'][next(iter(self.__cfg__['input_data']))]['preprocessor']
 
         self.__logger__.info("Reading extreme event table")
         ex_table, raw_table = read_extreme_event_catalogue()
         self.__logger__.info("Finished parsing extreme event table")
 
-        # Loop through the events
-        self.__logger__.info("Adding selected events to list for processing: ")
-        # Now start adding the events to the dictionary for further processing
-        for extreme_event_id in extreme_events:
-            self.__logger__.info(f"{extreme_event_id}")
-            try:
-                single_event = ex_table.loc[extreme_event_id].to_dict()
-                # Now prepare dictionary to be added to regions
-                single_event_as_region = {}
-                single_event_as_region['latitude'] = (single_event['Lat_from'],
-                                                      single_event['Lat_to'])
-                single_event_as_region['longitude'] = (single_event['Lon_from'],
-                                                       single_event['Lon_to'])
-                single_event_as_region['time'] = (single_event['Time_start'].to_pydatetime(),
-                                                  single_event['Time_stop'].to_pydatetime())
-                # self.__extremes_regions__ provides the regions for the events given in the recipe as a dictionary (read from respective catalogue)
-                self.__extremes_regions__.update(
-                    {extreme_event_id: single_event_as_region})
-            except KeyError:
-                self.__logger__.error("Entry not found in catalogue. Please check spelling of input. These are the available entries: \n{0}".format(
-                    '\n'.join(list(ex_table.index.values))))
-                raise
-
-        import IPython
-        IPython.embed()
-
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=[
-                                  'severity', 'magnitude', 'duration', 'extent'], index=self.__regions__.keys(), dtype=float)
+                                  'severity', 'magnitude', 'duration', 'extent'], index=[eventname], dtype=float)
 
         # initialize a dict for the multiple data sets from regions
         extremes_measures = {}
 
-        # Loop over the different regions (i.e. the different events)
-        for r, def_r in self.__extremes_regions__.items():
-            self.__logger__.info("Handling event {}".format(r))
-            # Now define the three cubes. Note that now they are really cubes,
-            # not dictionaries that contain cubes.
 
-            # The event cube spans the event in space and time
-            try:
-                event_cube = self.__spatiotemp_subsets__(cube, {r: def_r})[r]
-            except ValueError:
-                self.__logger__.warning("The following extreme event was not \
-                                        found in this dataset: {0}".format(r))
-                continue
+        # The event cube spans the event in space and time
+        # Retrieve eventname from preprocessor name
+        
+        tstart = ex_table.loc[eventname]['Time_start']
+        tend = ex_table.loc[eventname]['Time_stop']
+        event_cube = pp.extract_time(cube, tstart.year, tstart.month, tstart.day,
+                                     tend.year, tend.month, tend.day)
 
-            # The clim cube spans the event in space, with the time
-            # spanning all available timesteps in the dataset
-            spatial_def = def_r.copy()
-            spatial_def.pop("time")
-            clim_cube = self.__spatiotemp_subsets__(cube, {r: spatial_def})[r]
+            
+        # The clim cube spans the event in space, with the time
+        # spanning all available timesteps in the dataset
+        clim_cube = cube
 
-            # Now apply common preprocessing steps to get to daily data at 1x1 degree resolution
-            clim_cube = self._extremes_preprocessing(clim_cube)
-            event_cube = self._extremes_preprocessing(event_cube)
+        # Now apply common preprocessing steps to get to daily data at 1x1 degree resolution
+#        clim_cube = self._extremes_preprocessing(clim_cube)
+#        event_cube = self._extremes_preprocessing(event_cube)
 
-            # The ex cube is created here, and used later for saving the extreme
-            # climatology, it has the same shape as the event_cube
-            ex_cube = event_cube.copy()
+        # The ex cube is created here, and used later for saving the extreme
+        # climatology, it has the same shape as the event_cube
+        ex_cube = event_cube.copy()
 
-            # Now loop over each gridpoint in the selected region
-            counter_gridpoints = 1
-            n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
-            clim_cube.data
-            self.__logger__.info("Data has been read into memory")
-            self.__logger__.info("Start multi process calculation of extreme climatology " \
-                                 f"for {n_gridpoints} gridpoints using multiprocessing")
-            # Now calculate the xclim from clim_cube and subtract it from the event_cube.
-            amplitude = subtract_xclim(
-                event_cube, percentile=which_percentile, refcube=clim_cube, window_size=window_size)
-            self.__logger__.info("Finished calculating amplitude")
+        # Now loop over each gridpoint in the selected region
+        counter_gridpoints = 1
+        n_gridpoints = event_cube.shape[1]*event_cube.shape[2]
+        clim_cube.data
+        self.__logger__.info("Data has been read into memory")
+        self.__logger__.info("Start multi process calculation of extreme climatology " \
+                             f"for {n_gridpoints} gridpoints using multiprocessing")
 
-            # Note that due to the above check, amplitude values of the event are always positive
-            # therefore mask negative values
-            amplitude.data = np.ma.masked_where(
-                amplitude.core_data() <= 0, amplitude.core_data(), copy=True)
-            # Set long name
-            amplitude.long_name = 'Amplitude of '+event_cube.long_name
+        # Now calculate the xclim from clim_cube and subtract it from the event_cube.
+        amplitude = subtract_xclim(
+            event_cube, percentile=which_percentile, refcube=clim_cube, window_size=window_size)
+        self.__logger__.info("Finished calculating amplitude")
 
-            # The below check assures that the dimensions differ in size, otherwise
-            # broadcasting in np.atleast_3d could fail and produce erroneous
-            # results without notice
-            # TODO fix the below
-            try:
-                assert(sorted(list(set(amplitude.shape)))
-                       == sorted(list(amplitude.shape)))
-            except AssertionError:
-                self.__logger__.error("Can not safely broadcast, since not all dimensions \
-                                       of cube differ in size. Therefore skipping this event.")
-                continue
+        # Note that due to the above check, amplitude values of the event are always positive
+        # therefore mask negative values
+        amplitude.data = np.ma.masked_where(
+            amplitude.core_data() <= 0, amplitude.core_data(), copy=True)
+        # Set long name
+        amplitude.long_name = 'Amplitude of '+event_cube.long_name
 
-            #####################################
-            ###  calculate the three metrics  ###
-            #####################################
-            # severity
-            severity = amplitude * \
-                np.atleast_3d(np.array([np.diff(bds)
-                                        for bds in event_cube.coord("time").bounds]))
-            severity.data = np.ma.masked_where(~np.isfinite(severity.core_data()),
-                                               severity.core_data(), copy=True)
-            severity.units = cf_units.Unit(str(cube.units) +
-                                           " " +
-                                           str(cube.coord("time").units).split(" ")[0])
-            severity = severity.collapsed("day_of_year", iris.analysis.SUM)
-            severity.long_name = "severity"
+        # The below check assures that the dimensions differ in size, otherwise
+        # broadcasting in np.atleast_3d could fail and produce erroneous
+        # results without notice
+        if not (sorted(list(set(amplitude.shape)))
+                   == sorted(list(amplitude.shape))):
+            raise ValueError("Can not safely broadcast, since not all dimensions \
+                                   of cube differ in size.")
 
-            # magnitude
-            magnitude = amplitude.collapsed("day_of_year", iris.analysis.MAX)
-            magnitude.data = np.ma.masked_where(~np.isfinite(magnitude.core_data()),
-                                                magnitude.core_data(), copy=True)
-            magnitude.long_name = "magnitude"
 
-            # duration
-            duration = (amplitude * 0 + 1) * np.atleast_3d(
-                np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
-            duration.data = np.ma.masked_where(~np.isfinite(duration.core_data()),
-                                               duration.core_data(), copy=True)
-            duration.units = (str(cube.coord("time").units).split(" ")[0])
-            duration = duration.collapsed("day_of_year", iris.analysis.SUM)
-            duration.long_name = "duration"
+        #####################################
+        ###  calculate the three metrics  ###
+        #####################################
+        # severity
+        severity = amplitude * \
+            np.atleast_3d(np.array([np.diff(bds)
+                                    for bds in event_cube.coord("time").bounds]))
+        severity.data = np.ma.masked_where(~np.isfinite(severity.core_data()),
+                                           severity.core_data(), copy=True)
+        severity.units = cf_units.Unit(str(cube.units) +
+                                       " " +
+                                       str(cube.coord("time").units).split(" ")[0])
+        severity = severity.collapsed("day_of_year", iris.analysis.SUM)
+        severity.long_name = "severity"
 
-            # Now calculate the spatial event mask from the severity as outlined in
-            # section 3.2 of the Extreme Catalogue C3S_D511.1.5_Extreme_Catalogue_V1.pdf
-            event_mask_threshold = float(severity.collapsed(["latitude", "longitude"],
-                                                            iris.analysis.MEDIAN).data)
-            event_mask = severity.data > event_mask_threshold
-            # Here we move from a masked array to one single bool array
-            # where True values occur if threshold exceeded and input data (severity)
-            # was not masked.
-            event_mask2d = event_mask.data & ~event_mask.mask
+        # magnitude
+        magnitude = amplitude.collapsed("day_of_year", iris.analysis.MAX)
+        magnitude.data = np.ma.masked_where(~np.isfinite(magnitude.core_data()),
+                                            magnitude.core_data(), copy=True)
+        magnitude.long_name = "magnitude"
 
-            # Now expand it over time
-            event_mask3d = np.broadcast_to(event_mask2d, event_cube.shape)
+        # duration
+        duration = (amplitude * 0 + 1) * np.atleast_3d(
+            np.array([np.diff(bds) for bds in event_cube.coord("time").bounds]))
+        duration.data = np.ma.masked_where(~np.isfinite(duration.core_data()),
+                                           duration.core_data(), copy=True)
+        duration.units = (str(cube.coord("time").units).split(" ")[0])
+        duration = duration.collapsed("day_of_year", iris.analysis.SUM)
+        duration.long_name = "duration"
 
-            # Now create copies of the different event metrics and mask them with the event mask
-            severity_masked = severity.copy()
-            magnitude_masked = magnitude.copy()
-            duration_masked = duration.copy()
+        # Now calculate the spatial event mask from the severity as outlined in
+        # section 3.2 of the Extreme Catalogue C3S_D511.1.5_Extreme_Catalogue_V1.pdf
+        event_mask_threshold = float(severity.collapsed(["latitude", "longitude"],
+                                                        iris.analysis.MEDIAN).data)
+        event_mask = severity.data > event_mask_threshold
+        # Here we move from a masked array to one single bool array
+        # where True values occur if threshold exceeded and input data (severity)
+        # was not masked.
+        event_mask2d = event_mask.data & ~event_mask.mask
 
-            # Set the event_mask as mask for each of the three above
-            severity_masked.mask = event_mask2d
-            magnitude_masked.mask = event_mask2d
-            duration_masked.mask = event_mask2d
+        # Now expand it over time
+        event_mask3d = np.broadcast_to(event_mask2d, event_cube.shape)
 
-            # calculate spatial averages
-            grid_areas = iris.analysis.cartography.area_weights(
-                severity_masked)
-            severity_av = severity_masked.collapsed(
-                ["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
-            magnitude_av = magnitude_masked.collapsed(
-                ["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
-            duration_av = duration_masked.collapsed(
-                ["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
+        # Now create copies of the different event metrics and mask them with the event mask
+        severity_masked = severity.copy()
+        magnitude_masked = magnitude.copy()
+        duration_masked = duration.copy()
 
-            # now calculate time evolution of amplitude within defined event_mask
-            amplitude_time = amplitude.copy()
-            amplitude_time.mask = event_mask3d
+        # Set the event_mask as mask for each of the three above
+        severity_masked.mask = event_mask2d
+        magnitude_masked.mask = event_mask2d
+        duration_masked.mask = event_mask2d
 
-            # Note that collapsing needs to be done in two steps, otherwise masked values
-            # are propagated over the full array, which is not the preferred behaviour.
-            amplitude_time = amplitude_time.collapsed(["latitude"],
-                                                      iris.analysis.MEAN)
-            amplitude_time = amplitude_time.collapsed(["longitude"],
-                                                      iris.analysis.MEAN)
+        # calculate spatial averages
+        grid_areas = iris.analysis.cartography.area_weights(
+            severity_masked)
+        severity_av = severity_masked.collapsed(
+            ["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
+        magnitude_av = magnitude_masked.collapsed(
+            ["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
+        duration_av = duration_masked.collapsed(
+            ["latitude", "longitude"], iris.analysis.MEAN, weights=grid_areas)
 
-            # calculate extent
-            extent = ((duration * 0 + 1.) * grid_areas).collapsed(
-                ["latitude", "longitude"], iris.analysis.SUM)/1e6
-            extent.units = cf_units.Unit("km2")
+        # now calculate time evolution of amplitude within defined event_mask
+        amplitude_time = amplitude.copy()
+        amplitude_time.mask = event_mask3d
 
-            # now calculate time evolution of amplitude within defined event_mask
-            extent_time = amplitude.copy()
-            extent_time = (extent_time * 0 + 1.) * \
-                np.broadcast_to(grid_areas, extent_time.shape)/1e6
-            extent_time.units = cf_units.Unit("km2")
-            extent_time.long_name = "Extent (based on grid resolution)"
-            extent_time.mask = event_mask3d
+        # Note that collapsing needs to be done in two steps, otherwise masked values
+        # are propagated over the full array, which is not the preferred behaviour.
+        amplitude_time = amplitude_time.collapsed(["latitude"],
+                                                  iris.analysis.MEAN)
+        amplitude_time = amplitude_time.collapsed(["longitude"],
+                                                  iris.analysis.MEAN)
 
-            # Note that collapsing needs to be done in two steps, otherwise masked values
-            # are propagated over the full array, which is not the preferred behaviour.
-            extent_time = extent_time.collapsed(["latitude"],
-                                                iris.analysis.MEAN)
-            extent_time = extent_time.collapsed(["longitude"],
-                                                iris.analysis.SUM)
+        # calculate extent
+        extent = ((duration * 0 + 1.) * grid_areas).collapsed(
+            ["latitude", "longitude"], iris.analysis.SUM)/1e6
+        extent.units = cf_units.Unit("km2")
 
-            # log all results in a dictionary
-            extremes_measures.update({r:
-                                      {"severity": severity,
-                                       "magnitude": magnitude,
-                                       "duration": duration,
-                                       "time_series": {"amplitude": amplitude_time,
-                                                       "extent": extent_time}}
-                                      }
-                                     )
+        # now calculate time evolution of amplitude within defined event_mask
+        extent_time = amplitude.copy()
+        extent_time = (extent_time * 0 + 1.) * \
+            np.broadcast_to(grid_areas, extent_time.shape)/1e6
+        extent_time.units = cf_units.Unit("km2")
+        extent_time.long_name = "Extent (based on grid resolution)"
+        extent_time.mask = event_mask3d
 
-            # Add metrics to pd dataframe
-            df_metrics.loc[r] = pd.Series(
-                {'severity': severity_av.data, 'magnitude': magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
+        # Note that collapsing needs to be done in two steps, otherwise masked values
+        # are propagated over the full array, which is not the preferred behaviour.
+        extent_time = extent_time.collapsed(["latitude"],
+                                            iris.analysis.MEAN)
+        extent_time = extent_time.collapsed(["longitude"],
+                                            iris.analysis.SUM)
+
+        # log all results in a dictionary
+        extremes_measures.update({eventname:
+                                  {"severity": severity,
+                                   "magnitude": magnitude,
+                                   "duration": duration,
+                                   "time_series": {"amplitude": amplitude_time,
+                                                   "extent": extent_time}}
+                                  }
+                                 )
+
+        # Add metrics to pd dataframe
+        df_metrics.loc[eventname] = pd.Series(
+            {'severity': severity_av.data, 'magnitude': magnitude_av.data, 'duration': duration_av.data, 'extent': extent.data})
 
         self.__logger__.info(extremes_measures)
 
@@ -402,7 +359,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
 
                 filename = self.__plot_dir__ + os.sep + \
                     basic_filename + \
-                    "_" + r + "_" + dat + \
+                    "_" + eventname + "_" + dat + \
                     "." + self.__output_type__
                 list_of_plots.append(filename)
 
@@ -412,7 +369,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     caption = str(dat.title() +
                                   ' maps of ' +
                                   ecv_lookup(self.__varname__) +
-                                  ' for the extreme event ' + r +
+                                  ' for the extreme event ' + eventname +
                                   ' for the data set ' +
                                   " ".join(dataset_id) + ' (' +
                                   self.__time_period__ + ').')
@@ -502,13 +459,13 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
                     # plotting lineplots
                     filename = self.__plot_dir__ + os.sep + \
                         basic_filename + \
-                        "_" + r + "_" + "temp_extent_amplitude" + \
+                        "_" + eventname + "_" + "temp_extent_amplitude" + \
                         "." + self.__output_type__
                     list_of_plots.append(filename)
 
                     caption = str('Temporal progress of amplitude and extent of ' +
                                   ecv_lookup(self.__varname__) +
-                                  ' for the extreme event ' + r +
+                                  ' for the extreme event ' + eventname +
                                   ' for the data set ' +
                                   " ".join(dataset_id) + ' (' +
                                   self.__time_period__ + ').')
