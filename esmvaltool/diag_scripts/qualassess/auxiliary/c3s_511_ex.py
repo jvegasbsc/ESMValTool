@@ -22,6 +22,7 @@ import matplotlib.gridspec as gridspec
 import datetime
 import numpy as np
 import cf_units
+import yaml
 from sharedutils import parallel_apply_along_axis
 
 from .c3s_511_basic import Basic_Diagnostic_SP
@@ -99,7 +100,7 @@ def subtract_xclim(cube, percentile=None, refcube=None, window_size=None):
         cube.data = np.ma.masked_invalid(xclim_array) - cube.data
     return cube
 
-def write_table_to_yaml(ex_table):
+def write_table_to_yaml(ex_table, filename):
     name_mapping = {
         'Lat_from': 'start_latitude',
         'Lat_to': 'end_latitude',
@@ -111,9 +112,8 @@ def write_table_to_yaml(ex_table):
     preprocessor_instructions = preprocessor_instructions.to_dict('index')
     for key in preprocessor_instructions:
         preprocessor_instructions[key] = {'extract_region' : preprocessor_instructions[key]}
-    filepath = os.path.join(self.__cfg__['work_dir'],'extreme_events.yaml')
-    with open(filepath, 'w') as handle:
-       self.__logger__.info(f"Writing to disk: {filepath}")
+    with open(filename, 'w') as handle:
+       print(f"Writing to disk: {filename}")
        yaml.safe_dump(preprocessor_instructions, handle)
 
 
@@ -171,6 +171,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         self.__logger__.info("Reading extreme event table")
         ex_table, raw_table = read_extreme_event_catalogue()
         self.__logger__.info("Finished parsing extreme event table")
+        write_table_to_yaml(ex_table,os.path.join(self.__cfg__['work_dir'],'extreme_events.yaml'))
 
         # Initialize a pandas dataframe for saving the table of metrics
         df_metrics = pd.DataFrame(columns=[

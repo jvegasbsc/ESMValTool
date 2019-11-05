@@ -3,34 +3,65 @@ documentation:
     Independent assessment of extremes of single products for the C3S_511 quality brief
 
   authors:
-    - muel_bn
-    - crez_ba
+    - mueller_benjamin
+    - crezee_bas
 
-  maintainer:
-    - muel_bn
-    - crez_ba
 
 datasets:
-#  - {dataset: MPI-ESM-LR,  project: CMIP5,  mip: Amon,  exp: decadal2010,  ensemble: r1i1p1,  start_year: 2011,  end_year: 2019}
   - {dataset: CDS-SATELLITE-SOIL-MOISTURE, project: OBS, mip: day, tier: 2, type: sat, version: L3S-SSMV-COMBINED-v4.2, start_year: 1979, end_year: 2018}
 
 preprocessors:
-  noop: {}
-  regrid_ex:
-      regrid:
-        target_grid: 2x2
-        scheme: nearest
+  default: &default_pp
+    custom_order: True
+#    daily_statistics:
+#      operator: mean
+
+  Drought-Heat_Europe_2013:
+    extract_region:
+      end_latitude: 60.0
+      end_longitude: 17.0
+      start_latitude: 35.0
+      start_longitude: 10.0
+    <<: *default_pp
+  Drought-Heat_Europe_2015:
+    extract_region:
+      end_latitude: 55.0
+      end_longitude: 35.0
+      start_latitude: 45.0
+      start_longitude: 0.0
+    <<: *default_pp
+  Drought-Heat_Europe_2018:
+    extract_region:
+      end_latitude: 68.0
+      end_longitude: 35.0
+      start_latitude: 45.0
+      start_longitude: 10.0
+    <<: *default_pp
+  Drought-Heat_WRussia_2010:
+    extract_region:
+      end_latitude: 60.0
+      end_longitude: 55.0
+      start_latitude: 50.0
+      start_longitude: 35.0
+    <<: *default_pp
+  Drought-Heat_Europe_2003:
+    extract_region:
+      end_latitude: 53.0
+      end_longitude: 20.0
+      start_latitude: 42.0
+      start_longitude: 0.0
+    <<: *default_pp
 
 diagnostics:
   SPQB:
     description: Single product quality brief extremes section.
     variables:
       sm:
-        preprocessor: regrid_ex
-        derive: False
-#      tas:
-#        preprocessor: noop
-#        derive: False
+        preprocessor: Drought-Heat_Europe_2003 # Specify here the event to be studied
+                                               # and define it above as a preprocessor. At each 
+                                               # run the list of extreme events is written to
+                                               # the work_dir as yaml, it can be copied from 
+                                               # there to this recipe.
     scripts:
       SPQB_basic_report:
         script: qualassess/ex_C3S_511_SPQB.py # 
