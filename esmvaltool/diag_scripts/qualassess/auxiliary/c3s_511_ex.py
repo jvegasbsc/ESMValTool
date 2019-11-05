@@ -78,14 +78,14 @@ def get_xclim(cube, percentile, doy_range, window_size=None):
     return result
 
 
-def subtract_xclim(cube, percentile=None, refcube=None):
+def subtract_xclim(cube, percentile=None, refcube=None, window_size=None):
     if not refcube:
         cube = refcube
     try:
         iris.coord_categorisation.add_day_of_year(cube, 'time', name='day_of_year')
     except ValueError:
         pass
-    xclim_array = get_xclim(cube, percentile, cube.coord('day_of_year').points)
+    xclim_array = get_xclim(cube, percentile, cube.coord('day_of_year').points, window_size)
     # Now repeat
     if percentile >= 50:
         cube.data = cube.data - np.ma.masked_invalid(xclim_array)
@@ -165,11 +165,11 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         
         # Read settings from recipe
         # self.__extremes__ provides the information given in the recipe as a dictionary
-        min_measurements = self.__extremes__["min_measurements"]
-        which_percentile = self.__extremes__["which_percentile"]
-        window_size = self.__extremes__["window_size"]
-        extreme_events = self.__extremes__["extreme_events"]
-                
+        min_measurements = self.__cfg__["minimal_number_measurements"]
+        which_percentile = self.__cfg__["which_percentile"]
+        window_size = self.__cfg__["window_size"]
+        extreme_events = self.__cfg__["extreme_events"]
+
         self.__logger__.info("Reading extreme event table")
         ex_table,raw_table = read_extreme_event_catalogue()
         self.__logger__.info("Finished parsing extreme event table")
@@ -177,10 +177,8 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
         # Loop through the events
         self.__logger__.info("Adding selected events to list for processing: ")
         # Now start adding the events to the dictionary for further processing
-        if type(extreme_events) is not list:
-            extreme_events = [extreme_events]
         for extreme_event_id in extreme_events:
-            self.__logger__.info("%s",extreme_event_id)
+            self.__logger__.info(f"{extreme_event_id}")
             try:
                 single_event = ex_table.loc[extreme_event_id].to_dict()
                 # Now prepare dictionary to be added to regions
@@ -239,7 +237,7 @@ class ex_Diagnostic_SP(Basic_Diagnostic_SP):
             self.__logger__.info("Start multi process calculation of extreme climatology " +
                                      "for %s gridpoints using multiprocessing",n_gridpoints)
             # Now calculate the xclim from clim_cube and subtract it from the event_cube.
-            amplitude = subtract_xclim(event_cube, percentile=which_percentile, refcube=clim_cube)
+            amplitude = subtract_xclim(event_cube, percentile=which_percentile, refcube=clim_cube, window_size=window_size)
             self.__logger__.info("Finished calculating amplitude")
 
             # Note that due to the above check, amplitude values of the event are always positive
