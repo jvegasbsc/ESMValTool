@@ -8,7 +8,8 @@ documentation:
 
 
 datasets:
-  - {dataset: CDS-SATELLITE-SOIL-MOISTURE, project: OBS, mip: day, tier: 2, type: sat, version: L3S-SSMV-COMBINED-v4.2, start_year: 1979, end_year: 2018}
+#  - {dataset: CDS-SATELLITE-SOIL-MOISTURE, project: OBS, mip: day, tier: 2, type: sat, version: L3S-SSMV-COMBINED-v4.2, start_year: 1979, end_year: 2018}
+  -  {dataset: cds-satellite-lai-fapar, type: sat, project: OBS, mip: Lmon, version: V1, tier: 3, start_year: 1999,  end_year: 2013}
 
 preprocessors:
   default: &default_pp
@@ -56,7 +57,7 @@ diagnostics:
   SPQB:
     description: Single product quality brief extremes section.
     variables:
-      sm:
+      fapar:
         preprocessor: Drought-Heat_Europe_2003 # Specify here the event to be studied
                                                # and define it above as a preprocessor. At each 
                                                # run the list of extreme events is written to
@@ -66,10 +67,10 @@ diagnostics:
       SPQB_basic_report:
         script: qualassess/ex_C3S_511_SPQB.py # 
         requests: [custom]                    # ++++++++++ Extreme parameters follow below +++++++
-        minimal_number_measurements: 10       # if for a certain gridpoint there are less
+        minimal_number_measurements: 3        # if for a certain gridpoint there are less
                                               # valid data points than specified here
                                               # this gridpoint is masked
-        which_percentile: 10                  # per default assuming exceeding extremes 
+        which_percentile: 20                  # per default assuming exceeding extremes 
                                               # for percentiles > 50 and vice versa
         window_size: 5                        # size of the window
                                               # List below the extreme events as in the Google
@@ -77,7 +78,7 @@ diagnostics:
                                               # of the event refer to the columns 'Event Category', 
                                               # 'Region/Country' and 'Year' joined by '_' and any
                                               # whitespace removed.
-        extreme_events: [Drought_MiddleEast_2014, Drought-Heat_Europe_2013, Drought-Heat_Europe_2015, Drought-Heat_Europe_2003]
-        multiprocessing: 1                    # the number of cores used
+        extreme_events: [Drought-Heat_Europe_2003]
+        multiprocessing: 5                    # the number of cores used
                                               # use 1 for no multiprocessing
                                               # multiprocessing is an experimental functionality

@@ -23,7 +23,7 @@ import datetime
 import numpy as np
 import cf_units
 import yaml
-from sharedutils import parallel_apply_along_axis
+from .libs.trend_framework.sharedutils import parallel_apply_along_axis
 
 from .c3s_511_basic import Basic_Diagnostic_SP
 from .libs.MD_old.ESMValMD import ESMValMD
