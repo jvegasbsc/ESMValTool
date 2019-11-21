@@ -1,0 +1,3 @@
+[submodule "esmvaltool/diag_scripts/qualassess/auxiliary/libs/trend_framework"]
+	path = esmvaltool/diag_scripts/qualassess/auxiliary/libs/trend_framework
+	url = ../../bascrezee/trend_framework.git
