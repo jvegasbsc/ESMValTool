@@ -1273,9 +1273,7 @@ def plot_setup(d="time", m="module", numfigs=1, fig=plt.figure(), caption=''):
                        plt.subplot(gs[-5:-2, 0]), plt.subplot(gs[-2:, 0])])
         fig.set_figheight(1.7 * fig.get_figheight())
     if "climatology" == m:
-        logger.info(fig.get_figheight())
         fig.set_figheight(1.7 * fig.get_figheight())
-        logger.info(fig.get_figheight())
         caption = caption + ' Subplots a) - l) show months January - December.'
     if "percentiles" == m:
         fig.set_figheight(1.3 * fig.get_figheight())

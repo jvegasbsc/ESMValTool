@@ -605,7 +605,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         try:
             # model
             self.__dataset_id__ = [
-                fileinfo["cmor_table"],
+                fileinfo["diagnostic"],
                 fileinfo["dataset"],
                 fileinfo["mip"],
                 fileinfo["exp"],
@@ -613,8 +613,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 fileinfo["short_name"]]
         except BaseException:
             # obs/reanalysis
+            self.__logger__.info(fileinfo)
             self.__dataset_id__ = [
-                fileinfo["cmor_table"],
+                fileinfo["diagnostic"],
                 fileinfo["dataset"],
                 fileinfo["mip"],
                 fileinfo["type"],
@@ -1190,6 +1191,11 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             
             for d in ["time"]:
                 
+                if 'month_number' not in [coord.name() for coord in cube.coords()]:
+                    iris.coord_categorisation.add_month_number(cube,
+                                                               d,
+                                                               name='month_number')
+                    
                 long_left_over = [rd for rd in reg_dimensions if rd != d]
             
                 clim_comp_dict = utils.lazy_climatology(cube,'month_number')
@@ -1212,6 +1218,11 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         if "anomalies" in self.__requested_diags__:
             
             for d in ["time"]:
+                
+                if 'year' not in [coord.name() for coord in cube.coords()]:
+                    iris.coord_categorisation.add_year(cube,
+                                                       d,
+                                                       name='year')
                 
                 long_left_over = [rd for rd in reg_dimensions if rd != d]
             
