@@ -32,7 +32,7 @@ REQUIREMENTS = {
         'esmvalcore>=2.0.0b5,<2.1',
         'fiona',
         'jinja2',
-        'matplotlib<3',
+        'matplotlib<2.2.3',
         'nc-time-axis',  # needed by iris.plot
         'netCDF4',
         'numpy',
