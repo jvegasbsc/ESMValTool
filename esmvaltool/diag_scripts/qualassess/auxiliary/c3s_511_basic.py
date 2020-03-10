@@ -622,6 +622,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 fileinfo["version"],
                 fileinfo["short_name"]]
 
+        self.__dataset_id__ = [str(element) for element in self.__dataset_id__]
         self.__basic_filename__ = "_".join(
             self.__dataset_id__ + [self.__time_period__])
 
