@@ -710,7 +710,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__do_trends__()
         self.__do_extremes__()
         self.__do_sectors__()
-        if "SMM" in self.__requested_diags__:
+        if "MM" in self.__requested_diags__:
             self.__do_maturity_matrix__()
         if "GCOS" in self.__requested_diags__:
             self.__do_gcos_requirements__()
@@ -1844,30 +1844,30 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 
     def __do_maturity_matrix__(self):
 
-        this_function = "System maturity matrix"
+        this_function = "Maturity Matrix"
 
         self.__file_anouncement__(
-            subdir="c3s_511/single_smm_input",
-            expfile="_SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx",
-            protofile="SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx",
+            subdir="c3s_511/single_mm_input",
+            expfile="_MM_CORE_CLIMAX_c3s511_Adapted_v6_0.xlsx",
+            protofile="MM_CORE_CLIMAX_c3s511_Adapted_v6_0.xlsx",
             function=this_function)
 
         self.__file_anouncement__(
-            subdir="c3s_511/single_smm_input",
-            expfile="_SMM_Guide_for_USERS_C3S_511_v1.pdf",
-            protofile="SMM_Guide_for_USERS_C3S_511_v1.pdf",
+            subdir="c3s_511/single_mm_input",
+            expfile="_MM_Guide_for_USERS_C3S_511_v1.pdf",
+            protofile="MM_Guide_for_USERS_C3S_511_v1.pdf",
             function=this_function)
 
         expected_input, found = \
-            self.__file_anouncement__(subdir="c3s_511/single_smm_input",
-                                      expfile="_smm_expert.csv",
-                                      protofile="empty_smm_expert.csv",
+            self.__file_anouncement__(subdir="c3s_511/single_mm_input",
+                                      expfile="_mm_expert.csv",
+                                      protofile="empty_mm_expert.csv",
                                       function=this_function)
 
         if not found:
             suggestion = "Please make use of " + \
-                "SMM_Guide_for_USERS_C3S_511_v1.pdf and " + \
-                "SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx for producing " + \
+                "MM_Guide_for_USERS_C3S_511_v1.pdf and " + \
+                "MM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx for producing " + \
                 "the requested file!"
             caption = "The expected input file: " + expected_input + \
                 " was not found and an empty dummy file created, " + \
@@ -1898,23 +1898,23 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             expected_input,
             os.path.dirname(
                 os.path.realpath(__file__)) +
-            "/libs/predef/smm_definitions.csv")
+            "/libs/predef/mm_definitions.csv")
         fig.savefig(filename)
         plt.close(fig)
 
         ESMValMD("meta",
                  filename,
-                 self.__basetags__ + ['C3S_SMM'],
+                 self.__basetags__ + ['C3S_MM'],
                  caption,
-                 '#C3S' + 'SMM' + self.__varname__,
+                 '#C3S' + 'MM' + self.__varname__,
                  self.__infile__,
                  self.diagname,
                  self.authors)
 
         # produce report
         expected_input, found = \
-            self.__file_anouncement__(subdir="c3s_511/single_smm_input",
-                                      expfile="_smm_add.csv",
+            self.__file_anouncement__(subdir="c3s_511/single_mm_input",
+                                      expfile="_mm_add.csv",
                                       protofile="empty.txt",
                                       function=this_function)
 
@@ -1925,7 +1925,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 #                    "freetext": expected_input},
 #                filename=this_function.upper())
             self.reporting_structure.update(
-                    {"System Maturity Matrix": 
+                    {"Maturity Matrix": 
                         {"plots": [filename],
                          "freetext": expected_input}})
         else:
@@ -1934,7 +1934,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 #                    "plots": [filename]},
 #                filename=this_function.upper())
             self.reporting_structure.update(
-                    {"System Maturity Matrix": 
+                    {"Maturity Matrix": 
                         {"plots": [filename]}})
 
         return
