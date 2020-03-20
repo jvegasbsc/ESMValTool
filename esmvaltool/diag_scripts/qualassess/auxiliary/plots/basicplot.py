@@ -8,6 +8,7 @@ matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 #from matplotlib.ticker import LogFormatterMathtext
+from matplotlib.ticker import StrMethodFormatter
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
@@ -20,21 +21,28 @@ from ..libs import c3s_511_util as utils
 import sys
 import string
 from matplotlib.ticker import FuncFormatter
+import textwrap
 #import matplotlib.colors as colors
 import logging
 #from memory_profiler import profile
 from dask import array as da
 
+logger = logging.getLogger(os.path.basename(__file__))
 
 def label_in_perc_multiple(x, pos=0):
     return '%1.1f%%' % (x)
-
 
 def label_in_perc_single(x, pos=0):
     return '%1.1f%%' % (x * 100)
 
 def label_in_exp(x,pos=0):
     return r"$10^{%.1f}$" % (x)
+
+def label_in_exp_perc(x,pos=0):
+    if x * 100 < 0.1:
+        return "{}%".format(r"$10^{%d}$" % (np.log10(x*100)))
+    else:
+        return label_in_perc_single(x)
 
 
 MPLSTYLE = os.path.dirname(
@@ -321,10 +329,10 @@ class PlotHist(object):
         
         if dat_log:
             self.ax.set_yscale('log', nonposy='clip')
-#            self.ax.set_ylim(np.min(freqs)*0.1, np.max(freqs) * 1.1)
-        self.ax.set_ylim(top=np.max(hist) * 1.1)
-        
-        self.ax.yaxis.set_major_formatter(FuncFormatter(label_in_perc_single))
+            self.ax.yaxis.set_major_formatter(FuncFormatter(label_in_exp_perc))
+        else:
+            self.ax.yaxis.set_major_formatter(FuncFormatter(label_in_perc_single))
+            
         if (title is not None):
             self.ax.set_title(title)
         self.ax.set_xlabel(x_label)
@@ -824,8 +832,7 @@ class Plot2D(object):
 
             # Plot map
             # (this needs to be done due to an error in cartopy)
-#            try:
-            for i in [1]:
+            try:
                 if y_logarithmic:
                     cube.coord(lev_var).points = np.log10(
                         cube.coord(lev_var).points)
@@ -900,18 +907,18 @@ class Plot2D(object):
                     else:
                         plt.xticks(locs, labels, rotation=25)
                         plt.xlabel(self.__class__.TIME_LABEL)
-#            except Exception as e:
-#                self.logger.exception(e)
-#                exc_type, exc_obj, exc_tb = sys.exc_info()
-#                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-#                self.logger.debug(exc_type, fname, exc_tb.tb_lineno)
-#                pcm = qplt.pcolormesh(cube, cmap=brewer_cmap,
-#                                      vmin=vmin, vmax=vmax, norm=None)
-#                plt.text(0.5, 0.5, 'Data cannot be displayed as intended due '
-#                         'to cartopy issues with the data cube!',
-#                         horizontalalignment='center',
-#                         verticalalignment='center',
-#                         transform=plt.gca().transAxes)
+            except Exception as e:
+                self.logger.exception(e)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                self.logger.debug(exc_type, fname, exc_tb.tb_lineno)
+                pcm = qplt.pcolormesh(cube, cmap=brewer_cmap,
+                                      vmin=vmin, vmax=vmax, norm=None)
+                plt.text(0.5, 0.5, 'Data cannot be displayed as intended due '
+                         'to cartopy issues with the data cube!',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         transform=plt.gca().transAxes)
                         
             if self.plot_type == 'latlon':
                 mean = cube.collapsed(
@@ -927,11 +934,16 @@ class Plot2D(object):
                 plt.gca().coastlines()
                 plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",
                                     linestyle=':')
-                plt.gca().text(0,
-                       - 0.1 * ((self.n_cubes // n_columns) * 0.7 if self.n_cubes>n_columns else 1),
-                       r'mean: {:.2g} $\pm$ {:.2g} '.format(
-                           mean,#str(np.round(mean, 2)),
-                           std),#str(np.round(std, 2))),
+                if np.log10(mean) >= 4 or np.log(mean) <= -2:
+                    txt = r'mean: {:.2g} $\pm$ {:.2g} '.format(mean, std)
+                else:
+                    txt = r'mean: {:.2f} $\pm$ {:.2f} '.format(mean, std)
+                plt.gca().text(0, #TODO: here we are working on the text position
+                       -0.02,
+                       #- 0.1 * ((self.n_cubes // n_columns) * 0.7 if self.n_cubes>n_columns else 1),
+                       txt,
+                       horizontalalignment='left',
+                       verticalalignment='top',
                        transform=plt.gca().transAxes)
 
             # Label plots (supports at most 26 figures at the moment)
@@ -960,12 +972,14 @@ class Plot2D(object):
             cbar.ax.set_xticklabels([('{:.'+str(2)+'g}').format(x) for x in ticks])
 #            pass
         else:
-            plt.colorbar(pcm,
+            cbar = plt.colorbar(pcm,
                 cax=cax,
                 orientation='horizontal',
 #                fraction=1.,
                 extend=ext_cmap,
-                boundaries=levels)
+                boundaries=levels,
+                format='%.4g'
+                               )
         cax.set_xlabel((list(set(self.names))[0] if list(
             set(self.names))[0] else "") + list(set(self.units))[0])
 
@@ -1112,7 +1126,7 @@ class Plot1D(object):
 
 ###############################################################################
 
-    def plot(self, title=None, ax=None, colors=None):
+    def plot(self, title=None, ax=None, colors=None, dat_log=True):
         """
         Arguments
             title          : title of the plot
@@ -1151,7 +1165,7 @@ class Plot1D(object):
             cols = colors
             
         plt.sca(ax[0])
-
+        
         ymin = ymax = np.nan
         
         plotlist = []
@@ -1159,16 +1173,20 @@ class Plot1D(object):
         # plot line
         try:
             for ind, c in enumerate(self.cube):
+                c.data = 10**(c.data / 70)
                 linplot = plt.plot(
                                 c.coords("time")[0].points,
                                 c.data,
                                 color=cols[ind],
                                 label=title[ind],
                                 )
+                if dat_log:
+                    plt.gca().set_yscale("log")
                 plotlist.append(linplot.copy())
                 ymin=np.nanmin([ymin,np.nanmin(c.data)])
                 ymax=np.nanmax([ymax,np.nanmax(c.data)])
-            plt.gca().set_ylabel(self.name + " " + str(self.units),
+                buffer = 0.1 * (ymax - ymin)
+            plt.gca().set_ylabel(textwrap.fill(self.name + " " + str(self.units),45),
                                  rotation=90)
 
         except Exception as e:
@@ -1178,7 +1196,7 @@ class Plot1D(object):
             self.logger.exception(e)
             self.logger.debug('We did not expect this to fail!')
             plt.plot()
-
+            
         if 'time' == self.plot_type:
             pointsum = list(
                 set([np.sum(c.coords("time")[0].points) for c in self.cube]))
@@ -1209,23 +1227,25 @@ class Plot1D(object):
 
             plt.xticks(locs, labels, rotation=25)
             plt.xlabel(self.__class__.TIME_LABEL)
-            buffer = 0.1 * (ymax - ymin)
-            plt.ylim(ymin - buffer, ymax + buffer)
-            plt.grid()
-
-        if len(self.cube) > 1:
-            box = plt.gca().get_position()
-            plt.gca().set_position([box.x0, box.y0 + 0.05 * box.height,
-                                    box.width, box.y1 - box.height * 0.15])
-            handles, labels = plt.gca().get_legend_handles_labels()
-            order = [labels.index(t) for t in title]
-            handles = [handles[o] for o in order]
             
-            # Put a legend above current axis
-            plt.gca().legend(handles, title, 
-                   bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-                   ncol=7, mode="expand", borderaxespad=0.)
+            plt.ylim(ymin - buffer, ymax + buffer)
+            plt.grid()  
+            
 
+    
+            if len(self.cube) > 1:
+                box = plt.gca().get_position()
+                plt.gca().set_position([box.x0, box.y0 + 0.05 * box.height,
+                                        box.width, box.y1 - box.height * 0.15])
+                handles, labels = plt.gca().get_legend_handles_labels()
+                order = [labels.index(t) for t in title]
+                handles = [handles[o] for o in order]
+                
+                # Put a legend above current axis
+                plt.gca().legend(handles, title, 
+                       bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+                       ncol=7, mode="expand", borderaxespad=0.)
+            
 #        # removes ylabel instead of whitespace?!
 #        try:
 #            plt.tight_layout()
@@ -1236,7 +1256,7 @@ class Plot1D(object):
 
 
 def plot_setup(d="time", m="module", numfigs=1, fig=plt.figure(), caption=''):
-
+    #TODO: make sure that anomalies and climatologies look good
     if d in ["longitude", "levels"]:
         gs = gridspec.GridSpec(10, 5)
         ax = np.array([plt.subplot(gs[:-2, :-1]),
@@ -1260,7 +1280,9 @@ def plot_setup(d="time", m="module", numfigs=1, fig=plt.figure(), caption=''):
         caption = caption + ' Subplots a) - g) show percentiles ' + \
             '1%, 5%, 10%, 50%, 90%, 95%, and 99%.'
     if "anomalies" in m:
+        logger.info(fig.get_figheight())
         fig.set_figheight(np.ceil(numfigs / 9.) * fig.get_figheight())
+        logger.info(fig.get_figheight())
         caption = caption + ' Subplots ' + __my_string_ascii_lc__(0) + \
             ') - ' + __my_string_ascii_lc__(numfigs - 1) +  \
             ') show single years (max. last 21 years only).'

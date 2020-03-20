@@ -16,10 +16,11 @@ def do_smm_table(csv_expert, csv_definitions):
     Authors:  F. Massonnet and B. Hassler
     Creation: February 8th, 2018
     Updated: February 15th, 2018 (B. Mueller)
+             March 11th, 2020 (B. Mueller)
 
     Inputs:
         - csv_expert : A CSV file giving the grades assigned to each
-                       cell of the System Maturity Matrix (1 to 6)
+                       cell of the Maturity Matrix (1 to 6)
                        The first line is supposed to be a header with
                        the names of the different categories. This row is not read,
                        but it useful to keep it if the CSV themselves have to be opened
@@ -33,11 +34,11 @@ def do_smm_table(csv_expert, csv_definitions):
                        The CSV file should not have an empty line at the end!
                        Example:
                        >> cat input_file.csv
-                             "Software Readiness" , "Metadata", "User Documentation", "Uncertainty Characterisation", "Public access feedback and update","Usage"
-                              1                   , 4         , 3                   , 2                             , 1                                 , 6
-                              3                   , 2         , 1                   , 4                             , 6                                 , 5
-                              1                   , 3         , 1                   , 2                             , 4                                 ,
-                              6                   ,           , 3                   , 2                             , 6                                 ,
+                             "Metadata", "User Documentation", "Uncertainty Characterisation", "Public access feedback and update","Usage"
+                              4         , 3                   , 2                             , 1                                 , 6
+                              2         , 1                   , 4                             , 6                                 , 5
+                                        , 1                   , 2                             , 4                                 ,
+                                        ,                     , 2                             , 6                                 ,
 
         - csv_definitions : A CSV file (independent of the product to be assessed) giving
                             the standard names for criteria in the System Maturity Matrix.
@@ -47,14 +48,14 @@ def do_smm_table(csv_expert, csv_definitions):
 
                             Example:
                             >> cat definition_file.csv
-                               "Software\nReadiness", "Metadata",  "User\nDocumentation", "Uncertainty\nCharacterisation", "Public access,\nfeedback,\nand update", "Usage"
-                               "Coding\nStandards"  , "Standards", "Formal description\nof scientific\nmethodology", "Standards", "Public\nAccess/Archive", "Research"
-                               "Software\nDocumentation", "Collection\nlevel", "Formal validation\nreport", "Validation", "Version", "Decision\nsupport\nsystem"
-                               "Numerical\nReproducibility\nand portability", "File level", "Formal product\nuser guide", "Uncertainty\nquantification", "User\nfeedback",
-                               "Security", , "Formal description\nof operations\nconcept", "Automated quality\nmonitoring", "Updates to record" ,
+                               "Metadata",  "User\nDocumentation", "Uncertainty\nCharacterisation", "Public access,\nfeedback,\nand update", "Usage"
+                               "Standards", "Formal description\nof scientific\nmethodology", "Standards", "Public\nAccess/Archive", "Research"
+                               "Collection\nlevel", "Formal validation\nreport", "Validation", "Version", "Decision\nsupport\nsystem"
+                               , "Formal product\nuser guide", "Uncertainty\nquantification", "User\nfeedback",
+                               , , "Automated quality\nmonitoring", "Updates to record" ,
 
 
-    Output: a .png file including the System Maturity Matrix
+    Output: a .png file including the Maturity Matrix
 
     """
 
@@ -82,10 +83,10 @@ def do_smm_table(csv_expert, csv_definitions):
     # number of items
     if sum([1.0 * (len(definitions[i]) == nx)
             for i in range(len(definitions))]) != ny:
-        logger.error("do_smm_table: unfitting number of columns in " +
+        logger.error("do_mm_table: unfitting number of columns in " +
                      "definition file")
         raise ValueError("Invalid input: unfitting number of columns in " +
-                         "smm definition file: " + csv_definitions)
+                         "mm definition file: " + csv_definitions)
 
     # The grades to be used as color in the System maturity matrix
     grades = np.empty((ny, nx))
@@ -104,12 +105,12 @@ def do_smm_table(csv_expert, csv_definitions):
                         try:
                             grades[counter_y, counter_x] = int(item)
                         except IndexError:
-                            logger.error("do_smm_table: " +
+                            logger.error("do_mm_table: " +
                                          "unfitting number of columns in " +
                                          "definition and expert file")
                             raise ValueError("Invalid input: " +
                                              "unfitting number of columns " +
-                                             "in smm definition file: " +
+                                             "in mm definition file: " +
                                              csv_definitions +
                                              " and expert file: " + csv_expert)
                     counter_x += 1
@@ -159,7 +160,7 @@ def do_smm_table(csv_expert, csv_definitions):
               va="center") for i in np.arange(1, max_grade + 1)]
 
     # Finish polishing the figure
-    plt.title("System Maturity Matrix", fontsize=18)
+    plt.title("Maturity Matrix", fontsize=18)
     # Grid lines
     [plt.plot((0, nx), (y, y), color='k') for y in range(ny)]
     [plt.plot((x, x), (0, ny), color='k') for x in range(nx)]

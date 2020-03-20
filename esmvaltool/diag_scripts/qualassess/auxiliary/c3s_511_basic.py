@@ -605,7 +605,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         try:
             # model
             self.__dataset_id__ = [
-                fileinfo["cmor_table"],
+                fileinfo["diagnostic"],
                 fileinfo["dataset"],
                 fileinfo["mip"],
                 fileinfo["exp"],
@@ -613,14 +613,16 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 fileinfo["short_name"]]
         except BaseException:
             # obs/reanalysis
+            self.__logger__.info(fileinfo)
             self.__dataset_id__ = [
-                fileinfo["cmor_table"],
+                fileinfo["diagnostic"],
                 fileinfo["dataset"],
                 fileinfo["mip"],
                 fileinfo["type"],
                 fileinfo["version"],
                 fileinfo["short_name"]]
 
+        self.__dataset_id__ = [str(element) for element in self.__dataset_id__]
         self.__basic_filename__ = "_".join(
             self.__dataset_id__ + [self.__time_period__])
 
@@ -708,7 +710,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__do_trends__()
         self.__do_extremes__()
         self.__do_sectors__()
-        if "SMM" in self.__requested_diags__:
+        if "MM" in self.__requested_diags__:
             self.__do_maturity_matrix__()
         if "GCOS" in self.__requested_diags__:
             self.__do_gcos_requirements__()
@@ -1102,7 +1104,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 cube = self.sp_data
     
             if level is not None:
-                basic_filename = self.__basic_filename__ + "_ledataset_idv" + str(level)
+                basic_filename = self.__basic_filename__ + "_lev" + str(level)
                 dataset_id = [self.__dataset_id__[1], "at", "level", str(
                     level), str(self.sp_data.coord(self.level_dim).units)]
             else:
@@ -1146,6 +1148,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 long_left_over = [rd for rd in reg_dimensions if rd != d]
 
                 plotcube = utils.dask_weighted_stddev_wrapper(cube,self.map_area_frac,dims=d)
+                plotcube.units = cube.units
                 
                 vminmax = utils.minmax_cubelist([plotcube], [5, 95]) 
                 
@@ -1189,6 +1192,11 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             
             for d in ["time"]:
                 
+                if 'month_number' not in [coord.name() for coord in cube.coords()]:
+                    iris.coord_categorisation.add_month_number(cube,
+                                                               d,
+                                                               name='month_number')
+                    
                 long_left_over = [rd for rd in reg_dimensions if rd != d]
             
                 clim_comp_dict = utils.lazy_climatology(cube,'month_number')
@@ -1211,6 +1219,11 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         if "anomalies" in self.__requested_diags__:
             
             for d in ["time"]:
+                
+                if 'year' not in [coord.name() for coord in cube.coords()]:
+                    iris.coord_categorisation.add_year(cube,
+                                                       d,
+                                                       name='year')
                 
                 long_left_over = [rd for rd in reg_dimensions if rd != d]
             
@@ -1264,6 +1277,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 fig.set_figheight(1.2 * fig.get_figheight())
                 x.plot(ax=ax,
                        title=["{}%".format(p) for p in percentiles],
+                       dat_log=self.log_data,
                        colors=["skyblue",
                                "blue",
                                "darkorchid",
@@ -1830,30 +1844,30 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 
     def __do_maturity_matrix__(self):
 
-        this_function = "System maturity matrix"
+        this_function = "Maturity Matrix"
 
         self.__file_anouncement__(
-            subdir="c3s_511/single_smm_input",
-            expfile="_SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx",
-            protofile="SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx",
+            subdir="c3s_511/single_mm_input",
+            expfile="_MM_CORE_CLIMAX_c3s511_Adapted_v6_0.xlsx",
+            protofile="MM_CORE_CLIMAX_c3s511_Adapted_v6_0.xlsx",
             function=this_function)
 
         self.__file_anouncement__(
-            subdir="c3s_511/single_smm_input",
-            expfile="_SMM_Guide_for_USERS_C3S_511_v1.pdf",
-            protofile="SMM_Guide_for_USERS_C3S_511_v1.pdf",
+            subdir="c3s_511/single_mm_input",
+            expfile="_MM_Guide_for_USERS_C3S_511_v1.pdf",
+            protofile="MM_Guide_for_USERS_C3S_511_v1.pdf",
             function=this_function)
 
         expected_input, found = \
-            self.__file_anouncement__(subdir="c3s_511/single_smm_input",
-                                      expfile="_smm_expert.csv",
-                                      protofile="empty_smm_expert.csv",
+            self.__file_anouncement__(subdir="c3s_511/single_mm_input",
+                                      expfile="_mm_expert.csv",
+                                      protofile="empty_mm_expert.csv",
                                       function=this_function)
 
         if not found:
             suggestion = "Please make use of " + \
-                "SMM_Guide_for_USERS_C3S_511_v1.pdf and " + \
-                "SMM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx for producing " + \
+                "MM_Guide_for_USERS_C3S_511_v1.pdf and " + \
+                "MM_CORE_CLIMAX_c3s511_Adapted_v5_0.xlsx for producing " + \
                 "the requested file!"
             caption = "The expected input file: " + expected_input + \
                 " was not found and an empty dummy file created, " + \
@@ -1884,23 +1898,23 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             expected_input,
             os.path.dirname(
                 os.path.realpath(__file__)) +
-            "/libs/predef/smm_definitions.csv")
+            "/libs/predef/mm_definitions.csv")
         fig.savefig(filename)
         plt.close(fig)
 
         ESMValMD("meta",
                  filename,
-                 self.__basetags__ + ['C3S_SMM'],
+                 self.__basetags__ + ['C3S_MM'],
                  caption,
-                 '#C3S' + 'SMM' + self.__varname__,
+                 '#C3S' + 'MM' + self.__varname__,
                  self.__infile__,
                  self.diagname,
                  self.authors)
 
         # produce report
         expected_input, found = \
-            self.__file_anouncement__(subdir="c3s_511/single_smm_input",
-                                      expfile="_smm_add.csv",
+            self.__file_anouncement__(subdir="c3s_511/single_mm_input",
+                                      expfile="_mm_add.csv",
                                       protofile="empty.txt",
                                       function=this_function)
 
@@ -1911,7 +1925,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 #                    "freetext": expected_input},
 #                filename=this_function.upper())
             self.reporting_structure.update(
-                    {"System Maturity Matrix": 
+                    {"Maturity Matrix": 
                         {"plots": [filename],
                          "freetext": expected_input}})
         else:
@@ -1920,7 +1934,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 #                    "plots": [filename]},
 #                filename=this_function.upper())
             self.reporting_structure.update(
-                    {"System Maturity Matrix": 
+                    {"Maturity Matrix": 
                         {"plots": [filename]}})
 
         return
