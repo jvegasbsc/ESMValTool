@@ -1173,7 +1173,6 @@ class Plot1D(object):
         # plot line
         try:
             for ind, c in enumerate(self.cube):
-                c.data = 10**(c.data / 70)
                 linplot = plt.plot(
                                 c.coords("time")[0].points,
                                 c.data,
