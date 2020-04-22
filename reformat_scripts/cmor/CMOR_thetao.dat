@@ -1,0 +1,26 @@
+SOURCE: CMIP5
+!============
+variable_entry:    thetao
+!============
+modeling_realm:    ocean
+!----------------------------------
+! Variable attributes:
+!----------------------------------
+standard_name:     sea_water_potential_temperature
+units:             K 
+cell_methods:      time: mean
+cell_measures:     area: areacello volume: volcello
+long_name:         Sea Water Potential Temperature 
+!----------------------------------
+! Additional variable information:
+!----------------------------------
+dimensions:        longitude latitude olevel time
+out_name:          thetao
+type:              real
+valid_min:         -9.37e+17
+valid_max:         1.05e+20
+ok_min_mean_abs:   -9.37e+17
+ok_max_mean_abs:   1.05e+20
+!----------------------------------
+!
+

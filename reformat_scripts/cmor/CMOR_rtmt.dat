@@ -1,0 +1,28 @@
+SOURCE: CMIP5
+!============
+variable_entry:    rtmt
+!============
+modeling_realm:    atmos
+!----------------------------------
+! Variable attributes:
+!----------------------------------
+standard_name:     net_downward_radiative_flux_at_top_of_atmosphere_model
+units:             W m-2
+cell_methods:      time: mean
+cell_measures:     area: areacella
+long_name:         Net Downward Flux at Top of Model
+comment:           i.e., at the top of that portion of the atmosphere where dynamics are explicitly treated by the model. This is reported only if it differs from the net downward radiative flux at the top of the atmosphere.
+!----------------------------------
+! Additional variable information:
+!----------------------------------
+dimensions:        longitude latitude time
+out_name:          rtmt
+type:              real
+positive:          down
+valid_min:         -232.8
+valid_max:         218.7
+ok_min_mean_abs:   76.91
+ok_max_mean_abs:   89.25
+!----------------------------------
+!
+

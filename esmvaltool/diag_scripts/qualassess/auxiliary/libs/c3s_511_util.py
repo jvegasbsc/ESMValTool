@@ -5,17 +5,21 @@ Created on Wed Feb  7 12:17:48 2018
 
 """
 
+import pandas as pd
+import datetime
 import imp
 import os
 import sys
 import numpy as np
 import dask
+import copy
 from scipy import stats
 import cf_units
 #import matplotlib.pyplot as plt
 #import time
 import iris
 import collections
+import re
 #from memory_profiler import profile
 
 # sys.path.insert(0,
@@ -37,6 +41,95 @@ class HiddenPrints:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
+
+def convert_human_readable_coords_to_iso(coord_in):
+    '''
+    # This function converts human readable single coords of latitude or longitude 
+    # to iso-6709 standard
+    
+    parameters
+    ----------
+       
+       coord_in : str
+        the input coordinate (e.g. 53°N)
+        
+    returns
+    -------
+       coord_iso : float
+        iso-6709 formatted coordinate
+    '''
+    val,compass = re.split('[deg]+', coord_in)
+    if compass in ['N','E']:
+        result = float(val)
+    elif compass in ['S','W']:
+        result = float(val)*-1.
+    else:
+        result = float(val)
+    return result
+
+
+def read_extreme_event_catalogue():
+    ''' This function reads the extreme event catalogue
+
+    Returns
+    -------
+    (pandas.DataFrame,pandas.DataFrame)
+         the extreme event catalogue (parsed), the extreme event catalogue (raw)
+    '''
+    ex_table_dir = './predef/extremes_catalogue/'
+    #TODO move ex_table_file to the recipe (default value that can
+    # be over written if specified)
+    ex_table_file = 'V1_Apr19_accessed20190813.csv'
+    ex_table_loc = os.path.join(os.path.dirname(__file__),ex_table_dir,ex_table_file)
+
+    ############################################
+    ####  Reading in extreme event catalogue ###
+    ############################################
+
+    # First read complete table and parse into right data types
+    ex_table = pd.read_csv(ex_table_loc,skiprows=1)
+    raw_table = copy.deepcopy(ex_table)
+
+    # Parameters related to formatting of the table
+    fmt_dates = '%d/%m/%Y'
+    
+    # Convert the two datetime columns to datetime.datetime objects
+    for colname in ['Time_start','Time_stop']:
+        ex_table[colname] = ex_table[colname].apply(lambda x:\
+                            datetime.datetime.strptime(x,fmt_dates))
+    
+    # Now split latitude start-end into two seperate columns
+    lats = ex_table['Latitude extent (start, stop)'].str.split("-",n=1,expand=True)
+    lons = ex_table['Longitude extent (start, stop)'].str.split("-",n=1,expand=True)
+    
+    ex_table['Lat_from'] = lats[0]
+    ex_table['Lat_to'] = lats[1]
+    
+    ex_table['Lon_from'] = lons[0]
+    ex_table['Lon_to'] = lons[1]
+    
+    # Now convert them to iso-6709
+    for coord_key in ['Lat_from','Lat_to','Lon_from','Lon_to']:
+        ex_table[coord_key] = ex_table[coord_key].apply(lambda x: convert_human_readable_coords_to_iso(x))
+        
+    # Now create event_id
+    ex_table['extreme_event_id'] = ex_table[['Event Category','Region/Country', 'Year']].apply(lambda x: '_'.join(x),axis=1)
+    # Now strip the whitespace
+    ex_table['extreme_event_id'] = ex_table['extreme_event_id'].apply(lambda x: ''.join(x.split()))
+    
+    # Here we define the information that needs to end up in the dictionary 
+    # for each event for further processing the event
+    core_keys = ['extreme_event_id','Literature support',\
+                 'Lat_from','Lat_to','Lon_from','Lon_to',\
+                 'Time_start','Time_stop',\
+                 'Estimated duration (1-3) [used for selection]',\
+                 'Estimated scale  (1-3) [used for selection]',\
+                 'Estimated impact (1-3) [used for selection]']
+    ex_table = ex_table[core_keys]
+    
+    # Set extreme_event_id as table index
+    ex_table.index = ex_table.pop('extreme_event_id')
+    return ex_table,raw_table
 
 
 def __getInfoFromFile__(filename):
@@ -623,3 +716,11 @@ def lazy_percentiles(cube, percentiles, dims="time"):
         perc_dict.update({act_p:sub_cube})
         
     return perc_dict
+
+def cube_sorted(cube, coord):
+    coord_to_sort = cube.coord(coord)
+    assert coord_to_sort.ndim == 1, 'One dim coords only please.'
+    dim, = cube.coord_dims(coord_to_sort)
+    index = [slice(None)] * cube.ndim
+    index[dim] = np.argsort(coord_to_sort.points)
+    return cube[tuple(index)]

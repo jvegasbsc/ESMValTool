@@ -1,0 +1,21 @@
+SOURCE: self
+!============
+variable_entry:    TLT
+!============
+modeling_realm:    atmos
+!----------------------------------
+! Variable attributes:
+!----------------------------------
+standard_name:     air_temperature
+units:             K
+cell_methods:      time: mean
+cell_measures:     area: areacella
+long_name:         Lower tropospheric temperature
+!----------------------------------
+! Additional variable information:
+!----------------------------------
+dimensions:        longitude latitude time
+out_name:          TLT
+type:              real
+!----------------------------------
+!

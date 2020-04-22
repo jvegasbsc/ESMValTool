@@ -1,0 +1,115 @@
+<namelist>
+<include href="./config_private_BM_local.xml"/>
+<namelist_summary>
+###############################################################################
+namelist_C3S_511_SPQB.xml
+
+Description
+
+Author
+Benjamin Mueller (LMU, Germany - b.mueller@iggf.geo.uni-muenchen.de)
+Birgit Hassler (DLR, Germany - birgit.hassler@dlr.de)
+
+Project
+C3S_511
+
+References
+
+This namelist is part of the ESMValTool
+###############################################################################
+</namelist_summary>
+
+<GLOBAL>
+  <write_plots type="boolean">        True                      </write_plots>
+  <write_netcdf type="boolean">       True                      </write_netcdf>
+  <force_processing type="boolean">   False                     </force_processing>
+  <wrk_dir type="path">               @{WORKPATH}               </wrk_dir>
+  <plot_dir type="path">              @{PLOTPATH}/test/  		</plot_dir>
+  <climo_dir type="path">             @{CLIMOPATH}       		</climo_dir>
+  <write_plot_vars type="boolean">    True                      </write_plot_vars>
+  <max_data_filesize type="integer">  100                       </max_data_filesize>
+  <max_data_blocksize type="integer"> 500                       </max_data_blocksize>
+  <output_file_type>                  png                       </output_file_type>
+  <verbosity  type="integer">         1                         </verbosity>
+  <debuginfo type="boolean">          False                     </debuginfo>
+  <exit_on_warning  type="boolean">   True                      </exit_on_warning>
+  <tags>							  Testing_Namelist			</tags>
+</GLOBAL>
+
+
+<MODELS>
+</MODELS>
+
+
+<DIAGNOSTICS>
+   
+
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   	                      		ta                                       </variable>
+        <field_type>                      						T3Ds                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Land					  </tags>
+	
+		<model> OBS        ERA5-ta				   reanalysis				L4 	 2000 2001 @{OBSPATH}  </model>
+    </diag>
+
+       <!--
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   			toz                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Atmos					  </tags>
+	
+		<model> OBS        ESACCI-OZONE				   sat				L3 	 1997 2010  @{OBSPATH}  </model>
+    </diag>
+    
+
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable>			   			sic                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511_LMU.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Ocean					  </tags>
+	
+		<model> OBS_gridfile        NSIDC-BT				   sat				NH 	 1999 1999 @{OBSPATH}  /media/bmueller/Work/ESMVAL_res/work/Obs/OBS_NSIDC-BT_sat_NH_T2Ms_sic_199901-199912.nc </model>
+    </diag>
+
+
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ESACCI-OZONE">			   			tos                                       </variable>
+        <field_type>                      						T2Ds                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Ocean					  </tags>
+	
+		<model> OBS        CCI-tos				   sat				L3 	 2000 2001  @{OBSPATH}  </model>
+    </diag>   
+           --> 
+    
+    <!-- 
+    <diag>
+        <description>  											Doing dataset analysis. (completeness/consistency, Mean/var , trend , ESMusage , GCOS, [extremes, sectoral indices]) 		</description>
+        <variable_def_dir>                						./variable_defs/      							</variable_def_dir>
+        <variable ref_model="ECDS-XCO2">			   			xco2                                       </variable>
+        <field_type>                      						T2Ms                                      </field_type>
+        <diag_script cfg="./nml/cfg_C3S_511/cfg_C3S_511.py">   DUMMY_C3S_511.py                      </diag_script>
+        <launcher_arguments>               						[('execute_as_shell', False)]             </launcher_arguments>
+		<tags> 													R_Atmos					  </tags>
+	
+		<model> OBS        CDS-XCO2				   sat				L3 	 2003 2016  @{OBSPATH}  </model>
+    </diag>
+       -->
+
+</DIAGNOSTICS>
+
+</namelist>

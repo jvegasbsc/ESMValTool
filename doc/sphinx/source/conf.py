@@ -96,7 +96,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ESMValTool'
-copyright = u'{0}, Veronika Eyring, Axel Lauer, Mattia Righi, Martin Evaldsson et al.'.format(datetime.now().year)
+copyright = u'2008-2017, Veronika Eyring, Axel Lauer, Mattia Righi, Bjoern Broetz et al.'
+
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -260,12 +261,12 @@ latex_elements = {
      \fi}
      \begin{titlepage}
      \begin{center}
-     \includegraphics[width=\textwidth]{../../source/figures/ESMValTool-logo.pdf}\par
+     \sphinxincludegraphics[width=\textwidth]{ESMValTool-logo.pdf}\par
      \vspace{2cm}
      {\Huge \bf \sffamily User's and Developer's Guide \par}
      \vspace{1cm}
      {\Large \sffamily \MONTH ~ \the\year \par}
-     \vspace{12cm}
+     \vspace{14cm}
      Deutsches Zentrum f\"ur Luft- und Raumfahrt (DLR), Institut f\"ur Physik der Atmosph\"are, Oberpfaffenhofen, Germany \par
      \vspace{0.5cm}
      http://www.esmvaltool.org/ \par
@@ -289,7 +290,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+latex_logo = 'figures/ESMValTool-logo.pdf'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -413,6 +414,7 @@ epub_exclude_files = ['search.html']
 #epub_use_index = True
 
 numfig = True
+numfig_format = {'figure': 'Figure %s', 'table': 'Table %s', 'code-block': 'Listing %s', 'section': '%s'}
 
 # Configuration for intersphinx
 intersphinx_mapping = {

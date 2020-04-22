@@ -1,0 +1,1250 @@
+<namelist>
+<include href="./config_private_DLR-DKRZ.xml"/>
+<namelist_summary>
+###############################################################################
+namelist_perfmetrics_CMIP5.xml
+
+Description
+Namelist for plotting the performance metrics for the CMIP5 models. It 
+considers temperature, zonal and meridional wind, geopotential height, surface
+temperature, precipitation, TOA SW and LW radiation, SW and LW cloud radiative
+effects, and aerosol optical depth
+
+Authors
+Franziska Frank (DLR, Germany - franziska.frank@dlr.de)
+Mattia Righi (DLR, Germany - mattia.righi@dlr.de)
+Veronika Eyring (DLR, Germany - veronika.eyring@dlr.de)
+
+Contributor(s)
+n/a
+
+Project
+DLR ESMVal
+
+Reference
+Gleckler et al., J. Geophys. Res., 113, D06104, doi: 10.1029/2007JD008972 (2008)
+
+This namelist is part of the ESMValTool
+###############################################################################
+</namelist_summary>
+<GLOBAL>
+    <write_plots type="boolean">              True         </write_plots>
+    <write_netcdf type="boolean">             True         </write_netcdf>
+    <force_processing type="boolean">        False         </force_processing>
+    <wrk_dir type="path">                    @{WORKPATH}   </wrk_dir>
+    <plot_dir type="path">                   @{PLOTPATH}   </plot_dir>
+    <climo_dir type="path">                  @{CLIMOPATH}  </climo_dir>
+    <write_plot_vars type="boolean">          True         </write_plot_vars>
+    <max_data_filesize type="integer">         100         </max_data_filesize>
+    <max_data_blocksize type="integer">        500         </max_data_blocksize>
+    <verbosity type="integer">                  1         </verbosity>
+    <exit_on_warning type="boolean">        False         </exit_on_warning>
+    <output_file_type>                          png         </output_file_type>
+    <force_calc type="boolean">              False         </force_calc>
+    <force_gradecalc type="boolean">         False         </force_gradecalc>
+    <force_taylorcalc type="boolean">        False         </force_taylorcalc>
+    <tags>               P_esmval, D_gleckler08jgr         </tags>
+</GLOBAL>
+<MODELS>
+
+
+
+</MODELS>
+<DIAGNOSTICS>
+
+<diag>
+    <description>          Temperature                  </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ERA-Interim,NCEP">  ta         </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CESM output1 CMCC CMCC-CESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5-2 output1 CNRM-CERFACS CNRM-CM5-2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-P output1 MPI-M MPI-ESM-P historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-ESM1 output1 MRI MRI-ESM1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ERA-Interim         reanaly      1             1980 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
+    <model>  OBS         NCEP                reanaly      1             1980 2005  @{OBSPATH}/Tier2/NCEP            </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_cycle_monthlyclim_850_glob.ncl">  perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_cycle_monthlyclim_200_glob.ncl">  perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_cycle_monthlyclim_30_glob.ncl">   perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_cycle_monthlyclim_5_glob.ncl">    perfmetrics_main.ncl          </diag_script>
+
+    
+    <diag_script cfg="cfg_perfmetrics_zonal_annualclim_all_glob.ncl">   perfmetrics_main.ncl          </diag_script>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_taylor.ncl        </diag_script>
+
+    <tags> R_atmos, T_phys </tags>    
+</diag>
+
+<diag>
+    <description>          Eastward wind                </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ERA-Interim,NCEP">  ua         </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CESM output1 CMCC CMCC-CESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5-2 output1 CNRM-CERFACS CNRM-CM5-2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-P output1 MPI-M MPI-ESM-P historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-ESM1 output1 MRI MRI-ESM1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ERA-Interim         reanaly      1             1980 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
+    <model>  OBS         NCEP                reanaly      1             1980 2005  @{OBSPATH}/Tier2/NCEP            </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+
+    <tags> R_atmos, T_atmDyn </tags>    
+</diag>
+
+<diag>
+    <description>          Northward wind               </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ERA-Interim,NCEP">  va         </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+  
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CESM output1 CMCC CMCC-CESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5-2 output1 CNRM-CERFACS CNRM-CM5-2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-P output1 MPI-M MPI-ESM-P historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-ESM1 output1 MRI MRI-ESM1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ERA-Interim         reanaly      1             1980 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
+    <model>  OBS         NCEP                reanaly      1             1980 2005  @{OBSPATH}/Tier2/NCEP            </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_850_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_200_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+
+    <tags> R_atmos, T_atmDyn </tags>
+</diag>
+
+<diag>
+    <description>          Geopotential height          </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ERA-Interim,NCEP">  zg         </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CESM output1 CMCC CMCC-CESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5-2 output1 CNRM-CERFACS CNRM-CM5-2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-P output1 MPI-M MPI-ESM-P historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+ 
+    <model>  OBS         ERA-Interim         reanaly      1             1980 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
+    <model>  OBS         NCEP                reanaly      1             1980 2005  @{OBSPATH}/Tier2/NCEP            </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_500_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_500_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Specific humidity            </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="AIRS,ERA-Interim">  hus        </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 2003 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 2003 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-ESM1 output1 MRI MRI-ESM1 historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ERA-Interim         reanaly      1             2003 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
+    <model>  obs4mips    AIRS                L3           RetStd-v5     2003 2005  @{OBSPATH}/Tier1                 </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_400_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_400_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Near-surface temperature     </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ERA-Interim,NCEP">  tas        </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CESM output1 CMCC CMCC-CESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5-2 output1 CNRM-CERFACS CNRM-CM5-2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-P output1 MPI-M MPI-ESM-P historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-ESM1 output1 MRI MRI-ESM1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+
+    <model>  OBS         ERA-Interim         reanaly      1             1980 2005  @{OBSPATH}/Tier3/ERA-Interim     </model>
+    <model>  OBS         NCEP                reanaly      1             1980 2005  @{OBSPATH}/Tier2/NCEP            </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_latlon_annualclim_all_glob.ncl">  perfmetrics_main.ncl          </diag_script>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Sea-surface (skin) temperature </description>
+    <variable_def_dir>     ./variable_defs/               </variable_def_dir>
+    <variable ref_model="ESACCI-SST,HadISST">  ts         </variable>
+    <field_type>           T2Ms                           </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/   </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1992 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1992 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ESACCI-SST  sat L4-GHRSST-SSTdepth-OSTIA-GLOB  1992 2005  @{OBSPATH}/Tier2/ESACCI-SST      </model>
+    <model>  OBS         HadISST             reanaly            1       1992 2005  @{OBSPATH}/Tier2/HadISST         </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_ts.ncl">         perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_ts.ncl">         perfmetrics_grading.ncl       </diag_script>
+    
+        <tags> R_atmos, R_ocean, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Precipitations               </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="GPCP-SG">  pr                  </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CESM output1 CMCC CMCC-CESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5-2 output1 CNRM-CERFACS CNRM-CM5-2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1980 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-P output1 MPI-M MPI-ESM-P historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-ESM1 output1 MRI MRI-ESM1 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>-->
+
+    <model>  obs4mips    GPCP-SG             L3           v2.2          1980 2005  @{OBSPATH}/Tier1         </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+        <tags> R_atmos, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Total cloud cover            </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ESACCI-CLOUD,PATMOS">  clt      </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 1982 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 1982 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 1982 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ESACCI-CLOUD        sat    AVHRR-fv2.0         1982 2005  @{OBSPATH}/Tier2/ESACCI-CLOUD </model>
+    <model>  OBS         PATMOS              sat    1                   1982 2005  @{OBSPATH}/Tier2/PATMOS       </model>
+
+
+    
+    <diag_script cfg="cfg_perfmetrics_latlon_annualclim_all_glob.ncl">  perfmetrics_main.ncl          </diag_script>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_clouds </tags>
+</diag>
+
+<diag>
+    <description>          Longwave radiation           </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="CERES-EBAF">  rlut             </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon atmos Amon r6i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+
+    <model>  obs4mips    CERES-EBAF          L3B          Ed2-7         2001 2005  @{OBSPATH}/Tier1         </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Shortwave radiation          </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="CERES-EBAF">  rsut             </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+
+    <model>  obs4mips    CERES-EBAF          L3B          Ed2-7         2001 2005  @{OBSPATH}/Tier1         </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Longwave cloud forcing       </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="CERES-EBAF">  LW_CRE          </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+
+    <model>  obs4mips    CERES-EBAF          L3B          Ed2-7         2001 2005  @{OBSPATH}/Tier1         </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_latlon_annualclim_all_glob.ncl">  perfmetrics_main.ncl          </diag_script>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_clouds </tags>
+</diag>
+
+<diag>
+    <description>          Shortwave cloud forcing      </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="CERES-EBAF">  SW_CRE          </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5-1-FV2 output1 NSF-DOE-NCAR CESM1-CAM5-1-FV2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+<!-- Datenueberlapp    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FIO-ESM output1 FIO FIO-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon atmos Amon r1i1p1 latest 2001 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon atmos Amon r1i1p1 latest 2001 2005 CMIP5_template</model>-->
+
+    <model>  obs4mips    CERES-EBAF          L3B          Ed2-7         2001 2005  @{OBSPATH}/Tier1         </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_latlon_annualclim_all_glob.ncl">  perfmetrics_main.ncl          </diag_script>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_clouds </tags>
+</diag>
+
+<diag>
+    <description>          Aerosol optical depth 550 nm   </description>
+    <variable_def_dir>     ./variable_defs/               </variable_def_dir>
+    <variable ref_model="ESACCI-AEROSOL,MODIS">  od550aer </variable>
+    <field_type>           T2Ms                           </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/   </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon aerosol aero r1i1p2 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon aerosol aero r1i1p2 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon aerosol aero r1i1p1 latest 2003 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon aerosol aero r1i1p1 latest 2003 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon aerosol aero r1i1p1 latest 2003 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ESACCI-AEROSOL      sat          SU-v4.21      2003 2005  @{OBSPATH}/Tier2/ESACCI-AEROSOL  </model>
+    <model>  OBS         MODIS               sat          L3-C6         2003 2005  @{OBSPATH}/Tier2/MODIS-L3-C6     </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_aerosol, T_aerosols </tags>
+</diag>
+
+<diag>
+    <description>          Aerosol optical depth 870 nm </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ESACCI-AEROSOL">  od870aer     </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon aerosol aero r1i1p1 latest 1997 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon aerosol aero r1i1p1 latest 1997 2004 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+
+    <model>  OBS         ESACCI-AEROSOL      sat          SU-v4.21      1997 2005  @{OBSPATH}/Tier2/ESACCI-AEROSOL  </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_aerosol, T_aerosols </tags>
+</diag>
+
+<diag>
+    <description>          Absorption optical depth 550 nm </description>
+    <variable_def_dir>     ./variable_defs/                </variable_def_dir>
+    <variable ref_model="ESACCI-AEROSOL">  abs550aer       </variable>
+    <field_type>           T2Ms                            </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/    </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon aerosol aero r1i1p2 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon aerosol aero r1i1p2 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>-->
+
+    <model>  OBS         ESACCI-AEROSOL      sat          SU-v4.21      1997 2005  @{OBSPATH}/Tier2/ESACCI-AEROSOL  </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_atmDyn </tags>
+</diag>
+
+<diag>
+    <description>          Fine mode optical depth 550 nm </description>
+    <variable_def_dir>     ./variable_defs/               </variable_def_dir>
+    <variable ref_model="ESACCI-AEROSOL">  od550lt1aer    </variable>
+    <field_type>           T2Ms                           </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/   </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon aerosol aero r1i1p2 latest 1997 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon aerosol aero r1i1p2 latest 1997 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon aerosol aero r1i1p1 latest 1997 2005 CMIP5_template</model>
+
+    <model>  OBS         ESACCI-AEROSOL      sat          SU-v4.21      1997 2005  @{OBSPATH}/Tier2/ESACCI-AEROSOL  </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_aero.ncl">       perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmos, T_atmDyn </tags>
+</diag>
+
+<diag>
+    <description>          Total column ozone           </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="ESACCI-OZONE,NIWA">  toz       </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon atmos Amon r2i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon atmos Amon r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon atmos Amon r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon atmos Amon r1i1p2 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon atmos Amon r1i1p2 latest 1997 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon atmos Amon r1i1p1 latest 1997 2005 CMIP5_template</model>
+    <model>  OBS         ESACCI-OZONE        sat          L3            1997 2005  @{OBSPATH}/Tier2/ESACCI-OZONE    </model>
+    <model>  OBS         NIWA                reanaly      1             1997 2005  @{OBSPATH}/Tier3/NIWA            </model> 
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_toz.ncl">       perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_toz.ncl">       perfmetrics_grading.ncl       </diag_script>
+
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_SHpolar_toz.ncl">    perfmetrics_main.ncl          </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_SHpolar_toz.ncl">    perfmetrics_grading.ncl       </diag_script>
+    
+    <tags> R_atmosChem, T_chem, T_ghg </tags>
+</diag>
+
+<diag>
+    <description>          Sea-ice concentration        </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="NSIDC-NT,ESACCI-SSMI">  sic    </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- kein areafile    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- kein areafile    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon seaIce OImon r6i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon seaIce OImon r1i1p2 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon seaIce OImon r1i1p2 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon seaIce OImon r1i1p1 latest 1992 2004 CMIP5_template</model>
+<!-- kein areafile    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+
+    <model>  OBS_gridfile  NSIDC-NT    sat  NH   1992  2005  @{OBSPATH}/Tier2/NSIDC/
+                                      @{OBSPATH}/Tier2/NSIDC/OBS_NSIDC-NT_sat_NH_T2Ms_sic_197811-201312.nc  </model>
+    <model>  OBS_gridfile  ESACCI-SSMI sat  NH   1992  2005  @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-SSMI/
+                  @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-SSMI/OBS_ESACCI-SSMI_sat_NH_T2Ms_sic_199201-200812.nc  </model>
+
+
+
+
+
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_NHpolar_sic.ncl">  perfmetrics_main.ncl                 </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_NHpolar_sic.ncl">  perfmetrics_grading.ncl              </diag_script>
+    
+    <tags> R_seaIce, T_seaIce </tags>
+</diag>
+
+<diag>
+    <description>          Sea-ice concentration        </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable ref_model="NSIDC-NT,ESACCI-SSMI">  sic    </variable>
+    <field_type>           T2Ms                         </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CMCC-CM output1 CMCC CMCC-CM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- kein areafile    <model>ESGF_CMIP5 CMCC-CMS output1 CMCC CMCC-CMS historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- kein areafile    <model>ESGF_CMIP5 EC-EARTH output1 ICHEC EC-EARTH historical mon seaIce OImon r6i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM2p1 output1 NOAA-GFDL GFDL-CM2p1 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H historical mon seaIce OImon r1i1p2 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H-CC output1 NASA-GISS GISS-E2-H-CC historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R historical mon seaIce OImon r1i1p2 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R-CC output1 NASA-GISS GISS-E2-R-CC historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-AO output1 NIMR-KMA HadGEM2-AO historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon seaIce OImon r1i1p1 latest 1992 2004 CMIP5_template</model>
+<!-- kein areafile    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon seaIce OImon r1i1p1 latest 1992 2005 CMIP5_template</model>-->
+
+    <model>  OBS_gridfile  NSIDC-NT    sat  SH   1992  2005  @{OBSPATH}/Tier2/NSIDC/
+                                      @{OBSPATH}/Tier2/NSIDC/OBS_NSIDC-NT_sat_SH_T2Ms_sic_197811-201312.nc  </model>
+    <model>  OBS_gridfile  ESACCI-SSMI sat  SH   1992  2005  @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-SSMI/
+                  @{OBSPATH}/Tier2/ESACCI-SIC/ESACCI-SSMI/OBS_ESACCI-SSMI_sat_SH_T2Ms_sic_199201-200812.nc  </model>
+
+
+
+
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_SHpolar_sic.ncl">  perfmetrics_main.ncl                 </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_SHpolar_sic.ncl">  perfmetrics_grading.ncl              </diag_script>
+    
+    <tags> R_seaIce, T_seaIce </tags>
+</diag>
+
+<diag>
+    <description>          Soil moisture                   </description>
+    <variable_def_dir>     ./variable_defs/                </variable_def_dir>
+    <variable ref_model="ESACCI-SOILMOISTURE"> sm          </variable>
+    <field_type>           T2Ms                            </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/    </diag_script_cfg_dir>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CanCM4 output1 CCCma CanCM4 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-CAM5 output1 NSF-DOE-NCAR CESM1-CAM5 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-FASTCHEM output1 NSF-DOE-NCAR CESM1-FASTCHEM historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CESM1-WACCM output1 NSF-DOE-NCAR CESM1-WACCM historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 FGOALS-s2 output1 LASG-IAP FGOALS-s2 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 GFDL-ESM2G output1 NOAA-GFDL GFDL-ESM2G historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 HadCM3 output1 MOHC HadCM3 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 HadGEM2-CC output1 MOHC HadGEM2-CC historical mon land Lmon r1i1p1 latest 1988 2004 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES historical mon land Lmon r1i1p1 latest 1988 2004 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+    <model>ESGF_CMIP5 MIROC4h output1 MIROC MIROC4h historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM-CHEM output1 MIROC MIROC-ESM-CHEM historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME historical mon land Lmon r1i1p1 latest 1988 2005 CMIP5_template</model>-->
+
+    <model>  OBS ESACCI-SOILMOISTURE sat    L3S-SSMV-COMBINED   1988 2005  @{OBSPATH}/Tier2/ESACCI-SOILMOISTURE  </model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_sm.ncl">       perfmetrics_main.ncl           </diag_script>
+    <diag_script cfg="cfg_perfmetrics_grading_RMSD_all_glob_sm.ncl">       perfmetrics_grading.ncl        </diag_script>
+    
+    <tags> R_land, T_phys </tags>
+</diag>
+
+<diag>
+    <description>          Portrait diagram             </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable>             ta                           </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_grading_collect.ncl">    perfmetrics_grading_collect.ncl         </diag_script>
+    
+    <tags> R_atmos, R_aerosol, R_atmosChem, R_land, R_seaIce, T_aerosols, T_atmDyn, T_clouds, T_chem, T_ghg, T_phys, T_seaIce </tags>
+</diag>
+
+<diag>
+    <description>          Taylor diagram               </description>
+    <variable_def_dir>     ./variable_defs/             </variable_def_dir>
+    <variable>             ta                           </variable>
+    <field_type>           T3M                          </field_type>
+    <diag_script_cfg_dir>  ./nml/cfg_perfmetrics/CMIP5/ </diag_script_cfg_dir>
+
+    
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 historical mon atmos Amon r1i1p1 latest 1980 2005 CMIP5_template</model>
+
+    
+    <diag_script cfg="cfg_perfmetrics_taylor_collect.ncl">     perfmetrics_taylor_collect.ncl          </diag_script>
+    
+    <tags> R_atmos, R_aerosol, R_atmosChem, R_land, R_seaIce, T_aerosols, T_atmDyn, T_clouds, T_chem, T_ghg, T_phys, T_seaIce </tags>
+</diag>
+</DIAGNOSTICS>
+<ESGF><config_file>./esgf_config.xml</config_file></ESGF>
+</namelist>

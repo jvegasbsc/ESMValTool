@@ -1,0 +1,238 @@
+<namelist>
+<include href="./config_private.xml" />
+<namelist_summary>
+###############################################################################
+namelist_ECS.xml
+
+Description
+Namelist to calculate the Equilibrium Climate Sensitivity (ECS) using
+abrupt4xCO2 and piControl runs for the variables rtmt and tas. 
+
+Authors
+Ricarda Rettinger
+
+Project
+DLR ESMVal
+CRESCENDO
+
+Reference
+Andrews et al., 2012, Forcing, feedbacks and climate sensitivity in CMIP5 
+coupled atmosphere-ocean climate models, Geophysical Research Letters, 39.
+DOI: 10.1029/2012GL051607
+
+This namelist is part of the ESMValTool
+###############################################################################
+</namelist_summary>
+
+<GLOBAL>
+    <write_plots type="boolean">              True         </write_plots>
+    <write_netcdf type="boolean">             True         </write_netcdf>
+    <force_processing type="boolean">        False         </force_processing>
+    <wrk_dir type="path">                    ./work/       </wrk_dir>
+    <plot_dir type="path">                   ./work/plots/ </plot_dir>
+    <climo_dir type="path">                  ./work/climo/ </climo_dir>
+    <write_plot_vars type="boolean">          True         </write_plot_vars>
+    <max_data_filesize type="integer">         100         </max_data_filesize>
+    <max_data_blocksize type="integer">        500         </max_data_blocksize>
+    <verbosity type="integer">                  1         </verbosity>
+    <exit_on_warning type="boolean">        False         </exit_on_warning>
+    <output_file_type>                          ps         </output_file_type>
+    <force_calc type="boolean">              False         </force_calc>
+    <force_gradecalc type="boolean">         False         </force_gradecalc>
+    <force_taylorcalc type="boolean">        False         </force_taylorcalc>
+    <tags> D_andrews12,P_crescendo                         </tags>
+</GLOBAL>
+
+<MODELS>
+
+
+
+
+
+
+ 
+</MODELS>
+
+
+<DIAGNOSTICS>
+
+
+
+<diag>
+   <description>         tas                 </description>
+   <variable_def_dir>    ./variable_defs/              </variable_def_dir>
+   <variable>            tas                      </variable>   
+   <variable>            rtmt                      </variable>
+   <field_type>          T2Ms                          </field_type>
+   <diag_script_cfg_dir> ./nml/cfg_ECS/  </diag_script_cfg_dir>
+   <tags>                R_atmos             </tags>
+
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 abrupt4xCO2 mon atmos Amon r1i1p1 latest 0300 0449 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-0 output1 CSIRO-BOM ACCESS1-0 piControl mon atmos Amon r1i1p1 latest 0300 0449 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 abrupt4xCO2 mon atmos Amon r1i1p1 latest 0250 0399 CMIP5_template</model>
+    <model>ESGF_CMIP5 ACCESS1-3 output1 CSIRO-BOM ACCESS1-3 piControl mon atmos Amon r1i1p1 latest 0250 0399 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 abrupt4xCO2 mon atmos Amon r1i1p1 latest 0160 0309 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1 output1 BCC bcc-csm1-1 piControl mon atmos Amon r1i1p1 latest 0160 0309 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m abrupt4xCO2 mon atmos Amon r1i1p1 latest 0240 0389 CMIP5_template</model>
+    <model>ESGF_CMIP5 bcc-csm1-1-m output1 BCC bcc-csm1-1-m piControl mon atmos Amon r1i1p1 latest 0240 0389 CMIP5_template</model>
+<!-- keine Daten    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>-->
+<!-- keine Daten    <model>ESGF_CMIP5 BNU-ESM output1 BNU BNU-ESM piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>-->
+
+
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 piControl mon atmos Amon r1i1p1 latest 2015 2164 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 CCSM4 output1 NCAR CCSM4 piControl mon atmos Amon r1i1p1 latest 0800 0949 CMIP5_template</model>
+
+
+
+
+
+
+
+
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 CNRM-CM5 output1 CNRM-CERFACS CNRM-CM5 piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 abrupt4xCO2 mon atmos Amon r1i1p1 latest 0001 0150 CMIP5_template</model>
+    <model>ESGF_CMIP5 CSIRO-Mk3-6-0 output1 CSIRO-QCCCE CSIRO-Mk3-6-0 piControl mon atmos Amon r1i1p1 latest 0001 0150 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 abrupt4xCO2 mon atmos Amon r1i1p1 latest 0490 0639 CMIP5_template</model>
+    <model>ESGF_CMIP5 FGOALS-g2 output1 LASG-CESS FGOALS-g2 piControl mon atmos Amon r1i1p1 latest 0490 0639 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 abrupt4xCO2 mon atmos Amon r1i1p1 latest 0001 0150 CMIP5_template</model>
+    <model>ESGF_CMIP5 GFDL-CM3 output1 NOAA-GFDL GFDL-CM3 piControl mon atmos Amon r1i1p1 latest 0001 0150 CMIP5_template</model>
+
+
+
+
+
+
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-H output1 NASA-GISS GISS-E2-H piControl mon atmos Amon r1i1p1 latest 1200 1349 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 GISS-E2-R output1 NASA-GISS GISS-E2-R piControl mon atmos Amon r1i1p1 latest 3331 3480 CMIP5_template</model>
+
+
+
+
+
+
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 abrupt4xCO2 mon atmos Amon r1i1p1 latest 2090 2239 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 piControl mon atmos Amon r1i1p1 latest 2090 2239 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1989 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR piControl mon atmos Amon r1i1p1 latest 1850 1989 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM abrupt4xCO2 mon atmos Amon r1i1p1 latest 1 50 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM piControl mon atmos Amon r1i1p1 latest 1800 1949 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 abrupt4xCO2 mon atmos Amon r1i1p1 latest 2100 2249 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 piControl mon atmos Amon r1i1p1 latest 2100 2249 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+
+
+
+
+    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M abrupt4xCO2 mon atmos Amon r1i1p1 latest 0001 0150 CMIP5_template</model>
+    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M piControl mon atmos Amon r1i1p1 latest 0700 0849 CMIP5_template</model>    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1989 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR piControl mon atmos Amon r1i1p1 latest 1850 1989 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM abrupt4xCO2 mon atmos Amon r1i1p1 latest 1 50 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM piControl mon atmos Amon r1i1p1 latest 1800 1949 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 abrupt4xCO2 mon atmos Amon r1i1p1 latest 2100 2249 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC5 output1 MIROC MIROC5 piControl mon atmos Amon r1i1p1 latest 2100 2249 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR abrupt4xCO2 mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+    <model>ESGF_CMIP5 MPI-ESM-MR output1 MPI-M MPI-ESM-MR piControl mon atmos Amon r1i1p1 latest 1850 1999 CMIP5_template</model>
+
+
+
+
+    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M abrupt4xCO2 mon atmos Amon r1i1p1 latest 0001 0150 CMIP5_template</model>
+    <model>ESGF_CMIP5 NorESM1-M output1 NCC NorESM1-M piControl mon atmos Amon r1i1p1 latest 0700 0849 CMIP5_template</model>
+
+    <diag_script cfg="cfg_ECS_anomaly.ncl"> ECS.ncl </diag_script>
+</diag>
+
+
+
+
+
+<diag>
+   <description>         TCR                 </description>
+   <variable_def_dir>    ./variable_defs/    </variable_def_dir>
+   <variable>            tas                 </variable>
+   <field_type>          T2Ms                </field_type>
+   <diag_script_cfg_dir> ./nml/cfg_TCR/      </diag_script_cfg_dir>
+   <tags>                R_atmos             </tags>
+
+    <model>ESGF_CMIP5 CanESM2 output1 CCCma CanESM2 1pctCO2 mon atmos Amon r1i1p1 latest 1850 1929 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 CESM1-BGC output1 NSF-DOE-NCAR CESM1-BGC 1pctCO2 mon atmos Amon r1i1p1 latest 1 80 CMIP5_template</model>
+
+
+
+
+
+
+
+
+
+
+    <model>ESGF_CMIP5 GFDL-ESM2M output1 NOAA-GFDL GFDL-ESM2M 1pctCO2 mon atmos Amon r1i1p1 latest 1 80 CMIP5_template</model>
+
+
+
+
+
+
+    <model>ESGF_CMIP5 HadGEM2-ES output1 MOHC HadGEM2-ES 1pctCO2 mon atmos Amon r1i1p1 latest 1910 1989 CMIP5_template</model>
+    <model>ESGF_CMIP5 inmcm4 output1 INM inmcm4 1pctCO2 mon atmos Amon r1i1p1 latest 2090 2169 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-LR output1 IPSL IPSL-CM5A-LR 1pctCO2 mon atmos Amon r1i1p1 latest 1850 1929 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5A-MR output1 IPSL IPSL-CM5A-MR 1pctCO2 mon atmos Amon r1i1p1 latest 1850 1929 CMIP5_template</model>
+    <model>ESGF_CMIP5 IPSL-CM5B-LR output1 IPSL IPSL-CM5B-LR 1pctCO2 mon atmos Amon r1i1p1 latest 1850 1929 CMIP5_template</model>
+    <model>ESGF_CMIP5 MIROC-ESM output1 MIROC MIROC-ESM 1pctCO2 mon atmos Amon r1i1p1 latest 1 80 CMIP5_template</model>
+
+
+
+
+
+    <model>ESGF_CMIP5 MPI-ESM-LR output1 MPI-M MPI-ESM-LR 1pctCO2 mon atmos Amon r1i1p1 latest 1850 1929 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 MRI-CGCM3 output1 MRI MRI-CGCM3 1pctCO2 mon atmos Amon r1i1p1 latest 1851 1930 CMIP5_template</model>
+
+
+
+    <model>ESGF_CMIP5 NorESM1-ME output1 NCC NorESM1-ME 1pctCO2 mon atmos Amon r1i1p1 latest 1 80 CMIP5_template</model>
+
+
+   <diag_script cfg="cfg_TCR.ncl"> TCR.ncl        </diag_script>
+</diag>
+
+</DIAGNOSTICS>
+
+<include href="./config_private_DLR-DKRZ.xml" /><ESGF><config_file>./esgf_config.xml</config_file></ESGF></namelist>
