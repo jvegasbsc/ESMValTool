@@ -56,7 +56,7 @@ def color_lookup(ecv_name):
         "intdic": dict({"Data": "viridis",
                        "Sequential":"cool",
                        "Diverging":"bwr"}),
-        "lai": dict({"Data": "RdYlGn",
+        "lai": dict({"Data": "YlGn",
                     "Sequential":"YlGn",
                     "Diverging":"BrBG"}),
         "lwp": dict({"Data": "RdYlGn",
