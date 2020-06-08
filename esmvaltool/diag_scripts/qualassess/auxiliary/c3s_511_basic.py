@@ -18,10 +18,14 @@ import string
 import collections
 import csv
 import matplotlib
+import itertools
 #matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import dask
+import xarray
+from multiprocessing import Pool
+import pathos.pools as pp
 #from scipy import stats
 import datetime
 from json import load,dump
@@ -43,6 +47,7 @@ import logging
 from pprint import pprint
 from .libs.predef.ecv_lookup_table import ecv_lookup
 from .libs.predef.color_lookup_table import color_lookup
+from .libs.trend_framework.trends_core3d import linear_trend, theilsen_trend, mannkendall
 
 logger = logging.getLogger(os.path.basename(__file__))
 
@@ -1664,9 +1669,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
 
     def __trends_procedures_2D__(self, cube=None, level=None):
 
-        import resource
-        
-        before0 = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+#        import resource
         
         if cube is None:
             cube = self.sp_data
@@ -1680,27 +1683,123 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             dataset_id = [self.__dataset_id__[1]]
 
         list_of_plots = []
-
-        # simple linear trend (slope) and p-values
-        _, S, _, P = utils.temporal_trend(cube, pthres=1.01)
-
-        signtrends = (P.data <= 0.05) * np.sign(S.data)
-        ST = S.copy()
-        ST.data = signtrends
         
-        after1 = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        logger.info("full trend without plotting" + ":")
-        logger.info(str(round((after1-before0)/1024.,2)) + "MB")
+        pool_num =  self.__cfg__.pop('num_processors',1)
         
+        if pool_num > 1:
+            
+            self.__logger__.info("Multiprocessing trends framework with {} parallel processes.".format(pool_num))
+            
+            pool = pp.ProcessPool(pool_num)
+            
+#            pool = Pool(processes=pool_num)
+            
+            def pool_linear_trend(ts_cube):
+                xcube = xarray.DataArray.from_iris(ts_cube)
+                lintrend,linpvalue = linear_trend(xcube)
+                theilsen_slope = theilsen_trend(xcube)
+                return {"lintrend":lintrend,
+                        "linpvalue":linpvalue,
+                        "theilsen_slope":theilsen_slope,
+                        }
+            
+            res = pool.map(pool_linear_trend, cube.slices(['time']))
+            
+            lintrend = [r["lintrend"] for r in res]
+            linpvalue = [r["linpvalue"] for r in res]
+            theilsen_slope = [r["theilsen_slope"] for r in res]
+            
+            def xarray_reconcatenate(lat_lon_list):
+                sublists = []
+                for _, groups in itertools.groupby(lat_lon_list, lambda x: x.lat):
+                    sublists.append(list(groups))
+               
+                lonagg = [xarray.concat(sl, dim = "lon") for sl in sublists]
+                
+                fullagg = xarray.concat(lonagg, dim = "lat")
+                
+                return fullagg
+            
+            lintrend = xarray_reconcatenate(lintrend)
+            linpvalue = xarray_reconcatenate(linpvalue)
+            theilsen_slope = xarray_reconcatenate(theilsen_slope)
+            xcube = xarray.DataArray.from_iris(cube)
+            
+        else:
+                
+            xcube = xarray.DataArray.from_iris(cube)
+            
+            # basic calculations
+            lintrend,linpvalue = linear_trend(xcube)
+            theilsen_slope = theilsen_trend(xcube)
+        
+        # prepare cube conversion linear trend
+        if (" " in lintrend.name):
+            lintrend.name = lintrend.name.strip(" ")[0]
+        lintrend.attrs['units'] = lintrend.attrs['units'].replace("timestep", "({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        lintrend.attrs.update({'standard_name': None})
+        lintrend.attrs.update({'long_name': "Linear Trend of {}".format(xcube.attrs["long_name"])})
+        lintrend.attrs.update({'cell_methods': 'time: linear trend'})
+        
+        # prepare cube conversion pvalue
+        if (" " in linpvalue.name):
+            linpvalue.name = linpvalue.name.strip(" ")[0]
+        linpvalue.attrs.update({'standard_name': None})
+        linpvalue.attrs.update({'long_name': "Linear Trend of {} (p-value)".format(xcube.attrs["long_name"])})
+        linpvalue.attrs.update({'cell_methods': 'time: linear trend (pvalue)'})
+        
+        # prepare cube conversion theilsen
+        if (" " in theilsen_slope.name):
+            theilsen_slope.name = theilsen_slope.name.strip(" ")[0]
+        theilsen_slope.attrs['units'] = theilsen_slope.attrs['units'].replace("per timestep", "/ ({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        theilsen_slope.attrs.update({'standard_name': None})
+        theilsen_slope.attrs.update({'long_name': "Linear Trend of {}".format(xcube.attrs["long_name"])})
+        theilsen_slope.attrs.update({'cell_methods': 'time: Theil-Sen trend (pvalue)'})
+        
+        # adjust attributes
+        for key,val in xcube.attrs.items():
+            if key not in lintrend.attrs.keys():
+                lintrend.attrs.update({key: val})
+            if key not in linpvalue.attrs.keys():
+                linpvalue.attrs.update({key: val})
+            if key not in theilsen_slope.attrs.keys():
+                theilsen_slope.attrs.update({key: val})
+                
+        #conversions to cubes
+        lintrend_cube = lintrend.to_iris()
+        lintrend_cube.convert_units('{} / (10 years)'.format(cube.units))
+        
+        linpvalue_cube = linpvalue.to_iris()
+        
+        theilsen_slope_cube = theilsen_slope.to_iris()
+        theilsen_slope_cube.convert_units('{} / (10 years)'.format(cube.units))
+        
+        for c in [lintrend_cube, linpvalue_cube, theilsen_slope_cube]:
+            if not c.coord('latitude').has_bounds():
+                c.coord('latitude').guess_bounds()
+            if not c.coord('longitude').has_bounds():
+                c.coord('longitude').guess_bounds()
+        
+        self.__logger__.info(lintrend_cube)
+        self.__logger__.info(linpvalue_cube)
+        self.__logger__.info(theilsen_slope_cube)
+
         try:
-            # plotting routines
-            x = Plot2D(S)
+            
+            vminmax_ts = np.array([-1, 1]) * np.max(np.abs(
+                    np.nanpercentile(theilsen_slope_cube.data.compressed(), [5, 95])))
+            
+            vminmax_lt = np.array([-1, 1]) * np.max(np.abs(
+                    np.nanpercentile(lintrend_cube.data.compressed(), [5, 95])))
 
-            vminmax = np.array([-1, 1]) * np.max(np.abs(
-                    np.nanpercentile(S.data.compressed(), [5, 95])))
+            vminmax = [np.min(np.concatenate((vminmax_ts, vminmax_lt))),
+                       np.max(np.concatenate((vminmax_ts, vminmax_lt)))]
+            
+            # plotting routines
+            x = Plot2D(lintrend_cube)
 
             filename = self.__plot_dir__ + os.sep + \
-                basic_filename + "_trend." + self.__output_type__
+                basic_filename + "_lintrend." + self.__output_type__
             list_of_plots.append(filename)
 
             fig = plt.figure()
@@ -1721,7 +1820,39 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                      self.__basetags__ + ['DM_global', 'C3S_trend'],
                      str("Latitude/Longitude" + ' slope values of ' +
                          ecv_lookup(self.__varname__) +
-                         ' temporal trends per decade for the data set ' +
+                         ' temporal linear trends per decade for the data set ' +
+                         " ".join(dataset_id) + ' (' + self.__time_period__ +
+                         '). NA-values are shown in grey.'),
+                     '#C3S' + 'temptrend' + self.__varname__,
+                     self.__infile__,
+                     self.diagname,
+                     self.authors)
+                     
+            x = Plot2D(theilsen_slope_cube)
+
+            filename = self.__plot_dir__ + os.sep + \
+                basic_filename + "_ts_trend." + self.__output_type__
+            list_of_plots.append(filename)
+
+            fig = plt.figure()
+            (fig, ax, _) = plot_setup(fig=fig)
+            x.plot(ax=ax,
+                   color=self.colormaps,
+                   ext_cmap="both",
+                   color_type="Diverging",
+                   vminmax=vminmax,
+                   title=" ".join([self.__dataset_id__[indx] for 
+                                   indx in [0, 2, 1, 3]]) + " (" + 
+                    self.__time_period__ + ")")
+            fig.savefig(filename)
+            plt.close(fig.number)
+
+            ESMValMD("meta",
+                     filename,
+                     self.__basetags__ + ['DM_global', 'C3S_trend'],
+                     str("Latitude/Longitude" + ' slope values of ' +
+                         ecv_lookup(self.__varname__) +
+                         ' temporal Theil-Sen trends per decade for the data set ' +
                          " ".join(dataset_id) + ' (' + self.__time_period__ +
                          '). NA-values are shown in grey.'),
                      '#C3S' + 'temptrend' + self.__varname__,
@@ -1729,39 +1860,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
 
-            x = Plot2D(ST)
-
-            filename = self.__plot_dir__ + os.sep + \
-                basic_filename + "_signtrend." + self.__output_type__
-            list_of_plots.append(filename)
-
-            fig = plt.figure()
-            (fig, ax, _) = plot_setup(fig=fig)
-            x.plot(ax=ax,
-                   color=self.colormaps,
-                   color_type="Diverging",
-                   vminmax=[-1.,1.],
-                   title=" ".join([self.__dataset_id__[indx] for 
-                                   indx in [0, 2, 1, 3]]) + " (" + 
-                     self.__time_period__ + ")")
-            fig.savefig(filename)
-            plt.close(fig.number)
-
-            ESMValMD("meta",
-                     filename,
-                     self.__basetags__ + ['DM_global', 'C3S_trend'],
-                     str("Latitude/Longitude" + 
-                         ' significant slope signs (p<=0.05) of ' +
-                         ecv_lookup(self.__varname__) +
-                         ' temporal trends per decade for the data set ' +
-                         " ".join(dataset_id) + ' (' + self.__time_period__ +
-                         ')'),
-                     '#C3S' + 'temptrend' + self.__varname__,
-                     self.__infile__,
-                     self.diagname,
-                     self.authors)
-
-            x = Plot2D(P)
+            x = Plot2D(linpvalue_cube)
 
             filename = self.__plot_dir__ + os.sep + \
                 basic_filename + "_pvals." + self.__output_type__
@@ -1799,8 +1898,11 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
             self.__logger__.error(exc_type, fname, exc_tb.tb_lineno)
             self.__logger__.info("Trend")
             self.__logger__.info('Warning: blank figure!')
-
-            x = Plot2D_blank(S)
+            
+            filename = self.__plot_dir__ + os.sep + \
+                basic_filename + "_plottingerror." + self.__output_type__
+                
+            x = Plot2D_blank(linpvalue_cube)
 
             fig = plt.figure()
             (fig, ax, _) = plot_setup(fig=fig)
@@ -1823,13 +1925,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                      self.diagname,
                      self.authors)
 
-        del P
-        del ST
-        del S
-        
-        after2 = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        logger.info("full trend only plotting" + ":")
-        logger.info(str(round((after2-after1)/1024.,2)) + "MB")
+        del lintrend_cube
+        del linpvalue_cube
+        del theilsen_slope
 
         return list_of_plots
     

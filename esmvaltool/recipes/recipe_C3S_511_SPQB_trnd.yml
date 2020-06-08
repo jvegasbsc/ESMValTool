@@ -1,0 +1,49 @@
+documentation:
+  description: |
+    Independent assessment of single products for the C3S_511 quality brief - trends
+
+  authors:
+    - mueller_benjamin
+    - hassler_birgit
+
+  maintainer:
+    - mueller_benjamin
+    - hassler_birgit
+
+datasets:
+  - {dataset: MRI-CGCM3,  project: CMIP5,  mip: Amon,  exp: decadal1980,  ensemble: r1i1p1,  start_year: 1991,  end_year: 2000}
+#  - {dataset: CDS-ERA5-SNOWDEPTH, type: reanalysis, project: OBS, mip: LImon, version: L3, tier: 3, start_year: 1990,  end_year: 2018}
+#  - {dataset: CDS-XCH4, type: sat, project: OBS, mip: Amon,  version: L3, start_year: 2003,  end_year: 2016}
+preprocessors:
+  noop: {}
+  regrid_ex:
+    regrid:
+      target_grid: 1x1
+      scheme: nearest
+
+diagnostics:
+  SPQB:
+    description: Single product quality brief.
+    variables:
+      ta:
+#      snd:
+#      xch4:
+        preprocessor: regrid_ex
+        derive: False
+    scripts:
+      trend_framework:
+        script: qualassess/DUMMY_C3S_511_SPQB.py
+        requests: [lintrend]
+        num_processors: 7
+        levels: [8.50e+04]#,1.00e+02]
+#
+#      diag_O_hist:
+#        script: qualassess/DUMMY_C3S_511_SPQB.py
+#        requests: [histogram]
+#        log_data: False
+#        levels: [8.50e+04]#,1.00e+02]
+#        
+#      diag_T_trend: #worst for memory
+#        script: qualassess/DUMMY_C3S_511_SPQB.py
+#        requests: [lintrend]
+#        levels: [8.50e+04]

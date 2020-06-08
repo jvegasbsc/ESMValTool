@@ -2,7 +2,7 @@
 
 """
 ;#############################################################################
-; ta Diagnostics
+; fapar Diagnostics
 ; Author: Benjamin Mueller (LMU Munich, GER)
 ; C3S_511 project
 ;#############################################################################
@@ -36,19 +36,19 @@ import logging
 import os
 
 from esmvaltool.diag_scripts.shared import run_diagnostic
-from auxiliary.c3s_511_ex import ex_Diagnostic_SP
+from auxiliary.c3s_511_fapar import fapar_Diagnostic
 
 logger = logging.getLogger(os.path.basename(__file__))
 
 
 def main(cfg):
-    logger.info('>>>>>>>> ex_C3S_511_SPQB.py is running! <<<<<<<<<<<<')
+    logger.info('>>>>>>>> fapar_C3S_511_SPQB.py is running! <<<<<<<<<<<<')
 
     for filename, attributes in cfg['input_data'].items():
         logger.info("Processing variable %s from data set %s",
-                    attributes['standard_name'], attributes['dataset'])
+                    attributes['short_name'], attributes['dataset'])
         logger.info("Preparing diagnostic")
-        Diag = ex_Diagnostic_SP()
+        Diag = fapar_Diagnostic()
         Diag.set_info(cfg=cfg)
         logger.info("Loading %s", filename)
         Diag.read_data()
