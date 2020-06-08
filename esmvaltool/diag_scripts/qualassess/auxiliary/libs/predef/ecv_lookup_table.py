@@ -48,6 +48,7 @@ def ecv_lookup(ecv_name):
         "siu": "sea ice x velocity",
         "siv": "sea ice y velocity",
         "sm": "volumetric soil moisture",
+        "sm1m": "volumetric soil moisture",
         "snc": "area covered by snow",
         "snd": "snow depth",
         "swe": "snow water equivalent",
