@@ -16,6 +16,7 @@ def ecv_lookup(ecv_name):
         "hur": "relative humidity",
         "intdic": "dissolved inorganic carbon content",
         "lai": "leaf area index",
+        "lweGrace" : "liquid water equivalent",
         "lwp": "cloud liquid water path",
         "mrsos": "moisture in upper portion of soil column",
         "od550aer": "aerosol optical depth at 550nm",
