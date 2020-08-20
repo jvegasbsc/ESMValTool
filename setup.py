@@ -30,6 +30,7 @@ REQUIREMENTS = {
         'cftime',
         'cmocean',
         'dask>=2.12',
+        'diagonals>=0.3.2',
         'ecmwf-api-client',
         'eofs',
         'ESMPy',
@@ -39,9 +40,11 @@ REQUIREMENTS = {
         'jinja2',
         'joblib',
         'lime',
-        'matplotlib>3.3.1,<3.4',  # bug in 3.3.1, issue with nc-time-axis for >3.3.4
+        'llvmlite',
+        'matplotlib>3.3.1,<3.4',  # bug in 3.3.1, 3.3.2 and 3 fine
         'natsort',
-        'nc-time-axis<1.3.1',  # needed by iris.plot, issues with matplotlib 3.4 and 1.3.1
+        'numba==0.52',
+        'nc-time-axis<1.3.1',  # needed by iris.plot
         'netCDF4',
         'numpy',
         'pandas',
@@ -218,7 +221,8 @@ setup(
     extras_require={
         'develop': (set(REQUIREMENTS['develop'] + REQUIREMENTS['test']) -
                     {'pycodestyle'}),
-        'test': REQUIREMENTS['test'],
+        'test':
+        REQUIREMENTS['test'],
     },
     entry_points={
         'console_scripts': [

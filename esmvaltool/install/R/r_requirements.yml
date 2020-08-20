@@ -34,7 +34,7 @@ dotCall64:
 functional:
 ggplot2:
 gridExtra:
-lintr:
+# lintr:
 logging:
 mapproj:
 maps:
