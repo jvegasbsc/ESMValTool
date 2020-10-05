@@ -58,10 +58,10 @@ diagnostics:
 #      diag_O_info:
 #        script: qualassess/DUMMY_C3S_511_SPQB.py
 #        requests: [info]
-#      diag_O_avail:
-#        script: qualassess/DUMMY_C3S_511_SPQB.py
-#        requests: [availability]
-#        levels: [3.00e+04,8.50e+04,1.00e+02]
+      diag_O_avail:
+        script: qualassess/DUMMY_C3S_511_SPQB.py
+        requests: [availability]
+        levels: [3.00e+04]#,8.50e+04,1.00e+02]
 #      diag_O_hist:
 #        script: qualassess/DUMMY_C3S_511_SPQB.py
 #        requests: [histogram]

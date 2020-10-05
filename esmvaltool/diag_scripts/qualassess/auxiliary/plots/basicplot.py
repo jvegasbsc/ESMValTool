@@ -932,7 +932,7 @@ class Plot2D(object):
                     weights=iris.analysis.cartography.area_weights(cube)
                         ).data
                 plt.gca().coastlines()
-                plt.gca().gridlines(crs=ccrs.Geodetic(), color="k",
+                plt.gca().gridlines(crs=ccrs.PlateCarree(), color="k",
                                     linestyle=':')
                 if np.log10(mean) >= 4 or np.log(mean) <= -2:
                     txt = r'mean: {:.2g} $\pm$ {:.2g} '.format(mean, std)
@@ -960,13 +960,18 @@ class Plot2D(object):
             cax = ax[len(ax) - 1]
         
         if dat_log:
+            print(pcm)
+            print(cax)
+            print(ext_cmap)
+            ticks = ticks.compute()
+            print(ticks.compute())
             cbar = plt.colorbar(pcm,
                 cax=cax,
                 orientation='horizontal',
                 spacing='proportional',
 #                fraction=1.,
                 extend=ext_cmap,
-                ticks = ticks,
+                ticks = ticks.compute(),
 #                boundaries=(levels)
                 )
             cbar.ax.set_xticklabels([('{:.'+str(2)+'g}').format(x) for x in ticks])
@@ -1257,19 +1262,19 @@ class Plot1D(object):
 def plot_setup(d="time", m="module", numfigs=1, fig=plt.figure(), caption=''):
     #TODO: make sure that anomalies and climatologies look good
     if d in ["longitude", "levels"]:
-        gs = gridspec.GridSpec(10, 5)
-        ax = np.array([plt.subplot(gs[:-2, :-1]),
-                       plt.subplot(gs[:-2, -1]), plt.subplot(gs[-2:, :])])
+        gs = gridspec.GridSpec(30, 20)
+        ax = np.array([plt.subplot(gs[:-7, :-4]),
+                       plt.subplot(gs[:-7, -3:]), plt.subplot(gs[-2:, :])])
         fig.set_figwidth(1.7 * fig.get_figwidth())
-        fig.set_figheight(1.2 * fig.get_figheight())
+        fig.set_figheight(1.4 * fig.get_figheight())
     elif "time" == d:
-        gs = gridspec.GridSpec(9, 1)
+        gs = gridspec.GridSpec(10, 1)
         ax = np.array([plt.subplot(gs[:-2, 0]), plt.subplot(gs[-1, 0])])
         fig.set_figheight(1.2 * fig.get_figheight())
     elif "latitude" == d:
-        gs = gridspec.GridSpec(16, 1)
-        ax = np.array([plt.subplot(gs[:-5, 0]),
-                       plt.subplot(gs[-5:-2, 0]), plt.subplot(gs[-2:, 0])])
+        gs = gridspec.GridSpec(25, 1)
+        ax = np.array([plt.subplot(gs[:-10, 0]),
+                       plt.subplot(gs[-9:-3, 0]), plt.subplot(gs[-2:, 0])])
         fig.set_figheight(1.7 * fig.get_figheight())
     if "climatology" == m:
         fig.set_figheight(1.7 * fig.get_figheight())

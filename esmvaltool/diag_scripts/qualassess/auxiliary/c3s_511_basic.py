@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 import dask
 import xarray
 from multiprocessing import Pool
-import pathos.pools as pp
+#import pathos.pools as pp
 #from scipy import stats
 import datetime
 from json import load,dump
@@ -643,7 +643,7 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         """
         try:
             if os.path.isfile(self.__infile__):
-                self.sp_data = iris.load_cube(self.__infile__)
+                self.sp_data = iris.load_cube(self.__infile__).copy()
                 # get dimensions and correct if needed
                 sp_dimensions = [c.name() for c in self.sp_data.coords()]
                 aux_dimensions = [c.name() for c in self.sp_data.aux_coords]
@@ -1736,7 +1736,9 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         # prepare cube conversion linear trend
         if (" " in lintrend.name):
             lintrend.name = lintrend.name.strip(" ")[0]
-        lintrend.attrs['units'] = lintrend.attrs['units'].replace("timestep", "({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        print(lintrend.attrs['units'])
+        lintrend.attrs['units'] = lintrend.attrs['units'].replace("/ timestep", "({} {})-1".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        print(lintrend.attrs['units'])
         lintrend.attrs.update({'standard_name': None})
         lintrend.attrs.update({'long_name': "Linear Trend of {}".format(xcube.attrs["long_name"])})
         lintrend.attrs.update({'cell_methods': 'time: linear trend'})
@@ -1751,7 +1753,8 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
         # prepare cube conversion theilsen
         if (" " in theilsen_slope.name):
             theilsen_slope.name = theilsen_slope.name.strip(" ")[0]
-        theilsen_slope.attrs['units'] = theilsen_slope.attrs['units'].replace("per timestep", "/ ({} {})".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
+        print(theilsen_slope.attrs['units'])
+        theilsen_slope.attrs['units'] = theilsen_slope.attrs['units'].replace("per timestep", "({} {})-1".format(self.__avg_timestep__[1],cube.coord("time").units.name.split(" ")[0]))
         theilsen_slope.attrs.update({'standard_name': None})
         theilsen_slope.attrs.update({'long_name': "Linear Trend of {}".format(xcube.attrs["long_name"])})
         theilsen_slope.attrs.update({'cell_methods': 'time: Theil-Sen trend (pvalue)'})
@@ -1767,12 +1770,12 @@ class Basic_Diagnostic_SP(__Diagnostic_skeleton__):
                 
         #conversions to cubes
         lintrend_cube = lintrend.to_iris()
-        lintrend_cube.convert_units('{} / (10 years)'.format(cube.units))
+        lintrend_cube.convert_units('{} (10 years)-1'.format(cube.units))
         
         linpvalue_cube = linpvalue.to_iris()
         
         theilsen_slope_cube = theilsen_slope.to_iris()
-        theilsen_slope_cube.convert_units('{} / (10 years)'.format(cube.units))
+        theilsen_slope_cube.convert_units('{} (10 years)-1'.format(cube.units))
         
         for c in [lintrend_cube, linpvalue_cube, theilsen_slope_cube]:
             if not c.coord('latitude').has_bounds():

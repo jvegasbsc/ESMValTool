@@ -121,11 +121,15 @@ def color_lookup(ecv_name):
         "sm": dict({"Data": "YlGn",
                     "Sequential":"YlGn",
                     "Diverging":"BrBG"}),
-        "snc": dict(),
+        "snc": dict({"Data": "BuGn_r", #bone
+                     "Sequential": "BuPu",
+                     "Diverging": "coolwarm"}),
         "snd": dict({"Data": "jet", #bone
                      "Sequential": "BuPu",
-                     "Diverging": "Spectral"}),
-        "swe": dict(),
+                     "Diverging": "coolwarm"}),
+        "swe": dict({"Data": "jet", #bone
+                     "Sequential": "BuPu",
+                     "Diverging": "coolwarm"}),
         "so": dict({"Data": "viridis",
                     "Sequential":"YlGn",
                     "Diverging":"coolwarm"}),

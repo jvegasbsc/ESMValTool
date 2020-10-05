@@ -45,6 +45,7 @@ REQUIREMENTS = {
         'seawater',
         'seaborn',
         'shapely',
+        'statsmodels',
         'stratify',
         'xarray>=0.12',
         'xesmf',
