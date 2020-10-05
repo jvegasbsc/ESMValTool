@@ -79,7 +79,7 @@ diagnostics:
         preprocessor: noop
         derive: False
         additional_datasets:
-          - {dataset: CDS-ERA5LAND-SNOWWATEREQUIVALENT, type: reanalysis, project: OBS, mip: LImon, version: L3, tier: 3, start_year: 1981,  end_year: 1983}#2019}
+          - {dataset: CDS-ERA5LAND-SNOWWATEREQUIVALENT, type: reanalysis, project: OBS, mip: LImon, version: L3, tier: 3, start_year: 1981,  end_year: 2019}
     scripts:
 #       # diag_O_info:
 #       #   script: qualassess/DUMMY_C3S_511_SPQB.py

@@ -641,7 +641,10 @@ class Plot2D(object):
                         color["Data"] = color["Data"][:-2]
                     else:
                         color["Data"] = color["Data"] + "_r"
-                brewer_cmap = mpl_cm.get_cmap(color["Data"], lut=11)
+                if dat_log:
+                    brewer_cmap = mpl_cm.get_cmap(color["Data"], lut=10)
+                else:
+                    brewer_cmap = mpl_cm.get_cmap(color["Data"], lut=11)
             else:
                 if color_reverse:
                     col_save = color[color_type]
@@ -649,7 +652,10 @@ class Plot2D(object):
                         color[color_type] = color[color_type][:-2]
                     else:
                         color[color_type] = color[color_type] + "_r"
-                brewer_cmap = mpl_cm.get_cmap(color[color_type], lut=11)
+                if dat_log:
+                    brewer_cmap = mpl_cm.get_cmap(color[color_type], lut=10)
+                else:
+                    brewer_cmap = mpl_cm.get_cmap(color[color_type], lut=11)
 
         brewer_cmap.set_bad("grey", 0.1)
 
@@ -816,6 +822,7 @@ class Plot2D(object):
                 temp_min=10**np.floor(np.log10(temp_min))
                 if temp_min<vmin:
                     vmin = temp_min
+            vmin = vmin.compute()
 
         # Iterate over cubes
         for (idx, cube) in enumerate(self.cubes):
@@ -866,10 +873,12 @@ class Plot2D(object):
 #                        loc_data.mask = np.logical_or(loc_data.mask,loc_data<=0.0)
 #                    loc_cube.data = loc_data
                     
+
                     logticks=np.linspace(np.log10(vmin),
                                             np.log10(vmax),
-                                            len(levels)+1)
+                                            len(levels))
                     ticks = 10**logticks
+                    ticks = ticks[1:-1]
                     
                     pcm = iplt.pcolormesh(loc_cube,
                                     cmap=brewer_cmap,
@@ -960,21 +969,19 @@ class Plot2D(object):
             cax = ax[len(ax) - 1]
         
         if dat_log:
-            print(pcm)
-            print(cax)
-            print(ext_cmap)
-            ticks = ticks.compute()
-            print(ticks.compute())
             cbar = plt.colorbar(pcm,
                 cax=cax,
                 orientation='horizontal',
                 spacing='proportional',
 #                fraction=1.,
                 extend=ext_cmap,
-                ticks = ticks.compute(),
-#                boundaries=(levels)
+                ticks = ticks,
+                # boundaries=levels,
+                # format='%.2g'
                 )
-            cbar.ax.set_xticklabels([('{:.'+str(2)+'g}').format(x) for x in ticks])
+            # cbar.xticks(ticks,[('{:.'+str(2)+'g}').format(x) for x in ticks], rotation=30)
+            cbar.minorticks_off()
+            cbar.ax.set_xticklabels([('{:.'+str(1)+'g}').format(x) for x in ticks])
 #            pass
         else:
             cbar = plt.colorbar(pcm,
