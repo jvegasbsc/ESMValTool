@@ -215,26 +215,31 @@ colormaps:
       vmin: -1.
       vmax: 1.
       cmap: BrBG
+      extend: both
     ubrmsd:
       title: ubrmsd
       vmin: 0.
       vmax: 1.
       cmap: YlOrBr
+      extend: max
     rmsd:
       title: rmsd
       vmin: 0.
       vmax: 1.
       cmap: YlOrBr
+      extend: max
     absdiff:
       title: absdiff
       vmin: -0.5
       vmax: .5
       cmap: BrBG
+      extend: both
     reldiff:
       title: reldiff
       cmap: BrBG
       vmin: -150
       vmax: 150
+      extend: both
     theilsenmk:
       title: theilsen
       cmap: BrBG
@@ -248,7 +253,6 @@ colormaps:
       vmax: 0.5
       extend: both
 
-  # For now the same as LAI, can be adapted
   bdalb:
     pearsonr:
       title: pearsonr
@@ -280,8 +284,11 @@ colormaps:
       cmap: BrBG
       vmin: -0.01
       vmax: 0.01
+      extend: both
     timemean:
       title: timemean
       cmap: YlOrBr
       vmin: 0.0
       vmax: 0.5
+      extend: max
+
