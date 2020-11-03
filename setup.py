@@ -30,6 +30,7 @@ REQUIREMENTS = {
         'cftime',
         'cmocean',
         'dask>=2.12',
+        'diagonals>=0.3.2',
         'ecmwf-api-client',
         'eofs',
         'ESMPy',
