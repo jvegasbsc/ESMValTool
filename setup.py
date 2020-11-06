@@ -30,6 +30,7 @@ REQUIREMENTS = {
         'cftime',
         'cmocean',
         'dask>=2.12',
+        'diagonals',
         'ecmwf-api-client',
         'eofs',
         'ESMPy',
@@ -40,6 +41,7 @@ REQUIREMENTS = {
         'joblib',
         'lime',
         'matplotlib>3.3.1',  # bug in 3.3.1, 3.3.2 and 3 fine
+        'mapgenerator',
         'natsort',
         'nc-time-axis',  # needed by iris.plot
         'netCDF4',
