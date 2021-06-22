@@ -5,7 +5,7 @@ FROM bsces/esmvalcore:latest
 # RUN apt install julia -y && apt-get clean
 COPY ./environment.yml /src/ESMValTool/environment.yml
 WORKDIR /src/ESMValTool
-RUN conda update -n base -y conda && conda env update --name base --file environment.yml && conda clean --all -y
+RUN mamba env update --name base --file environment.yml && mamba clean --all -y
 
 # Make RUN commands use the new environment:
 SHELL ["/bin/bash", "-c"]
